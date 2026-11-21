@@ -1,0 +1,49 @@
+name: 🌐 Rumtelo CI - i18n keys
+
+# No secrets, no environment: checks that every message key the apps use exists
+# in every languages/*.json and that the catalogs match translations/ (packages/i18n tests).
+
+on:
+    pull_request:
+    push:
+        branches: [dev, main]
+        paths:
+            - 'apps/application/**'
+            - 'apps/website/**'
+            - 'packages/ui/**'
+            - 'packages/i18n/**'
+            - '.github/workflows/i18n-keys.yml'
+    workflow_dispatch:
+
+concurrency:
+    group: i18n-keys-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    i18n-keys:
+        name: Message keys resolve in every locale
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v5
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v6
+
+            - name: Setup Node
+              uses: actions/setup-node@v5
+              with:
+                  node-version: '22.22.2'
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            # i18n imports @rumtelo/contracts, which resolves to dist/.
+            - name: Build contracts
+              run: pnpm --filter @rumtelo/contracts build
+
+            - name: i18n tests
+              run: pnpm --filter @rumtelo/i18n test

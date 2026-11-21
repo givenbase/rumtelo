@@ -55,6 +55,7 @@ Templates: `.env.github.secrets.example`, `.env.github.vars.example`. Script: `s
 | `db-migrate.yml` | Applies schema on remote DB when migration/auth files push (or manual); then API smoke. Locally `pn db:push` already chains Mikro + `auth:migrate`. |
 | `api-smoke.yml` | `/health*` must not 5xx (strict ready after migrate) |
 | `e2e-smoke.yml` | Playwright `@smoke` against staging application |
+| `i18n-keys.yml` | Every message key used in application/website/ui exists in every `languages/*.json`; catalogs match `translations/` (`pnpm --filter @rumtelo/i18n test`) |
 
 `db:push` / `db:seed` run via `oxnode` scripts (not `@mikro-orm/cli`) so CI is not hit by the Node 22.22.3+ `yargonaut` / `require.cache` crash under `--import @oxc-node/core/register`. They also build `@rumtelo/contracts` first (`dist/` is required by package exports). Workflows pin Node **22.22.2**.
 
