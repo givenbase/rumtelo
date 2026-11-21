@@ -638,6 +638,14 @@ const settings = {
                 'Stripe not configured — paid upgrades are locked. Households stay on Basic until billing is enabled.',
             stub_billing:
                 'Upgrades charge now. Downgrades keep your current plan until the paid period ends. Manage card & invoices via Stripe Portal.',
+            /** Extra seats on an active subscription; `{price}` comes from `SEAT_ADDON_UNIT_CENTS`. */
+            seat_addon_eyebrow: 'Extra seats',
+            seat_addon_blurb:
+                'Room for one more person on the board: €{price} a month per seat, billed with your plan.',
+            seat_contributor: 'Member seat (can edit)',
+            seat_viewer: 'Viewer seat (looks along)',
+            seat_count_active: '{count, plural, one {# extra seat} other {# extra seats}}',
+            seat_count_none: 'No extra seats',
         },
         export: {
             eyebrow: 'Everything to CSV or JSON',

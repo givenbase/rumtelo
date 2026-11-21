@@ -1576,6 +1576,15 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.coach.money_coach.fixed_costs.business_leak.cta': 'Bekijk gekoppelde rekeningen',
         'features.coach.money_coach.fixed_costs.subscription_review.cta': 'Abonnementen bekijken',
         'features.coach.jar_guide.summary': 'Waar is {jar} voor?',
+        // Extra seats on the plan panel: "plek", not DeepL's "stoel"/"zitplaats".
+        'pages.settings.panels.plan.seat_addon_eyebrow': 'Extra plekken',
+        'pages.settings.panels.plan.seat_addon_blurb':
+            'Ruimte voor nog iemand op het bord: €{price} per maand per plek, samen met je abonnement.',
+        'pages.settings.panels.plan.seat_contributor': 'Plek voor een lid (mag bewerken)',
+        'pages.settings.panels.plan.seat_viewer': 'Plek voor een kijker (kijkt mee)',
+        'pages.settings.panels.plan.seat_count_active':
+            '{count, plural, one {# extra plek} other {# extra plekken}}',
+        'pages.settings.panels.plan.seat_count_none': 'Geen extra plekken',
         'features.coach.split_more': '{count, plural, =1 {Nog 1 tip} other {Nog # tips}}',
         'features.money.jars.coach_line.necessities_over':
             '{jar} heeft deze maand {amount} meer nodig dan het krijgt.',

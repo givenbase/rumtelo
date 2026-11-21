@@ -6423,7 +6423,13 @@
                     "stub_demo": "Cuenta de demostración: el plan es fijo para este perfil. Regístrate con tu propio correo electrónico para cambiar de plan.",
                     "stub_preview": "Vista previa / omisión: los cambios de plan son gratuitos (sin Stripe Checkout).",
                     "stub_stripe": "Stripe no está configurado: las actualizaciones de pago están bloqueadas. Los hogares seguirán en el plan Básico hasta que se active la facturación.",
-                    "stub_billing": "Las actualizaciones se cobran de inmediato. En caso de bajar de plan, mantendrás tu plan actual hasta que finalice el periodo de pago. Gestiona tu tarjeta y tus facturas a través del portal de Stripe."
+                    "stub_billing": "Las actualizaciones se cobran de inmediato. En caso de bajar de plan, mantendrás tu plan actual hasta que finalice el periodo de pago. Gestiona tu tarjeta y tus facturas a través del portal de Stripe.",
+                    "seat_addon_eyebrow": "Extra seats",
+                    "seat_addon_blurb": "Room for one more person on the board: €{price} a month per seat, billed with your plan.",
+                    "seat_contributor": "Member seat (can edit)",
+                    "seat_viewer": "Viewer seat (looks along)",
+                    "seat_count_active": "{count, plural, one {# extra seat} other {# extra seats}}",
+                    "seat_count_none": "No extra seats"
                 },
                 "export": {
                     "eyebrow": "Todo a CSV o JSON",

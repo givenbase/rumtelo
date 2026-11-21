@@ -6423,7 +6423,13 @@
                     "stub_demo": "Demorekening — voor dit profiel geldt een vast abonnement. Meld je aan met je eigen e-mailadres om van abonnement te wisselen.",
                     "stub_preview": "Voorbeeld / omzeilen — het wijzigen van abonnementen is gratis (geen Stripe Checkout).",
                     "stub_stripe": "Stripe is niet geconfigureerd — betaalde upgrades zijn geblokkeerd. Huishoudens blijven op het Basic-abonnement totdat facturering is ingeschakeld.",
-                    "stub_billing": "Upgrades worden direct in rekening gebracht. Bij downgrades blijft je huidige abonnement van kracht tot het einde van de betaalde periode. Beheer je kaart en facturen via het Stripe-portaal."
+                    "stub_billing": "Upgrades worden direct in rekening gebracht. Bij downgrades blijft je huidige abonnement van kracht tot het einde van de betaalde periode. Beheer je kaart en facturen via het Stripe-portaal.",
+                    "seat_addon_eyebrow": "Extra plekken",
+                    "seat_addon_blurb": "Ruimte voor nog iemand op het bord: €{price} per maand per plek, samen met je abonnement.",
+                    "seat_contributor": "Plek voor een lid (mag bewerken)",
+                    "seat_viewer": "Plek voor een kijker (kijkt mee)",
+                    "seat_count_active": "{count, plural, one {# extra plek} other {# extra plekken}}",
+                    "seat_count_none": "Geen extra plekken"
                 },
                 "export": {
                     "eyebrow": "Alles naar CSV of JSON",

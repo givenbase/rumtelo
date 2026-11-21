@@ -6423,7 +6423,13 @@
                     "stub_demo": "Compte démo — le forfait est fixe pour ce profil. Inscrivez-vous avec votre propre adresse e-mail pour changer de forfait.",
                     "stub_preview": "Aperçu / contournement — les changements de forfait sont gratuits (pas de paiement via Stripe Checkout).",
                     "stub_stripe": "Stripe n'est pas configuré — les mises à niveau payantes sont désactivées. Les foyers restent sur la formule « Basic » jusqu'à ce que la facturation soit activée.",
-                    "stub_billing": "Les surclassements sont facturés immédiatement. En cas de passage à un forfait inférieur, vous conservez votre forfait actuel jusqu’à la fin de la période de facturation. Gérez vos cartes bancaires et vos factures via le portail Stripe."
+                    "stub_billing": "Les surclassements sont facturés immédiatement. En cas de passage à un forfait inférieur, vous conservez votre forfait actuel jusqu’à la fin de la période de facturation. Gérez vos cartes bancaires et vos factures via le portail Stripe.",
+                    "seat_addon_eyebrow": "Extra seats",
+                    "seat_addon_blurb": "Room for one more person on the board: €{price} a month per seat, billed with your plan.",
+                    "seat_contributor": "Member seat (can edit)",
+                    "seat_viewer": "Viewer seat (looks along)",
+                    "seat_count_active": "{count, plural, one {# extra seat} other {# extra seats}}",
+                    "seat_count_none": "No extra seats"
                 },
                 "export": {
                     "eyebrow": "Tout au format CSV ou JSON",
