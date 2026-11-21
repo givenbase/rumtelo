@@ -515,11 +515,16 @@ export function HomeDashboardClient() {
                         closeBlockers={monthScore.closeBlockers}
                         priorOpenPeriod={monthScore.priorOpenPeriod}
                         periodNote={periodScoreNote}
+                        // When the next-move card already says "close the month", the score card
+                        // shows only the score: no second close button and no repeated blockers
+                        // (the close flow itself walks through them).
                         canCloseMonth={
                             live &&
                             canMutate &&
                             liveData?.monthScore !== undefined &&
-                            !liveData.monthScore.isClosed
+                            !liveData.monthScore.isClosed &&
+                            nextMove?.kind !== 'CLOSE_PRIOR' &&
+                            nextMove?.kind !== 'CLOSE_MONTH'
                         }
                         period={monthScore.period}
                         onStartClose={startClose}
