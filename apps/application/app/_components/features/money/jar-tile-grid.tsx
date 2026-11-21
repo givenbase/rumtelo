@@ -69,7 +69,8 @@ function JarTile({
                         {name}
                     </span>
                     {/* One literal line so a beginner knows what the jar is for. */}
-                    <span className="text-xs leading-snug text-pretty text-fg-muted">
+                    {/* Fixed two-line height so every tile lines up, however long the copy. */}
+                    <span className="line-clamp-2 min-h-[2lh] text-xs leading-snug text-pretty text-fg-muted">
                         {t(`purpose.${jar.key}`)}
                     </span>
                 </span>
@@ -112,8 +113,8 @@ function JarTile({
                 />
             </span>
 
-            <span className="mt-auto flex min-w-0 flex-wrap items-center justify-between gap-x-2 gap-y-1.5 font-mono text-xs">
-                <span className="min-w-0 text-fg-muted">
+            <span className="mt-auto flex min-w-0 items-center justify-between gap-2 font-mono text-xs">
+                <span className="min-w-0 truncate text-fg-muted">
                     {t('tile_saved')}{' '}
                     <span className="font-medium text-fg tabular-nums">
                         {formatMoney(jar.potBalance)}
