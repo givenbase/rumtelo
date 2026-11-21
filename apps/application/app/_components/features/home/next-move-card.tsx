@@ -145,9 +145,9 @@ export function NextMoveCard({
             <Typography
                 as="h2"
                 id={titleId}
-                size="lg"
+                size="sm"
                 weight="semibold"
-                className="mt-2 text-pretty">
+                className="mt-2 text-pretty sm:text-xl">
                 {title}
             </Typography>
             {body ? (
