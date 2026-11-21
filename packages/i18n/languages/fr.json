@@ -3713,9 +3713,9 @@
                         }
                     },
                     "steps": {
-                        "coach": {
-                            "title": "L'entraîneur",
-                            "content": "Un conseil sur votre situation actuelle et une action que vous pouvez entreprendre. Conseils : à vous de choisir. Activez ou désactivez le Coach dans l'aide ou dans les paramètres."
+                        "todo": {
+                            "title": "To do",
+                            "content": "Your next move and what else is waiting, in one place. The Coach adds one tip when it has one — you choose. Turn the Coach on or off in Help or Settings."
                         },
                         "hero": {
                             "title": "L'argent de ce mois-ci",
@@ -3999,8 +3999,20 @@
                 "attention_eyebrow": "Il faut que tu donnes ton accord",
                 "attention_blurb": "Un cabinet vous a demandé l'autorisation de consulter ou de gérer ce forum. N'acceptez cette demande que si vous connaissez ce cabinet."
             },
+            "todo": {
+                "eyebrow": "To do · {count}",
+                "eyebrow_empty": "To do",
+                "empty_title": "All done for now ✓",
+                "view": "View",
+                "view_aria": "View: {item}",
+                "rows": {
+                    "inbox": "{count, plural, one {# transaction to sort} other {# transactions to sort}}",
+                    "week_check": "Your week check is ready — ten minutes.",
+                    "bills": "{count, plural, one {# bill still unpaid} other {# bills still unpaid}}",
+                    "bills_names": "{count, plural, one {# bill still unpaid: {names}} other {# bills still unpaid, including {names}}}"
+                }
+            },
             "next_move": {
-                "eyebrow": "Next move",
                 "close_month": {
                     "title": "Close {month}: see your score and carry what's left.",
                     "cta": "Close month"

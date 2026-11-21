@@ -73,9 +73,9 @@ export function buildHomeTourSteps(t: TranslateFn): PageTourStep[] {
     return [
         ...buildShellTourSteps(t),
         step(
-            '[data-tour="home-coach"]',
-            t('pages.home.steps.coach.title'),
-            t('pages.home.steps.coach.content')
+            '[data-tour="home-todo"]',
+            t('pages.home.steps.todo.title'),
+            t('pages.home.steps.todo.content')
         ),
         step(
             '[data-tour="home-hero"]',

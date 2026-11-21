@@ -1,6 +1,5 @@
 'use client';
 
-import { useId } from 'react';
 import Link from 'next/link';
 
 import { useTranslations } from '@rumtelo/i18n';
@@ -8,23 +7,20 @@ import { Button, Typography } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { CREATE_HREF } from '@/app/_lib/create-routes';
-import type { NextMove, Weekday } from '@/app/_lib/next-move';
+import type { TodoFirst } from '@/app/_lib/home-todo';
 import { moneyPath } from '@/app/_lib/routes';
 
-type NextMoveCardProps = {
-    move: NextMove;
+type NextMoveBodyProps = {
+    move: TodoFirst;
+    /** Id for the heading, so the To do card can label itself with it. */
+    titleId: string;
     /** Writer (OWNER / MEMBER) and not a Practice preview. Read-only users get the text only. */
     canAct: boolean;
     /** The plan has statement import. */
     canImport: boolean;
-    /** EUR households read "Every euro"; other currencies read "Every amount". */
-    isEuro: boolean;
     /** `YYYY-MM` to a month name. */
     formatMonth: (period: string) => string;
-    formatWeekday: (weekday: Weekday) => string;
     onCloseMonth: (period: string) => void;
-    /** Set when Home is showing another period: the card still talks about now. */
-    travelNote?: string | null;
 };
 
 const PRIMARY_BUTTON = 'h-12 w-full sm:h-10 sm:w-auto';
@@ -32,21 +28,19 @@ const TEXT_LINK =
     'inline-flex min-h-11 items-center text-sm font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
 
 /**
- * Home's one next move. Product state, not a Coach tip: it stays with the Coach off. One
- * primary button for writers; text only for a VIEWER or a Practice preview.
+ * Home's next move: the first item of the To do card. Product state, not a Coach tip: it stays
+ * with the Coach off. One primary button for writers; text only for a VIEWER or a Practice
+ * preview. The calm state has no next move and is the To do card's empty state instead.
  */
-export function NextMoveCard({
+export function NextMoveBody({
     move,
+    titleId,
     canAct,
     canImport,
-    isEuro,
     formatMonth,
-    formatWeekday,
     onCloseMonth,
-    travelNote,
-}: NextMoveCardProps) {
+}: NextMoveBodyProps) {
     const t = useTranslations('pages.dashboard.next_move');
-    const titleId = useId();
 
     let title: string;
     let body: string | null = null;
@@ -118,36 +112,16 @@ export function NextMoveCard({
                 </Button>
             ) : null;
             break;
-        case 'CALM':
-            title = t(isEuro ? 'calm.title' : 'calm.title_other_currency', {
-                weekday: formatWeekday(move.nextCheckDay),
-            });
-            action = (
-                <Link href="#jars" className={TEXT_LINK}>
-                    {t('calm.link')}
-                </Link>
-            );
-            break;
     }
 
     return (
-        <section
-            aria-labelledby={titleId}
-            className="rounded-2xl border border-line bg-surface p-5 shadow-md sm:p-6">
-            <Typography as="p" variant="eyebrow" color="primary">
-                {t('eyebrow')}
-            </Typography>
-            {travelNote ? (
-                <Typography as="p" size="xs" color="muted" className="mt-1">
-                    {travelNote}
-                </Typography>
-            ) : null}
+        <>
             <Typography
                 as="h2"
                 id={titleId}
                 size="sm"
                 weight="semibold"
-                className="mt-2 text-pretty sm:text-xl">
+                className="min-w-0 text-pretty wrap-anywhere sm:text-xl">
                 {title}
             </Typography>
             {body ? (
@@ -159,13 +133,13 @@ export function NextMoveCard({
                 <div
                     className={cn(
                         'mt-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4',
-                        !secondary && !(move.kind === 'CALM') && 'items-stretch'
+                        !secondary && 'items-stretch'
                     )}>
                     {action}
                     {secondary}
                 </div>
             ) : null}
-        </section>
+        </>
     );
 }
 
@@ -185,13 +159,14 @@ export function NextMoveCardSkeleton() {
 
 export function NextMoveCardError({ onRetry }: { onRetry: () => void }) {
     const t = useTranslations('pages.dashboard.next_move');
+    const tTodo = useTranslations('pages.dashboard.todo');
     const tUi = useTranslations();
     return (
         <section
             role="alert"
             className="grid justify-items-start gap-3 rounded-2xl border border-line bg-surface p-5 shadow-md sm:p-6">
             <Typography as="p" variant="eyebrow" color="primary">
-                {t('eyebrow')}
+                {tTodo('eyebrow_empty')}
             </Typography>
             <Typography as="p" size="sm" color="muted">
                 {t('error')}

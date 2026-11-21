@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react';
 
 import Link from 'next/link';
 
@@ -46,26 +46,29 @@ const UNDO_WINDOW_MS = 6000;
 type CoachLineProps = {
     /** Ordered by priority; the first one that may render wins. Empty → renders nothing. */
     candidates: readonly CoachLineCandidate[];
-    /** Optional trailing link under the line (Home only: "All tips (n)"). */
-    footer?: ReactNode;
     className?: string;
 };
 
+/** What `useCoachLine` hands to a surface: the tip to show, or the undo row, or nothing. */
+export type CoachLineState = {
+    /** The one tip to render, or `null` (tips off, hidden, nothing with a move, loading). */
+    candidate: CoachLineCandidate | null;
+    /** The tip was just hidden: show "Tip hidden. Undo" for the undo window. */
+    undoing: boolean;
+    hide: (candidate: CoachLineCandidate) => void;
+    undoHide: () => void;
+};
+
 /**
- * The Coach, once per page, after the household's own data: one sentence, one move (two on
- * the fixed-costs over-split rule), and a Hide button with Undo. No tint, no warning colours.
- * Renders nothing when there is no concrete move, when tips are off (Settings, VIEWER,
- * Practice look-along, closed or future month) or while the feed is loading. Rules:
- * `docs/product/coach-redesign.md` §2–§3.
+ * The Coach line's rules and hide/undo logic. Home renders the tip as a row of its To do card;
+ * every other page uses `CoachLine`. Tips are off in Settings, for a VIEWER, in Practice
+ * look-along and on closed or future months; nothing shows while the feed is loading.
  */
-export function CoachLine({ candidates, footer, className }: CoachLineProps) {
-    const t = useTranslations('features.coach.line');
+export function useCoachLine(candidates: readonly CoachLineCandidate[]): CoachLineState {
     const queryClient = useQueryClient();
     const apiError = useApiError();
-    const labelId = useId();
     const { householdId } = useAuth();
     const { showToast } = useHouseholdShell();
-    const { isCapabilityLocked } = usePlanCapabilities();
     const helpersEnabled = useHelpersEnabled();
     const live = isLiveData(householdId);
     const settingsQuery = useLiveQuery(
@@ -153,59 +156,76 @@ export function CoachLine({ candidates, footer, className }: CoachLineProps) {
         setUndo(null);
     }
 
-    if (!coachOn) return null;
+    const candidate =
+        coachOn && !undo && !settled
+            ? selectCoachLineCandidate(candidates, { localHidden, isProductEnabled })
+            : null;
+    return { candidate, undoing: coachOn && undo !== null, hide, undoHide };
+}
 
-    if (undo) {
-        return (
-            <aside
-                role="status"
-                className={cn(
-                    'flex flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-2xl border border-line bg-surface px-4 py-2',
-                    className
-                )}>
-                <p className="min-w-0 text-sm text-fg-muted">{t('hidden')}</p>
-                <button
-                    type="button"
-                    ref={focusOnMount}
-                    onClick={undoHide}
-                    className="inline-flex min-h-11 items-center rounded-md px-2 text-sm font-semibold text-accent underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
-                    {t('undo')}
-                </button>
-            </aside>
-        );
-    }
+/** The "Tip hidden. Undo" row; the Undo button takes focus. */
+export function CoachLineUndo({ onUndo, className }: { onUndo: () => void; className?: string }) {
+    const t = useTranslations('features.coach.line');
+    return (
+        <aside
+            role="status"
+            className={cn(
+                'flex flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-2xl border border-line bg-surface px-4 py-2',
+                className
+            )}>
+            <p className="min-w-0 text-sm text-fg-muted">{t('hidden')}</p>
+            <button
+                type="button"
+                ref={focusOnMount}
+                onClick={onUndo}
+                className="inline-flex min-h-11 items-center rounded-md px-2 text-sm font-semibold text-accent underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+                {t('undo')}
+            </button>
+        </aside>
+    );
+}
 
-    if (settled) return null;
+/** A tip's move as a link; a plan-locked destination shows the lock and "Plus" suffix. */
+export function CoachLineCtaLink({ cta, primary }: { cta: CoachLineCta; primary: boolean }) {
+    const t = useTranslations('features.coach.line');
+    const { isCapabilityLocked } = usePlanCapabilities();
+    const locked = isCapabilityLocked(capabilityKeyForPathname(cta.href.split(/[?#]/)[0] ?? ''));
+    return (
+        <Link
+            href={cta.href}
+            className={cn(
+                'inline-flex min-h-11 items-center gap-1.5 rounded-md text-sm font-semibold underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
+                primary ? 'text-accent' : 'text-fg-secondary hover:text-accent'
+            )}>
+            <span className="min-w-0 wrap-anywhere">{cta.label}</span>
+            {locked ? (
+                <>
+                    <Icon name="lock" size="sm" aria-hidden className="shrink-0" />
+                    <span className="font-mono text-xs font-medium text-fg-muted">
+                        · {t('locked_suffix')}
+                    </span>
+                </>
+            ) : (
+                <span aria-hidden>→</span>
+            )}
+        </Link>
+    );
+}
 
-    const candidate = selectCoachLineCandidate(candidates, { localHidden, isProductEnabled });
+/**
+ * The Coach, once per page, after the household's own data: one sentence, one move (two on
+ * the fixed-costs over-split rule), and a Hide button with Undo. No tint, no warning colours.
+ * Renders nothing when there is no concrete move, when tips are off (Settings, VIEWER,
+ * Practice look-along, closed or future month) or while the feed is loading. Rules:
+ * `docs/product/coach-redesign.md` §2–§3.
+ */
+export function CoachLine({ candidates, className }: CoachLineProps) {
+    const t = useTranslations('features.coach.line');
+    const labelId = useId();
+    const { candidate, undoing, hide, undoHide } = useCoachLine(candidates);
+
+    if (undoing) return <CoachLineUndo onUndo={undoHide} className={className} />;
     if (!candidate) return null;
-
-    function renderCta(cta: CoachLineCta, primary: boolean) {
-        const locked = isCapabilityLocked(
-            capabilityKeyForPathname(cta.href.split(/[?#]/)[0] ?? '')
-        );
-        return (
-            <Link
-                key={cta.href}
-                href={cta.href}
-                className={cn(
-                    'inline-flex min-h-11 items-center gap-1.5 rounded-md text-sm font-semibold underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
-                    primary ? 'text-accent' : 'text-fg-secondary hover:text-accent'
-                )}>
-                <span className="min-w-0 wrap-anywhere">{cta.label}</span>
-                {locked ? (
-                    <>
-                        <Icon name="lock" size="sm" aria-hidden className="shrink-0" />
-                        <span className="font-mono text-xs font-medium text-fg-muted">
-                            · {t('locked_suffix')}
-                        </span>
-                    </>
-                ) : (
-                    <span aria-hidden>→</span>
-                )}
-            </Link>
-        );
-    }
 
     return (
         <div className={cn('grid gap-1', className)} data-coach-guide="line">
@@ -229,11 +249,12 @@ export function CoachLine({ candidates, footer, className }: CoachLineProps) {
                     {candidate.text}
                 </p>
                 <div className="order-4 flex min-w-0 flex-wrap items-center gap-x-4 gap-y-0 lg:shrink-0">
-                    {renderCta(candidate.cta, true)}
-                    {candidate.secondaryCta ? renderCta(candidate.secondaryCta, false) : null}
+                    <CoachLineCtaLink cta={candidate.cta} primary />
+                    {candidate.secondaryCta ? (
+                        <CoachLineCtaLink cta={candidate.secondaryCta} primary={false} />
+                    ) : null}
                 </div>
             </aside>
-            {footer}
         </div>
     );
 }
