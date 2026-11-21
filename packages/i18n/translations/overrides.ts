@@ -1034,14 +1034,25 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.money.jars.move_between': 'Van potje naar potje gaan',
         'features.money.jars.allocated': '{count} potjes · {pct}% opzijgezet',
         'features.money.jars.in_pot': 'In het potje',
-        'features.money.jars.in_pot_short': 'Potje',
-        'features.money.jars.in_pot_amount': 'In het potje {amount}',
-        'features.money.jars.summary_open_aria':
-            '{name}: {available} deze maand, {pot} in het potje',
         'features.money.jars.footer_stacked':
             '{on} / {total} potjes op schema · opgestapeld gedurende {months} maanden',
         'features.money.jars.footer_period': '{on} / {total}-potjes liggen deze periode op schema',
-        'features.money.jars.drilldown.open_jar_link': 'Potje openen ▸',
+        // Jar tile: literal, positive. Names apply only while the household jar has its seed name.
+        'features.money.jars.names.NECESSITIES': 'Noodzakelijk',
+        'features.money.jars.names.FINANCIAL_FREEDOM': 'Financiële vrijheid',
+        'features.money.jars.names.LONG_TERM_SAVINGS': 'Lange termijn',
+        'features.money.jars.names.EDUCATION': 'Opleiding',
+        'features.money.jars.names.PLAY': 'Plezier',
+        'features.money.jars.names.GIVE': 'Geven',
+        'features.money.jars.tile_of': 'van {amount} deze maand',
+        'features.money.jars.tile_saved': 'Gespaard',
+        'features.money.jars.tile_open_bills':
+            '{count, plural, one {# open rekening} other {# open rekeningen}}',
+        'features.money.jars.tile_meter_label': '{name}: over deze maand',
+        'features.money.jars.tile_meter_left': '{pct}% over',
+        'features.money.jars.tile_meter_over': 'Over het budget',
+        'features.money.jars.left_label': 'Over deze maand',
+        'features.money.jars.left_label_stacked': 'Over in de periode',
         'features.money.jars.guides.FINANCIAL_FREEDOM.note':
             'Met dit potje koop je activa. Geld gaat erin en komt er nooit meer uit — alleen het rendement komt eruit.',
         'features.money.jars.guides.EDUCATION.note':

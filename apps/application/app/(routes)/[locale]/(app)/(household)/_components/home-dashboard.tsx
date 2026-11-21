@@ -20,12 +20,9 @@ import type { CoachLineCandidate } from '@/app/_lib/coach-line';
 import { feedLineCandidate } from '@/app/_lib/coach-line-feed';
 import { useCoachCopyContext } from '@/app/_lib/use-coach-copy-context';
 
-import { resolveJarSubtitle } from '@/app/_lib/jar-copy';
-import { jarChrome } from '@/app/_lib/jar-meta';
 import { buildPeriodTravelScoreNote } from '@/app/_lib/period-travel-score-note';
 import { formatPeriodTravelLabels } from '@/app/_lib/period-travel-i18n';
 import { isProductEnabled } from '@/app/_lib/launch-products';
-import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { BoardStage, stageAtLeast } from '@/app/_lib/board-stage';
 import { useShellNav } from '@/app/_lib/use-shell-nav';
@@ -36,7 +33,6 @@ import { useWeekCheckStatus } from '@/app/_lib/use-week-check-status';
 import { todayIso } from '@/app/_lib/week-key';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
-import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import { HeroKluis } from '@/components/features/home/hero-kluis';
 import { PortalWidget } from '@/components/features/home/portal-widget';
 import { TodayCard } from '@/components/features/home/today-card';
@@ -48,8 +44,7 @@ import {
     NextMoveCardSkeleton,
 } from '@/components/features/home/next-move-card';
 import { Week1Checklist } from '@/components/features/home/week1-checklist';
-import { JarDrilldownTable } from '@/components/features/money/jar-drilldown-table';
-import type { JarDrilldownItem } from '@/components/features/money/jar-drilldown-parts';
+import { JarTileGrid } from '@/components/features/money/jar-tile-grid';
 import { CoachLine } from '@/components/features/helpers';
 import { HouseholdPermissionSection, roleCanSee } from '@/app/_lib/role-permissions';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
@@ -60,7 +55,6 @@ import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabi
 export function HomeDashboardClient() {
     const t = useTranslations();
     const tDashboard = useTranslations('pages.dashboard');
-    const tJars = useTranslations('features.money.jars');
     const tShell = useTranslations('pages.shell');
     const tCoach = useTranslations('features.coach');
     const copyContext = useCoachCopyContext();
@@ -119,44 +113,11 @@ export function HomeDashboardClient() {
         priorOpenPeriod: null,
     };
 
-    const { byKey: catalogByKey } = useJarCatalog();
-    const categoryTemplatesQuery = useCategoryTemplates(live);
-
     const dashboardQuery = useLiveQuery(
         apiQuery.money.dashboard.get.queryOptions({
             input: { householdId: householdId!, period: periodKey },
         }),
         emptyDashboard as never,
-        live
-    );
-
-    const byJarQuery = useLiveQuery(
-        apiQuery.money.fixedCosts.byJar.queryOptions({ input: { householdId: householdId! } }),
-        [] as never,
-        live
-    );
-
-    const periodTxQuery = useLiveQuery(
-        apiQuery.money.transactions.list.queryOptions({
-            input: { householdId: householdId!, period: periodKey, limit: 200 },
-        }),
-        { items: [], nextCursor: null },
-        live
-    );
-
-    const merchantsQuery = useLiveQuery(
-        apiQuery.money.catalogs.merchantPresets.list.queryOptions({
-            input: { householdId: householdId! },
-        }),
-        [] as never,
-        live
-    );
-
-    const givingOrgsQuery = useLiveQuery(
-        apiQuery.money.catalogs.givingOrganizations.list.queryOptions({
-            input: { householdId: householdId! },
-        }),
-        [] as never,
         live
     );
 
@@ -192,26 +153,7 @@ export function HomeDashboardClient() {
     const baselineById = new Map(
         (liveData?.baselineJars ?? []).map(jar => [jar.id, jar.allocated] as const)
     );
-    const jars: JarDrilldownItem[] = (liveData?.jars ?? []).map(jar => {
-        const catalog = catalogByKey.get(jar.key);
-        return {
-            id: jar.id,
-            key: jar.key,
-            name: jar.name,
-            subtitle: resolveJarSubtitle(tJars, jar.key, jar.subtitle, catalog?.subtitle),
-            icon: jar.icon ?? catalog?.icon ?? '◇',
-            color: jarChrome(jar.key).color,
-            allocated: jar.allocated,
-            available: jar.available,
-            spent: jar.spent,
-            committedOut: jar.committedOut,
-            potBalance: jar.potBalance,
-            overspent: jar.overspent,
-            categories: jar.categories ?? [],
-            href: `/product/money/jars/${jarKeyToSlug(jar.key)}`,
-            baselineAllocated: baselineById.get(jar.id) ?? null,
-        };
-    });
+    const jars = liveData?.jars ?? [];
     // The dream from onboarding; shown on every launch surface (Soul is hidden in production).
     const dreamLine = dashboard.why?.trim() || null;
     const monthScore = liveData?.monthScore ?? emptyMonthScore;
@@ -229,7 +171,7 @@ export function HomeDashboardClient() {
               monthsHorizon: travelMeta.monthsHorizon,
               stackedTotal: dashboard.allocatedTotal ?? 0,
               formatMoney,
-              jarHighlights: (liveData?.jars ?? []).slice(0, 2).map(jar => ({
+              jarHighlights: jars.slice(0, 2).map(jar => ({
                   name: jar.name,
                   from: baselineById.get(jar.id) ?? jar.allocated,
                   to: jar.allocated,
@@ -562,23 +504,11 @@ export function HomeDashboardClient() {
                               ]
                             : []
                     }>
-                    <JarDrilldownTable
+                    <JarTileGrid
                         jars={jars}
-                        extras={
-                            live
-                                ? {
-                                      period,
-                                      fixedCosts: (byJarQuery.data ?? []).flatMap(
-                                          group => group.items
-                                      ),
-                                      transactions: periodTxQuery.data?.items ?? [],
-                                      categoryTemplates: categoryTemplatesQuery.data ?? [],
-                                      merchants: merchantsQuery.data ?? [],
-                                      givingOrgs: givingOrgsQuery.data ?? [],
-                                      jarByKey: catalogByKey,
-                                  }
-                                : undefined
-                        }
+                        period={period}
+                        stacked={stacked}
+                        loading={live && dashboardQuery.isPending}
                     />
                 </HeroKluis>
             </div>

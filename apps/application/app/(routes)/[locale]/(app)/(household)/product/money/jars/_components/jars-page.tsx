@@ -10,11 +10,8 @@ import { toPeriodKey } from '@rumtelo/utils';
 
 import { CREATE_HREF, createTxHref } from '@/app/_lib/create-routes';
 import { isLiveData } from '@/app/_lib/preview';
-import { resolveJarSubtitle } from '@/app/_lib/jar-copy';
-import { jarChrome } from '@/app/_lib/jar-meta';
-import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { productPath } from '@/app/_lib/routes';
-import { JarSummaryRow } from '@/components/features/money/jar-summary-row';
+import { JarTileGrid } from '@/components/features/money/jar-tile-grid';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListToolbar } from '@/components/layout/list-toolbar';
@@ -41,11 +38,7 @@ export function JarsPageClient({ embed = false }: { embed?: boolean }) {
         live
     );
 
-    const { byKey: catalogByKey } = useJarCatalog();
     const jars = dashboardQuery.data?.jars ?? [];
-    const baselineById = new Map(
-        (dashboardQuery.data?.baselineJars ?? []).map(jar => [jar.id, jar.allocated] as const)
-    );
     const stacked = dashboardQuery.data?.travel?.mode === 'stacked';
     const totalPct = jars.reduce((total, j) => total + j.percentage, 0);
     const onTarget = jars.filter(j => !j.overspent).length;
@@ -108,40 +101,12 @@ export function JarsPageClient({ embed = false }: { embed?: boolean }) {
             </div>
 
             <div id="jars-list" data-tour="jars-list">
-                <div className="grid gap-2">
-                    {jars.map(jar => {
-                        const catalog = catalogByKey.get(jar.key);
-                        return (
-                            <JarSummaryRow
-                                key={jar.id}
-                                jar={{
-                                    id: jar.id,
-                                    key: jar.key,
-                                    name: jar.name,
-                                    subtitle: resolveJarSubtitle(
-                                        t,
-                                        jar.key,
-                                        jar.subtitle,
-                                        catalog?.subtitle
-                                    ),
-                                    icon: jar.icon ?? catalog?.icon ?? '◇',
-                                    color: jarChrome(jar.key).color,
-                                    percentage: jar.percentage,
-                                    allocated: jar.allocated,
-                                    available: jar.available,
-                                    spent: jar.spent,
-                                    credited: jar.credited,
-                                    committedOut: jar.committedOut,
-                                    potBalance: jar.potBalance,
-                                    overspent: jar.overspent,
-                                    baselineAllocated: stacked
-                                        ? (baselineById.get(jar.id) ?? null)
-                                        : null,
-                                }}
-                            />
-                        );
-                    })}
-                </div>
+                <JarTileGrid
+                    jars={jars}
+                    period={period}
+                    stacked={stacked}
+                    loading={live && dashboardQuery.isPending}
+                />
 
                 <div className="mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 font-mono text-xs text-fg-faint">
                     <span>

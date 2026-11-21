@@ -138,3 +138,26 @@ export function resolveJarSubtitle(
     if (householdSubtitle) return householdSubtitle;
     return jarCatalogSubtitle(t, jarKey, catalogSubtitle);
 }
+
+/**
+ * English seed names the backend copies onto a household's jars at onboarding
+ * (`jar.seed-data.ts`). A jar still carrying its seed name is shown in the active locale;
+ * a name the household typed is theirs and is never replaced.
+ */
+const SEED_JAR_NAMES: Record<JarKey, string> = {
+    [JarKey.NECESSITIES]: 'Necessity',
+    [JarKey.FINANCIAL_FREEDOM]: 'Financial Freedom',
+    [JarKey.LONG_TERM_SAVINGS]: 'Long Term Savings',
+    [JarKey.EDUCATION]: 'Education',
+    [JarKey.PLAY]: 'Play',
+    [JarKey.GIVE]: 'Give / foundation',
+};
+
+/** Jar name for display: i18n over the stored name only while the stored name is the seed default. */
+export function resolveJarName(t: TranslateFn, jarKey: string, storedName: string): string {
+    if (!JAR_KEYS.has(jarKey)) return storedName;
+    const seedName = SEED_JAR_NAMES[jarKey as JarKey];
+    if (storedName.trim().toLowerCase() !== seedName.toLowerCase()) return storedName;
+    const key = `names.${jarKey}`;
+    return t.has(key) ? t(key) : storedName;
+}
