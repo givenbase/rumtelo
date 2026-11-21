@@ -12,7 +12,6 @@ import {
     isYearMonthAfter,
     isYearMonthBefore,
     periodTravelBounds,
-    shiftYearMonth,
 } from '@rumtelo/utils';
 
 import { formatPeriodTravelLabels } from '@/app/_lib/period-travel-i18n';
@@ -53,7 +52,7 @@ function labelShort(period: Period, locale: string): string {
 
 /**
  * Budget-period month picker:
- * hero read-out, quick jumps, year nav, 3×4 month grid.
+ * selected month (with a jump back to this month), year nav, 3×4 month grid.
  */
 export function PeriodSelector() {
     const t = useTranslations('pages.shell');
@@ -66,8 +65,6 @@ export function PeriodSelector() {
     const { floor, horizon } = periodTravelBounds(householdCreatedAt);
     const value = encode(period);
     const thisMonth = encode(current);
-    const lastMonth = encode(shiftYearMonth(current, -1));
-    const nextMonth = encode(shiftYearMonth(current, 1));
     const travel = describePeriodTravel(period);
     const labels = formatPeriodTravelLabels(travel, t);
 
@@ -143,85 +140,25 @@ export function PeriodSelector() {
                 align="end"
                 sideOffset={8}
                 className="w-[min(100vw-2rem,19.5rem)] overflow-hidden rounded-2xl border border-line bg-surface p-0 text-fg shadow-[0_18px_50px_-28px_rgba(15,23,42,0.45)]">
-                <div
-                    className={cn(
-                        'relative overflow-hidden border-b border-line px-4 pt-4 pb-3.5',
-                        travel.direction === 'past'
-                            ? 'bg-linear-to-br from-amber-500/15 via-surface to-surface'
-                            : 'bg-linear-to-br from-accent-soft via-surface to-surface'
-                    )}>
-                    <span
-                        className={cn(
-                            'pointer-events-none absolute inset-x-3 top-3 h-px',
-                            travel.direction === 'past' ? 'bg-amber-500/40' : 'bg-accent/35'
-                        )}
-                        aria-hidden
-                    />
-                    <p className="text-[13px] text-fg-muted italic">
-                        {travel.direction === 'current'
-                            ? t('period_options.this_month')
-                            : travel.direction === 'past'
-                              ? t('period_looking_back')
-                              : t('period_looking_ahead')}
+                {/* Header: the selected month; off the current month, one button back to it. */}
+                <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
+                    <p className="min-w-0 truncate text-base font-semibold text-fg first-letter:uppercase">
+                        {monthLong(period, locale)} {period.year}
                     </p>
-                    <div className="mt-1.5 flex items-end gap-2.5">
-                        <p className="font-display text-[34px] leading-none font-semibold tracking-tight text-fg">
-                            {monthShort(period, locale)}
-                        </p>
-                        <div className="mb-0.5 min-w-0">
-                            <p className="text-sm leading-tight font-medium text-fg">
-                                {monthLong(period, locale)}
-                            </p>
-                            <p className="text-xs leading-tight text-fg-muted">
-                                {period.year}
-                                {travel.direction !== 'current' ? ` · ${labels.relativeLabel}` : ''}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div
-                    className="flex flex-wrap items-center gap-1 border-b border-line px-3 py-2"
-                    role="listbox"
-                    aria-label={t('period_quick')}>
-                    {(
-                        [
-                            { labelKey: 'period_options.this_month', key: thisMonth },
-                            { labelKey: 'period_options.last_month', key: lastMonth },
-                            { labelKey: 'period_options.next_month', key: nextMonth },
-                        ] as const
-                    ).map((option, index) => {
-                        const selected = value === option.key;
-                        const optionPeriod = decode(option.key);
-                        const disabled =
-                            isYearMonthBefore(optionPeriod, floor) ||
-                            isYearMonthAfter(optionPeriod, horizon);
-                        return (
-                            <span key={option.key} className="inline-flex items-center gap-1">
-                                {index > 0 ? (
-                                    <span className="text-fg-faint" aria-hidden>
-                                        ·
-                                    </span>
-                                ) : null}
-                                <button
-                                    type="button"
-                                    role="option"
-                                    aria-selected={selected}
-                                    disabled={disabled}
-                                    onClick={() => commitKey(option.key)}
-                                    className={cn(
-                                        'px-1.5 py-1 text-xs tracking-tight transition-colors',
-                                        selected
-                                            ? 'font-semibold text-accent'
-                                            : disabled
-                                              ? 'cursor-not-allowed text-fg-faint opacity-40'
-                                              : 'text-fg-muted hover:text-fg'
-                                    )}>
-                                    {t(option.labelKey)}
-                                </button>
-                            </span>
-                        );
-                    })}
+                    {travel.direction === 'current' ? (
+                        <span className="shrink-0 rounded-full bg-accent-soft px-2.5 py-1 text-xs font-medium text-accent">
+                            {t('period_options.this_month')}
+                        </span>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={() => commitKey(thisMonth)}
+                            className="shrink-0 rounded-full border border-line px-2.5 py-1 text-xs font-medium text-fg-muted transition-colors hover:border-accent hover:bg-accent-soft hover:text-accent">
+                            {travel.direction === 'past'
+                                ? `${t('period_options.this_month')} ›`
+                                : `‹ ${t('period_options.this_month')}`}
+                        </button>
+                    )}
                 </div>
 
                 <div className="px-3 pt-2.5 pb-3">
