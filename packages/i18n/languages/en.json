@@ -792,30 +792,17 @@
                 "locked_suffix": "Plus"
             },
             "verdict": {
-                "eyebrow": "✦ The Coach",
                 "kind_nudge": "Next move",
                 "kind_win": "Win",
                 "kind_warning": "Worth a look",
                 "kind_insight": "Insight",
                 "kind_week_check": "Week check",
                 "kind_on_track": "On track",
-                "kind_alert": "Act this week",
-                "share": "Share",
-                "open": "Open",
-                "detail": "Detail",
-                "message_n": "Message {n}",
-                "month_score_badge": "Month score",
-                "month_score_slide": "Month score advice",
-                "previous": "Previous",
-                "next": "Next",
-                "collapse": "Collapse",
-                "expand": "Show coach",
-                "collapsed_clear": "Nothing waiting — expand when you want the score",
-                "collapsed_attention": "Something needs you",
-                "collapsed_waiting": "{count} waiting"
+                "kind_alert": "Act this week"
             },
             "dismiss": "Dismiss",
             "got_it": "Got it",
+            "split_more": "{count, plural, =1 {1 more tip} other {# more tips}}",
             "split_tips": {
                 "play-above-default": "Play above 10% usually comes from Financial Freedom or Long Term Savings. Those two buy your future; Play spends this month.",
                 "play-above-default-saver": "Play above 10% can be healthy if you under-spend joy — just don’t fund it by cutting Financial Freedom.",
@@ -832,15 +819,10 @@
             "helpers": {
                 "mark_title": "From The Coach — turn on-screen tips on or off in Settings → Preferences",
                 "mark_label": "The Coach",
-                "tip_aria": "The Coach: {title}",
-                "locked_cta": "🔒 {cta}",
-                "open_coach": "Open The Coach",
-                "why_aria": "The Coach"
+                "open_coach": "Open The Coach"
             },
             "jar_guide": {
                 "summary": "What is {jar} for?",
-                "aria": "The Coach for this jar",
-                "heading": "What can I use this for?",
                 "allowed": "This may go to",
                 "give_who": "Who should receive it?",
                 "give_hint": "Pick a cause, then an organization with independent checks — same Coach shortlist as on Why & where.",
@@ -848,9 +830,7 @@
                 "add_transaction": "Add transaction",
                 "learn_nudge_title": "Grow with Learn",
                 "learn_nudge": "Put titles on your Learn shelf, browse the library for inspiration, and add a goal on this jar when you are ready to claim the spend.",
-                "split_inside": "Split inside this jar",
-                "footer": "The Coach — tips without shame.",
-                "turn_off": "Turn tips off"
+                "split_inside": "Split inside this jar"
             },
             "money_coach": {
                 "due_bills": {
@@ -864,13 +844,17 @@
                 },
                 "fixed_costs": {
                     "over_necessities": {
+                        "text": "{jar} bills come to {amount} a month more than the jar gets.",
                         "cta": "Add income",
                         "cta_secondary": "Open the biggest fixed cost"
                     },
                     "business_leak": {
+                        "text": "{amount} a month in business costs is paid from your household.",
                         "cta": "See linked bills"
                     },
                     "subscription_review": {
+                        "text_one": "1 subscription costs {amount} a month. Still using it?",
+                        "text_other": "{count} subscriptions cost {amount} a month. Still using all of them?",
                         "cta": "Review subscriptions"
                     }
                 },
@@ -925,15 +909,6 @@
                     "setup_typical": "Set up my typical week",
                     "change_typical": "Change my typical week"
                 }
-            },
-            "period_travel": {
-                "looking_back_one": "Looking back at {stamp} ({relativeLabel}): about {money} moved through your jars that month.",
-                "looking_back_other": "Looking back at {stamp} ({relativeLabel}): about {money} moved through your jars that month.",
-                "looking_ahead_one": "By {stamp}, if you keep this plan, about {money} will have moved through your jars across {horizon} month.",
-                "looking_ahead_other": "By {stamp}, if you keep this plan, about {money} will have moved through your jars across {horizon} months.",
-                "pace_needed": "{name} still needs pace — roughly {money}/mo net to make the date.",
-                "past_note": "Lifetime goal saved and live debt are not rewound for past months.",
-                "jar_highlight": "{name} {from} → {to}"
             }
         },
         "energy": {
@@ -941,9 +916,6 @@
                 "eyebrow": "Energy · your capacity",
                 "title": "The floor under every decision.",
                 "line": "Grip on your energy — sleep, hours, training, food.",
-                "fallback_coach_kind": "THIS WEEK",
-                "fallback_coach_text": "Log sleep and training — energy is the floor under every money decision.",
-                "fallback_coach_cta": "Open your week",
                 "cards": {
                     "week": {
                         "name": "Week",
@@ -1274,9 +1246,6 @@
                 "eyebrow": "Growth · long term",
                 "title": "Grow in more than one direction.",
                 "line": "Grip on your growth — skills, goals, learning; you move forward.",
-                "fallback_coach_kind": "THE LEVER",
-                "fallback_coach_text": "Cutting costs has a floor; raising income does not. Income is the faster lever.",
-                "fallback_coach_cta": "Open income",
                 "cards": {
                     "goals": {
                         "name": "Goals",
@@ -1360,7 +1329,6 @@
                     "give_mode_manual": "I know who",
                     "give_mode_org": "Help me choose",
                     "give_mode_open": "Keep it open",
-                    "pledge_tip_title": "A pledge, not a pot",
                     "pledge_tip_link": "Why giving is in a money app → Soul",
                     "pledge_tip_body": "Every sorted amount that leaves your Give jar this year counts toward it — nothing to move by hand.",
                     "cause_label": "Cause (purpose)",
@@ -1617,9 +1585,6 @@
                 "lead_library": "Search, then narrow by what it is and what it is about. Mark a title and it lands on Learn.",
                 "partner_max": "Courses on Max are on MasterClass. Plus points at Udemy instead. Books, films, and series open as the plan allows — we recommend them, we do not host them.",
                 "partner_default": "Learn is on Plus and Max. Courses on Plus are on Udemy; Max points at MasterClass. Books, films, and series open as the plan allows — we recommend them, we do not host them.",
-                "jar_coach_title": "Education jar",
-                "jar_banner": "Your Education jar is where this spending lives. What raises your earning power pays itself back into Financial Freedom.",
-                "jar_cta": "View Education jar",
                 "browse_library": "Browse library",
                 "show_more": "Show more",
                 "show_more_remaining": "Show more · {remaining} left",
@@ -1737,12 +1702,6 @@
                 "through_then": "Through then",
                 "then_label": "Then",
                 "now": "Now",
-                "target": "Target",
-                "gap": "Gap",
-                "gap_over": "over",
-                "gap_met": "met",
-                "gap_to_go": "to go",
-                "mo_net": "/mo net",
                 "subline_travel": "{amount}/mo · {months} months",
                 "subline_annual": "{amount}/yr",
                 "loading": "Loading…",
@@ -1759,8 +1718,11 @@
                 "empty_guest_body": "Income sources show up here once you are signed in."
             },
             "income_simulator": {
-                "eyebrow": "What a raise does",
-                "eyebrow_with_mark": "✦ What a raise does",
+                "eyebrow": "✦ Your target",
+                "target_line": "{amount} a month net",
+                "gap_to_go": "{amount} to go",
+                "gap_met": "Target reached",
+                "gap_over": "{amount} above your target",
                 "intro": "Drag the monthly net. The split stays; each jar moves with it.",
                 "cleared_intro": "{name} is reached. I won't pick a higher number.",
                 "set_next_target": "Set the next target",
@@ -2317,10 +2279,6 @@
                 "eyebrow": "Money · this month",
                 "title": "How your money moves.",
                 "line": "Grip on your money — six jars, what comes in, what goes out.",
-                "fallback_coach_kind": "START HERE",
-                "fallback_coach_text": "Start with income and fixed costs.",
-                "fallback_coach_cta": "Open income",
-                "see_overview": "See overview",
                 "cards": {
                     "jars": {
                         "name": "Jars",
@@ -2366,32 +2324,32 @@
                 "tap_hint": "Tap a jar for fixed costs, other spends, and what is left",
                 "summary_nothing": "Nothing set aside or spent this month",
                 "of_amount": "of {amount}",
+                "tile_of": "of {amount} this month",
+                "tile_saved": "Saved",
+                "tile_open_bills": "{count, plural, one {# open bill} other {# open bills}}",
+                "tile_meter_label": "{name}: left this month",
+                "tile_meter_left": "{pct}% left",
+                "tile_meter_over": "Overspent",
+                "left_label": "Left this month",
+                "left_label_stacked": "Left over the span",
+                "names": {
+                    "NECESSITIES": "Necessity",
+                    "FINANCIAL_FREEDOM": "Financial Freedom",
+                    "LONG_TERM_SAVINGS": "Long Term Savings",
+                    "EDUCATION": "Education",
+                    "PLAY": "Play",
+                    "GIVE": "Give"
+                },
                 "this_month": "This month",
                 "this_month_of": "{available} of {allocated} this month",
                 "in_pot": "In the pot",
-                "in_pot_short": "Pot",
-                "in_pot_amount": "In the pot {amount}",
-                "summary_open_aria": "{name}: {available} this month, {pot} in the pot",
                 "activity_fixed": "{amount} fixed costs",
                 "activity_added": "{amount} extra in",
                 "activity_spent": "{amount} other spends",
                 "activity_categories": "{count} categories",
-                "meta_paid": "{count} paid",
-                "meta_open": "{count} open",
-                "meta_paid_hint": "Fixed costs marked paid this month",
-                "meta_open_hint": "Fixed costs still due this month",
-                "meta_fixed_hint": "Recurring fixed costs this month",
-                "meta_extra_hint": "Extra money sorted into this jar this month",
-                "meta_other_spends_hint": "Sorted out transactions this month",
                 "footer_stacked": "{on} / {total} jars on track · stacked over {months} months",
                 "footer_period": "{on} / {total} jars on track this period",
                 "income_link": "What would a raise do to these jars? → Income",
-                "drilldown": {
-                    "show_categories": "Show {name} categories",
-                    "hide_categories": "Hide {name} categories",
-                    "category_detail_hint": "Open the jar for category detail.",
-                    "open_jar_link": "Open jar ▸"
-                },
                 "guides": {
                     "NECESSITIES": {
                         "subtitle": "Must-pays",
@@ -2921,9 +2879,6 @@
                 "amount_history": "Amount history",
                 "start_date": "Start date",
                 "end_date": "End date (optional)",
-                "raise_tip_title": "Got a raise or new job?",
-                "raise_tip_body": "End this income and add a new one with the new amount and start date. That keeps history honest when you travel months.",
-                "raise_tip_link": "Add new income →",
                 "end_income": "End income",
                 "confirm_end": "Click again to end",
                 "toast_ended": "Income ended",
@@ -3416,11 +3371,9 @@
                 "review_bills": "See linked bills"
             },
             "household_profile": {
-                "filter_tip_title": "Bill list is tailored",
-                "filter_tip_body": "Some bill types stay hidden based on your household profile. Change it in Settings → Household, or show every type for this form.",
+                "filter_hint": "Some bill types are hidden by your household profile.",
                 "show_all": "Show all",
                 "use_filter": "Use profile filter",
-                "open_settings": "Household profile",
                 "showing_all": "Showing every bill type for this form. Turn the profile filter back on anytime.",
                 "toast_added": "Added to household profile: {profiles} — so Money can suggest matching bills."
             }
@@ -3430,9 +3383,6 @@
                 "eyebrow": "Soul · the why",
                 "title": "The why under the numbers.",
                 "line": "Grip on your why — stillness, gratitude, intention.",
-                "fallback_coach_kind": "START SMALL",
-                "fallback_coach_text": "One minute of stillness or one line of gratitude — both protect the jars.",
-                "fallback_coach_cta": "Open stillness",
                 "cards": {
                     "stillness": {
                         "name": "Stillness",
@@ -3606,7 +3556,6 @@
                 "check_3_body": "Updates that describe what changed for the people or animals — not a thank-you card.",
                 "check_4_title": "Room for more",
                 "check_4_body": "A clear answer to “what would an extra amount do?” If they cannot say, the money sits.",
-                "coach_tip_title": "Why this is in a money app",
                 "coach_tip_1": "It does not have to be much. Five percent, transferred automatically, to a place you chose on purpose. The amount is not the point — the habit is.",
                 "coach_tip_2": "Choose where it goes the way you choose everything else here: with evidence, not with a logo. An organization that publishes what it spends and what changed is one you can keep giving to for years.",
                 "causes": {
@@ -7070,30 +7019,7 @@
             "closing_title": "You stay in control.",
             "closing_body": "See where it went. Get grip again. New here or already on your way: clear tools, tips you can act on. Information, never shame — spent more than planned is a signal to adjust, not a judgment on you.",
             "cta_jars": "View my jars",
-            "cta_week_check": "Week check",
-            "routes": {
-                "home": "One look: where did it go this month — and do you have grip again?",
-                "money_jars": "This month, divided before it starts. Money with a job never has to be defended.",
-                "money_transactions": "You do not track spending to judge yourself — you track it to see where your life leaks.",
-                "money_debt": "Debt is rented time. Every coin of interest is an hour of your life someone else directs.",
-                "money_fixed_costs": "Fixed costs are decisions you made once and pay for monthly. Review them like decisions.",
-                "growth_goals": "A goal turns this month's surplus into something that lasts. With a date and a jar it is a plan.",
-                "growth_net_worth": "What you already own is working — or costing — every month. That is not a wish.",
-                "energy_week": "Your hours are your capacity. Divided on purpose, or by whoever asks loudest.",
-                "energy_sleep": "Sleep is the floor the jars stand on. Cut it and every other number quietly drops.",
-                "soul_stillness": "A calm mind directs money. A restless one spends it and calls that a decision.",
-                "soul_gratitude": "Someone who sees what he already has buys less to fill a hole.",
-                "soul_giving": "A fixed share that leaves before you can hold it keeps money a tool, not a master.",
-                "soul_intent": "An intention is an instruction to yourself. A resolution is a hope.",
-                "soul_centers": "Name where it feels stuck, and the next step usually names itself.",
-                "growth_income": "Cutting costs has a floor. Raising income does not.",
-                "growth_learn": "A book you cannot name a use for was Play spending, not Education.",
-                "growth_learn_library": "We recommend what to get and who to support. We never host the work.",
-                "energy_training": "Training is the only spend that raises the value of every other hour.",
-                "energy_food": "Food is fuel for the week your jars divide. Fuel is bought, not willed.",
-                "money_week_check": "Ten minutes a week — look, redirect, set intention. Beats worrying every day.",
-                "why": "Rumtelo — grip on life. Clear tools that help you stay in control — product by product."
-            }
+            "cta_week_check": "Week check"
         }
     }
 }

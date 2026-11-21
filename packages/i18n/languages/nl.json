@@ -785,37 +785,24 @@
                 "voice_unavailable": "Stem is niet beschikbaar in deze browser"
             },
             "line": {
-                "label": "The Coach",
-                "hide": "Hide this tip",
-                "hidden": "Tip hidden.",
-                "undo": "Undo",
+                "label": "De Coach",
+                "hide": "Verberg deze tip",
+                "hidden": "Tip verborgen.",
+                "undo": "Ongedaan maken",
                 "locked_suffix": "Plus"
             },
             "verdict": {
-                "eyebrow": "✦ De Coach",
-                "kind_nudge": "Next move",
+                "kind_nudge": "Volgende stap",
                 "kind_win": "Winnen",
-                "kind_warning": "Worth a look",
+                "kind_warning": "Even naar kijken",
                 "kind_insight": "Inzicht",
                 "kind_week_check": "Weekcheck",
                 "kind_on_track": "Op schema",
-                "kind_alert": "Act this week",
-                "share": "Delen",
-                "open": "Openen",
-                "detail": "Details",
-                "message_n": "Bericht {n}",
-                "month_score_badge": "Maandscore",
-                "month_score_slide": "Maandscore-advies",
-                "previous": "Vorige",
-                "next": "Volgende",
-                "collapse": "Samenvouwen",
-                "expand": "De Coach weergeven",
-                "collapsed_clear": "Er staat niets op je te wachten — vouw het uit wanneer je de score wilt zien",
-                "collapsed_attention": "Er is iets dat jou nodig heeft",
-                "collapsed_waiting": "{count} wacht"
+                "kind_alert": "Deze week doen"
             },
             "dismiss": "Sluiten",
             "got_it": "Oké, begrepen",
+            "split_more": "{count, plural, =1 {Nog 1 tip} other {Nog # tips}}",
             "split_tips": {
                 "play-above-default": "Het deel dat je aan ‘plezier’ uitgeeft en boven de 10% ligt, komt meestal uit ‘financiële vrijheid’ of ‘langetermijnspaargeld’. Die twee zorgen voor je toekomst; ‘plezier’ is wat je deze maand uitgeeft.",
                 "play-above-default-saver": "Een uitgavenpercentage van meer dan 10% kan gezond zijn als je niet te veel uitgeeft aan plezier — zorg er alleen voor dat je dit niet financiert door in te boeten aan financiële vrijheid.",
@@ -832,15 +819,10 @@
             "helpers": {
                 "mark_title": "Van De Coach — schakel tips op het scherm in of uit via Instellingen → Voorkeuren",
                 "mark_label": "De Coach",
-                "tip_aria": "De Coach: {title}",
-                "locked_cta": "🔒 {cta}",
-                "open_coach": "Open De Coach",
-                "why_aria": "De Coach"
+                "open_coach": "Open De Coach"
             },
             "jar_guide": {
-                "summary": "What is {jar} for?",
-                "aria": "De Coach voor dit potje",
-                "heading": "Waar kan ik dit voor gebruiken?",
+                "summary": "Waar is {jar} voor?",
                 "allowed": "Dit zou kunnen gaan naar",
                 "give_who": "Voor wie is het bedoeld?",
                 "give_hint": "Kies een goed doel en vervolgens een organisatie die onafhankelijk wordt gecontroleerd — dezelfde shortlist van De Coach als op Waarom en waar.",
@@ -848,9 +830,7 @@
                 "add_transaction": "Transactie toevoegen",
                 "learn_nudge_title": "Groei met Leren",
                 "learn_nudge": "Zet titels op je Leren-plank, blader door de bibliotheek voor inspiratie, en voeg een doel toe op dit potje als je klaar bent om de uitgave te claimen.",
-                "split_inside": "Verdeeld in dit potje",
-                "footer": "De Coach — tips zonder schaamte.",
-                "turn_off": "Tips uitschakelen"
+                "split_inside": "Verdeeld in dit potje"
             },
             "money_coach": {
                 "due_bills": {
@@ -864,14 +844,18 @@
                 },
                 "fixed_costs": {
                     "over_necessities": {
-                        "cta": "Add income",
-                        "cta_secondary": "Open the biggest fixed cost"
+                        "text": "Rekeningen uit {jar} zijn {amount} per maand meer dan het potje krijgt.",
+                        "cta": "Inkomen toevoegen",
+                        "cta_secondary": "Open de grootste vaste kosten"
                     },
                     "business_leak": {
-                        "cta": "See linked bills"
+                        "text": "{amount} per maand aan zakelijke kosten betaal je vanuit je huishouden.",
+                        "cta": "Bekijk gekoppelde rekeningen"
                     },
                     "subscription_review": {
-                        "cta": "Review subscriptions"
+                        "text_one": "1 abonnement kost {amount} per maand. Gebruik je het nog?",
+                        "text_other": "{count} abonnementen kosten {amount} per maand. Gebruik je ze nog allemaal?",
+                        "cta": "Abonnementen bekijken"
                     }
                 },
                 "necessities_share": {
@@ -925,15 +909,6 @@
                     "setup_typical": "Mijn typische week in kaart brengen",
                     "change_typical": "Mijn gebruikelijke week aanpassen"
                 }
-            },
-            "period_travel": {
-                "looking_back_one": "Terugblik op {stamp} ({relativeLabel}): ongeveer {money} ging die maand door je potjes.",
-                "looking_back_other": "Terugblik op {stamp} ({relativeLabel}): ongeveer {money} ging die maand door je potjes.",
-                "looking_ahead_one": "Tegen {stamp}, als je je aan dit plan houdt, zal er in de loop van {horizon} maand ongeveer {money} door je potjes zijn gegaan.",
-                "looking_ahead_other": "Tegen {stamp}, als je je aan dit plan houdt, zal er in de loop van {horizon} maanden ongeveer {money} door je potjes zijn gegaan.",
-                "pace_needed": "{name} moet nog wat vaart maken — ongeveer {money} netto per maand om de deadline te halen.",
-                "past_note": "Het gespaarde levensdoel en de lopende schuld worden voor voorbije maanden niet teruggedraaid.",
-                "jar_highlight": "{name} {from} → {to}"
             }
         },
         "energy": {
@@ -941,9 +916,6 @@
                 "eyebrow": "Energie · jouw vermogen",
                 "title": "De basis voor elke beslissing.",
                 "line": "Grip op je energie — slaap, uren, training, voeding.",
-                "fallback_coach_kind": "DEZE WEEK",
-                "fallback_coach_text": "Houd je slaap en training bij — energie vormt de basis voor elke financiële beslissing.",
-                "fallback_coach_cta": "Begin je week goed",
                 "cards": {
                     "week": {
                         "name": "Week",
@@ -1274,9 +1246,6 @@
                 "eyebrow": "Groei · op lange termijn",
                 "title": "Groei in meer dan één richting.",
                 "line": "Grip op je groei — vaardigheden, doelen, leren; jij gaat vooruit.",
-                "fallback_coach_kind": "DE HENDEL",
-                "fallback_coach_text": "Kostenbesparingen hebben een ondergrens; inkomstenverhoging niet. Inkomsten zijn de snellere hefboom.",
-                "fallback_coach_cta": "Open inkomen",
                 "cards": {
                     "goals": {
                         "name": "Doelstellingen",
@@ -1360,7 +1329,6 @@
                     "give_mode_manual": "Ik weet wie",
                     "give_mode_org": "Help me kiezen",
                     "give_mode_open": "Laat het open staan",
-                    "pledge_tip_title": "Een belofte, geen potje",
                     "pledge_tip_link": "Waarom ‘geven’ in een geld-app staat → Soul",
                     "pledge_tip_body": "Elk gesorteerd bedrag dat dit jaar uit je ‘Give’-potje komt, telt mee — je hoeft niets met de hand te verplaatsen.",
                     "cause_label": "Reden (doel)",
@@ -1617,9 +1585,6 @@
                 "lead_library": "Zoek, en filter vervolgens op wat het is en waar het over gaat. Selecteer een titel en deze verschijnt op Leren.",
                 "partner_max": "Cursussen over Max zijn te vinden op MasterClass. In plaats daarvan kun je punten verdienen op Udemy. Boeken, films en series kun je bekijken voor zover je abonnement dat toestaat — wij bevelen ze aan, maar bieden ze niet zelf aan.",
                 "partner_default": "Learn is beschikbaar in de Plus- en Max-abonnementen. De cursussen in het Plus-abonnement staan op Udemy; het Max-abonnement verwijst naar MasterClass. Boeken, films en series zijn toegankelijk binnen de mogelijkheden van het abonnement — wij bevelen ze aan, maar bieden ze niet zelf aan.",
-                "jar_coach_title": "Opleiding-potje",
-                "jar_banner": "In je ‘Opleiding’-potje worden deze uitgaven ondergebracht. Wat je verdiencapaciteit vergroot, draagt bij aan je financiële vrijheid.",
-                "jar_cta": "Bekijk het ‘Opleiding’-potje",
                 "browse_library": "Door de bibliotheek bladeren",
                 "show_more": "Meer tonen",
                 "show_more_remaining": "Meer tonen · nog {remaining}",
@@ -1737,12 +1702,6 @@
                 "through_then": "Tot dan",
                 "then_label": "Vervolgens",
                 "now": "Nu",
-                "target": "Doel",
-                "gap": "Kloof",
-                "gap_over": "meer dan",
-                "gap_met": "ontmoet",
-                "gap_to_go": "om te gaan",
-                "mo_net": "/maand netto",
                 "subline_travel": "{amount}/maand · {months} maanden",
                 "subline_annual": "{amount}/jaar",
                 "loading": "Laden…",
@@ -1759,8 +1718,11 @@
                 "empty_guest_body": "Zodra je bent ingelogd, worden hier je inkomstenbronnen weergegeven."
             },
             "income_simulator": {
-                "eyebrow": "Wat een loonsverhoging inhoudt",
-                "eyebrow_with_mark": "✦ Wat een loonsverhoging inhoudt",
+                "eyebrow": "✦ Jouw doel",
+                "target_line": "{amount} per maand netto",
+                "gap_to_go": "nog {amount}",
+                "gap_met": "Doel bereikt",
+                "gap_over": "{amount} boven je doel",
                 "intro": "Sleep het maandbedrag. De verdeling blijft behouden; elk potje wordt mee verplaatst.",
                 "cleared_intro": "{name} is bereikt. Ik kies geen hoger getal.",
                 "set_next_target": "Stel het volgende doel vast",
@@ -2317,10 +2279,6 @@
                 "eyebrow": "Geld · deze maand",
                 "title": "Hoe je geld wordt verplaatst.",
                 "line": "Grip op je geld — zes potjes, wat binnenkomt, wat eruit gaat.",
-                "fallback_coach_kind": "BEGIN HIER",
-                "fallback_coach_text": "Begin met inkomen en vaste kosten.",
-                "fallback_coach_cta": "Open inkomen",
-                "see_overview": "Zie overzicht",
                 "cards": {
                     "jars": {
                         "name": "Potjes",
@@ -2353,8 +2311,8 @@
             },
             "jars": {
                 "coach_line": {
-                    "necessities_over": "{jar} needs {amount} more than it gets this month.",
-                    "open_fixed": "Open fixed costs"
+                    "necessities_over": "{jar} heeft deze maand {amount} meer nodig dan het krijgt.",
+                    "open_fixed": "Open vaste kosten"
                 },
                 "eyebrow": "DE ZES POTJES",
                 "title": "Elke munt krijgt een taak vóór hij binnenkomt.",
@@ -2366,32 +2324,32 @@
                 "tap_hint": "Tik op een potje voor vaste kosten, losse uitgaven en wat er nog over is",
                 "summary_nothing": "Deze maand niets opzijgezet of uitgegeven",
                 "of_amount": "van {amount}",
+                "tile_of": "van {amount} deze maand",
+                "tile_saved": "Gespaard",
+                "tile_open_bills": "{count, plural, one {# open rekening} other {# open rekeningen}}",
+                "tile_meter_label": "{name}: over deze maand",
+                "tile_meter_left": "{pct}% over",
+                "tile_meter_over": "Over het budget",
+                "left_label": "Over deze maand",
+                "left_label_stacked": "Over in de periode",
+                "names": {
+                    "NECESSITIES": "Noodzakelijk",
+                    "FINANCIAL_FREEDOM": "Financiële vrijheid",
+                    "LONG_TERM_SAVINGS": "Lange termijn",
+                    "EDUCATION": "Opleiding",
+                    "PLAY": "Plezier",
+                    "GIVE": "Geven"
+                },
                 "this_month": "Deze maand",
                 "this_month_of": "{available} van {allocated} deze maand",
                 "in_pot": "In het potje",
-                "in_pot_short": "Potje",
-                "in_pot_amount": "In het potje {amount}",
-                "summary_open_aria": "{name}: {available} deze maand, {pot} in het potje",
                 "activity_fixed": "{amount} vaste kosten",
                 "activity_added": "{amount} extra erbij",
                 "activity_spent": "{amount} losse uitgaven",
                 "activity_categories": "{count} categorieën",
-                "meta_paid": "{count} betaald",
-                "meta_open": "{count} open",
-                "meta_paid_hint": "Vaste kosten die deze maand als betaald staan",
-                "meta_open_hint": "Vaste kosten die deze maand nog openstaan",
-                "meta_fixed_hint": "Terugkerende vaste kosten deze maand",
-                "meta_extra_hint": "Extra geld dat deze maand in dit potje is gesorteerd",
-                "meta_other_spends_hint": "Gesorteerde UIT-transacties deze maand",
                 "footer_stacked": "{on} / {total} potjes op schema · opgestapeld gedurende {months} maanden",
                 "footer_period": "{on} / {total}-potjes liggen deze periode op schema",
                 "income_link": "Wat zou een loonsverhoging voor deze potjes betekenen? → Inkomen",
-                "drilldown": {
-                    "show_categories": "Toon {name} categorieën",
-                    "hide_categories": "{name}-categorieën verbergen",
-                    "category_detail_hint": "Open het venster voor meer informatie over de categorie.",
-                    "open_jar_link": "Potje openen ▸"
-                },
                 "guides": {
                     "NECESSITIES": {
                         "subtitle": "Verplichte betalingen",
@@ -2598,7 +2556,7 @@
                 "detail_status_skipped": "Deze periode overgeslagen",
                 "detail_status_rolled": "Meegenomen naar een latere maand",
                 "detail_status_planned": "Gepland",
-                "could_cancel": "Could cancel?",
+                "could_cancel": "Kun je opzeggen?",
                 "toast_active": "Rekening is weer actief",
                 "toast_ended": "Rekening beëindigd",
                 "toast_paused": "Rekening tijdelijk opgeschort",
@@ -2921,9 +2879,6 @@
                 "amount_history": "Overzicht van bedragen",
                 "start_date": "Startdatum",
                 "end_date": "Einddatum (optioneel)",
-                "raise_tip_title": "Loonsverhoging of nieuwe baan?",
-                "raise_tip_body": "Beëindig deze inkomsten en voeg nieuwe toe met het nieuwe bedrag en de startdatum. Zo blijft de geschiedenis kloppen als je door de maanden bladert.",
-                "raise_tip_link": "Nieuwe inkomsten toevoegen →",
                 "end_income": "Inkomsten beëindigen",
                 "confirm_end": "Klik opnieuw om te beëindigen",
                 "toast_ended": "Inkomsten beëindigd",
@@ -3412,15 +3367,13 @@
                 }
             },
             "business_household_leak": {
-                "line": "{amount} a month in business costs is paid from your household.",
+                "line": "{amount} per maand aan zakelijke kosten betaal je vanuit je huishouden.",
                 "review_bills": "Bekijk gekoppelde rekeningen"
             },
             "household_profile": {
-                "filter_tip_title": "Rekeninglijst is afgestemd",
-                "filter_tip_body": "Sommige soorten rekeningen blijven verborgen op basis van je huishoudprofiel. Pas het aan in Instellingen → Huishouden, of toon alle soorten voor dit formulier.",
+                "filter_hint": "Sommige soorten rekeningen zijn verborgen door je huishoudprofiel.",
                 "show_all": "Alles tonen",
                 "use_filter": "Profiel filter gebruiken",
-                "open_settings": "Huishoudprofiel",
                 "showing_all": "Alle soorten rekeningen worden getoond voor dit formulier. Zet de profielfilter wanneer je wilt weer aan.",
                 "toast_added": "Toegevoegd aan huishoudprofiel: {profiles} — zodat Money passende rekeningen kan voorstellen."
             }
@@ -3430,9 +3383,6 @@
                 "eyebrow": "Soul · het waarom",
                 "title": "Het verhaal achter de cijfers.",
                 "line": "Grip op je waarom — stilte, dankbaarheid, intentie.",
-                "fallback_coach_kind": "BEGIN KLEIN",
-                "fallback_coach_text": "Eén minuut stilte of één zin vol dankbaarheid — beide beschermen de potjes.",
-                "fallback_coach_cta": "Open stilte",
                 "cards": {
                     "stillness": {
                         "name": "Stilte",
@@ -3606,7 +3556,6 @@
                 "check_3_body": "Updates waarin wordt beschreven wat er voor de mensen of dieren is veranderd — geen bedankkaartje.",
                 "check_4_title": "Ruimte voor meer",
                 "check_4_body": "Een duidelijk antwoord op de vraag: „Wat zou je met dat extra bedrag doen?“ Als ze daar geen antwoord op kunnen geven, blijft het geld gewoon liggen.",
-                "coach_tip_title": "Waarom staat dit in een geld-app?",
                 "coach_tip_1": "Het hoeft niet veel te zijn. Vijf procent, automatisch overgemaakt naar een bestemming die je bewust hebt gekozen. Het gaat niet om het bedrag, maar om de gewoonte.",
                 "coach_tip_2": "Bepaal zelf waar het naartoe gaat, net zoals je hier overal anders ook zelf beslist: op basis van feiten, niet op basis van een logo. Een organisatie die openbaar maakt wat ze uitgeeft en wat er is veranderd, is een organisatie waaraan je jarenlang kunt blijven doneren.",
                 "causes": {
@@ -7070,30 +7019,7 @@
             "closing_title": "Jij houdt de touwtjes in handen.",
             "closing_body": "Kijk waar het naartoe is gegaan. Krijg weer grip op de situatie. Of je nu nieuw bent of al op de goede weg bent: duidelijke hulpmiddelen en tips waarmee je aan de slag kunt. Informatie, nooit een verwijt — meer uitgeven dan gepland is een signaal om bij te sturen, geen oordeel over jou.",
             "cta_jars": "Bekijk mijn potjes",
-            "cta_week_check": "Weekcheck",
-            "routes": {
-                "home": "Eén blik: waar is het deze maand gebleven — en heb je weer grip?",
-                "money_jars": "Deze maand is al verdeeld voordat hij begint. Geld dat je met een baan verdient, hoef je nooit te verdedigen.",
-                "money_transactions": "Je houdt je uitgaven niet bij om jezelf te beoordelen — je houdt ze bij om te zien waar je geld weglekt.",
-                "money_debt": "Schuld is gehuurde tijd. Elke cent aan rente is een uur van je leven waarover iemand anders de baas is.",
-                "money_fixed_costs": "Vaste kosten zijn beslissingen die je eenmalig hebt genomen en waarvoor je maandelijks betaalt. Bekijk ze als beslissingen.",
-                "growth_goals": "Een doel zorgt ervoor dat het overschot van deze maand iets blijvends wordt. Met een datum en een potje is het een plan.",
-                "growth_net_worth": "Wat je al bezit, levert elke maand iets op — of kost je elke maand geld. Dat is geen wens.",
-                "energy_week": "Je uren bepalen je capaciteit. Die worden bewust verdeeld, of door degene die het hardst om iets vraagt.",
-                "energy_sleep": "Slaap is de vloer waarop de potjes staan. Haal die weg en alle andere getallen vallen stilletjes naar beneden.",
-                "soul_stillness": "Een rustige geest gaat verstandig met geld om. Een onrustige geest geeft het uit en noemt dat een beslissing.",
-                "soul_gratitude": "Iemand die ziet wat hij al heeft, koopt minder om een leemte op te vullen.",
-                "soul_giving": "Een vast aandeel dat verdwijnt voordat je het in bezit kunt nemen, zorgt ervoor dat geld een hulpmiddel blijft en geen meester wordt.",
-                "soul_intent": "Een voornemen is een opdracht aan jezelf. Een voornemen is een wens.",
-                "soul_centers": "Geef aan waar het vastloopt, en dan wordt de volgende stap meestal vanzelf duidelijk.",
-                "growth_income": "Er is een ondergrens aan kostenbesparingen. Dat geldt niet voor het verhogen van de inkomsten.",
-                "growth_learn": "Een boek waarvoor je geen enkele toepassing kunt bedenken, was een uitgave voor vermaak, niet voor onderwijs.",
-                "growth_learn_library": "Wij geven advies over wat je kunt kopen en wie je kunt steunen. Wij hosten het werk zelf nooit.",
-                "energy_training": "Opleiding is de enige uitgave die de waarde van elk ander uur verhoogt.",
-                "energy_food": "Eten is brandstof voor de week die jullie potjes verdelen. Brandstof koop je, die krijg je niet zomaar.",
-                "money_week_check": "Tien minuten per week — even kijken, je aandacht verleggen, een doel voor ogen houden. Dat is beter dan je elke dag zorgen maken.",
-                "why": "Rumtelo — grip op het leven. Duidelijke hulpmiddelen die je helpen de controle te behouden — product voor product."
-            }
+            "cta_week_check": "Weekcheck"
         }
     }
 }

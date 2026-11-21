@@ -792,30 +792,17 @@
                 "locked_suffix": "Plus"
             },
             "verdict": {
-                "eyebrow": "✦ L'entraîneur",
                 "kind_nudge": "Next move",
                 "kind_win": "Gagner",
                 "kind_warning": "Worth a look",
                 "kind_insight": "Analyse",
                 "kind_week_check": "Bilan hebdomadaire",
                 "kind_on_track": "En bonne voie",
-                "kind_alert": "Act this week",
-                "share": "Partager",
-                "open": "Ouvrir",
-                "detail": "Détails",
-                "message_n": "Message {n}",
-                "month_score_badge": "Score mensuel",
-                "month_score_slide": "Conseils pour le score mensuel",
-                "previous": "Précédent",
-                "next": "Suivant",
-                "collapse": "Réduire",
-                "expand": "Afficher l'entraîneur",
-                "collapsed_clear": "Rien à attendre — développez la partition quand vous le souhaitez",
-                "collapsed_attention": "Il y a quelque chose qui a besoin de toi",
-                "collapsed_waiting": "{count} en attente"
+                "kind_alert": "Act this week"
             },
             "dismiss": "Ignorer",
             "got_it": "D'accord",
+            "split_more": "{count, plural, =1 {1 more tip} other {# more tips}}",
             "split_tips": {
                 "play-above-default": "La part consacrée aux loisirs, supérieure à 10 %, provient généralement de la liberté financière ou de l'épargne à long terme. Ces deux éléments vous assurent un avenir ; les loisirs, quant à eux, représentent les dépenses du mois.",
                 "play-above-default-saver": "Une part de loisirs supérieure à 10 % peut être bénéfique si vous ne sacrifiez pas votre bonheur — mais veillez à ne pas la financer au détriment de votre liberté financière.",
@@ -832,15 +819,10 @@
             "helpers": {
                 "mark_title": "Conseil de The Coach : activez ou désactivez les astuces à l'écran dans Paramètres → Préférences",
                 "mark_label": "L'entraîneur",
-                "tip_aria": "L'entraîneur : {title}",
-                "locked_cta": "🔒 {cta}",
-                "open_coach": "Ouvrir « The Coach »",
-                "why_aria": "L'entraîneur"
+                "open_coach": "Ouvrir « The Coach »"
             },
             "jar_guide": {
                 "summary": "What is {jar} for?",
-                "aria": "Le sac « Coach » de ce bocal",
-                "heading": "À quoi cela peut-il me servir ?",
                 "allowed": "Cela pourrait concerner",
                 "give_who": "À qui est-il destiné ?",
                 "give_hint": "Choisissez une cause, puis une association faisant l'objet de contrôles indépendants — la même sélection proposée par Coach que sur « Why & where ».",
@@ -848,9 +830,7 @@
                 "add_transaction": "Ajouter une transaction",
                 "learn_nudge_title": "Grandir avec Apprendre",
                 "learn_nudge": "Mettez des titres sur votre rayon Apprendre, parcourez la bibliothèque pour l'inspiration, et ajoutez un objectif sur ce pot quand vous êtes prêt à revendiquer la dépense.",
-                "split_inside": "Diviser à l'intérieur de ce bocal",
-                "footer": "The Coach — des conseils sans complexe.",
-                "turn_off": "Désactiver les conseils"
+                "split_inside": "Diviser à l'intérieur de ce bocal"
             },
             "money_coach": {
                 "due_bills": {
@@ -864,13 +844,17 @@
                 },
                 "fixed_costs": {
                     "over_necessities": {
+                        "text": "{jar} bills come to {amount} a month more than the jar gets.",
                         "cta": "Add income",
                         "cta_secondary": "Open the biggest fixed cost"
                     },
                     "business_leak": {
+                        "text": "{amount} a month in business costs is paid from your household.",
                         "cta": "See linked bills"
                     },
                     "subscription_review": {
+                        "text_one": "1 subscription costs {amount} a month. Still using it?",
+                        "text_other": "{count} subscriptions cost {amount} a month. Still using all of them?",
                         "cta": "Review subscriptions"
                     }
                 },
@@ -925,15 +909,6 @@
                     "setup_typical": "Organiser ma semaine type",
                     "change_typical": "Modifier mon emploi du temps hebdomadaire habituel"
                 }
-            },
-            "period_travel": {
-                "looking_back_one": "Rétrospective sur {stamp} ({relativeLabel}) : environ {money} sont passés par vos bocaux ce mois-là.",
-                "looking_back_other": "Rétrospective sur {stamp} ({relativeLabel}) : environ {money} sont passés par vos bocaux ce mois-là.",
-                "looking_ahead_one": "D'ici {stamp}, si vous suivez ce programme, environ {money} se seront écoulés de vos bocaux au cours des {horizon} mois.",
-                "looking_ahead_other": "D'ici {stamp}, si vous suivez ce programme, environ {money} se seront écoulés de vos bocaux en l'espace de {horizon} mois.",
-                "pace_needed": "{name} doit encore accélérer le rythme — il lui faut environ {money} par mois (net) pour atteindre l'objectif.",
-                "past_note": "L'objectif à vie atteint et la dette en cours ne sont pas réinitialisés pour les mois passés.",
-                "jar_highlight": "{name} {from} → {to}"
             }
         },
         "energy": {
@@ -941,9 +916,6 @@
                 "eyebrow": "Énergie · votre capacité",
                 "title": "Le fondement de chaque décision.",
                 "line": "Maîtrisez votre énergie : sommeil, horaires, entraînement, alimentation.",
-                "fallback_coach_kind": "CETTE SEMAINE",
-                "fallback_coach_text": "Notez vos heures de sommeil et vos séances d'entraînement : l'énergie est le fondement de toutes vos décisions financières.",
-                "fallback_coach_cta": "Commencez votre semaine",
                 "cards": {
                     "week": {
                         "name": "Semaine",
@@ -1274,9 +1246,6 @@
                 "eyebrow": "Croissance · à long terme",
                 "title": "Développez-vous dans plusieurs directions.",
                 "line": "Prenez votre évolution en main : compétences, objectifs, apprentissage… vous allez de l'avant.",
-                "fallback_coach_kind": "LE LEVIER",
-                "fallback_coach_text": "La réduction des coûts a une limite ; l'augmentation des revenus, non. Les revenus constituent le levier le plus efficace.",
-                "fallback_coach_cta": "Revenus bruts",
                 "cards": {
                     "goals": {
                         "name": "Objectifs",
@@ -1360,7 +1329,6 @@
                     "give_mode_manual": "Je sais qui",
                     "give_mode_org": "Aide-moi à choisir",
                     "give_mode_open": "Laissez-le ouvert",
-                    "pledge_tip_title": "Un engagement, pas un pot",
                     "pledge_tip_link": "Pourquoi le don figure-t-il dans une application financière ? → Soul",
                     "pledge_tip_body": "Chaque somme triée qui sort de votre tirelire « Give » cette année est prise en compte — pas besoin de tout transférer manuellement.",
                     "cause_label": "Cause (objectif)",
@@ -1617,9 +1585,6 @@
                 "lead_library": "Effectuez une recherche, puis affinez les résultats en fonction du type de contenu et du sujet. Sélectionnez un titre pour l'ajouter à la rubrique « Apprendre ».",
                 "partner_max": "Les cours sur Max sont disponibles sur MasterClass. Vous pouvez également gagner des points bonus sur Udemy. Les livres, films et séries sont accessibles selon les conditions de l'abonnement — nous les recommandons, mais nous ne les hébergeons pas.",
                 "partner_default": "La rubrique « Apprendre » est disponible dans les formules Plus et Max. Les cours de la formule Plus se trouvent sur Udemy ; ceux de la formule Max sont hébergés sur MasterClass. Les livres, films et séries sont accessibles selon les conditions de chaque formule — nous les recommandons, mais ne les hébergeons pas nous-mêmes.",
-                "jar_coach_title": "Pot Éducation",
-                "jar_banner": "C'est dans votre « tirelire Éducation » que sont affectées ces dépenses. Tout ce qui augmente votre capacité de gain contribue à vous mener vers la liberté financière.",
-                "jar_cta": "Voir le pot Éducation",
                 "browse_library": "Parcourir la bibliothèque",
                 "show_more": "Afficher plus",
                 "show_more_remaining": "Afficher plus · {remaining} restants",
@@ -1737,12 +1702,6 @@
                 "through_then": "Jusqu'à ce moment-là",
                 "then_label": "Ensuite",
                 "now": "Maintenant",
-                "target": "Cible",
-                "gap": "Écart",
-                "gap_over": "plus de",
-                "gap_met": "rencontré",
-                "gap_to_go": "à emporter",
-                "mo_net": "/mo net",
                 "subline_travel": "{amount}/mois · {months} mois",
                 "subline_annual": "{amount} par an",
                 "loading": "Chargement en cours…",
@@ -1759,8 +1718,11 @@
                 "empty_guest_body": "Les sources de revenus s'affichent ici une fois que vous êtes connecté."
             },
             "income_simulator": {
-                "eyebrow": "À quoi sert une augmentation de salaire ?",
-                "eyebrow_with_mark": "✦ À quoi sert une augmentation de salaire ?",
+                "eyebrow": "✦ Your target",
+                "target_line": "{amount} a month net",
+                "gap_to_go": "{amount} to go",
+                "gap_met": "Target reached",
+                "gap_over": "{amount} above your target",
                 "intro": "Faites glisser le montant net mensuel. La répartition reste inchangée ; chaque pot se déplace avec lui.",
                 "cleared_intro": "On arrive à {name}. Je ne choisirai pas un nombre plus élevé.",
                 "set_next_target": "Définir l'objectif suivant",
@@ -2317,10 +2279,6 @@
                 "eyebrow": "Argent · ce mois-ci",
                 "title": "Comment circule votre argent.",
                 "line": "Maîtrisez vos finances : six bocaux pour noter vos recettes et vos dépenses.",
-                "fallback_coach_kind": "COMMENCEZ ICI",
-                "fallback_coach_text": "Commencez par ajouter vos revenus et vos coûts fixes : vos « pots » vous indiqueront alors le montant dont vous disposez pour gérer votre budget.",
-                "fallback_coach_cta": "Ouvrir des bocaux",
-                "see_overview": "Voir la présentation générale",
                 "cards": {
                     "jars": {
                         "name": "Pots",
@@ -2366,32 +2324,32 @@
                 "tap_hint": "Cliquez sur un pot pour voir les coûts fixes, les dépenses et le solde restant",
                 "summary_nothing": "Je n'ai rien prévu ni dépensé ce mois-ci",
                 "of_amount": "de {amount}",
+                "tile_of": "of {amount} this month",
+                "tile_saved": "Saved",
+                "tile_open_bills": "{count, plural, one {# open bill} other {# open bills}}",
+                "tile_meter_label": "{name}: left this month",
+                "tile_meter_left": "{pct}% left",
+                "tile_meter_over": "Overspent",
+                "left_label": "Left this month",
+                "left_label_stacked": "Left over the span",
+                "names": {
+                    "NECESSITIES": "Necessity",
+                    "FINANCIAL_FREEDOM": "Financial Freedom",
+                    "LONG_TERM_SAVINGS": "Long Term Savings",
+                    "EDUCATION": "Education",
+                    "PLAY": "Play",
+                    "GIVE": "Give"
+                },
                 "this_month": "Ce mois",
                 "this_month_of": "{available} sur {allocated} ce mois",
                 "in_pot": "Dans le pot",
-                "in_pot_short": "Pot",
-                "in_pot_amount": "Dans le pot {amount}",
-                "summary_open_aria": "{name} : {available} ce mois-ci, {pot} dans la cagnotte",
                 "activity_fixed": "{amount} corrigé",
                 "activity_added": "{amount} ajouté",
                 "activity_spent": "{amount} dépensé",
                 "activity_categories": "{count} catégories",
-                "meta_paid": "{count} payé",
-                "meta_open": "{count} ouvert",
-                "meta_paid_hint": "Coûts fixes marqués comme payés ce mois-ci",
-                "meta_open_hint": "Frais fixes encore à régler ce mois-ci",
-                "meta_fixed_hint": "Coûts fixes récurrents de ce mois-ci",
-                "meta_extra_hint": "L'argent supplémentaire a été mis dans ce bocal ce mois-ci",
-                "meta_other_spends_hint": "J'ai fait le tri dans les opérations de ce mois-ci",
                 "footer_stacked": "{on} / {total} bocaux en cours de préparation · empilés sur une période de {months} mois",
                 "footer_period": "{on} / {total} bocaux prévus pour cette période",
                 "income_link": "Quel serait l'impact d'une augmentation sur ces bocaux ? → Revenus",
-                "drilldown": {
-                    "show_categories": "Afficher {name} catégories",
-                    "hide_categories": "Masquer les {name} catégories",
-                    "category_detail_hint": "Ouvrez la rubrique pour consulter les détails de la catégorie.",
-                    "open_jar_link": "Ouvrir le bocal ▸"
-                },
                 "guides": {
                     "NECESSITIES": {
                         "subtitle": "Paiements obligatoires",
@@ -2921,9 +2879,6 @@
                 "amount_history": "Historique des montants",
                 "start_date": "Date de début",
                 "end_date": "Date de fin (facultative)",
-                "raise_tip_title": "Tu as eu une augmentation ou un nouvel emploi ?",
-                "raise_tip_body": "Supprimez cette source de revenus et ajoutez-en une nouvelle en indiquant le nouveau montant et la date de début. Cela permet de conserver un historique fidèle lorsque vous voyagez pendant plusieurs mois.",
-                "raise_tip_link": "Ajouter une nouvelle source de revenus →",
                 "end_income": "Revenu final",
                 "confirm_end": "Cliquez à nouveau pour terminer",
                 "toast_ended": "Revenu final",
@@ -3416,11 +3371,9 @@
                 "review_bills": "Voir les projets de loi en lien"
             },
             "household_profile": {
-                "filter_tip_title": "La liste des factures est personnalisée",
-                "filter_tip_body": "Certains types de factures restent masqués en fonction du profil de votre foyer. Modifiez-le dans Paramètres → Ménage, ou affichez tous les types pour ce formulaire.",
+                "filter_hint": "Some bill types are hidden by your household profile.",
                 "show_all": "Tout afficher",
                 "use_filter": "Utiliser le filtre de profil",
-                "open_settings": "Profil du ménage",
                 "showing_all": "Affichage de tous les types de factures pour ce formulaire. Vous pouvez réactiver le filtre de profil à tout moment.",
                 "toast_added": "Ajouté au profil du foyer : {profiles} — afin que Money puisse proposer des factures correspondantes."
             }
@@ -3430,9 +3383,6 @@
                 "eyebrow": "L'âme · le pourquoi",
                 "title": "Ce qui se cache derrière les chiffres.",
                 "line": "Concentrez-vous sur ce qui vous motive : le calme, la gratitude, l'intention.",
-                "fallback_coach_kind": "COMMENCEZ PETIT",
-                "fallback_coach_text": "Une minute de silence ou une phrase de gratitude : les deux protègent les bocaux.",
-                "fallback_coach_cta": "Le silence ouvert",
                 "cards": {
                     "stillness": {
                         "name": "Le silence",
@@ -3606,7 +3556,6 @@
                 "check_3_body": "Des nouvelles qui expliquent ce qui a changé pour les personnes ou les animaux — pas une carte de remerciement.",
                 "check_4_title": "Il y a encore de la place",
                 "check_4_body": "Une réponse claire à la question « À quoi servirait une somme supplémentaire ? » S'ils ne peuvent pas répondre, l'argent reste sur place.",
-                "coach_tip_title": "Pourquoi cette fonctionnalité se trouve-t-elle dans une application financière ?",
                 "coach_tip_1": "Pas besoin que ce soit beaucoup. Cinq pour cent, transférés automatiquement, vers un compte que vous aurez choisi à dessein. Ce n’est pas le montant qui compte, mais l’habitude.",
                 "coach_tip_2": "Choisissez à quoi servir cet argent comme vous choisissez tout le reste ici : en vous basant sur des faits, et non sur un logo. Une organisation qui publie le détail de ses dépenses et les changements qu’elle a apportés est une organisation à laquelle vous pouvez continuer à faire des dons pendant des années.",
                 "causes": {
@@ -7070,30 +7019,7 @@
             "closing_title": "C'est vous qui gardez le contrôle.",
             "closing_body": "Voyez où ça vous a mené. Reprenez le contrôle. Que vous soyez nouveau ici ou déjà sur la bonne voie : des outils clairs, des conseils que vous pouvez mettre en pratique. Des informations, jamais de reproches — avoir dépensé plus que prévu est un signal qui vous invite à ajuster votre comportement, pas un jugement à votre égard.",
             "cta_jars": "Voir mes bocaux",
-            "cta_week_check": "Bilan hebdomadaire",
-            "routes": {
-                "home": "Un coup d'œil : où est-il passé ce mois-ci ? Et avez-vous retrouvé votre adhérence ?",
-                "money_jars": "Ce mois-ci, déjà divisé avant même d'avoir commencé. L'argent gagné grâce à un emploi n'a jamais besoin d'être justifié.",
-                "money_transactions": "Vous ne suivez pas vos dépenses pour vous juger, mais pour identifier les fuites dans votre budget.",
-                "money_debt": "La dette, c'est du temps loué. Chaque centime d'intérêt, c'est une heure de votre vie dont quelqu'un d'autre dispose à sa guise.",
-                "money_fixed_costs": "Les coûts fixes correspondent à des choix que vous avez faits une seule fois et que vous payez chaque mois. Considérez-les comme de véritables décisions.",
-                "growth_goals": "Un objectif permet de transformer l'excédent de ce mois-ci en quelque chose de durable. Avec une date et un bocal, c'est un projet.",
-                "growth_net_worth": "Ce que vous possédez déjà fonctionne — ou vous coûte — chaque mois. Ce n'est pas un vœu pieux.",
-                "energy_week": "Vos heures, c'est votre capacité. Réparties selon votre choix, ou en fonction de celui qui s'impose le plus.",
-                "energy_sleep": "Le sommeil, c'est le sol sur lequel reposent les bocaux. Si on le coupe, tous les autres chiffres s'effondrent en silence.",
-                "soul_stillness": "Un esprit serein sait gérer son argent. Un esprit agité le dépense et appelle cela une décision.",
-                "soul_gratitude": "Celui qui prend conscience de ce qu'il possède déjà achète moins pour combler un manque.",
-                "soul_giving": "Une part fixe qui disparaît avant que vous n'ayez pu la conserver permet à l'argent de rester un outil, et non un maître.",
-                "soul_intent": "Une intention, c'est une consigne que l'on se donne à soi-même. Une résolution, c'est un espoir.",
-                "soul_centers": "Identifiez l'endroit où vous vous sentez bloqué, et la prochaine étape s'impose généralement d'elle-même.",
-                "growth_income": "La réduction des coûts a une limite. L'augmentation des revenus, non.",
-                "growth_learn": "Un livre dont on ne voit pas à quoi il pourrait servir relevait des dépenses de loisirs, et non de l'éducation.",
-                "growth_learn_library": "Nous vous conseillons sur les produits à acheter et les créateurs à soutenir. Nous n'hébergeons jamais les œuvres.",
-                "energy_training": "La formation est la seule dépense qui permet d'accroître la valeur de chaque heure de travail.",
-                "energy_food": "La nourriture, c'est le carburant pour la semaine que vos bocaux vous permettent de tenir. Le carburant, ça s'achète, ça ne tombe pas du ciel.",
-                "money_week_check": "Dix minutes par semaine : observer, se recentrer, se fixer un objectif. C'est mieux que de s'inquiéter tous les jours.",
-                "why": "Rumtelo — la maîtrise de la vie. Des outils simples qui vous aident à garder le contrôle — produit par produit."
-            }
+            "cta_week_check": "Bilan hebdomadaire"
         }
     }
 }
