@@ -1044,6 +1044,12 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.money.jars.names.EDUCATION': 'Opleiding',
         'features.money.jars.names.PLAY': 'Plezier',
         'features.money.jars.names.GIVE': 'Geven',
+        'features.money.jars.purpose.NECESSITIES': 'Huur, boodschappen en rekeningen',
+        'features.money.jars.purpose.FINANCIAL_FREEDOM': 'Beleggen; nooit uitgeven',
+        'features.money.jars.purpose.LONG_TERM_SAVINGS': 'Grotere plannen en een buffer',
+        'features.money.jars.purpose.EDUCATION': 'Boeken, cursussen, nieuwe vaardigheden',
+        'features.money.jars.purpose.PLAY': 'Vrij te besteden aan plezier',
+        'features.money.jars.purpose.GIVE': 'Doneren en anderen helpen',
         'features.money.jars.tile_of': 'van {amount} deze maand',
         'features.money.jars.tile_saved': 'Gespaard',
         'features.money.jars.tile_open_bills':

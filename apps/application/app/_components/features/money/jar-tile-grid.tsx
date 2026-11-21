@@ -64,8 +64,14 @@ function JarTile({
                     className="grid size-8 shrink-0 place-items-center rounded-lg border border-line bg-raised text-base">
                     {jarIcon(jar.key, jar.icon)}
                 </span>
-                <span className="min-w-0 pt-1 text-sm leading-tight font-semibold text-balance break-words text-fg">
-                    {name}
+                <span className="grid min-w-0 gap-0.5 pt-0.5">
+                    <span className="text-sm leading-tight font-semibold text-balance break-words text-fg">
+                        {name}
+                    </span>
+                    {/* One literal line so a beginner knows what the jar is for. */}
+                    <span className="text-xs leading-snug text-pretty text-fg-muted">
+                        {t(`purpose.${jar.key}`)}
+                    </span>
                 </span>
             </span>
 
