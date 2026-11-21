@@ -37,19 +37,19 @@ const focusRing =
 function SideMetric({ label, value, footnote, href, accent, className }: SideMetricProps) {
     const body = (
         <>
-            <Eyebrow className="block min-h-[2.5rem] overflow-hidden text-pretty break-words hyphens-auto">
-                {label}
-            </Eyebrow>
+            <Eyebrow className="block text-pretty break-words hyphens-auto">{label}</Eyebrow>
             <p
                 className={cn(
-                    'metric-value mt-1.5 min-h-8 font-display text-xl leading-none font-semibold tracking-tight tabular-nums transition-colors sm:text-2xl',
+                    'metric-value mt-1.5 font-display text-xl leading-none font-semibold tracking-tight tabular-nums transition-colors sm:text-2xl',
                     accent ? 'text-accent' : 'text-fg'
                 )}>
                 {value}
             </p>
-            <div className="mt-1.5 min-h-[2.25rem] font-mono text-[10px] leading-snug tracking-wide text-fg-faint uppercase">
-                {footnote ?? '\u00a0'}
-            </div>
+            {footnote ? (
+                <div className="mt-1 font-mono text-[10px] leading-snug tracking-wide text-fg-faint uppercase">
+                    {footnote}
+                </div>
+            ) : null}
         </>
     );
 
@@ -126,7 +126,7 @@ export function HeroKluis({
 
     return (
         <div className="border border-accent/30 bg-surface p-5 shadow-glow sm:p-6">
-            <div className="grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1.85fr)] lg:items-start lg:gap-6">
+            <div className="grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1.85fr)] lg:items-center lg:gap-6">
                 {/* Only this figure stays hero-sized */}
                 <Link href={incomeHref} className={cn('group block min-w-0', focusRing)}>
                     <Eyebrow>{eyebrow}</Eyebrow>
@@ -162,15 +162,15 @@ export function HeroKluis({
                     with the side column, so at lg four columns were too narrow and amounts
                     such as "€10,421.60" ran into each other. */}
                 <div className="@container min-w-0 lg:border-l lg:border-line lg:pl-5">
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-4 sm:gap-x-5 @2xl:grid-cols-4 @2xl:gap-0">
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-4 sm:gap-x-5">
                         {sideMetrics.map((metric, index) => (
                             <SideMetric
                                 key={metric.label}
                                 {...metric}
                                 className={cn(
                                     'min-w-0',
-                                    index > 0 && '@2xl:border-l @2xl:border-line @2xl:pl-4',
-                                    index < sideMetrics.length - 1 && '@2xl:pr-4'
+                                    index > 0 && 'border-l border-line pl-4',
+                                    index < sideMetrics.length - 1 && 'pr-4'
                                 )}
                             />
                         ))}

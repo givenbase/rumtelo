@@ -23,7 +23,6 @@ import { useCoachCopyContext } from '@/app/_lib/use-coach-copy-context';
 import { buildPeriodTravelScoreNote } from '@/app/_lib/period-travel-score-note';
 import { formatPeriodTravelLabels } from '@/app/_lib/period-travel-i18n';
 import { isProductEnabled } from '@/app/_lib/launch-products';
-import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { BoardStage, stageAtLeast } from '@/app/_lib/board-stage';
 import { useShellNav } from '@/app/_lib/use-shell-nav';
 import { resolveNextMove, type Weekday } from '@/app/_lib/next-move';
@@ -482,24 +481,15 @@ export function HomeDashboardClient() {
                     totalDelta={totalDelta}
                     incomeBreakdown={incomeBreakdown}
                     incomeHref={moneyPath('income')}
-                    // The stat row waits for the first spending (S-5.3 #4).
+                    // The stat row waits for the first spending (S-5.3 #4). "Left over" and "In
+                    // Play" are not repeated here: the jar grid below already shows both.
                     stats={
                         progress?.hasTransactions
                             ? [
                                   {
-                                      label: t('pages.dashboard.stats.avg_left'),
-                                      value: formatMoney(dashboard.avgLeftOver ?? 0),
-                                      tone: 'accent',
-                                  },
-                                  {
                                       label: t('pages.dashboard.stats.safe_per_day'),
                                       value: formatMoney(dashboard.safePerDay ?? 0),
                                       tone: 'accent',
-                                  },
-                                  {
-                                      label: t('pages.dashboard.stats.play_left'),
-                                      value: formatMoney(dashboard.playLeft ?? 0),
-                                      href: `/product/money/jars/${jarKeyToSlug('PLAY')}`,
                                   },
                               ]
                             : []
