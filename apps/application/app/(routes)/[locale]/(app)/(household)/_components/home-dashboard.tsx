@@ -2,7 +2,6 @@
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useState } from 'react';
-import Link from 'next/link';
 import {
     CAPABILITIES,
     CoachKind,
@@ -25,7 +24,8 @@ import { formatPeriodTravelLabels } from '@/app/_lib/period-travel-i18n';
 import { isProductEnabled } from '@/app/_lib/launch-products';
 import { BoardStage, stageAtLeast } from '@/app/_lib/board-stage';
 import { useShellNav } from '@/app/_lib/use-shell-nav';
-import { resolveNextMove, type Weekday } from '@/app/_lib/next-move';
+import { buildHomeTodo } from '@/app/_lib/home-todo';
+import type { Weekday } from '@/app/_lib/next-move';
 import { moneyPath } from '@/app/_lib/routes';
 import { settingsHref } from '@/app/_lib/settings-tabs';
 import { useWeekCheckStatus } from '@/app/_lib/use-week-check-status';
@@ -37,14 +37,11 @@ import { PortalWidget } from '@/components/features/home/portal-widget';
 import { TodayCard } from '@/components/features/home/today-card';
 import { CloseMonthFlow } from '@/components/features/home/close-month-flow';
 import { MonthScoreLog } from '@/components/features/home/month-score-log';
-import {
-    NextMoveCard,
-    NextMoveCardError,
-    NextMoveCardSkeleton,
-} from '@/components/features/home/next-move-card';
+import { NextMoveCardError, NextMoveCardSkeleton } from '@/components/features/home/next-move-card';
+import { TodoCard } from '@/components/features/home/todo-card';
 import { Week1Checklist } from '@/components/features/home/week1-checklist';
 import { JarTileGrid } from '@/components/features/money/jar-tile-grid';
-import { CoachLine } from '@/components/features/helpers';
+import { useCoachLine } from '@/components/features/helpers';
 import { HouseholdPermissionSection, roleCanSee } from '@/app/_lib/role-permissions';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
@@ -60,7 +57,7 @@ export function HomeDashboardClient() {
     const locale = useLocale();
     const { householdId, session } = useAuth();
     const { period } = useHouseholdShell();
-    const { canMutate, role, practicePreview } = useBoardWriteAccess();
+    const { role, practicePreview } = useBoardWriteAccess();
     const { hasCapability } = usePlanCapabilities();
     const canSeeHome = roleCanSee(role, HouseholdPermissionSection.HOME);
     const canSeeGrowth = roleCanSee(role, HouseholdPermissionSection.GROWTH);
@@ -140,7 +137,7 @@ export function HomeDashboardClient() {
 
     const weekCheck = useWeekCheckStatus();
 
-    // One close flow, two doors: the next-move card and the month score.
+    // One close flow, one door: the To do card's next move (the month score only reports).
     const [closeFlow, setCloseFlow] = useState<{ open: boolean; target: string | null }>({
         open: false,
         target: null,
@@ -178,9 +175,9 @@ export function HomeDashboardClient() {
               tDashboard,
           })
         : null;
-    // The Coach line sits after the jars and the month score. It never repeats the next-move
-    // card (inbox, bills, week check); Practice invites stay, because the card does not cover
-    // them. `CoachLine` itself drops everything when tips are off.
+    // The Coach's top tip is a row of the To do card. It never repeats what the card already
+    // says (inbox, bills, week check); Practice invites stay, because the card does not cover
+    // them. `useCoachLine` drops everything when tips are off.
     const coachCandidates: CoachLineCandidate[] = (() => {
         const practiceNudge: CoachLineCandidate | null =
             live && canManagePractice && pendingPracticeCount > 0
@@ -212,6 +209,7 @@ export function HomeDashboardClient() {
             });
         return practiceNudge ? [practiceNudge, ...feedCandidates] : feedCandidates;
     })();
+    const coachLine = useCoachLine(coachCandidates);
 
     // The month score waits until there is something to score (S-5.3 #1); levels wait for a close.
     const progress = liveData?.progress;
@@ -227,11 +225,11 @@ export function HomeDashboardClient() {
     const { stage, stageReady } = useShellNav();
     const fromRoutine = stageReady && stageAtLeast(stage, BoardStage.ROUTINE);
 
-    // The next-move card is about now, whatever period Home is showing.
+    // The To do card is about now, whatever period Home is showing.
     const nowDashboard = weekCheck.dashboard;
     const canAct = !practicePreview && role !== HouseholdRole.VIEWER;
-    const nextMove = nowDashboard
-        ? resolveNextMove({
+    const todo = nowDashboard
+        ? buildHomeTodo({
               today: todayIso(),
               reminderDay: weekCheck.reminderDay,
               weekCheckGraceOpen: weekCheck.graceOpen,
@@ -244,6 +242,9 @@ export function HomeDashboardClient() {
                   priorOpenPeriod: nowDashboard.monthScore.priorOpenPeriod,
               },
               progress: nowDashboard.progress,
+              canAct,
+              closeBlockers: nowDashboard.monthScore.closeBlockers ?? null,
+              hasCoachTip: coachLine.candidate !== null || coachLine.undoing,
           })
         : null;
     const formatMonth = (key: string) => formatPeriod(key, locale);
@@ -357,16 +358,22 @@ export function HomeDashboardClient() {
                 ) : null}
             </div>
 
-            <div className="order-2 min-w-0 lg:col-start-1" data-tour="home-next-move">
-                {!live ? null : nextMove ? (
-                    <NextMoveCard
-                        move={nextMove}
+            <div className="order-2 min-w-0 lg:col-start-1" data-tour="home-todo">
+                {!live ? null : todo ? (
+                    <TodoCard
+                        todo={todo}
                         canAct={canAct}
                         canImport={hasCapability(CAPABILITIES.moneyImport)}
                         isEuro={currency === 'EUR'}
                         formatMonth={formatMonth}
                         formatWeekday={formatWeekday}
                         onCloseMonth={startClose}
+                        coach={coachLine}
+                        allTipsCount={
+                            coachCandidates.length > 1 && fromRoutine
+                                ? coachCandidates.length
+                                : null
+                        }
                         travelNote={
                             travel.direction !== 'current'
                                 ? tDashboard('next_move.travel_note', {
@@ -506,46 +513,16 @@ export function HomeDashboardClient() {
             {showMonthScore ? (
                 <div id="month-score" className="order-5 min-w-0 scroll-mt-20 lg:col-start-1">
                     <MonthScoreLog
+                        compact
                         score={monthScore.score}
                         daysLeft={monthScore.daysLeft}
                         level={monthScore.level}
                         showLevel={Boolean(progress?.hasClosedMonth)}
-                        events={monthScore.events}
                         isClosed={liveData?.monthScore?.isClosed}
-                        closeBlockers={monthScore.closeBlockers}
-                        priorOpenPeriod={monthScore.priorOpenPeriod}
                         periodNote={periodScoreNote}
-                        // When the next-move card already says "close the month", the score card
-                        // shows only the score: no second close button and no repeated blockers
-                        // (the close flow itself walks through them).
-                        canCloseMonth={
-                            live &&
-                            canMutate &&
-                            liveData?.monthScore !== undefined &&
-                            !liveData.monthScore.isClosed &&
-                            nextMove?.kind !== 'CLOSE_PRIOR' &&
-                            nextMove?.kind !== 'CLOSE_MONTH'
-                        }
-                        period={monthScore.period}
-                        onStartClose={startClose}
                     />
                 </div>
             ) : null}
-
-            <div className="order-6 min-w-0 empty:hidden lg:col-start-1" data-tour="home-coach">
-                <CoachLine
-                    candidates={coachCandidates}
-                    footer={
-                        coachCandidates.length > 1 && fromRoutine ? (
-                            <Link
-                                href="/product/coach"
-                                className="inline-flex min-h-11 items-center text-sm font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
-                                {tDashboard('coach.all_tips', { count: coachCandidates.length })}
-                            </Link>
-                        ) : null
-                    }
-                />
-            </div>
 
             <CloseMonthFlow
                 open={closeFlow.open}

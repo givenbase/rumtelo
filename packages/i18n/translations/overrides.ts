@@ -818,7 +818,18 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.money.week_check.entry_status_open': 'Deze week: nog niet gedaan',
         'features.money.week_check.entry_status_done': 'Deze week: gedaan',
         // Home: one next move, week-1 checklist. Plurals are ICU, so DeepL skips them.
-        'pages.dashboard.next_move.eyebrow': 'Volgende stap',
+        'pages.dashboard.todo.eyebrow': 'Te doen · {count}',
+        'pages.dashboard.todo.eyebrow_empty': 'Te doen',
+        'pages.dashboard.todo.empty_title': 'Alles gedaan voor nu ✓',
+        'pages.dashboard.todo.view': 'Bekijken',
+        'pages.dashboard.todo.view_aria': 'Bekijken: {item}',
+        'pages.dashboard.todo.rows.inbox':
+            '{count, plural, one {# transactie te sorteren} other {# transacties te sorteren}}',
+        'pages.dashboard.todo.rows.week_check': 'Je weekcheck staat klaar — tien minuten.',
+        'pages.dashboard.todo.rows.bills':
+            '{count, plural, one {# rekening nog niet betaald} other {# rekeningen nog niet betaald}}',
+        'pages.dashboard.todo.rows.bills_names':
+            '{count, plural, one {# rekening nog niet betaald: {names}} other {# rekeningen nog niet betaald, onder andere {names}}}',
         'pages.dashboard.next_move.close_month.title':
             'Sluit {month} af: zie je score en neem mee wat over is.',
         'pages.dashboard.next_move.close_month.cta': 'Maand afsluiten',
@@ -1305,7 +1316,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Tip van De Coach · beste prijs-kwaliteitverhouding',
         'features.tour.chrome.helpers_hint':
             'Waarom-regels en potjeskaarten van De Coach (✦ De Coach). Hetzelfde als Instellingen → Voorkeuren. Standaard ingeschakeld voor beginners.',
-        'features.tour.pages.home.steps.coach.title': 'De Coach',
+        'features.tour.pages.home.steps.todo.title': 'Te doen',
         'pages.landing.faq.coach.question': 'Wat doet De Coach eigenlijk?',
         'pages.meta.coach': 'De Coach',
         'pages.settings.panels.coach.eyebrow': 'De Coach',
@@ -1320,8 +1331,8 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.coach.helpers.open_coach': 'Open De Coach',
         'features.money.jars.guides.GIVE.note':
             'Door te geven blijft geld een hulpmiddel en geen meester. Het wordt automatisch overgemaakt — De Coach helpt je te kiezen waarheen.',
-        'features.tour.pages.home.steps.coach.content':
-            'Eén tip over je huidige situatie en één actie die je kunt ondernemen. Tips — je kiest zelf. Schakel De Coach in of uit via ‘Help’ of ‘Instellingen’.',
+        'features.tour.pages.home.steps.todo.content':
+            'Je volgende stap en wat er nog meer wacht, op één plek. De Coach voegt één tip toe als die er is — je kiest zelf. Schakel De Coach in of uit via ‘Help’ of ‘Instellingen’.',
         'pages.settings.panels.automation.blurb':
             'Drie regels. Als alles is uitgeschakeld, geeft Rumtelo alleen weer, maar voert nooit acties uit. De instellingen voor De Coach vind je onder ‘Account’.',
         // Week check = weekcheck (not wekelijkse controle).

@@ -19,6 +19,6 @@ export {
 export { HelperGate, HelperGate as CoachGuideGate } from './helper-gate';
 export { CoachFeatureGate } from './coach-feature-gate';
 export { CoachMark } from './helper-mark';
-export { CoachLine } from './coach-line';
+export { CoachLine, CoachLineCtaLink, CoachLineUndo, useCoachLine } from './coach-line';
 export { JarGuideCard } from './jar-guide-card';
 export { EntityNotFoundState } from './entity-not-found-state';

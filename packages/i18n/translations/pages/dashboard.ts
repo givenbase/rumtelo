@@ -105,9 +105,23 @@ const dashboard = {
         attention_blurb:
             'A Practice asked to view or manage this board. Accept only if you know them.',
     },
-    /** Home's one next move (product state, not a Coach tip). */
+    /** Home's "To do" card: the next move first, then a few smaller rows, or the calm state. */
+    todo: {
+        eyebrow: 'To do · {count}',
+        eyebrow_empty: 'To do',
+        empty_title: 'All done for now ✓',
+        view: 'View',
+        view_aria: 'View: {item}',
+        rows: {
+            inbox: '{count, plural, one {# transaction to sort} other {# transactions to sort}}',
+            week_check: 'Your week check is ready — ten minutes.',
+            bills: '{count, plural, one {# bill still unpaid} other {# bills still unpaid}}',
+            bills_names:
+                '{count, plural, one {# bill still unpaid: {names}} other {# bills still unpaid, including {names}}}',
+        },
+    },
+    /** Home's next move, the first item of the To do card (product state, not a Coach tip). */
     next_move: {
-        eyebrow: 'Next move',
         close_month: {
             title: "Close {month}: see your score and carry what's left.",
             cta: 'Close month',

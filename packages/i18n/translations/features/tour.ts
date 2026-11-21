@@ -113,10 +113,10 @@ const tour = {
                 },
             },
             steps: {
-                coach: {
-                    title: 'The Coach',
+                todo: {
+                    title: 'To do',
                     content:
-                        'One tip on where you stand and one move you can make. Tips — you choose. Turn the Coach on or off in Help or Settings.',
+                        'Your next move and what else is waiting, in one place. The Coach adds one tip when it has one — you choose. Turn the Coach on or off in Help or Settings.',
                 },
                 hero: {
                     title: 'This month’s money',

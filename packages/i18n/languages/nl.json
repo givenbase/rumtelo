@@ -3713,9 +3713,9 @@
                         }
                     },
                     "steps": {
-                        "coach": {
-                            "title": "De Coach",
-                            "content": "Eén tip over je huidige situatie en één actie die je kunt ondernemen. Tips — je kiest zelf. Schakel De Coach in of uit via ‘Help’ of ‘Instellingen’."
+                        "todo": {
+                            "title": "Te doen",
+                            "content": "Je volgende stap en wat er nog meer wacht, op één plek. De Coach voegt één tip toe als die er is — je kiest zelf. Schakel De Coach in of uit via ‘Help’ of ‘Instellingen’."
                         },
                         "hero": {
                             "title": "Het geld van deze maand",
@@ -3999,8 +3999,20 @@
                 "attention_eyebrow": "Jouw akkoord nodig",
                 "attention_blurb": "Een Practice vroeg om dit bord te bekijken of te beheren. Accepteer alleen als je ze kent."
             },
+            "todo": {
+                "eyebrow": "Te doen · {count}",
+                "eyebrow_empty": "Te doen",
+                "empty_title": "Alles gedaan voor nu ✓",
+                "view": "Bekijken",
+                "view_aria": "Bekijken: {item}",
+                "rows": {
+                    "inbox": "{count, plural, one {# transactie te sorteren} other {# transacties te sorteren}}",
+                    "week_check": "Je weekcheck staat klaar — tien minuten.",
+                    "bills": "{count, plural, one {# rekening nog niet betaald} other {# rekeningen nog niet betaald}}",
+                    "bills_names": "{count, plural, one {# rekening nog niet betaald: {names}} other {# rekeningen nog niet betaald, onder andere {names}}}"
+                }
+            },
             "next_move": {
-                "eyebrow": "Volgende stap",
                 "close_month": {
                     "title": "Sluit {month} af: zie je score en neem mee wat over is.",
                     "cta": "Maand afsluiten"
