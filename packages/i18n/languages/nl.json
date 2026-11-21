@@ -2341,12 +2341,12 @@
                     "GIVE": "Geven"
                 },
                 "purpose": {
-                    "NECESSITIES": "Huur, boodschappen en rekeningen",
-                    "FINANCIAL_FREEDOM": "Beleggen; nooit uitgeven",
-                    "LONG_TERM_SAVINGS": "Grotere plannen en een buffer",
-                    "EDUCATION": "Boeken, cursussen, nieuwe vaardigheden",
-                    "PLAY": "Vrij te besteden aan plezier",
-                    "GIVE": "Doneren en anderen helpen"
+                    "NECESSITIES": "Huur, eten, rekeningen",
+                    "FINANCIAL_FREEDOM": "Beleggen, nooit uitgeven",
+                    "LONG_TERM_SAVINGS": "Grote plannen, buffer",
+                    "EDUCATION": "Cursussen, boeken, groei",
+                    "PLAY": "Plezier, vrij te besteden",
+                    "GIVE": "Doneren, anderen helpen"
                 },
                 "this_month": "Deze maand",
                 "this_month_of": "{available} van {allocated} deze maand",

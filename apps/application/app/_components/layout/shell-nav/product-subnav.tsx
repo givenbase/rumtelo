@@ -45,7 +45,9 @@ export function ProductSubnav({
     }, []);
 
     return (
-        <nav aria-label={ariaLabel} className="flex min-w-0 snap-x gap-1.5 overflow-x-auto">
+        <nav
+            aria-label={ariaLabel}
+            className="flex min-w-0 snap-x [scrollbar-width:none] gap-1.5 overflow-x-auto [&::-webkit-scrollbar]:hidden">
             {items.map(item => {
                 const active = item.key === activeKey;
                 const showBadge = item.badge === 'to_sort' && toSortCount > 0;
@@ -57,13 +59,13 @@ export function ProductSubnav({
                         href={item.href}
                         aria-current={active ? 'page' : undefined}
                         className={cn(
-                            'flex min-h-11 min-w-0 flex-1 snap-start items-center justify-center gap-1.5 rounded-full border px-2.5 text-center text-[13px] font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent/40 sm:flex-none sm:px-3.5 sm:py-1.5 sm:font-mono sm:text-xs sm:tracking-wide sm:uppercase',
+                            'flex min-h-11 shrink-0 snap-start items-center justify-center gap-1.5 rounded-full border px-3.5 text-center text-[13px] font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent/40 sm:py-1.5 sm:font-mono sm:text-xs sm:tracking-wide sm:uppercase',
                             active
                                 ? 'border-accent-hover bg-accent-soft text-accent'
                                 : 'border-line text-fg-muted hover:bg-raised hover:text-fg',
                             muted && 'border-dashed text-fg-faint'
                         )}>
-                        <span className="truncate">{t(item.labelKey)}</span>
+                        <span>{t(item.labelKey)}</span>
                         {item.state === 'later' ? (
                             <>
                                 <Icon name="clock" size="sm" aria-hidden className="shrink-0" />

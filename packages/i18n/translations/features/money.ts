@@ -71,12 +71,12 @@ const money = {
         },
         /** One literal line per jar on the jar tiles: what the money is for. */
         purpose: {
-            NECESSITIES: 'Rent, groceries and bills',
-            FINANCIAL_FREEDOM: 'Invest it; never spend it',
-            LONG_TERM_SAVINGS: 'Bigger plans and a buffer',
-            EDUCATION: 'Books, courses, new skills',
-            PLAY: 'Free to spend on fun',
-            GIVE: 'Donate and help others',
+            NECESSITIES: 'Rent, food, bills',
+            FINANCIAL_FREEDOM: 'Invest, never spend',
+            LONG_TERM_SAVINGS: 'Big plans, buffer',
+            EDUCATION: 'Courses, books, skills',
+            PLAY: 'Fun, spent freely',
+            GIVE: 'Donate, help others',
         },
         this_month: 'This month',
         this_month_of: '{available} of {allocated} this month',

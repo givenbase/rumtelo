@@ -69,8 +69,9 @@ function JarTile({
                         {name}
                     </span>
                     {/* One literal line so a beginner knows what the jar is for. */}
-                    {/* Fixed two-line height so every tile lines up, however long the copy. */}
-                    <span className="line-clamp-2 min-h-[2lh] text-xs leading-snug text-pretty text-fg-muted">
+                    {/* Every purpose line follows the same short "x, y" pattern so it fits one
+                        line; no forced height needed. */}
+                    <span className="truncate text-xs leading-snug text-fg-muted">
                         {t(`purpose.${jar.key}`)}
                     </span>
                 </span>
@@ -113,18 +114,22 @@ function JarTile({
                 />
             </span>
 
-            <span className="mt-auto flex min-w-0 items-center justify-between gap-2 font-mono text-xs">
-                <span className="min-w-0 truncate text-fg-muted">
+            {/* Two fixed rows: the saved amount is never cut off, and the open-bills chip
+                (or an empty row of the same height) keeps every tile the same height. */}
+            <span className="mt-auto grid min-w-0 gap-1.5 font-mono text-xs">
+                <span className="text-fg-muted">
                     {t('tile_saved')}{' '}
-                    <span className="font-medium text-fg tabular-nums">
+                    <span className="font-medium whitespace-nowrap text-fg tabular-nums">
                         {formatMoney(jar.potBalance)}
                     </span>
                 </span>
-                {openBills > 0 ? (
-                    <span className="inline-flex shrink-0 items-center rounded-full border border-warning/50 bg-warning/15 px-2 py-0.5 text-[11px] font-medium text-warning">
-                        {t('tile_open_bills', { count: openBills })}
-                    </span>
-                ) : null}
+                <span className="flex min-h-6 items-center">
+                    {openBills > 0 ? (
+                        <span className="inline-flex items-center rounded-full border border-warning/50 bg-warning/15 px-2 py-0.5 text-[11px] font-medium whitespace-nowrap text-warning">
+                            {t('tile_open_bills', { count: openBills })}
+                        </span>
+                    ) : null}
+                </span>
             </span>
         </Link>
     );
@@ -175,7 +180,7 @@ export function JarTileGrid({
     return (
         <div className={cn('@container min-w-0', className)}>
             {loading ? (
-                <div className="grid grid-cols-2 gap-2.5 @xl:grid-cols-3 @xl:gap-3">
+                <div className="grid grid-cols-1 gap-2.5 @md:grid-cols-2 @xl:gap-3 @3xl:grid-cols-3">
                     {Array.from({ length: 6 }, (_, index) => (
                         <JarTileSkeleton key={index} />
                     ))}
@@ -195,7 +200,7 @@ export function JarTileGrid({
                             <span>{t('of_amount', { amount: formatMoney(summary.envelope) })}</span>
                         </p>
                     ) : null}
-                    <ul className="grid grid-cols-2 gap-2.5 @xl:grid-cols-3 @xl:gap-3">
+                    <ul className="grid grid-cols-1 gap-2.5 @md:grid-cols-2 @xl:gap-3 @3xl:grid-cols-3">
                         {jars.map(jar => (
                             <li key={jar.id} className="min-w-0">
                                 <JarTile
