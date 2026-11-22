@@ -33,17 +33,17 @@ function monthLong(period: Period, locale: string): string {
     );
 }
 
-/** Today's read-out: short date, ISO week number and quarter. */
-function todayParts(locale: string): { date: string; week: number; quarter: number } {
+/** Today's read-out: weekday + day number for the tile, ISO week, quarter, month progress. */
+function todayParts(locale: string) {
     const now = new Date();
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
     return {
-        date: new Intl.DateTimeFormat(locale, {
-            weekday: 'short',
-            day: 'numeric',
-            month: 'short',
-        }).format(now),
+        weekday: new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(now),
+        day: now.getDate(),
         week: Number(currentWeekKey(now).slice(-2)),
         quarter: Math.ceil((now.getMonth() + 1) / 3),
+        daysLeft: daysInMonth - now.getDate(),
+        monthPct: Math.round((now.getDate() / daysInMonth) * 100),
     };
 }
 
@@ -159,7 +159,7 @@ export function PeriodSelector() {
                 sideOffset={8}
                 className="w-[min(100vw-2rem,19.5rem)] overflow-hidden rounded-2xl border border-line bg-surface p-0 text-fg shadow-[0_18px_50px_-28px_rgba(15,23,42,0.45)]">
                 {/* Header: the selected month; off the current month, one button back to it. */}
-                <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-1">
+                <div className="flex items-center justify-between gap-3 px-4 pt-3.5 pb-1">
                     <p className="min-w-0 truncate text-base font-semibold text-fg first-letter:uppercase">
                         {monthLong(period, locale)} {period.year}
                     </p>
@@ -178,15 +178,44 @@ export function PeriodSelector() {
                         </button>
                     )}
                 </div>
-                <p className="border-b border-line px-4 py-2 text-xs text-fg-muted">
-                    {t('period_today', {
-                        date: today.date,
-                        week: today.week,
-                        quarter: today.quarter,
-                    })}
-                </p>
+                {/* Today strip: a date tile, week + quarter chips and how far the month is. */}
+                <div className="mx-3 mt-2 mb-1 flex items-center gap-3 rounded-2xl bg-raised p-2.5">
+                    <div className="flex size-12 shrink-0 flex-col items-center justify-center rounded-xl bg-accent text-on-accent">
+                        <span className="text-[10px] leading-none font-medium tracking-wide uppercase opacity-80">
+                            {today.weekday.replace('.', '')}
+                        </span>
+                        <span className="mt-0.5 text-xl leading-none font-semibold tabular-nums">
+                            {today.day}
+                        </span>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-sm font-semibold text-fg">
+                                {t('period_today')}
+                            </span>
+                            <span className="rounded-full bg-surface px-2 py-0.5 text-[11px] font-medium text-fg-muted ring-1 ring-line">
+                                {t('period_week', { week: today.week })}
+                            </span>
+                            <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-medium text-accent">
+                                {t('period_quarter', { quarter: today.quarter })}
+                            </span>
+                        </div>
+                        <div className="mt-2 h-1 overflow-hidden rounded-full bg-line">
+                            <div
+                                className="h-full rounded-full bg-accent"
+                                style={{ width: `${today.monthPct}%` }}
+                            />
+                        </div>
+                        <p className="mt-1 truncate text-[11px] text-fg-muted">
+                            {t('period_days_left', {
+                                count: today.daysLeft,
+                                month: monthLong(current, locale),
+                            })}
+                        </p>
+                    </div>
+                </div>
 
-                <div className="px-3 pt-2.5 pb-3">
+                <div className="mt-2 border-t border-line px-3 pt-2.5 pb-3">
                     <div className="mb-2 flex items-center justify-center gap-4">
                         <button
                             type="button"
