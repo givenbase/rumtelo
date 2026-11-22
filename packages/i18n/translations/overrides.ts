@@ -928,6 +928,10 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.nav.aria.mobile_tabs': 'Hoofdmenu',
         'pages.nav.aria.money_sections': 'Onderdelen van Geld',
         // Locks that explain the gain. "Overstappen", never "Probeer" (no trial).
+        'pages.shell.period_today': 'Vandaag · {date} · week {week} · Q{quarter}',
+        'pages.shell.period_quarter': 'Q{quarter}',
+        'pages.shell.period_quarter_label': 'Kwartaal {quarter}',
+        'pages.shell.period_month_current': '{month}, deze maand',
         'pages.shell.plan_gains.title': 'Meer met {plan}',
         'pages.shell.plan_gains.price': '{plan} · {price}/maand',
         'pages.shell.plan_gains.close': 'Sluiten',
