@@ -4,14 +4,14 @@ Status: **proposal, not decided.** Date: 2026-11-23. Money doctrine (which pots 
 
 ## 0. Decisions so far (Given, 2026-11-23)
 
-These override the names used further down, which still show the first draft ("Nodig · Later · Vrij", "Buffer", "Af en toe").
+These override the names used further down, which still show the first draft ("Nodig · Later · Vrij", "Af en toe"). Read Nodig as Basis and Later as Toekomst.
 
 | Topic | Decision |
 | --- | --- |
 | Replace the six jars | Yes |
-| Group labels | **Vast · Toekomst · Vrij** (EN **Fixed · Future · Free**; ES Fijo · Futuro · Libre; FR Fixe · Futur · Libre). Set by hand per language, not machine-translated |
+| Group labels | **Basis · Toekomst · Vrij** (EN **Basics · Future · Free**; ES Básico · Futuro · Libre; FR Base · Futur · Libre). Set by hand per language, not machine-translated. First chosen as "Vast · Toekomst · Vrij"; "Vast" was replaced by "Basis" after the terminology check (§0.1) |
 | Method name | Given's suggestion: **Rumtelo-potjes** (EN "Rumtelo Pots") — to confirm |
-| Emergency pot | Called **Noodpot** (EN "Emergency fund"), not "Buffer": Given looked for "nood" and could not find it. Line: "Voor als er iets misgaat." One pot, target set by the household |
+| Emergency pot | Called **Buffer** (EN "Emergency fund"), the standard term at Nibud and the banks, with the line **"Voor nood en tegenvallers"** so someone looking for "nood" finds it. One pot, target set by the household |
 | Known irregular costs | A pot in **Toekomst**, not in Vast. "Af en toe" is rejected as a name; decided: **Grote uitgaven** (EN "Big expenses"), line "Je weet dat ze komen." |
 | Geven | Optional pot, off by default; existing households keep theirs |
 | Drill-down | Tapping a group opens a group page with its pots in order; tapping a pot opens the pot |
@@ -28,8 +28,8 @@ Pots per group after these decisions:
 
 | Group | Line under it | On by default | Optional |
 | --- | --- | --- | --- |
-| **Vast** (see §0.1: "Basis" recommended) | Wat moet, elke maand | Vaste kosten, Dagelijks | — |
-| **Toekomst** | Wat je opbouwt | Noodpot (see §0.1: "Buffer" recommended), Doelen | Beleggen, Leren |
+| **Basis** | Wat moet, elke maand | Vaste kosten, Dagelijks | — |
+| **Toekomst** | Wat je opbouwt | Buffer, Doelen | Beleggen, Leren |
 | **Vrij** | Wat je kiest | Plezier, showing how much is already committed to subscriptions | Geven |
 
 ### 0.1 Terminology check against the standards (2026-11-23)
@@ -42,12 +42,12 @@ Checked against Nibud's budgeting method, the official EU/CBS classification of 
 
 | Our word | Standard term | Verdict |
 | --- | --- | --- |
-| Vast (group, meaning "what must") | Nibud's "vast" means contractual and recurring and includes subscriptions | **Change recommended: Basis / Basics** (Nibud's own word for necessities is "basispakket"). "Vast" for essentials contradicts the standard and our own subscription rule |
+| Vast (group, meaning "what must") | Nibud's "vast" means contractual and recurring and includes subscriptions | **Changed to Basis / Basics (decided)** (Nibud's own word for necessities is "basispakket"). "Vast" for essentials contradicts the standard and our own subscription rule |
 | Toekomst / Future | none | Keep |
 | Vrij / Free | "vrij besteedbaar" is a standard phrase | Keep |
 | Vaste kosten | "Vaste lasten" is the standard (Nibud, ABN AMRO, Knab, CPB); "vaste kosten" is an understood synonym | Keep (deliberate: no "lasten"); map to Nibud "vaste lasten" in data |
 | Dagelijks | Nibud "huishoudelijke uitgaven"; debt help "leefgeld" | Keep; map to "huishoudelijke uitgaven" |
-| Noodpot | "Buffer" / "financiële buffer" (Nibud BufferBerekenaar, banks). "Noodpot" was found only on one blog | **Change recommended: Buffer**, with the line "Voor nood en tegenvallers" so people looking for "nood" find it |
+| Noodpot | "Buffer" / "financiële buffer" (Nibud BufferBerekenaar, banks). "Noodpot" was found only on one blog | **Changed to Buffer (decided)**, with the line "Voor nood en tegenvallers" so people looking for "nood" find it |
 | Doelen | banks say "spaardoelen" (not verified) | Keep; goals come from Planning and are not only savings |
 | Beleggen | not checked | Keep; never names a product |
 | Leren | ECOICOP 10 "Onderwijs" | Keep; map to Onderwijs |
