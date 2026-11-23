@@ -92,9 +92,17 @@ export const JarBalance = Jar.extend({
     categories: z.array(Category),
 });
 
+/**
+ * The whole board in one write: the service requires every jar of the household exactly
+ * once and a total of exactly 100.00 (`jar_split_keys` / `jar_split_total`), so the
+ * array can never be longer than the number of jars.
+ */
 export const UpdateJarSplit = z.object({
     householdId: HouseholdId,
-    split: z.array(z.object({ jarId: Id, percentage: z.number().min(0).max(100) })).min(1),
+    split: z
+        .array(z.object({ jarId: Id, percentage: z.number().min(0).max(100) }))
+        .min(1)
+        .max(Object.values(JarKey).length),
 });
 
 // Inferred types (same-module merge for consumers)

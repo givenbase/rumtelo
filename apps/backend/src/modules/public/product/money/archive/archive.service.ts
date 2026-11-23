@@ -22,6 +22,7 @@ import {
 } from '@rumtelo/contracts';
 
 import { PlanAccessService } from '../../../../../common/capability';
+import { checkJarSplit } from '../../../../../common/utils/jar-split.util';
 import { currentHouseholdId } from '../../../../../common/household/household.context';
 import { HouseholdScopedRepository } from '../../../../../common/household/household-scoped.repository';
 import { HouseholdSettingsService } from '../../../../auth/household/household-settings/household-settings.service';
@@ -84,6 +85,32 @@ export class ArchiveService {
         const canDebt = hasCapability(CAPABILITIES.moneyDebt, planKey);
         const canGoals = hasCapability(CAPABILITIES.growthGoals, planKey);
         const householdId = currentHouseholdId();
+
+        // Decide the jar split before anything is written. Restore is not transactional,
+        // so a split `updateSplit` would reject must never reach it: the same rule
+        // (`checkJarSplit`) runs here, in the dry run too, and a bad split is skipped
+        // with a warning instead of aborting a half-applied import.
+        const localJars = await this.jars.list();
+        const localKeyToId = new Map(localJars.map(jar => [jar.key, jar.id]));
+        let splitRows: Array<{ jarId: string; percentage: number }> | null = null;
+        if (applyJarSplit && payload.jars.length > 0) {
+            const checked = checkJarSplit(
+                localJars,
+                payload.jars.map(jar => ({ key: jar.key, percentage: jar.percentage }))
+            );
+            if (checked.ok) {
+                splitRows = checked.shares.map(share => ({
+                    jarId: localKeyToId.get(share.key)!,
+                    percentage: share.percentage,
+                }));
+            } else {
+                warnings.push(
+                    checked.reason === 'jar_split_keys'
+                        ? 'jar_split_incomplete'
+                        : 'jar_split_not_100'
+                );
+            }
+        }
 
         const settingsCounts = emptySection();
         const accountSettingsCounts = emptySection();
@@ -227,8 +254,6 @@ export class ArchiveService {
             }
         }
 
-        const localJars = await this.jars.list();
-        const localKeyToId = new Map(localJars.map(jar => [jar.key, jar.id]));
         const exportIdToKey = new Map<string, JarKey>();
         for (const jar of payload.jars) {
             if (jar.id) exportIdToKey.set(jar.id, jar.key);
@@ -242,24 +267,9 @@ export class ArchiveService {
         };
 
         let jarsSplitUpdated = false;
-        if (applyJarSplit && payload.jars.length > 0) {
-            const total = payload.jars.reduce((sum, jar) => sum + jar.percentage, 0);
-            if (Math.abs(total - 100) <= 0.01) {
-                const split = payload.jars
-                    .map(jar => {
-                        const jarId = localKeyToId.get(jar.key);
-                        return jarId ? { jarId, percentage: jar.percentage } : null;
-                    })
-                    .filter((row): row is { jarId: string; percentage: number } => row !== null);
-                if (split.length === localJars.length) {
-                    if (!dryRun) await this.jars.updateSplit(split);
-                    jarsSplitUpdated = true;
-                } else {
-                    warnings.push('jar_split_incomplete');
-                }
-            } else {
-                warnings.push('jar_split_not_100');
-            }
+        if (splitRows) {
+            if (!dryRun) await this.jars.updateSplit(splitRows);
+            jarsSplitUpdated = true;
         }
 
         // Holdings are not restored by the money archive; income / bills relink by

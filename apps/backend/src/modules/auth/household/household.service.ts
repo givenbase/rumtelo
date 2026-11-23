@@ -56,7 +56,7 @@ import { personDisplayName } from '../user/account/person-display-name.util';
 import { HouseholdBillingService } from './household-billing/household-billing.service';
 import { HouseholdSettings } from './household-settings/household-settings.entity';
 import { HouseholdSettingsService } from './household-settings/household-settings.service';
-import { resolveJarSplit, splitIncomeByJar } from './jar-split.util';
+import { resolveJarSplit, splitIncomeByJar } from '../../../common/utils/jar-split.util';
 import { defaultHouseholdName, mainAccountName } from './onboarding-defaults.util';
 import { AuthHousehold } from './managed/household/auth-household.entity';
 import { AuthInvitation } from './managed/invitation/auth-invitation.entity';

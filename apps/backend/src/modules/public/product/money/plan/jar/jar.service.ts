@@ -21,6 +21,7 @@ import {
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
 import { apiBadRequest } from '../../../../../../common/errors/api-user-error';
+import { resolveJarSplit, type JarShare } from '../../../../../../common/utils/jar-split.util';
 import { AuthHousehold } from '../../../../../auth/household/managed/household/auth-household.entity';
 import { AccountSettingsService } from '../../../../../auth/user/account/account-settings';
 import {
@@ -390,19 +391,37 @@ export class JarService {
     // ====================================================================
 
     /**
-     * A split that does not total 100 silently loses or invents money, so this is
-     * rejected rather than normalised.
+     * The split is the whole board in one write: every jar of this household exactly once,
+     * totalling exactly 100.00. A partial or oversized payload would leave the household
+     * above or below 100 and silently invent or lose money, so it is rejected, not
+     * normalised. Validation reuses the onboarding rule (`resolveJarSplit`: basis points,
+     * `jar_split_keys` / `jar_split_total`) so both entry points agree. A jar id from
+     * outside the household is simply not in the scoped list and counts as a bad key.
      */
     async updateSplit(split: { jarId: string; percentage: number }[]): Promise<JarDto[]> {
-        const total = split.reduce((sum, entry) => sum + entry.percentage, 0);
-        if (Math.abs(total - 100) > 0.01) {
-            throw new Error(`Jar split must total 100%, received ${total}%`);
-        }
-        const jars = await Promise.all(
-            split.map(({ jarId }) => this.jars.findOneOrFail({ id: jarId }))
+        const jars = await this.jars.find({});
+        const jarById = new Map(jars.map(jar => [jar.id, jar]));
+
+        const shares: JarShare[] = split.map(entry => {
+            const jar = jarById.get(entry.jarId);
+            if (!jar) throw apiBadRequest('jar_split_keys');
+            return { key: jar.key, percentage: entry.percentage };
+        });
+        const validated = resolveJarSplit(
+            jars.map(jar => ({
+                key: jar.key,
+                sortOrder: jar.sortOrder,
+                percentage: jar.percentage,
+            })),
+            shares
         );
-        for (const [index, jar] of jars.entries()) {
-            jar.percentage = split[index]!.percentage.toFixed(2);
+
+        const jarByKey = new Map(jars.map(jar => [jar.key, jar]));
+        for (const share of validated) {
+            // Round to basis points first so the stored value is exactly what was totalled.
+            jarByKey.get(share.key)!.percentage = (
+                Math.round(share.percentage * 100) / 100
+            ).toFixed(2);
         }
         await this.em.flush();
         return this.list();

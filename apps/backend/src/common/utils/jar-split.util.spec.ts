@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { JarKey } from '@rumtelo/contracts';
 
 import {
+    checkJarSplit,
     resolveJarSplit,
     splitIncomeByJar,
     type JarShare,
@@ -74,6 +75,18 @@ describe('resolveJarSplit', () => {
         );
     });
 
+    it.each([
+        ['negative', [105, -5, 0, 0, 0, 0]],
+        ['over 100', [110, 0, 0, 0, 0, -10]],
+        ['NaN', [Number.NaN, 25, 25, 25, 25, 0]],
+    ])('rejects a share that is %s even when the total reaches 100', (_label, percentages) => {
+        expect(() => resolveJarSplit(TEMPLATES, custom(percentages))).toThrow(
+            expect.objectContaining({
+                response: expect.objectContaining({ message: 'jar_split_total' }),
+            })
+        );
+    });
+
     it('rejects a duplicate key with jar_split_keys', () => {
         const duplicated = custom([55, 10, 10, 10, 10, 5]);
         duplicated[5] = { key: JarKey.PLAY, percentage: 5 };
@@ -84,6 +97,25 @@ describe('resolveJarSplit', () => {
         expect(() =>
             resolveJarSplit(TEMPLATES, custom([55, 10, 10, 10, 10, 5]).slice(0, 5))
         ).toThrow('jar_split_keys');
+    });
+});
+
+describe('checkJarSplit', () => {
+    it('returns the shares in template order for a valid split', () => {
+        const checked = checkJarSplit(TEMPLATES, custom([50, 15, 10, 10, 10, 5]).reverse());
+        expect(checked).toEqual({ ok: true, shares: custom([50, 15, 10, 10, 10, 5]) });
+    });
+
+    it('reports the failure as a value, not a throw', () => {
+        expect(checkJarSplit(TEMPLATES, custom([55, 10, 10, 10, 10, 4.994]))).toEqual({
+            ok: false,
+            reason: 'jar_split_total',
+            total: 99.99,
+        });
+        expect(checkJarSplit(TEMPLATES, custom([100, 0, 0, 0, 0, 0]).slice(0, 3))).toEqual({
+            ok: false,
+            reason: 'jar_split_keys',
+        });
     });
 });
 
