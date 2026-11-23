@@ -20,7 +20,7 @@ import { useHouseholdShell } from '@/components/features/shell/household-shell-c
 const FEED_KEYS = [`${MONEY_COACH_KEY_PREFIX}necessities_share`];
 
 /**
- * The one Coach line on the Money overview, after the six jar rows. Feed first
+ * The one Coach line on the Money overview, after the pot rows. Feed first
  * (`money.necessities_share`), then a local rule from the jar itself when Necessities needs
  * more than it gets. Owned here, not by `JarsPageClient embed`, so it can never render twice.
  */

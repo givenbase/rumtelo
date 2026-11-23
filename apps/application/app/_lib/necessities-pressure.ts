@@ -2,7 +2,7 @@ import type { JarBalance } from '@rumtelo/contracts';
 import { DEFAULT_GROUP_SPLIT, JarGroup, JarKey, jarGroupFor } from '@rumtelo/contracts';
 
 /**
- * When fixed costs / Necessities blow past the Eker envelope.
+ * When fixed costs / Necessities blow past the Basics envelope.
  *
  * Why we coach simplify + earn more (never raid FF):
  * `apps/backend/src/modules/public/product/money/README.md`
@@ -19,7 +19,7 @@ export type NecessitiesPressureInput = {
     fixedOutMonthlyCents: number;
     /** Fixed OUT on the Necessities jar only (cents). */
     necessitiesFixedMonthlyCents: number;
-    /** Household Necessities split % (defaults to Eker 55). */
+    /** Household Necessities split % (group default 55). */
     necessitiesPct?: number;
 };
 

@@ -7,7 +7,7 @@
  * first step and the routine name are full translation keys on the preset itself.
  * A preset is a suggestion: the person edits every word before anything is saved.
  *
- * Money presets respect the six-jar doctrine: planned future spends (emergency fund,
+ * Money presets respect the pots doctrine: planned future spends (emergency fund,
  * holiday, paying off a debt) draw on Long Term Savings, never on Financial Freedom,
  * which is for investing and is never spent.
  */

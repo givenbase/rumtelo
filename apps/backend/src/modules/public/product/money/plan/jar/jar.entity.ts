@@ -13,8 +13,8 @@ import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 /**
  * Jar Entity
  *
- * Household-owned jar instance — one of the six jars every household gets at
- * onboarding. Display defaults + capabilities are copied from the backoffice
+ * Household-owned jar instance — one of the pots a household has (three from
+ * onboarding, more once it refines a group). Display defaults + capabilities are copied from the backoffice
  * `JarTemplate`; the household may rename / re-split afterwards.
  *
  * @see JarTemplate
@@ -52,7 +52,7 @@ export class Jar extends HouseholdEntity {
     capabilities!: JarCapabilities;
 
     // ? ENUMS
-    /** Which of the six jars this is; unique per household. */
+    /** Which pot this is (`JarKey`); unique per household. */
     @Enum(NativeEnum({ JarKey, domain: 'money' }))
     key!: JarKey;
 

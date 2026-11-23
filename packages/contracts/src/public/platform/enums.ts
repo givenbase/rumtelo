@@ -148,7 +148,7 @@ export enum IncomeStability {
 }
 
 /**
- * How familiar the household is with the six-jar method — drives bank-setup coaching.
+ * How familiar the household is with splitting income into pots — drives bank-setup coaching.
  * Stored in `HouseholdAnswers` under {@link HouseholdAnswerKey.JAR_EXPERIENCE}.
  */
 export enum JarExperience {

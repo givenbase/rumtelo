@@ -59,7 +59,7 @@ export const CAPABILITY_CATALOG: Record<CapabilityKey, CapabilityDefinition> = {
         key: CAPABILITIES.moneyJars,
         kind: CapabilityKind.SCREEN,
         name: 'Jars',
-        description: 'The six jars — core money model.',
+        description: 'Rumtelo Pots — core money model.',
         sortOrder: 11,
     },
     [CAPABILITIES.moneySpending]: {

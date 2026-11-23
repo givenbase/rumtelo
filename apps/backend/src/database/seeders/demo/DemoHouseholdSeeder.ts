@@ -403,7 +403,7 @@ export class DemoHouseholdSeeder extends Seeder {
 
         await em.flush();
 
-        // Jar-sorted demo rows still need categoryId — otherwise Six Jars shows Uncategorized.
+        // Jar-sorted demo rows still need categoryId — otherwise the pots screen shows Uncategorized.
         await this.linkDemoCategories(em, householdId, jars);
         await em.flush();
 
