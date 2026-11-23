@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 
-import type { FixedCost, JarBalance } from '@rumtelo/contracts';
+import { JAR_GROUP_ORDER, type FixedCost, type JarBalance } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useTranslations } from '@rumtelo/i18n';
 import { cn } from '@rumtelo/utils';
@@ -11,7 +11,13 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { resolveJarName } from '@/app/_lib/jar-copy';
 import { jarIcon } from '@/app/_lib/jar-meta';
 import { openBillCountsByJar } from '@/app/_lib/jar-open-bills';
-import { orderJarsByGroup } from '@/app/_lib/jar-group';
+import {
+    GROUP_CHROME,
+    GROUP_PARAM,
+    groupSlug,
+    jarsInGroup,
+    sumGroupAmount,
+} from '@/app/_lib/jar-group';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { jarsMonthSummary, jarTileFigures } from '@/app/_lib/jar-tile';
 import { isLiveData } from '@/app/_lib/preview';
@@ -167,9 +173,10 @@ export function useOpenBillsByJar(period: { year: number; month: number }): Map<
 }
 
 /**
- * Six pots as a compact flat grid (2 columns, 3 when the container is wide) under one summary
- * line, in group order (Basics, Future, Free). Used on Home (inside the money hero); Money
- * uses the grouped `PotsBoard`. Both read open bills through `useOpenBillsByJar`.
+ * The pots under one summary line, in their three groups (Basics, Future, Free): a small
+ * numbered heading per group with its amount, then that group's tiles. Used on Home (inside
+ * the money hero); Money uses the fuller `PotsBoard` (bar, shares, one group at a time), which
+ * each heading here links to. Both read open bills through `useOpenBillsByJar`.
  */
 export function JarTileGrid({
     jars,
@@ -186,10 +193,11 @@ export function JarTileGrid({
     className?: string;
 }) {
     const t = useTranslations('features.money.jars');
+    const tGroups = useTranslations('features.money.groups');
     const { formatMoney } = useHouseholdCurrency();
     const openByJar = useOpenBillsByJar(period);
     const summary = jarsMonthSummary(jars);
-    const orderedJars = orderJarsByGroup(jars);
+    const groups = JAR_GROUP_ORDER.filter(group => jarsInGroup(jars, group).length > 0);
 
     return (
         <div className={cn('@container min-w-0', className)}>
@@ -214,17 +222,72 @@ export function JarTileGrid({
                             <span>{t('of_amount', { amount: formatMoney(summary.envelope) })}</span>
                         </p>
                     ) : null}
-                    <ul className="grid grid-cols-1 gap-2.5 @md:grid-cols-2 @xl:gap-3 @3xl:grid-cols-3">
-                        {orderedJars.map(jar => (
-                            <li key={jar.id} className="min-w-0">
-                                <JarTile
-                                    jar={jar}
-                                    openBills={openByJar.get(jar.id) ?? 0}
-                                    stacked={stacked}
-                                />
-                            </li>
-                        ))}
-                    </ul>
+                    <div className="grid min-w-0 gap-5">
+                        {groups.map(group => {
+                            const title = tGroups(`${group}.title`);
+                            const headingId = `home-pots-group-${groupSlug(group)}`;
+                            return (
+                                <section
+                                    key={group}
+                                    aria-labelledby={headingId}
+                                    className="grid min-w-0 gap-2.5">
+                                    <header className="flex min-w-0 items-center justify-between gap-3">
+                                        <div className="flex min-w-0 items-center gap-2">
+                                            <span
+                                                aria-hidden
+                                                className={cn(
+                                                    'grid size-6 shrink-0 place-items-center rounded-full border border-line bg-raised font-mono text-xs font-semibold',
+                                                    GROUP_CHROME[group].text
+                                                )}>
+                                                {JAR_GROUP_ORDER.indexOf(group) + 1}
+                                            </span>
+                                            <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                                                <h3
+                                                    id={headingId}
+                                                    className="text-sm leading-tight font-semibold text-fg">
+                                                    <Link
+                                                        href={`/product/money/jars?${GROUP_PARAM}=${groupSlug(group)}`}
+                                                        aria-label={tGroups('open_group', {
+                                                            group: title,
+                                                        })}
+                                                        className={cn(
+                                                            'inline-flex min-h-6 items-center rounded-md underline-offset-2 hover:underline',
+                                                            focusRing
+                                                        )}>
+                                                        {title}
+                                                        <span
+                                                            aria-hidden
+                                                            className="ml-1 text-fg-muted">
+                                                            ›
+                                                        </span>
+                                                    </Link>
+                                                </h3>
+                                                <p className="text-xs leading-snug text-fg-muted">
+                                                    {tGroups(`${group}.line`)}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <span className="shrink-0 font-mono text-xs font-medium whitespace-nowrap text-fg tabular-nums">
+                                            {formatMoney(
+                                                sumGroupAmount(jars, group, jar => jar.allocated)
+                                            )}
+                                        </span>
+                                    </header>
+                                    <ul className="grid grid-cols-1 gap-2.5 @md:grid-cols-2 @xl:gap-3 @3xl:grid-cols-3">
+                                        {jarsInGroup(jars, group).map(jar => (
+                                            <li key={jar.id} className="min-w-0">
+                                                <JarTile
+                                                    jar={jar}
+                                                    openBills={openByJar.get(jar.id) ?? 0}
+                                                    stacked={stacked}
+                                                />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </section>
+                            );
+                        })}
+                    </div>
                 </>
             )}
         </div>
