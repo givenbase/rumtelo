@@ -24,6 +24,22 @@ Further decisions the same day:
 | What the first group means | **What must be paid**, not "what recurs". A recurring cost the household chooses (cinema pass, streaming, gym) is paid from Vrij. When adding a recurring cost the app asks "Moet dit, of kies je dit?" |
 | Grote uitgaven | **Dropped as a pot** (it reads like "Vaste kosten"). Yearly and quarterly bills are fixed costs with a yearly/quarterly cadence; repairs and replacement come from the emergency pot; planned purchases are goals |
 
+### 0.2 Built as step 2 (Given, 2026-11-23): three pots, refine inside
+
+Given's rule: **55 / 20 / 25 is the split at group level; inside a group a household can specify further and turns that on itself.** This supersedes the "on by default" column below.
+
+| Topic | Decision / state |
+| --- | --- |
+| Default household | **Three pots**: Basis 55% · Toekomst 20% · Vrij 25% (one main pot per group) |
+| Refining | Optional pots are turned on per group in Settings › split: Basis → Dagelijks; Toekomst → Doelen, Beleggen, Leren; Vrij → Geven. A pot takes its share out of its group's main pot; the three group totals do not change |
+| Names | A main pot shows the group name while alone (Basis), its own name once refined (Vaste kosten, Buffer, Plezier) |
+| Turning off | Only while nothing references the pot (transactions, fixed costs, goals, rules, week-check lines); the share returns to the main pot |
+| Existing households | Keep their six pots untouched; they count as refined |
+| Pot that is off | Presets, merchants, categories and archive rows that target it land in the group's main pot. A Give pledge needs the Giving pot (no fallback) |
+| Share an optional pot takes when turned on | **Proposal, to confirm:** Dagelijks 20, Doelen 6, Beleggen 5, Leren 5, Geven 5 (`OPTIONAL_JAR_SHARE`) |
+| Coach | Group level: Basis above 60% and Toekomst under 10% (thresholds unchanged from before; copy to confirm) |
+| Not built (step 3) | "Buffer fills first", "Moet dit, of kies je dit?" on fixed costs, Basis derived from real fixed costs, category tags (ECOICOP/Nibud) |
+
 Pots per group after these decisions:
 
 | Group | Line under it | On by default | Optional |

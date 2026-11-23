@@ -80,3 +80,19 @@ Step 1 (three groups, new pot names, split validation) is on `dev`. See `docs/pr
 - **Application unit tests are not part of `pnpm test` (Low, S).** `apps/application` has no `test` script; its 16 node:test files only run by hand. Needs `tsx` as a devDependency — Given's approval.
 - **Decisions for Given:** remove the "Secrets of the Millionaire Mind / T. Harv Eker" book card (`apps/website/app/_components/landing/landing-why.tsx:9`) and footer attribution (`pages/landing.ts:387`); the brand line replacing "Six jars. Ten minutes a week." (`docs/brand/quotes.md`); the Coach tip that names 55% as the default starting point (changes with the default split in step 2); the pot name "Beleggen / Investing".
 - **Step 2 (needs a migration):** separate Buffer pot that fills first, Giving off by default, subscriptions under Fun with "Moet dit, of kies je dit?", category tags (ECOICOP, Nibud group, must/choose), default split 55/20/25 and Basis derived from real fixed costs.
+
+## Rumtelo Pots — follow-ups after step 2 (2026-11-23)
+
+Step 2 = three pots by default (55 / 20 / 25), optional pots turned on inside a group. Migrations `Migration20261123100000_JarKeyDailyGoals` and `Migration20261123100100_JarTemplateMainPots` are hand-written and **unverified until staging**.
+
+| Priority | Item | Note |
+| --- | --- | --- |
+| High | Cross-household reference on write (pre-existing) | `transaction.service.ts`, `fixed-cost.service.ts`, `sort-rule.service.ts` take a jar/category id from the client via `em.getReference` / `findOneOrFail` without a household check; a member who knows another household's id can attach own rows to it. Resolve through `HouseholdScopedRepository`. Found by the security review; not introduced by step 2 |
+| High | Staging check after deploy | No household onboarded in the window between migration and new backend with a split that is not 100%; turn pots on/off in two tabs; split save during an activation |
+| Medium | Given confirms | `OPTIONAL_JAR_SHARE` (Daily 20, Goals 6, Investing 5, Learning 5, Giving 5); Coach tips `basics-high` / `future-low`; MEMBER may turn pots on/off (same as the split); sweep rule "Basics surplus → Investing" when Investing is off |
+| Medium | Step 3 | Buffer fills first; "Moet dit, of kies je dit?"; Basics derived from real fixed costs; category tags |
+| Medium | Bill preset for an optional pot that is off | `fixed-cost.service.ts` ~515: an Education bill preset resolved to Future's main pot is refused (pot takes no bills) — decide whether Buffer may carry bills |
+| Low | `packages/utils` `coach-readiness.test.ts:69` fails (pre-existing) | asserts `GROWTH_TIP_PRODUCERS` is backlog, code has SHIP; makes root `pnpm test` red |
+| Low | Dead copy and constants | old `features.coach.split_tips.*` keys, `features.brand.auth_manifesto.jars.*`, `AUTH_MANIFESTO_JAR_VISUALS` / "Six jars" in `packages/ui` AuthManifesto, `DEFAULT_JAR_SPLIT` (deprecated), `.claude/rules/frontend.md` "six jars" |
+| Low | Guide card for a lone main pot | shows the key's guide, not the group purpose; `giving-finder.tsx:262` hard-codes the Give key; NL `guides.LONG_TERM_SAVINGS.links.goals` says "Doelstellingen" |
+| Low | Archive restore | warning `goal_give_pot_missing` has no translated text yet; restore is still not transactional |
