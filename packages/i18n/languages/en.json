@@ -76,6 +76,11 @@
                     "bill_link_outflow": "Link an outflow to settle an outgoing bill.",
                     "bill_link_inflow": "Link an inflow to settle a recurring credit.",
                     "asset_not_found": "That holding is not in your net worth.",
+                    "jar_not_found": "That pot is no longer here. Pick another pot.",
+                    "category_not_found": "That category is no longer here. Pick another category.",
+                    "transaction_not_found": "That transaction is no longer here. Refresh the page to see the current list.",
+                    "debt_not_found": "That debt is no longer here. Refresh the page to see your debts.",
+                    "fixed_cost_not_found": "That fixed cost is no longer here. Refresh the page to see your fixed costs.",
                     "bank_account_not_found": "That bank account is not in this household.",
                     "iban_already_linked": "This IBAN is already linked to an account.",
                     "account_name_taken": "An account with this name already exists.",
@@ -2359,7 +2364,20 @@
                 "all": "All",
                 "open_group": "Open {group}",
                 "view_label": "Show",
-                "bar_label": "Share of your income per group: {shares}"
+                "bar_label": "Share of your income per group: {shares}",
+                "basics_fit": {
+                    "over_title": "Basics is short for your fixed costs",
+                    "over_text": "Your fixed costs come to {costs} a month — {needed}% of your income. The pot that pays them is at {current}%.",
+                    "over_apply": "Set Basics to {needed}%",
+                    "over_stuck": "Free and Future have no share left to move. Start with your biggest fixed cost.",
+                    "over_effect": "{delta}% comes out of Free.",
+                    "over_effect_future": "{delta}% comes out of Free and Future — {future}% of it from Future.",
+                    "room_title": "Basics has room",
+                    "room_text": "Your fixed costs take {needed}% of your income. The Fixed costs pot is at {current}% — there is room.",
+                    "room_apply": "Move {delta}% to Future",
+                    "applied": "Filled in — check the numbers and save.",
+                    "no_income": "Once income lands, you’ll see here whether Basics fits your fixed costs."
+                }
             },
             "jars": {
                 "coach_line": {
@@ -3176,6 +3194,15 @@
                 "chosen": "✓ Chosen",
                 "give_here": "Give here",
                 "website": "Website ↗"
+            },
+            "must_or_choose": {
+                "question": "Must this be paid, or do you choose it?",
+                "must": "Must",
+                "must_hint": "Rent, energy, insurance — paid from {pot}.",
+                "choose": "I choose",
+                "choose_hint": "Streaming, cinema pass, gym — paid from {pot}.",
+                "other_pot": "Pick another pot",
+                "lands_in": "Paid from {pot}."
             },
             "fixed_form": {
                 "save": "Save fixed cost",
@@ -4535,7 +4562,7 @@
                 "quote": "Wealth isn’t a number. It’s grip on your life.",
                 "body": "We built Rumtelo for ourselves first. We earned fine and still wondered where it went — money, life, energy, time. Budget apps counted after the fact. Nobody helped us get grip again. So we made what we needed: clear tools, a tip from The Coach, and you choose. Then we brought it to market so others can do the same.",
                 "books_eyebrow": "GROUNDED IN PROVEN BOOKS",
-                "books_lead": "Rumtelo is not a new theory. It turns ideas from books that have shaped money, mindset and direction for decades into a daily routine you can actually keep.",
+                "books_lead": "The method is ours: Rumtelo Pots — three pots, split first, ten minutes a week. The thinking behind it comes from books that have shaped money, mindset and direction for decades.",
                 "signature": "Given Loyiso, founder & CEO · Charissa Peroti, co-founder · Amsterdam",
                 "manifesto": "Don’t chase the number. Own the direction.",
                 "audience": "Built for people who are doing well — and for people who are ready to.",
@@ -4631,7 +4658,7 @@
             },
             "footer": {
                 "aria": "Footer",
-                "attribution": "Rumtelo · Amsterdam, the Netherlands. Built by the founders for themselves first — then brought to market so others can use the same routine. Grounded in books like Rich Dad Poor Dad, Think and Grow Rich, Secrets of the Millionaire Mind and The Psychology of Money. Independent product — not affiliated with, endorsed by, or licensed from those authors.",
+                "attribution": "Rumtelo · Amsterdam, the Netherlands. Built by the founders for themselves first — then brought to market so others can use the same routine. Rumtelo Pots is our own method: three pots, split first, ten minutes a week. Inspired by books like Rich Dad Poor Dad, Think and Grow Rich and The Psychology of Money. Independent product — not affiliated with, endorsed by, or licensed from those authors.",
                 "disclaimer": "Rumtelo is a coach and an overview — not a bank and not a licensed financial adviser. Suggestions are education, not personal investment advice.",
                 "trust": {
                     "readonly": {
@@ -6501,7 +6528,7 @@
                         },
                         "sweep": {
                             "name": "Sweep surplus",
-                            "desc": "Whatever is left in Basics on the 1st moves to Investing."
+                            "desc": "Whatever is left in Basics on the 1st moves to Investing if that pot is on, otherwise to Future."
                         }
                     }
                 },

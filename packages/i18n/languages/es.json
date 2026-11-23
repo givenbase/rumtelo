@@ -76,6 +76,11 @@
                     "bill_link_outflow": "Vincula un gasto para liquidar una factura pendiente.",
                     "bill_link_inflow": "Vincula un ingreso para liquidar un abono periódico.",
                     "asset_not_found": "Esa participación no forma parte de tu patrimonio neto.",
+                    "jar_not_found": "That pot is no longer here. Pick another pot.",
+                    "category_not_found": "That category is no longer here. Pick another category.",
+                    "transaction_not_found": "That transaction is no longer here. Refresh the page to see the current list.",
+                    "debt_not_found": "That debt is no longer here. Refresh the page to see your debts.",
+                    "fixed_cost_not_found": "That fixed cost is no longer here. Refresh the page to see your fixed costs.",
                     "bank_account_not_found": "Esa cuenta bancaria no pertenece a este hogar.",
                     "iban_already_linked": "Este IBAN ya está vinculado a una cuenta.",
                     "account_name_taken": "Ya existe una cuenta con este nombre.",
@@ -2359,7 +2364,20 @@
                 "all": "All",
                 "open_group": "Open {group}",
                 "view_label": "Show",
-                "bar_label": "Share of your income per group: {shares}"
+                "bar_label": "Share of your income per group: {shares}",
+                "basics_fit": {
+                    "over_title": "Basics is short for your fixed costs",
+                    "over_text": "Your fixed costs come to {costs} a month — {needed}% of your income. The pot that pays them is at {current}%.",
+                    "over_apply": "Set Basics to {needed}%",
+                    "over_stuck": "Free and Future have no share left to move. Start with your biggest fixed cost.",
+                    "over_effect": "{delta}% comes out of Free.",
+                    "over_effect_future": "{delta}% comes out of Free and Future — {future}% of it from Future.",
+                    "room_title": "Basics has room",
+                    "room_text": "Your fixed costs take {needed}% of your income. The Fixed costs pot is at {current}% — there is room.",
+                    "room_apply": "Move {delta}% to Future",
+                    "applied": "Filled in — check the numbers and save.",
+                    "no_income": "Once income lands, you’ll see here whether Basics fits your fixed costs."
+                }
             },
             "jars": {
                 "coach_line": {
@@ -3176,6 +3194,15 @@
                 "chosen": "✓ Seleccionado",
                 "give_here": "Dona aquí",
                 "website": "Página web ↗"
+            },
+            "must_or_choose": {
+                "question": "Must this be paid, or do you choose it?",
+                "must": "Must",
+                "must_hint": "Rent, energy, insurance — paid from {pot}.",
+                "choose": "I choose",
+                "choose_hint": "Streaming, cinema pass, gym — paid from {pot}.",
+                "other_pot": "Pick another pot",
+                "lands_in": "Paid from {pot}."
             },
             "fixed_form": {
                 "save": "Guardar coste fijo",
@@ -4535,7 +4562,7 @@
                 "quote": "La riqueza no es una cifra. Es el control que ejerce sobre tu vida.",
                 "body": "Creamos Rumtelo, en primer lugar, para nosotros mismos. Ganábamos bien y, aun así, nos preguntábamos dónde se nos iba todo: el dinero, la vida, la energía, el tiempo. Las aplicaciones de gestión presupuestaria solo servían para hacer cuentas a posteriori. Nadie nos ayudaba a recuperar el control. Así que creamos lo que necesitábamos: herramientas claras, un consejo de «The Coach» y la posibilidad de elegir. Después, lo lanzamos al mercado para que otros pudieran hacer lo mismo.",
                 "books_eyebrow": "BASADO EN LIBROS DE RECONOCIDA VALORACIÓN",
-                "books_lead": "Rumtelo no es una teoría nueva. Convierte las ideas de los libros que han marcado la evolución del dinero, la mentalidad y el rumbo durante décadas en una rutina diaria que realmente puedes mantener.",
+                "books_lead": "The method is ours: Rumtelo Pots — three pots, split first, ten minutes a week. The thinking behind it comes from books that have shaped money, mindset and direction for decades.",
                 "signature": "Given Loyiso, fundador y director ejecutivo · Charissa Peroti, cofundadora · Ámsterdam",
                 "manifesto": "No te obsesiones con las cifras. Asume el control de la dirección.",
                 "audience": "Creado para quienes ya tienen éxito… y para quienes están preparados para alcanzarlo.",
@@ -4631,7 +4658,7 @@
             },
             "footer": {
                 "aria": "Pie de página",
-                "attribution": "Rumtelo · Amsterdam, the Netherlands. Built by the founders for themselves first — then brought to market so others can use the same routine. Grounded in books like Rich Dad Poor Dad, Think and Grow Rich, Secrets of the Millionaire Mind and The Psychology of Money. Independent product — not affiliated with, endorsed by, or licensed from those authors.",
+                "attribution": "Rumtelo · Amsterdam, the Netherlands. Built by the founders for themselves first — then brought to market so others can use the same routine. Rumtelo Pots is our own method: three pots, split first, ten minutes a week. Inspired by books like Rich Dad Poor Dad, Think and Grow Rich and The Psychology of Money. Independent product — not affiliated with, endorsed by, or licensed from those authors.",
                 "disclaimer": "Rumtelo es un servicio de orientación y una fuente de información general; no es un banco ni un asesor financiero autorizado. Las sugerencias tienen carácter informativo y no constituyen asesoramiento de inversión personalizado.",
                 "trust": {
                     "readonly": {
@@ -6501,7 +6528,7 @@
                         },
                         "sweep": {
                             "name": "Excedente de barrido",
-                            "desc": "Todo lo que quede en «Conceptos básicos» el día 1 se traslada a «Inversiones»."
+                            "desc": "Whatever is left in Basics on the 1st moves to Investing if that pot is on, otherwise to Future."
                         }
                     }
                 },

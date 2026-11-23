@@ -288,7 +288,7 @@ const landing = {
         body: 'We built Rumtelo for ourselves first. We earned fine and still wondered where it went — money, life, energy, time. Budget apps counted after the fact. Nobody helped us get grip again. So we made what we needed: clear tools, a tip from The Coach, and you choose. Then we brought it to market so others can do the same.',
         books_eyebrow: 'GROUNDED IN PROVEN BOOKS',
         books_lead:
-            'Rumtelo is not a new theory. It turns ideas from books that have shaped money, mindset and direction for decades into a daily routine you can actually keep.',
+            'The method is ours: Rumtelo Pots — three pots, split first, ten minutes a week. The thinking behind it comes from books that have shaped money, mindset and direction for decades.',
         signature: 'Given Loyiso, founder & CEO · Charissa Peroti, co-founder · Amsterdam',
         manifesto: 'Don’t chase the number. Own the direction.',
         audience: 'Built for people who are doing well — and for people who are ready to.',
@@ -386,7 +386,7 @@ const landing = {
     footer: {
         aria: 'Footer',
         attribution:
-            'Rumtelo · Amsterdam, the Netherlands. Built by the founders for themselves first — then brought to market so others can use the same routine. Grounded in books like Rich Dad Poor Dad, Think and Grow Rich, Secrets of the Millionaire Mind and The Psychology of Money. Independent product — not affiliated with, endorsed by, or licensed from those authors.',
+            'Rumtelo · Amsterdam, the Netherlands. Built by the founders for themselves first — then brought to market so others can use the same routine. Rumtelo Pots is our own method: three pots, split first, ten minutes a week. Inspired by books like Rich Dad Poor Dad, Think and Grow Rich and The Psychology of Money. Independent product — not affiliated with, endorsed by, or licensed from those authors.',
         disclaimer:
             'Rumtelo is a coach and an overview — not a bank and not a licensed financial adviser. Suggestions are education, not personal investment advice.',
         trust: {

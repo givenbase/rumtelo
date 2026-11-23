@@ -588,7 +588,7 @@ const settings = {
                 },
                 sweep: {
                     name: 'Sweep surplus',
-                    desc: 'Whatever is left in Basics on the 1st moves to Investing.',
+                    desc: 'Whatever is left in Basics on the 1st moves to Investing if that pot is on, otherwise to Future.',
                 },
             },
         },

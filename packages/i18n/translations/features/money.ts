@@ -92,6 +92,29 @@ const money = {
         view_label: 'Show',
         /** Text alternative of the stacked bar; {shares} reads "Basics 55%, Future 30%, Free 15%". */
         bar_label: 'Share of your income per group: {shares}',
+        /**
+         * Split settings: real monthly fixed costs vs the share Basics gets. Information, never
+         * shame — the button only fills in the numbers; the household still saves.
+         */
+        basics_fit: {
+            over_title: 'Basics is short for your fixed costs',
+            over_text:
+                'Your fixed costs come to {costs} a month — {needed}% of your income. The pot that pays them is at {current}%.',
+            over_apply: 'Set Basics to {needed}%',
+            /** Free and Future have no share left, so there is no button; a fixed-costs link follows. */
+            over_stuck:
+                'Free and Future have no share left to move. Start with your biggest fixed cost.',
+            over_effect: '{delta}% comes out of Free.',
+            /** Free is too small to give the whole difference; {future} is the part from Future. */
+            over_effect_future:
+                '{delta}% comes out of Free and Future — {future}% of it from Future.',
+            room_title: 'Basics has room',
+            room_text:
+                'Your fixed costs take {needed}% of your income. The Fixed costs pot is at {current}% — there is room.',
+            room_apply: 'Move {delta}% to Future',
+            applied: 'Filled in — check the numbers and save.',
+            no_income: 'Once income lands, you’ll see here whether Basics fits your fixed costs.',
+        },
     },
     jars: {
         /** The one Coach line after the jar rows on the Money overview. */
@@ -952,6 +975,19 @@ const money = {
         chosen: '✓ Chosen',
         give_here: 'Give here',
         website: 'Website ↗',
+    },
+    /**
+     * Fixed-cost form: Basics is for what must be paid, not for what recurs. A recurring cost
+     * you choose (streaming, cinema pass, gym) is paid from Free.
+     */
+    must_or_choose: {
+        question: 'Must this be paid, or do you choose it?',
+        must: 'Must',
+        must_hint: 'Rent, energy, insurance — paid from {pot}.',
+        choose: 'I choose',
+        choose_hint: 'Streaming, cinema pass, gym — paid from {pot}.',
+        other_pot: 'Pick another pot',
+        lands_in: 'Paid from {pot}.',
     },
     fixed_form: {
         save: 'Save fixed cost',

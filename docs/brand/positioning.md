@@ -76,7 +76,7 @@ Source: **Complete Brand Guidelines RB** (logo, palette, typography).
 
 | Token | Value | Role |
 |---|---|---|
-| Accent | `#06656C` brand teal | Primary actions, Freedom jar, growth |
+| Accent | `#06656C` brand teal | Primary actions, Investing pot, growth |
 | Accent tint | `#00777F` → `#2EAEAA` → `#4ED9D2` | Hover / dark-mode accents |
 | Ink | `#1A202D` brand navy | Primary text / dark surfaces |
 | Surfaces | `#EEF1F5` / `#FFFFFF` | Cool wash + white cards |
@@ -88,7 +88,7 @@ Source: **Complete Brand Guidelines RB** (logo, palette, typography).
 **Avoid:** purple/indigo as brand identity, neon, crypto gold, loud bank-blue gradients. Do not recolor or stretch the logo lockup.
 
 **Logo preference:** combination mark (gradient R + `umtelo` wordmark) + lettermark **R** favicon.  
-Metaphors: jars/vessels, direction, quiet geometric glyph. **Not** pigs, coins, €/$, charts.
+Metaphors: pots/vessels, direction, quiet geometric glyph. **Not** pigs, coins, €/$, charts.
 
 ---
 

@@ -58,6 +58,13 @@ const message = {
             bill_link_outflow: 'Link an outflow to settle an outgoing bill.',
             bill_link_inflow: 'Link an inflow to settle a recurring credit.',
             asset_not_found: 'That holding is not in your net worth.',
+            jar_not_found: 'That pot is no longer here. Pick another pot.',
+            category_not_found: 'That category is no longer here. Pick another category.',
+            transaction_not_found:
+                'That transaction is no longer here. Refresh the page to see the current list.',
+            debt_not_found: 'That debt is no longer here. Refresh the page to see your debts.',
+            fixed_cost_not_found:
+                'That fixed cost is no longer here. Refresh the page to see your fixed costs.',
             bank_account_not_found: 'That bank account is not in this household.',
             iban_already_linked: 'This IBAN is already linked to an account.',
             account_name_taken: 'An account with this name already exists.',

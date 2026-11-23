@@ -247,6 +247,17 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.settings.toasts.member_removed': 'Lid verwijderd',
         'pages.settings.toasts.member_remove_failed': 'Lid verwijderen lukte niet',
         'common.message.error.api.member_not_found': 'Dit lid hoort niet meer bij dit huishouden',
+        // Stale screen or deleted row: say what is gone, then one next move.
+        'common.message.error.api.jar_not_found':
+            'Dit potje bestaat niet meer. Kies een ander potje.',
+        'common.message.error.api.category_not_found':
+            'Deze categorie bestaat niet meer. Kies een andere categorie.',
+        'common.message.error.api.transaction_not_found':
+            'Deze transactie bestaat niet meer. Ververs de pagina voor de actuele lijst.',
+        'common.message.error.api.debt_not_found':
+            'Deze schuld bestaat niet meer. Ververs de pagina voor je schulden.',
+        'common.message.error.api.fixed_cost_not_found':
+            'Deze vaste kost bestaat niet meer. Ververs de pagina voor je vaste kosten.',
         'common.message.error.api.cannot_remove_owner':
             'De eigenaar van het huishouden kun je niet verwijderen',
         'common.message.error.api.member_remove_failed':
@@ -1272,10 +1283,13 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.tour.pages.debt.sections.what_for.body':
             'Houd bij wat je nog schuldig bent en wat het elke maand kost. Aflossingen gaan meestal uit Basis — deze pagina houdt het saldo in beeld.',
         'pages.settings.panels.automation.rules.sweep.desc':
-            'Wat op de 1e nog in Basis staat, gaat naar Beleggen.',
-        // CL-15: The Secret dropped from the book list (decision D10).
+            'Wat op de 1e nog in Basis staat, gaat naar Beleggen als dat potje aan staat, anders naar Toekomst.',
+        // CL-15: The Secret dropped from the book list (decision D10). 2026-11-23: Rumtelo Pots is
+        // the founders' own method — no visible string credits the six-jar book any more.
         'pages.landing.footer.attribution':
-            'Rumtelo · Amsterdam, Nederland. Eerst door de oprichters voor zichzelf ontwikkeld — en vervolgens op de markt gebracht zodat ook anderen er gebruik van kunnen maken. Gebaseerd op boeken als ‘Rich Dad Poor Dad’, ‘Think and Grow Rich’, ‘Secrets of the Millionaire Mind’ en ‘The Psychology of Money’. Onafhankelijk product — niet gelieerd aan, goedgekeurd door of in licentie gegeven door deze auteurs.',
+            'Rumtelo · Amsterdam, Nederland. Eerst door de oprichters voor zichzelf gebouwd — daarna op de markt gebracht, zodat anderen dezelfde routine kunnen gebruiken. Rumtelo-potjes is onze eigen methode: drie potjes, eerst verdelen, tien minuten per week. Geïnspireerd door boeken als ‘Rich Dad Poor Dad’, ‘Think and Grow Rich’ en ‘The Psychology of Money’. Onafhankelijk product — niet gelieerd aan, goedgekeurd door of in licentie gegeven door deze auteurs.',
+        'pages.landing.why.books_lead':
+            'De methode is van ons: Rumtelo-potjes — drie potjes, eerst verdelen, tien minuten per week. Het denkwerk erachter komt uit boeken die al tientallen jaren richting geven aan geld, mindset en koers.',
         // Weekly habit = routine, never praktijk/oefening/methode. EN source now says routine, so NL is pinned.
         'features.soul.stillness.mind_tie':
             'Een onrustige geest stuurt geld niet aan — hij geeft het uit en noemt dat een beslissing. Rust is geen meditatie, maar een strategie: de enige routine die niets kost en al het andere beschermt. Elke munt die je niet impulsief uitgeeft, is een munt die voor een potje kiest.',
@@ -1830,6 +1844,36 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.money.groups.open_group': 'Open {group}',
         'features.money.groups.view_label': 'Toon',
         'features.money.groups.bar_label': 'Aandeel van je inkomen per groep: {shares}',
+        // Split settings: fixed costs vs the Basics share. Information, never shame.
+        'features.money.groups.basics_fit.over_title': 'Basis is te krap voor je vaste kosten',
+        'features.money.groups.basics_fit.over_text':
+            'Je vaste kosten zijn {costs} per maand — {needed}% van je inkomen. Het potje dat ze betaalt staat op {current}%.',
+        'features.money.groups.basics_fit.over_apply': 'Zet Basis op {needed}%',
+        'features.money.groups.basics_fit.over_stuck':
+            'Vrij en Toekomst hebben geen aandeel meer om te verschuiven. Begin bij je grootste vaste kostenpost.',
+        'features.money.groups.basics_fit.over_effect': '{delta}% komt uit Vrij.',
+        'features.money.groups.basics_fit.over_effect_future':
+            '{delta}% komt uit Vrij en Toekomst — {future}% daarvan uit Toekomst.',
+        'features.money.groups.basics_fit.room_title': 'Basis heeft ruimte',
+        'features.money.groups.basics_fit.room_text':
+            'Je vaste kosten nemen {needed}% van je inkomen. Het potje Vaste kosten staat op {current}% — er is ruimte.',
+        'features.money.groups.basics_fit.room_apply': 'Zet {delta}% over naar Toekomst',
+        'features.money.groups.basics_fit.applied': 'Ingevuld — kijk de getallen na en sla op.',
+        'features.money.groups.basics_fit.no_income':
+            'Zodra er inkomen binnenkomt, zie je hier of Basis past bij je vaste kosten.',
+        // Fixed-cost form: Basics is for what must be paid; a recurring cost you choose goes to Free.
+        'features.money.must_or_choose.question': 'Moet dit, of kies je dit?',
+        'features.money.must_or_choose.must': 'Moet',
+        'features.money.must_or_choose.must_hint': 'Huur, energie, verzekering — gaat uit {pot}.',
+        'features.money.must_or_choose.choose': 'Kies ik',
+        'features.money.must_or_choose.choose_hint':
+            'Streaming, bioscooppas, sportschool — gaat uit {pot}.',
+        'features.money.must_or_choose.other_pot': 'Kies een ander potje',
+        'features.money.must_or_choose.lands_in': 'Gaat uit {pot}.',
+        // The Growth screen is "Doelen"; DeepL said "Doelstellingen" on the pot guide links.
+        'features.money.jars.guides.LONG_TERM_SAVINGS.links.goals': 'Doelen',
+        'features.money.jars.guides.FINANCIAL_FREEDOM.links.goals': 'Doelen',
+        'features.money.jars.guides.EDUCATION.links.goals': 'Doelen',
         // Refine a group: optional pots take their share out of the group; the group % stays.
         'features.money.groups.refine.title': 'Verfijn {group}',
         'features.money.groups.refine.intro':
