@@ -12,6 +12,10 @@ import {
 import { householdStorage } from '../../../common/household/household.context';
 import { BankAccount } from '../../public/product/money/ledger/bank-account/bank-account.entity';
 import { Jar } from '../../public/product/money/plan/jar/jar.entity';
+import {
+    JAR_SHARE_BASELINE_PERIOD,
+    JarShare,
+} from '../../public/product/money/plan/jar/jar-share.entity';
 import { IncomeSource } from '../../public/product/money/plan/income/income-source.entity';
 import { HouseholdSettings } from './household-settings/household-settings.entity';
 import { AuthHousehold } from './managed/household/auth-household.entity';
@@ -302,6 +306,29 @@ describe('HouseholdService.onboard', () => {
             })
         );
         expect(rowsOf(Jar).map(jar => jar.percentage)).toEqual(['50.00', '25.00', '25.00']);
+    });
+
+    it('gives every new pot a baseline share row with its starting percentage, in the same flush', async () => {
+        const { onboard, rowsOf, em } = setup();
+        await onboard(
+            input({
+                split: [
+                    { key: JarKey.NECESSITIES, percentage: 50 },
+                    { key: JarKey.LONG_TERM_SAVINGS, percentage: 25 },
+                    { key: JarKey.PLAY, percentage: 25 },
+                ],
+            })
+        );
+
+        const jars = rowsOf(Jar);
+        const shares = rowsOf(JarShare);
+        expect(shares).toHaveLength(jars.length);
+        expect(shares.map(share => [share.jar, share.period, share.percentage])).toEqual(
+            jars.map(jar => [jar, JAR_SHARE_BASELINE_PERIOD, jar.percentage])
+        );
+        expect(shares.every(share => share.household === 'household-new')).toBe(true);
+        // Pots, share rows and income are written in one unit of work: a single flush.
+        expect(em.flush).toHaveBeenCalledTimes(1);
     });
 
     it('rejects a split that names an optional pot before anything is created', async () => {

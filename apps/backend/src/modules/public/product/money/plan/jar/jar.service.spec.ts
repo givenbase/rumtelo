@@ -1,12 +1,22 @@
 import { BadRequestException } from '@nestjs/common';
 import { LockMode } from '@mikro-orm/core';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { JarKey } from '@rumtelo/contracts';
 
 import { householdStorage } from '../../../../../../common/household/household.context';
 import type { Jar } from './jar.entity';
+import { JAR_SHARE_BASELINE_PERIOD, JarShare } from './jar-share.entity';
 import { JarService } from './jar.service';
+
+/** "This month" for every write in this spec. */
+const NOW = '2026-11';
+
+beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-23T10:00:00Z'));
+});
+afterEach(() => vi.useRealTimers());
 
 const HOUSEHOLD = 'household-1';
 const OTHER_HOUSEHOLD = 'household-2';
@@ -34,12 +44,35 @@ function buildJars(household: string, board: Array<[JarKey, string]> = DEFAULT_B
     );
 }
 
+type ShareRow = { household: string; jar: { id: string }; period: string; percentage: string };
+
+/** The baseline row the migration wrote for every pot that existed when the table was made. */
+function baselineShares(jars: Jar[]): ShareRow[] {
+    return jars.map(jar => ({
+        household: (jar as unknown as { household: string }).household,
+        jar: { id: jar.id },
+        period: JAR_SHARE_BASELINE_PERIOD,
+        percentage: jar.percentage,
+    }));
+}
+
 /**
  * The scoped repository injects `household` into the filter, so the fake `em.find`
  * honours it exactly like Postgres would: a foreign household's jars are invisible.
+ * Share rows live in their own list; `withShareHistory: false` leaves the household's pots
+ * with no share rows at all (the deploy-window case).
  */
-function buildService(householdBoard: Array<[JarKey, string]> = DEFAULT_BOARD) {
-    const rows = [...buildJars(HOUSEHOLD, householdBoard), ...buildJars(OTHER_HOUSEHOLD)];
+function buildService(
+    householdBoard: Array<[JarKey, string]> = DEFAULT_BOARD,
+    options: { withShareHistory?: boolean } = {}
+) {
+    const householdJars = buildJars(HOUSEHOLD, householdBoard);
+    const otherJars = buildJars(OTHER_HOUSEHOLD);
+    const rows = [...householdJars, ...otherJars];
+    const shares: ShareRow[] = [
+        ...(options.withShareHistory === false ? [] : baselineShares(householdJars)),
+        ...baselineShares(otherJars),
+    ];
     const flush = vi.fn<() => Promise<void>>(async () => undefined);
     const em = {
         find: vi.fn<
@@ -48,11 +81,18 @@ function buildService(householdBoard: Array<[JarKey, string]> = DEFAULT_BOARD) {
                 where: { household: string },
                 options?: { lockMode?: LockMode; orderBy?: unknown }
             ) => Promise<Jar[]>
-        >(async (_entity, where) =>
-            rows.filter(
+        >(async (entity, where) =>
+            (entity === JarShare ? (shares as unknown as Jar[]) : rows).filter(
                 row => (row as unknown as { household: string }).household === where.household
             )
         ),
+        create: vi.fn<(entity: unknown, data: ShareRow) => ShareRow>((_entity, data) => ({
+            ...data,
+        })),
+        persist: vi.fn<(row: ShareRow) => void>(row => {
+            shares.push(row);
+        }),
+        remove: vi.fn<(row: ShareRow) => void>(),
         flush,
         transactional: undefined as unknown as <T>(cb: (tx: unknown) => Promise<T>) => Promise<T>,
     };
@@ -60,7 +100,7 @@ function buildService(householdBoard: Array<[JarKey, string]> = DEFAULT_BOARD) {
     em.transactional = cb => cb(em);
     const service = new JarService(em as never, {} as never, {} as never, {} as never);
     vi.spyOn(service, 'list').mockResolvedValue([]);
-    return { service, rows, flush, em };
+    return { service, rows, shares, flush, em };
 }
 
 function inHousehold<T>(run: () => Promise<T>): Promise<T> {
@@ -313,8 +353,9 @@ describe('JarService.updateSplit lock', () => {
 
         await inHousehold(() => service.updateSplit(fullSplit([50, 15, 10, 10, 10, 5])));
 
-        expect(em.find).toHaveBeenCalledTimes(1);
-        const [, where, options] = em.find.mock.calls[0]!;
+        const jarFinds = em.find.mock.calls.filter(([entity]) => entity !== JarShare);
+        expect(jarFinds).toHaveLength(1);
+        const [, where, options] = jarFinds[0]!;
         expect(where).toEqual({ household: HOUSEHOLD });
         expect(options).toMatchObject({
             orderBy: { id: 'ASC' },
@@ -347,5 +388,86 @@ describe('JarService.updateSplit lock', () => {
             response: expect.objectContaining({ message: 'jar_split_keys' }),
         });
         expect(flush).not.toHaveBeenCalled();
+    });
+});
+
+/**
+ * Share history (SP3-H): a split change writes this month's row, never an earlier one, so a
+ * later balance read keeps every past month at the share it had.
+ */
+describe('JarService.updateSplit share history', () => {
+    const shareOf = (shares: ShareRow[], key: JarKey, period: string) =>
+        shares.find(row => row.jar.id === `${HOUSEHOLD}-${key}` && row.period === period);
+
+    it('writes this month for the pots that changed and leaves every other pot and month alone', async () => {
+        const { service, shares } = buildService();
+
+        await inHousehold(() => service.updateSplit(fullSplit([50, 15, 10, 10, 10, 5])));
+
+        const ofHousehold = shares.filter(row => row.household === HOUSEHOLD);
+        expect(ofHousehold.filter(row => row.period === NOW).map(row => row.jar.id)).toEqual([
+            `${HOUSEHOLD}-${JarKey.NECESSITIES}`,
+            `${HOUSEHOLD}-${JarKey.FINANCIAL_FREEDOM}`,
+        ]);
+        expect(shareOf(shares, JarKey.NECESSITIES, NOW)!.percentage).toBe('50.00');
+        expect(shareOf(shares, JarKey.FINANCIAL_FREEDOM, NOW)!.percentage).toBe('15.00');
+        // The baseline (the past) is untouched.
+        expect(shareOf(shares, JarKey.NECESSITIES, JAR_SHARE_BASELINE_PERIOD)!.percentage).toBe(
+            '55.00'
+        );
+        expect(ofHousehold).toHaveLength(8);
+    });
+
+    it('overwrites the same month on a second change instead of adding a row', async () => {
+        const { service, shares } = buildService();
+
+        await inHousehold(() => service.updateSplit(fullSplit([50, 15, 10, 10, 10, 5])));
+        await inHousehold(() => service.updateSplit(fullSplit([45, 20, 10, 10, 10, 5])));
+
+        const necessities = shares.filter(
+            row => row.jar.id === `${HOUSEHOLD}-${JarKey.NECESSITIES}`
+        );
+        expect(necessities.map(row => [row.period, row.percentage])).toEqual([
+            [JAR_SHARE_BASELINE_PERIOD, '55.00'],
+            [NOW, '45.00'],
+        ]);
+    });
+
+    it('adds nothing when the split is saved unchanged', async () => {
+        const { service, shares } = buildService();
+        const before = shares.length;
+
+        await inHousehold(() => service.updateSplit(fullSplit([55, 10, 10, 10, 10, 5])));
+
+        expect(shares).toHaveLength(before);
+    });
+
+    it('writes the baseline first for a pot with no rows at all, so its past keeps its old share', async () => {
+        const { service, shares } = buildService(DEFAULT_BOARD, { withShareHistory: false });
+
+        await inHousehold(() => service.updateSplit(fullSplit([50, 15, 10, 10, 10, 5])));
+
+        const necessities = shares.filter(
+            row =>
+                row.household === HOUSEHOLD && row.jar.id === `${HOUSEHOLD}-${JarKey.NECESSITIES}`
+        );
+        expect(necessities.map(row => [row.period, row.percentage])).toEqual([
+            [JAR_SHARE_BASELINE_PERIOD, '55.00'],
+            [NOW, '50.00'],
+        ]);
+        // Every other pot gets its baseline too (a household with no rows at all), and no
+        // current-month row: it did not change.
+        expect(shareOf(shares, JarKey.PLAY, NOW)).toBeUndefined();
+        expect(shareOf(shares, JarKey.PLAY, JAR_SHARE_BASELINE_PERIOD)!.percentage).toBe('10.00');
+    });
+
+    it('never writes a share row for another household', async () => {
+        const { service, shares } = buildService();
+
+        await inHousehold(() => service.updateSplit(fullSplit([50, 15, 10, 10, 10, 5])));
+
+        const other = shares.filter(row => row.household === OTHER_HOUSEHOLD);
+        expect(other).toHaveLength(DEFAULT_BOARD.length);
+        expect(other.every(row => row.period === JAR_SHARE_BASELINE_PERIOD)).toBe(true);
     });
 });

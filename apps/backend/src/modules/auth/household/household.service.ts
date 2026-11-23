@@ -51,6 +51,10 @@ import { BankAccount } from '../../public/product/money/ledger/bank-account/bank
 import { IncomeAmountPeriod } from '../../public/product/money/plan/income/income-amount-period.entity';
 import { IncomeSource } from '../../public/product/money/plan/income/income-source.entity';
 import { Jar } from '../../public/product/money/plan/jar/jar.entity';
+import {
+    JAR_SHARE_BASELINE_PERIOD,
+    JarShare,
+} from '../../public/product/money/plan/jar/jar-share.entity';
 import { AccountSettingsService } from '../user/account/account-settings/account-settings.service';
 import { AccountService } from '../user/account/account.service';
 import { personDisplayName } from '../user/account/person-display-name.util';
@@ -556,7 +560,7 @@ export class HouseholdService {
 
         for (const meta of templates) {
             const percentage = percentageByKey.get(meta.key) ?? Number(meta.percentage);
-            this.em.create(Jar, {
+            const jar = this.em.create(Jar, {
                 household: org.id,
                 key: meta.key,
                 name: meta.name,
@@ -566,6 +570,13 @@ export class HouseholdService {
                 capabilities: { ...meta.capabilities },
                 sortOrder: meta.sortOrder,
                 defaultAccount: mainAccount.id,
+            } as never);
+            // The pot's share history starts here: this share since the pot existed.
+            this.em.create(JarShare, {
+                household: org.id,
+                jar,
+                period: JAR_SHARE_BASELINE_PERIOD,
+                percentage: percentage.toFixed(2),
             } as never);
         }
 

@@ -1,6 +1,6 @@
 import { LockMode } from '@mikro-orm/core';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
     JAR_CAPABILITIES,
@@ -18,7 +18,17 @@ import { Goal } from '../../targets/goal/goal.entity';
 import { WeekCheckAllocation } from '../../week-check/week-check-allocation.entity';
 import { FixedCost } from '../fixed-cost/fixed-cost.entity';
 import type { Jar } from './jar.entity';
+import { JAR_SHARE_BASELINE_PERIOD, JarShare } from './jar-share.entity';
 import { JarService } from './jar.service';
+
+/** "This month" for every write in this spec. */
+const NOW = '2026-11';
+
+beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-23T10:00:00Z'));
+});
+afterEach(() => vi.useRealTimers());
 
 const HOUSEHOLD = 'household-1';
 const OTHER_HOUSEHOLD = 'household-2';
@@ -72,6 +82,18 @@ function templateFor(key: OptionalJarKey, overrides: { percentage?: string } = {
     };
 }
 
+type ShareRow = { household: string; jar: { id: string }; period: string; percentage: string };
+
+/** The baseline row the migration wrote for every pot that existed when the table was made. */
+function baselineRows(jars: JarRow[]): ShareRow[] {
+    return jars.map(jar => ({
+        household: jar.household,
+        jar: { id: jar.id },
+        period: JAR_SHARE_BASELINE_PERIOD,
+        percentage: jar.percentage,
+    }));
+}
+
 type Referenced = 'Transaction' | 'FixedCost' | 'Goal' | 'SortRule' | 'WeekCheckAllocation';
 
 /**
@@ -91,11 +113,15 @@ function buildService(
          */
         categoryReferencing?: Partial<Record<'Transaction' | 'FixedCost' | 'SortRule', string[]>>;
         commitError?: Error;
+        /** Share history of the household; defaults to one baseline row per pot. */
+        shares?: ShareRow[];
     } = {}
 ) {
-    const rows = [
-        ...buildRows(HOUSEHOLD, options.board ?? DEFAULT_BOARD),
-        ...buildRows(OTHER_HOUSEHOLD, DEFAULT_BOARD),
+    const householdRowsSeed = buildRows(HOUSEHOLD, options.board ?? DEFAULT_BOARD);
+    const rows = [...householdRowsSeed, ...buildRows(OTHER_HOUSEHOLD, DEFAULT_BOARD)];
+    const shares: ShareRow[] = [
+        ...(options.shares ?? baselineRows(householdRowsSeed)),
+        ...baselineRows(buildRows(OTHER_HOUSEHOLD, DEFAULT_BOARD)),
     ];
     const templates = options.templates ?? OPTIONAL_JAR_KEYS.map(key => templateFor(key));
     const lockedWith: Array<unknown> = [];
@@ -136,7 +162,11 @@ function buildService(
                 where: { household: string; key?: unknown; id?: string },
                 findOptions?: { lockMode?: LockMode; orderBy?: unknown }
             ) => Promise<JarRow[]>
-        >(async (_entity, where, findOptions) => {
+        >(async (entity, where, findOptions) => {
+            // Share rows are a second table: not a jar read, never locked.
+            if (entity === JarShare) {
+                return shares.filter(row => row.household === where.household) as never;
+            }
             jarFinds.push({ where, options: findOptions });
             if (findOptions?.lockMode) lockedWith.push(findOptions.lockMode);
             return rows.filter(row => matches(row, where));
@@ -178,21 +208,24 @@ function buildService(
             }
             return count;
         }),
-        create: vi.fn<(entity: unknown, data: JarRow) => JarRow>((_entity, data) => ({
-            ...data,
-            id: `${data.household}-new-${data.key}`,
-        })),
-        persist: vi.fn<(row: JarRow) => void>(row => {
-            rows.push(row);
+        create: vi.fn<(entity: unknown, data: JarRow) => JarRow>((entity, data) =>
+            entity === JarShare ? { ...data } : { ...data, id: `${data.household}-new-${data.key}` }
+        ),
+        persist: vi.fn<(row: JarRow | ShareRow) => void>(row => {
+            if ('period' in row) shares.push(row);
+            else rows.push(row);
         }),
-        remove: vi.fn<(row: JarRow) => void>(row => {
-            rows.splice(rows.indexOf(row), 1);
+        remove: vi.fn<(row: JarRow | ShareRow) => void>(row => {
+            const list = 'period' in row ? shares : rows;
+            (list as unknown[]).splice(list.indexOf(row as never), 1);
         }),
         transactional: undefined as unknown as <T>(cb: (tx: unknown) => Promise<T>) => Promise<T>,
     };
     em.transactional = async cb => {
         const snapshot = rows.map(row => ({ row, percentage: row.percentage }));
+        const shareSnapshot = shares.map(row => ({ row, percentage: row.percentage }));
         const before = [...rows];
+        const sharesBefore = [...shares];
         try {
             const result = await cb(em);
             if (options.commitError) throw options.commitError;
@@ -200,6 +233,8 @@ function buildService(
         } catch (error) {
             rows.splice(0, rows.length, ...before);
             for (const entry of snapshot) entry.row.percentage = entry.percentage;
+            shares.splice(0, shares.length, ...sharesBefore);
+            for (const entry of shareSnapshot) entry.row.percentage = entry.percentage;
             throw error;
         }
     };
@@ -213,7 +248,7 @@ function buildService(
                 templates.find(template => template.key === key) ?? null,
         } as never
     );
-    return { service, rows, em, lockedWith, jarFinds, referenceCounted };
+    return { service, rows, shares, em, lockedWith, jarFinds, referenceCounted };
 }
 
 function inHousehold<T>(run: () => Promise<T>): Promise<T> {
@@ -595,5 +630,172 @@ describe('JarService.deactivate', () => {
 
         expect(householdRows(rows).map(row => [row.key, row.percentage])).toEqual(DEFAULT_BOARD);
         expect(asJar(householdRows(rows)[0]!).key).toBe(JarKey.NECESSITIES);
+    });
+});
+
+/**
+ * Share history (SP3-H): turning a pot on or off writes this month's rows and carries the
+ * past, so no earlier month is re-priced. After every change each pot's row for the current
+ * month equals its `percentage`.
+ */
+describe('share history on activate / deactivate', () => {
+    const SIX_POT_BOARD: Array<[JarKey, string]> = [
+        [JarKey.NECESSITIES, '35.00'],
+        [JarKey.DAILY, '20.00'],
+        [JarKey.LONG_TERM_SAVINGS, '15.00'],
+        [JarKey.FINANCIAL_FREEDOM, '5.00'],
+        [JarKey.PLAY, '20.00'],
+        [JarKey.GIVE, '5.00'],
+    ];
+
+    const historyOf = (shares: ShareRow[], key: JarKey, household = HOUSEHOLD) =>
+        shares
+            // A pot turned on in the test is minted as `<household>-new-<key>` by the fake.
+            .filter(
+                row =>
+                    row.household === household &&
+                    [`${household}-${key}`, `${household}-new-${key}`].includes(row.jar.id)
+            )
+            .map(row => [row.period, row.percentage])
+            .sort(([left], [right]) => left!.localeCompare(right!));
+
+    /** Every pot's row for the current month equals its percentage (or the history reads the same). */
+    const currentRowsMatch = (rows: JarRow[], shares: ShareRow[]) =>
+        householdRows(rows).every(jar => {
+            const own = shares
+                .filter(row => row.jar.id === jar.id && row.period <= NOW)
+                .sort((left, right) => left.period.localeCompare(right.period));
+            return own.at(-1)?.percentage === jar.percentage;
+        });
+
+    it('turns a pot on: it starts this month, the main pot keeps its past and steps down from now', async () => {
+        const { service, rows, shares } = buildService();
+
+        await inHousehold(() => service.activate(JarKey.DAILY));
+
+        expect(historyOf(shares, JarKey.DAILY)).toEqual([[NOW, '20.00']]);
+        expect(historyOf(shares, JarKey.NECESSITIES)).toEqual([
+            [JAR_SHARE_BASELINE_PERIOD, '55.00'],
+            [NOW, '35.00'],
+        ]);
+        expect(currentRowsMatch(rows, shares)).toBe(true);
+    });
+
+    it('writes the baseline first when the main pot has no share rows at all', async () => {
+        const { service, shares } = buildService({ shares: [] });
+
+        await inHousehold(() => service.activate(JarKey.DAILY));
+
+        expect(historyOf(shares, JarKey.NECESSITIES)).toEqual([
+            [JAR_SHARE_BASELINE_PERIOD, '55.00'],
+            [NOW, '35.00'],
+        ]);
+    });
+
+    it('turning a pot on in a month it already has a row (same month change) overwrites that month only', async () => {
+        const { service, shares } = buildService();
+
+        const dto = await inHousehold(() => service.activate(JarKey.GOALS));
+        await inHousehold(() => service.deactivate(dto.id));
+        await inHousehold(() => service.activate(JarKey.GOALS));
+
+        expect(historyOf(shares, JarKey.GOALS)).toEqual([[NOW, '6.00']]);
+        expect(historyOf(shares, JarKey.LONG_TERM_SAVINGS)).toEqual([
+            [JAR_SHARE_BASELINE_PERIOD, '20.00'],
+            [NOW, '14.00'],
+        ]);
+    });
+
+    it('leaves the history untouched when the activation is refused or rolled back', async () => {
+        const { service, shares } = buildService({
+            commitError: Object.assign(new Error('duplicate key'), { code: '23505' }),
+        });
+        const before = shares.map(row => ({ ...row }));
+
+        await expect(inHousehold(() => service.activate(JarKey.GIVE))).rejects.toBeTruthy();
+
+        expect(shares).toEqual(before);
+    });
+
+    it('turns a pot off: its history is added onto the main pot, period by period, then its rows go', async () => {
+        // Daily was turned on in September (20 % out of Basics), so before that Basics held 55.
+        const jarId = (key: JarKey) => ({ id: `${HOUSEHOLD}-${key}` });
+        const shareRow = (key: JarKey, period: string, percentage: string): ShareRow => ({
+            household: HOUSEHOLD,
+            jar: jarId(key),
+            period,
+            percentage,
+        });
+        const { service, rows, shares } = buildService({
+            board: SIX_POT_BOARD,
+            shares: [
+                shareRow(JarKey.NECESSITIES, JAR_SHARE_BASELINE_PERIOD, '55.00'),
+                shareRow(JarKey.NECESSITIES, '2026-09', '35.00'),
+                shareRow(JarKey.DAILY, '2026-09', '15.00'),
+                shareRow(JarKey.DAILY, '2026-10', '20.00'),
+                ...[
+                    JarKey.LONG_TERM_SAVINGS,
+                    JarKey.FINANCIAL_FREEDOM,
+                    JarKey.PLAY,
+                    JarKey.GIVE,
+                ].map(key =>
+                    shareRow(
+                        key,
+                        JAR_SHARE_BASELINE_PERIOD,
+                        SIX_POT_BOARD.find(([boardKey]) => boardKey === key)![1]
+                    )
+                ),
+            ],
+        });
+
+        await inHousehold(() => service.deactivate(`${HOUSEHOLD}-${JarKey.DAILY}`));
+
+        // 2026-09: 35 + 15 = 50 (Daily was 15 then); 2026-10: 35 + 20 = 55; now: 55.
+        expect(historyOf(shares, JarKey.NECESSITIES)).toEqual([
+            [JAR_SHARE_BASELINE_PERIOD, '55.00'],
+            ['2026-09', '50.00'],
+            ['2026-10', '55.00'],
+            [NOW, '55.00'],
+        ]);
+        expect(historyOf(shares, JarKey.DAILY)).toEqual([]);
+        expect(percentageOf(rows, JarKey.NECESSITIES)).toBe('55.00');
+        expect(currentRowsMatch(rows, shares)).toBe(true);
+    });
+
+    it('merges a pot that has no share rows at all by its current percentage', async () => {
+        const { service, shares } = buildService({ board: SIX_POT_BOARD, shares: [] });
+
+        await inHousehold(() => service.deactivate(`${HOUSEHOLD}-${JarKey.DAILY}`));
+
+        expect(historyOf(shares, JarKey.NECESSITIES)).toEqual([
+            [JAR_SHARE_BASELINE_PERIOD, '55.00'],
+            [NOW, '55.00'],
+        ]);
+    });
+
+    it('keeps another household’s share rows untouched', async () => {
+        const { service, shares } = buildService({ board: SIX_POT_BOARD });
+        const before = shares
+            .filter(row => row.household === OTHER_HOUSEHOLD)
+            .map(row => ({ ...row }));
+
+        await inHousehold(() => service.deactivate(`${HOUSEHOLD}-${JarKey.DAILY}`));
+        await inHousehold(() => service.activate(JarKey.EDUCATION));
+
+        expect(shares.filter(row => row.household === OTHER_HOUSEHOLD)).toEqual(before);
+    });
+
+    it('round-trips in the same month: the main pot ends with its original current share', async () => {
+        const { service, rows, shares } = buildService();
+
+        const dto = await inHousehold(() => service.activate(JarKey.EDUCATION));
+        await inHousehold(() => service.deactivate(dto.id));
+
+        expect(historyOf(shares, JarKey.LONG_TERM_SAVINGS)).toEqual([
+            [JAR_SHARE_BASELINE_PERIOD, '20.00'],
+            [NOW, '20.00'],
+        ]);
+        expect(historyOf(shares, JarKey.EDUCATION)).toEqual([]);
+        expect(currentRowsMatch(rows, shares)).toBe(true);
     });
 });

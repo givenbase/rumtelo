@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 
 import {
     DEFAULT_GROUP_SPLIT,
-    DEFAULT_JAR_SPLIT,
     JAR_CAPABILITIES,
     JAR_GROUP_BY_KEY,
     JAR_GROUP_ORDER,
@@ -57,9 +56,13 @@ describe('jar groups', () => {
     });
 
     it('sums the default split to 55 / 20 / 25', () => {
-        const shares = Object.values(JarKey).map(key => ({
-            key,
-            percentage: DEFAULT_JAR_SPLIT[key],
+        // A new household starts with the three main pots only.
+        const split = defaultJarSplitFor(
+            JAR_GROUP_ORDER.map(group => JAR_MAIN_KEY_BY_GROUP[group])
+        );
+        const shares = Object.entries(split).map(([key, percentage]) => ({
+            key: key as JarKey,
+            percentage: percentage ?? 0,
         }));
         const expected = {
             [JarGroup.BASIS]: 55,

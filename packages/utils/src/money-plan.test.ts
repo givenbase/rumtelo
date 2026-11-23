@@ -9,11 +9,10 @@ import {
 } from './money-plan';
 
 describe('jarPotBalance', () => {
-    it('sums months × allocation plus lifetime credits minus spends', () => {
+    it('adds the cumulative deposit and lifetime credits, minus spends', () => {
         assert.equal(
             jarPotBalance({
-                allocated: 100_00,
-                monthCount: 3,
+                cumulativeDeposit: 300_00,
                 lifetimeCredited: 50_00,
                 lifetimeSpent: 40_00,
             }),
@@ -21,15 +20,14 @@ describe('jarPotBalance', () => {
         );
     });
 
-    it('treats monthCount below 1 as one month', () => {
+    it('can go negative when spends exceed what was deposited', () => {
         assert.equal(
             jarPotBalance({
-                allocated: 80_00,
-                monthCount: 0,
+                cumulativeDeposit: 80_00,
                 lifetimeCredited: 0,
-                lifetimeSpent: 20_00,
+                lifetimeSpent: 100_00,
             }),
-            60_00
+            -20_00
         );
     });
 });

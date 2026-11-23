@@ -85,7 +85,7 @@ See `docs/ENTITY_STYLE.md`. Enforced by `pnpm lint:entities`:
 
 ## Households: the isolation model
 
-A **household** is one shared money unit — one board of jars, one week check, one
+A **household** is one shared money unit — one board of pots (`jar` in code), one week check, one
 pot of money to steer. It is a better-auth organization stored as `auth.household`
 (`modelName: 'household'`). A solo user is a
 household of one; a couple, family or friends-investing-together group are

@@ -16,16 +16,14 @@ import {
     mainJarKeyFor,
 } from '@rumtelo/contracts';
 import {
-    allocateByPercentage,
     categoryEnvelope,
+    currentYearMonth,
     endOfPeriodIso,
     fixedCostAppliesAsOf,
     jarCoverage,
     jarPotBalance,
     monthlyAmount,
     monthlyNetAsOf,
-    parsePeriodKey,
-    periodKeysInclusive,
     scaleJarsForHorizon,
     toPeriodKey,
     travelForPeriod,
@@ -35,7 +33,10 @@ import { HouseholdScopedRepository } from '../../../../../../common/household/ho
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
 import { apiBadRequest } from '../../../../../../common/errors/api-user-error';
 import { parseUniqueConstraint } from '../../../../../../common/utils/database-constraint-error.util';
-import { resolveJarSplit, type JarShare } from '../../../../../../common/utils/jar-split.util';
+import {
+    resolveJarSplit,
+    type JarShare as JarSplitShare,
+} from '../../../../../../common/utils/jar-split.util';
 import { AuthHousehold } from '../../../../../auth/household/managed/household/auth-household.entity';
 import { AccountSettingsService } from '../../../../../auth/user/account/account-settings';
 import {
@@ -55,7 +56,24 @@ import { Goal } from '../../targets/goal/goal.entity';
 import { WeekCheckAllocation } from '../../week-check/week-check-allocation.entity';
 import { FixedCost } from '../fixed-cost/fixed-cost.entity';
 import { Category } from './category.entity';
+import {
+    incomeChangePeriods,
+    toIncomeSources,
+    type IncomeAmountPeriodRow,
+    type IncomeSourceRow,
+} from './income-history.util';
 import { Jar } from './jar.entity';
+import { JAR_SHARE_BASELINE_PERIOD, JarShare } from './jar-share.entity';
+import {
+    allocateMonth,
+    cumulativeDepositsByPot,
+    fromBasisPoints,
+    mergeShareHistories,
+    healedShareHistory,
+    potShareHistory,
+    shareBasisPointsAt,
+    toBasisPoints,
+} from './jar-share.util';
 
 /**
  * The contract is the source of truth for wire shapes; deriving the DTO from it
@@ -121,6 +139,10 @@ export class JarService {
                 if (mainBasisPoints - shareBasisPoints <= 0) {
                     throw apiBadRequest('jar_share_too_small');
                 }
+                // Bring the history in line with the pots as they are now (old-backend drift)
+                // before this change builds on it.
+                const shares = await this.loadShares(tx);
+                this.reconcileHistory(tx, shares, jars);
                 main.percentage = fromBasisPoints(mainBasisPoints - shareBasisPoints);
 
                 const jar = scoped.create({
@@ -134,6 +156,12 @@ export class JarService {
                     defaultAccount: main.defaultAccount,
                 } as never);
                 tx.persist(jar);
+
+                // History: the main pot gives up its share from this month on and the new pot
+                // starts now, so no earlier month is re-priced.
+                const period = currentPeriodKey();
+                this.writeShare(tx, shares, main, period, main.percentage);
+                this.writeShare(tx, shares, jar, period, jar.percentage);
 
                 // The household still totals exactly 100.00 (same rule as `updateSplit`).
                 const after = [...jars, jar].map(row => ({
@@ -218,7 +246,14 @@ export class JarService {
         return this.balancesSnapshot(period);
     }
 
-    /** Snapshot balances for one calendar month (no Looking Ahead stacking). */
+    /**
+     * Snapshot balances for one calendar month (no Looking Ahead stacking).
+     *
+     * `allocated` is the viewed month's income split by the shares that applied in that month.
+     * `potBalance` is the sum of every month's deposit since the household started, each at its
+     * own month's income and share, plus credited, minus spent. Constant queries: the income
+     * rows and the share rows are each read once, whatever the number of months.
+     */
     private async balancesSnapshot(period: string) {
         const jars = await this.jars.find({}, { orderBy: { sortOrder: 'ASC' } });
         const startPeriod = await this.potStartPeriod(period);
@@ -230,7 +265,8 @@ export class JarService {
             spentByCategory,
             committedByJar,
             committedByCategory,
-            income,
+            incomeSources,
+            shareRows,
             lifetime,
         ] = await Promise.all([
             this.applyJarTranslations(jars.map(toJarDto)),
@@ -240,20 +276,39 @@ export class JarService {
             this.spentByCategory(period),
             this.committedOutByJar(),
             this.committedOutByCategory(),
-            this.monthlyNetIncome(endOfPeriodIso(period)),
+            this.loadIncomeSources(),
+            new HouseholdScopedRepository(this.em, JarShare).find({}),
             this.spentCreditedByJarBetween(startPeriod, period),
         ]);
         const jarById = new Map(jarDtos.map(jar => [jar.id, jar]));
+        const currentPeriod = currentPeriodKey();
+        const histories = jars.map(jar => ({
+            id: jar.id,
+            history: healedShareHistory(
+                sharesOf(shareRows, jar.id),
+                jar.percentage,
+                currentPeriod,
+                shareRows.length > 0
+            ),
+        }));
+        const incomeAsOfPeriod = (month: string) =>
+            monthlyNetAsOf(incomeSources, endOfPeriodIso(month));
         const allocations = new Map(
-            allocateByPercentage(
-                income,
-                jars.map(jar => ({ id: jar.id, percentage: Number(jar.percentage) }))
+            allocateMonth(
+                incomeAsOfPeriod(period),
+                histories.map(pot => ({
+                    id: pot.id,
+                    basisPoints: shareBasisPointsAt(pot.history, period),
+                }))
             ).map(row => [row.id, row.amount])
         );
-        const monthCount = periodKeysInclusive(
-            parsePeriodKey(startPeriod),
-            parsePeriodKey(period)
-        ).length;
+        const deposits = cumulativeDepositsByPot({
+            fromPeriod: startPeriod,
+            throughPeriod: period,
+            pots: histories,
+            incomeAsOfPeriod,
+            incomeChangePeriods: incomeChangePeriods(incomeSources),
+        });
 
         return Promise.all(
             jars.map(async jar => {
@@ -264,8 +319,7 @@ export class JarService {
                 const committedOut = committedByJar.get(jar.id) ?? 0;
                 const coverage = jarCoverage({ allocated, spent, credited, committedOut });
                 const potBalance = jarPotBalance({
-                    allocated,
-                    monthCount,
+                    cumulativeDeposit: deposits.get(jar.id) ?? 0,
                     lifetimeCredited: lifetime.credited.get(jar.id) ?? 0,
                     lifetimeSpent: lifetime.spent.get(jar.id) ?? 0,
                 });
@@ -348,51 +402,7 @@ export class JarService {
      */
     async monthlyNetIncome(asOfDate?: string): Promise<number> {
         const asOf = (asOfDate ?? new Date().toISOString().slice(0, 10)).slice(0, 10);
-        const householdId = currentHouseholdId();
-        const [rows, periodRows] = await Promise.all([
-            this.em.getConnection().execute<
-                {
-                    id: string;
-                    amount: string;
-                    cadence: Cadence;
-                    is_active: boolean;
-                    started_on: string | null;
-                    ends_on: string | null;
-                }[]
-            >(
-                `SELECT id, amount::text, cadence, is_active, started_on, ends_on
-                 FROM money_income_source WHERE household_id = ?`,
-                [householdId]
-            ),
-            this.em.getConnection().execute<
-                {
-                    income_source_id: string;
-                    amount: string;
-                    effective_on: string;
-                }[]
-            >(
-                `SELECT income_source_id, amount::text, effective_on
-                 FROM money_income_amount_period WHERE household_id = ?`,
-                [householdId]
-            ),
-        ]);
-        const periodsBySource = new Map<string, { amount: number; effectiveOn: string }[]>();
-        for (const row of periodRows) {
-            const list = periodsBySource.get(row.income_source_id) ?? [];
-            list.push({ amount: Number(row.amount), effectiveOn: row.effective_on });
-            periodsBySource.set(row.income_source_id, list);
-        }
-        return monthlyNetAsOf(
-            rows.map(row => ({
-                amount: Number(row.amount),
-                cadence: row.cadence,
-                isActive: row.is_active,
-                startedOn: row.started_on,
-                endsOn: row.ends_on,
-                periods: periodsBySource.get(row.id) ?? [],
-            })),
-            asOf
-        );
+        return monthlyNetAsOf(await this.loadIncomeSources(), asOf);
     }
 
     /**
@@ -500,7 +510,7 @@ export class JarService {
             const jars = await this.lockHouseholdJars(tx);
             const jarById = new Map(jars.map(jar => [jar.id, jar]));
 
-            const shares: JarShare[] = split.map(entry => {
+            const shares: JarSplitShare[] = split.map(entry => {
                 const jar = jarById.get(entry.jarId);
                 if (!jar) throw apiBadRequest('jar_split_keys');
                 return { key: jar.key, percentage: entry.percentage };
@@ -514,12 +524,20 @@ export class JarService {
                 shares
             );
 
+            // History first: after this, every pot's share for this month is what the pot says
+            // today, so a changed pot is exactly a pot whose new value differs from it.
+            const shareRows = await this.loadShares(tx);
+            this.reconcileHistory(tx, shareRows, jars);
+            const period = currentPeriodKey();
             const jarByKey = new Map(jars.map(jar => [jar.key, jar]));
             for (const share of validated) {
+                const jar = jarByKey.get(share.key)!;
                 // Round to basis points first so the stored value is exactly what was totalled.
-                jarByKey.get(share.key)!.percentage = (
-                    Math.round(share.percentage * 100) / 100
-                ).toFixed(2);
+                const next = (Math.round(share.percentage * 100) / 100).toFixed(2);
+                // Only a real change writes a row, so saving an untouched pot adds nothing.
+                const changed = toBasisPoints(jar.percentage) !== toBasisPoints(next);
+                jar.percentage = next;
+                if (changed) this.writeShare(tx, shareRows, jar, period, next);
             }
             await tx.flush();
         });
@@ -649,9 +667,32 @@ export class JarService {
             ]);
             if (references.some(count => count > 0)) throw apiBadRequest('jar_not_empty');
 
+            // Past months keep the money both pots had: the removed pot's history is added onto
+            // the main pot's, period by period, before the pot (and its rows) go.
+            const shareRows = await this.loadShares(tx);
+            this.reconcileHistory(tx, shareRows, locked);
+            const period = currentPeriodKey();
+            const merged = mergeShareHistories(
+                potShareHistory(sharesOf(shareRows, main.id), main.percentage),
+                potShareHistory(sharesOf(shareRows, jar.id), jar.percentage),
+                period
+            );
             main.percentage = fromBasisPoints(
                 toBasisPoints(main.percentage) + toBasisPoints(jar.percentage)
             );
+            for (const share of merged) {
+                this.writeShare(
+                    tx,
+                    shareRows,
+                    main,
+                    share.period,
+                    fromBasisPoints(share.basisPoints)
+                );
+            }
+            // The cached percentage wins if the history had drifted from it.
+            this.writeShare(tx, shareRows, main, period, main.percentage);
+            const shareScoped = new HouseholdScopedRepository(tx, JarShare);
+            for (const row of sharesOf(shareRows, jar.id)) shareScoped.remove(row);
             scoped.remove(jar);
         });
     }
@@ -662,6 +703,91 @@ export class JarService {
     }
 
     // Private
+
+    /** Every share row of the household (the whole history is a handful of rows per pot). */
+    private loadShares(tx: EntityManager): Promise<JarShare[]> {
+        return new HouseholdScopedRepository(tx, JarShare).find({});
+    }
+
+    /**
+     * Set the pot's share from `period` on: update that month's row, or add one. `shareRows` is
+     * the household's loaded list and is kept in step, so later reads in the same transaction
+     * see the write. Callers keep the invariant: after any change, every pot's row for the
+     * current period equals `jar.percentage`.
+     */
+    private writeShare(
+        tx: EntityManager,
+        shareRows: JarShare[],
+        jar: Jar,
+        period: string,
+        percentage: string
+    ): void {
+        const existing = shareRows.find(row => row.jar.id === jar.id && row.period === period);
+        if (existing) {
+            existing.percentage = percentage;
+            return;
+        }
+        const created = new HouseholdScopedRepository(tx, JarShare).create({
+            jar,
+            period,
+            percentage,
+        });
+        tx.persist(created);
+        shareRows.push(created);
+    }
+
+    /**
+     * Bring the share history in line with the pots as they are today, before a write builds on
+     * it. The old backend can still run `activate` / `deactivate` / `updateSplit` for a short
+     * while after `money_jar_share` exists, and it writes no share rows. Two repairs, nothing
+     * else:
+     *
+     * - A pot with NO rows: if the household has no share rows at all (the table was not filled
+     *   yet), every such pot gets the baseline row (`JAR_SHARE_BASELINE_PERIOD`) with its
+     *   percentage, which is what reads already treated it as. If the household has rows for
+     *   other pots, this pot was created by the old code: its first row goes at the CURRENT
+     *   month, so it counts from now on, like a pot turned on now, and never from 1970, which
+     *   would push earlier months above 100 %.
+     * - A pot whose share for the current month differs from `jar.percentage` (an old-code
+     *   change): a current-month row with `jar.percentage` is written. The drift stays confined
+     *   to the months of the deploy window.
+     *
+     * After this, every pot's row for the current month equals `jar.percentage`.
+     */
+    private reconcileHistory(tx: EntityManager, shareRows: JarShare[], jars: Jar[]): void {
+        const householdHasRows = shareRows.length > 0;
+        const period = currentPeriodKey();
+        for (const jar of jars) {
+            const own = sharesOf(shareRows, jar.id);
+            if (own.length === 0) {
+                const first = householdHasRows ? period : JAR_SHARE_BASELINE_PERIOD;
+                this.writeShare(tx, shareRows, jar, first, jar.percentage);
+                continue;
+            }
+            const shareNow = shareBasisPointsAt(potShareHistory(own, jar.percentage), period);
+            if (shareNow !== toBasisPoints(jar.percentage)) {
+                this.writeShare(tx, shareRows, jar, period, jar.percentage);
+            }
+        }
+    }
+
+    /** Income sources and their amount history, two queries, mapped for `monthlyNetAsOf`. */
+    private async loadIncomeSources() {
+        const householdId = currentHouseholdId();
+        const [sourceRows, periodRows] = await Promise.all([
+            this.em.getConnection().execute<IncomeSourceRow[]>(
+                `SELECT id, amount::text, cadence, is_active, started_on, ends_on
+                 FROM money_income_source WHERE household_id = ?`,
+                [householdId]
+            ),
+            this.em.getConnection().execute<IncomeAmountPeriodRow[]>(
+                `SELECT income_source_id, amount::text, effective_on
+                 FROM money_income_amount_period WHERE household_id = ?`,
+                [householdId]
+            ),
+        ]);
+        return toIncomeSources(sourceRows, periodRows);
+    }
 
     /**
      * Lock every jar of the household for the rest of the transaction, in a fixed order (by
@@ -864,14 +990,18 @@ export class JarService {
     }
 }
 
-/** A stored percentage (decimal string or number) as integer basis points (0.01 %). */
-function toBasisPoints(percentage: string | number): number {
-    return Math.round(Number(percentage) * 100);
+/**
+ * The budget month a write belongs to, found the way the rest of the money module finds "this
+ * month" (`travelForPeriod`: the calendar month of today).
+ */
+function currentPeriodKey(now = new Date()): string {
+    const { year, month } = currentYearMonth(now);
+    return toPeriodKey(year, month);
 }
 
-/** Basis points back to the stored decimal string with two decimals. */
-function fromBasisPoints(basisPoints: number): string {
-    return (basisPoints / 100).toFixed(2);
+/** One pot's share rows out of the household's list. */
+function sharesOf(shareRows: readonly JarShare[], jarId: string): JarShare[] {
+    return shareRows.filter(row => row.jar.id === jarId);
 }
 
 function toJarDto(jar: Jar): JarDto {

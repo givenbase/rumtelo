@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
     JAR_CAPABILITIES,
@@ -11,7 +11,17 @@ import {
 
 import { householdStorage } from '../../../../../../common/household/household.context';
 import type { Jar } from './jar.entity';
+import { JAR_SHARE_BASELINE_PERIOD, JarShare } from './jar-share.entity';
 import { JarService } from './jar.service';
+
+/** "This month" for every write in this spec. */
+const NOW = '2026-11';
+
+beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-23T10:00:00Z'));
+});
+afterEach(() => vi.useRealTimers());
 
 /**
  * Households created before the three-pot default keep their six pots untouched. These specs
@@ -73,9 +83,29 @@ function template(key: OptionalJarKey) {
     };
 }
 
+type ShareRow = { household: string; jar: { id: string }; period: string; percentage: string };
+
+/** The baseline row the migration wrote for every pot that existed when the table was made. */
+const baselineRows = (jars: JarRow[]): ShareRow[] =>
+    jars.map(jar => ({
+        household: jar.household,
+        jar: { id: jar.id },
+        period: JAR_SHARE_BASELINE_PERIOD,
+        percentage: jar.percentage,
+    }));
+
 /** Same fake as the activation spec: honours the injected `household`, rolls back on error. */
-function build(board: Array<[JarKey, string]> = LEGACY_BOARD) {
-    const rows = [...rowsFor(HOUSEHOLD, board), ...rowsFor(OTHER_HOUSEHOLD, LEGACY_BOARD)];
+function build(
+    board: Array<[JarKey, string]> = LEGACY_BOARD,
+    options: { withShareHistory?: boolean } = {}
+) {
+    const householdSeed = rowsFor(HOUSEHOLD, board);
+    const otherSeed = rowsFor(OTHER_HOUSEHOLD, LEGACY_BOARD);
+    const rows = [...householdSeed, ...otherSeed];
+    const shares: ShareRow[] = [
+        ...(options.withShareHistory === false ? [] : baselineRows(householdSeed)),
+        ...baselineRows(otherSeed),
+    ];
     const matches = (row: JarRow, where: { household: string; key?: unknown; id?: string }) => {
         if (row.household !== where.household) return false;
         if (where.id !== undefined && row.id !== where.id) return false;
@@ -90,21 +120,26 @@ function build(board: Array<[JarKey, string]> = LEGACY_BOARD) {
     const em = {
         find: vi.fn<
             (entity: unknown, where: { household: string; key?: unknown }) => Promise<JarRow[]>
-        >(async (_entity, where) => rows.filter(row => matches(row, where))),
+        >(async (entity, where) =>
+            entity === JarShare
+                ? (shares.filter(row => row.household === where.household) as never)
+                : rows.filter(row => matches(row, where))
+        ),
         findOne: vi.fn<
             (entity: unknown, where: { household: string; id?: string }) => Promise<JarRow | null>
         >(async (_entity, where) => rows.find(row => matches(row, where)) ?? null),
         // Nothing points at any pot in these cases.
         count: vi.fn<() => Promise<number>>(async () => 0),
-        create: vi.fn<(entity: unknown, data: JarRow) => JarRow>((_entity, data) => ({
-            ...data,
-            id: `${data.household}-new-${data.key}`,
-        })),
-        persist: vi.fn<(row: JarRow) => void>(row => {
-            rows.push(row);
+        create: vi.fn<(entity: unknown, data: JarRow) => JarRow>((entity, data) =>
+            entity === JarShare ? { ...data } : { ...data, id: `${data.household}-new-${data.key}` }
+        ),
+        persist: vi.fn<(row: JarRow | ShareRow) => void>(row => {
+            if ('period' in row) shares.push(row);
+            else rows.push(row);
         }),
-        remove: vi.fn<(row: JarRow) => void>(row => {
-            rows.splice(rows.indexOf(row), 1);
+        remove: vi.fn<(row: JarRow | ShareRow) => void>(row => {
+            const list = 'period' in row ? shares : rows;
+            (list as unknown[]).splice(list.indexOf(row as never), 1);
         }),
         flush,
         transactional: undefined as unknown as <T>(cb: (tx: unknown) => Promise<T>) => Promise<T>,
@@ -112,11 +147,15 @@ function build(board: Array<[JarKey, string]> = LEGACY_BOARD) {
     em.transactional = async cb => {
         const before = [...rows];
         const percentages = rows.map(row => row.percentage);
+        const sharesBefore = [...shares];
+        const sharePercentages = shares.map(row => row.percentage);
         try {
             return await cb(em);
         } catch (error) {
             rows.splice(0, rows.length, ...before);
             rows.forEach((row, index) => (row.percentage = percentages[index]!));
+            shares.splice(0, shares.length, ...sharesBefore);
+            shares.forEach((row, index) => (row.percentage = sharePercentages[index]!));
             throw error;
         }
     };
@@ -132,7 +171,7 @@ function build(board: Array<[JarKey, string]> = LEGACY_BOARD) {
         } as never
     );
     vi.spyOn(service, 'list').mockResolvedValue([]);
-    return { service, rows, flush };
+    return { service, rows, shares, flush };
 }
 
 const inHousehold = <T>(run: () => Promise<T>) =>
@@ -263,6 +302,90 @@ describe('an existing six-pot household', () => {
             });
         }
         expect(mine(rows)).toHaveLength(6);
+    });
+});
+
+/**
+ * Share history of a household that predates it: one baseline row per pot (what the migration
+ * wrote), so its past keeps the split it had, and every change adds only this month's rows.
+ */
+describe('an existing household keeps its past split', () => {
+    const history = (shares: ShareRow[], key: JarKey) =>
+        shares
+            .filter(row => row.household === HOUSEHOLD && row.jar.id.endsWith(`-${key}`))
+            .map(row => [row.period, row.percentage])
+            .sort(([left], [right]) => left!.localeCompare(right!));
+
+    it('a saved split adds this month for the pots that moved; the baseline stays as it was', async () => {
+        const { service, shares } = build();
+
+        await inHousehold(() =>
+            service.updateSplit(
+                [
+                    [JarKey.NECESSITIES, 50],
+                    [JarKey.FINANCIAL_FREEDOM, 15],
+                    [JarKey.EDUCATION, 10],
+                    [JarKey.LONG_TERM_SAVINGS, 10],
+                    [JarKey.PLAY, 10],
+                    [JarKey.GIVE, 5],
+                ].map(([key, percentage]) => ({
+                    jarId: `${HOUSEHOLD}-${key}`,
+                    percentage: percentage as number,
+                }))
+            )
+        );
+
+        expect(history(shares, JarKey.NECESSITIES)).toEqual([
+            [JAR_SHARE_BASELINE_PERIOD, '55.00'],
+            [NOW, '50.00'],
+        ]);
+        expect(history(shares, JarKey.FINANCIAL_FREEDOM)).toEqual([
+            [JAR_SHARE_BASELINE_PERIOD, '10.00'],
+            [NOW, '15.00'],
+        ]);
+        expect(history(shares, JarKey.PLAY)).toEqual([[JAR_SHARE_BASELINE_PERIOD, '10.00']]);
+    });
+
+    it('turning Daily on adds it from this month and steps Necessities down from this month', async () => {
+        const { service, shares } = build();
+
+        await inHousehold(() => service.activate(JarKey.DAILY));
+
+        expect(history(shares, JarKey.DAILY)).toEqual([[NOW, '20.00']]);
+        expect(history(shares, JarKey.NECESSITIES)).toEqual([
+            [JAR_SHARE_BASELINE_PERIOD, '55.00'],
+            [NOW, '35.00'],
+        ]);
+    });
+
+    it('a household with no share rows yet (deploy window) is read as its baseline, then written down on first change', async () => {
+        const { service, shares } = build(LEGACY_BOARD, { withShareHistory: false });
+
+        await inHousehold(() => service.activate(JarKey.DAILY));
+
+        expect(history(shares, JarKey.NECESSITIES)).toEqual([
+            [JAR_SHARE_BASELINE_PERIOD, '55.00'],
+            [NOW, '35.00'],
+        ]);
+        // A household with no rows at all gets a baseline for EVERY pot, so none of them is
+        // later mistaken for a pot an old backend created after the table existed.
+        expect(history(shares, JarKey.PLAY)).toEqual([[JAR_SHARE_BASELINE_PERIOD, '10.00']]);
+    });
+
+    it('turning all optional pots on and off leaves the main pot with the original baseline and a current row at its percentage', async () => {
+        const { service, rows, shares } = build();
+        const created: string[] = [];
+        for (const key of [JarKey.DAILY, JarKey.GOALS]) {
+            created.push((await inHousehold(() => service.activate(key))).id);
+        }
+        for (const id of created) await inHousehold(() => service.deactivate(id));
+
+        expect(history(shares, JarKey.NECESSITIES)).toEqual([
+            [JAR_SHARE_BASELINE_PERIOD, '55.00'],
+            [NOW, '55.00'],
+        ]);
+        expect(pct(rows, JarKey.NECESSITIES)).toBe('55.00');
+        expect(history(shares, JarKey.DAILY)).toEqual([]);
     });
 });
 

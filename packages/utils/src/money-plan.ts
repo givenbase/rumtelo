@@ -52,26 +52,28 @@ export function jarCoverage(input: JarCoverageInput): JarCoverage {
 
 /**
  * Cumulative jar pot through a period:
- * months × this-month allocation + lifetime credited − lifetime spent.
- * Allocation uses the current plan (historical income per month not stored yet).
+ * everything the split deposited into the pot, month by month, + credited − spent.
+ *
+ * `cumulativeDeposit` is the sum over every month from the household's start through the
+ * viewed period of that month's income × that month's share of the pot. The caller builds it
+ * from the stored income history and the pot's share history (`JarShare`), so a later split or
+ * income change never re-prices an earlier month.
  */
 export function jarPotBalance(input: {
-    /** This period’s plan deposit (income × %). */
-    allocated: number;
-    /** Inclusive month count from household start through viewed period. */
-    monthCount: number;
+    /** Σ of the pot's monthly deposits, each at its own month's income and share. */
+    cumulativeDeposit: number;
     /** Sorted IN across that range. */
     lifetimeCredited: number;
     /** Sorted OUT across that range. */
     lifetimeSpent: number;
 }): number {
-    const months = Math.max(1, input.monthCount);
-    return months * input.allocated + input.lifetimeCredited - input.lifetimeSpent;
+    return input.cumulativeDeposit + input.lifetimeCredited - input.lifetimeSpent;
 }
 
 /**
  * Looking Ahead pot: live cumulative stock + planned deposits for each month ahead.
- * Assumes no future spends yet (same as `jarPotBalance` with an empty future ledger).
+ * Assumes no future spends yet (same as `jarPotBalance` with an empty future ledger) and the
+ * current split carried forward.
  */
 export function projectPotBalanceAhead(input: {
     potBalance: number;
