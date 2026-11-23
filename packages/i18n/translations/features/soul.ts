@@ -167,6 +167,11 @@ const soul = {
         empty_auto_body: 'Add a fixed cost on the Giving pot to plan monthly gifts.',
         empty_ledger_title: 'No sorted giving this year.',
         empty_ledger_body: 'Gifts that leave Giving show up here once sorted.',
+        /** The household has not turned on the optional Giving pot inside Free. */
+        pot_off_title: 'Giving is off',
+        pot_off_body:
+            'Giving is an optional pot inside Free. Turn it on and a share of Free goes to gifts and causes before you spend it — Free itself stays the same.',
+        pot_off_cta: 'Turn on Giving',
         no_org: 'No organization named yet',
         received_year: 'Received this year',
         to_whom: 'To whom',
@@ -191,7 +196,7 @@ const soul = {
         check_4_body:
             'A clear answer to “what would an extra amount do?” If they cannot say, the money sits.',
         coach_tip_1:
-            'It does not have to be much. Five percent, transferred automatically, to a place you chose on purpose. The amount is not the point — the habit is.',
+            'It does not have to be much. A small share, transferred automatically, to a place you chose on purpose. The amount is not the point — the habit is.',
         coach_tip_2:
             'Choose where it goes the way you choose everything else here: with evidence, not with a logo. An organization that publishes what it spends and what changed is one you can keep giving to for years.',
         causes: {

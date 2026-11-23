@@ -35,6 +35,8 @@ Keep the same punch: *where it went / no mystery / clear picture*.
 | **Paycheck in. Picture clear.** | Income split, hero secondary, demo caption |
 | **Basics. Future. Free. Ten minutes a week.** | *Proposed 2026-11-23, for Given.* Short form of the positioning line — chips, ads, app-store subtitle. Names the Rumtelo Pots groups instead of counting jars |
 | ~~Six jars. Ten minutes a week.~~ | *Retired 2026-11-23* — the six jars are replaced by Rumtelo Pots (Basics · Future · Free) |
+| **Three pots. Refine if you want.** | *Proposed 2026-11-23, for Given.* The default-and-refine story in one beat — pots section, onboarding support, help intro |
+| **Start with three. Add detail when you want it.** | *Proposed 2026-11-23, for Given.* Softer twin for onboarding and settings intros |
 
 ---
 
@@ -81,6 +83,8 @@ Add to pages when you need more copy. Stay in this voice — don’t drift back 
 - Split first. Spend second.
 - Assign it. Then spend it.
 - Income lands. Basics, Future, Free. *(proposed 2026-11-23)*
+- Three pots. Refine if you want. *(proposed 2026-11-23)*
+- Split a pot further. The three numbers stay. *(proposed 2026-11-23)*
 - ~~Income lands. Six jars decide.~~ *(retired 2026-11-23)*
 - Give money a job before it arrives.
 - Your money, assigned. Not guessed.
@@ -203,6 +207,9 @@ See [product/practice.md](../product/practice.md).
 | Three groups. One calm overview. *(proposed 2026-11-23)* | Drie groepen. Eén rustig overzicht. |
 | Basics. Future. Free. Ten minutes a week. *(proposed 2026-11-23)* | Basis. Toekomst. Vrij. Tien minuten per week. |
 | Income lands. Basics, Future, Free. *(proposed 2026-11-23)* | Inkomen binnen. Basis, Toekomst, Vrij. |
+| Three pots. Refine if you want. *(proposed 2026-11-23)* | Drie potjes. Verfijn als je wilt. |
+| Start with three. Add detail when you want it. *(proposed 2026-11-23)* | Begin met drie. Meer detail als je het wilt. |
+| Split a pot further. The three numbers stay. *(proposed 2026-11-23)* | Verfijn een potje. De drie getallen blijven. |
 | ~~Six jars. One calm overview.~~ *(retired 2026-11-23)* | ~~Zes potjes. Één rustig overzicht.~~ |
 | ~~Six jars. Ten minutes a week.~~ *(retired 2026-11-23)* | ~~Zes potjes. Tien minuten per week.~~ |
 | Not just money. Where your life goes. | Niet alleen geld. Waar je leven naartoe gaat. |

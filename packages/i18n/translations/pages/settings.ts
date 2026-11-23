@@ -298,7 +298,7 @@ const settings = {
         },
         jars_placement: {
             eyebrow: 'Where each pot sits',
-            blurb: 'Mix freely — Fixed costs and daily on your current account, the rest as savings pots at your bank, Investing on its own account.',
+            blurb: 'Mix freely — Basics on your current account, the rest as savings pots at your bank. Investing can sit on its own account.',
             accounts_one: '{count} account',
             accounts_other: '{count} accounts',
             no_accounts: 'No accounts',
@@ -588,7 +588,7 @@ const settings = {
                 },
                 sweep: {
                     name: 'Sweep surplus',
-                    desc: 'Whatever is left in Fixed costs and daily on the 1st moves to Investing.',
+                    desc: 'Whatever is left in Basics on the 1st moves to Investing.',
                 },
             },
         },

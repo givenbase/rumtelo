@@ -57,6 +57,7 @@
                     "goal_save_only_achieved": "Seuls les objectifs « SAVE » peuvent être considérés comme atteints de cette manière",
                     "goal_not_active": "L'objectif n'est pas actif",
                     "goal_no_jar_spend": "Goal has no pot to spend from",
+                    "goal_give_needs_give_jar": "A giving pledge needs the Giving pot. Turn on Giving in your split, then make the pledge.",
                     "payment_amount_positive": "Le montant du paiement doit être positif",
                     "bill_paused_no_settlement": "Les factures suspendues ou clôturées ne peuvent pas faire l'objet de nouveaux règlements.",
                     "due_month_required": "Choisissez le mois au cours duquel vous souhaitez être facturé pour les factures trimestrielles ou annuelles.",
@@ -98,7 +99,11 @@
                     "cannot_remove_owner": "Le chef de famille ne peut pas être exclu",
                     "member_remove_failed": "Impossible de supprimer ce membre. Veuillez réessayer.",
                     "jar_split_total": "Pot split must total 100%, received {total}%",
-                    "jar_split_keys": "The split must list every pot exactly once",
+                    "jar_split_keys": "The split must list each of your pots exactly once",
+                    "jar_not_optional": "This is one of your three main pots, so it stays on. Change its share in your split instead.",
+                    "jar_already_active": "This pot is already on.",
+                    "jar_not_empty": "This pot still holds transactions, fixed costs or goals. Move them to another pot first, then turn it off.",
+                    "jar_share_too_small": "The main pot has too little share left for this. Raise the group’s share in your split first.",
                     "jar_placement_account_invalid": "Ce compte bancaire n'appartient pas à ce foyer.",
                     "book_catalog_unavailable": "Le catalogue de livres n'a pas répondu.",
                     "contact_send_failed": "Nous n'avons pas pu envoyer votre message. Veuillez réessayer ou nous envoyer un e-mail directement.",
@@ -536,7 +541,7 @@
                 },
                 "jars": {
                     "necessity": {
-                        "name": "Fixed costs and daily",
+                        "name": "Fixed costs",
                         "short": "FIXED"
                     },
                     "freedom": {
@@ -548,7 +553,7 @@
                         "short": "LEARN"
                     },
                     "savings": {
-                        "name": "Buffer and goals",
+                        "name": "Buffer",
                         "short": "BUFFER"
                     },
                     "play": {
@@ -814,7 +819,9 @@
                 "nec-high": "Fixed costs and daily above 60% squeezes every other pot. Cutting fixed costs usually helps more than cutting Investing.",
                 "nec-low": "Fixed costs and daily under 45% is tight for most households — check that rent, insurance and debt instalments still fit.",
                 "spender-ff": "Your pattern leans spender — try 1–2% more into Investing before adding to Fun.",
-                "saver-play": "Your pattern leans saver — a little more Fun helps you keep the split up. Joy that is planned is not waste."
+                "saver-play": "Your pattern leans saver — a little more Fun helps you keep the split up. Joy that is planned is not waste.",
+                "basics-high": "Basics is above 60% of your income — what must be paid takes most of it. Look at your biggest fixed cost first; the split is not the thing to squeeze.",
+                "future-low": "Future is under 10% of your income, so little is left to build with. Move 1–2% from Free to Future."
             },
             "helpers": {
                 "mark_title": "Conseil de The Coach : activez ou désactivez les astuces à l'écran dans Paramètres → Préférences",
@@ -859,7 +866,7 @@
                     }
                 },
                 "necessities_share": {
-                    "text": "Fixed costs and daily is at {pct}%, above the 55% the default split starts from. Fine for now — to bring it down, trim fixed costs or raise income, and leave Investing as it is.",
+                    "text": "Basics is at {pct}%, above the 55% the default split starts from. Fine for now — to bring it down, trim fixed costs or raise income.",
                     "cta": "Review pots"
                 },
                 "over_necessities": {
@@ -1477,7 +1484,7 @@
             "net_worth": {
                 "page_eyebrow": "✦ MON PATRIMOINE NET",
                 "page_title": "Où se trouve votre argent — et non comment il évolue.",
-                "page_lead": "Holdings plus what sits in Investing and in Buffer and goals, minus open debts. Linked income and bills are money in motion, not a wish list.",
+                "page_lead": "Holdings plus your savings in Future (Buffer and Investing), minus open debts. Linked income and bills are money in motion, not a wish list.",
                 "add_asset": "+ Ajouter un élément",
                 "horizon_eyebrow": "✦ Jusqu'où cela vous mènera-t-il ?",
                 "stat_holdings": "Portefeuille",
@@ -1508,7 +1515,7 @@
                 "not_available_yet": "pas encore disponible",
                 "per_month_short": "p/m",
                 "empty_title": "Aucun titre en portefeuille pour l'instant",
-                "empty_body": "Add your first asset (for example an investment). Buffer and goals, Investing and your debts already count. Do not double-count savings as a Cash asset and in those pots.",
+                "empty_body": "Add your first asset (for example an investment). Your savings in Future and your debts already count. Do not double-count savings as a Cash asset and in those pots.",
                 "debt_empty_title": "Aucune dette enregistrée",
                 "debt_empty_body": "Les dettes que vous ajoutez dans « Argent → Dettes » s'affichent automatiquement ici.",
                 "month_score_eyebrow": "Score mensuel",
@@ -1935,7 +1942,7 @@
                     },
                     "emergency_buffer": {
                         "name": "Build an emergency buffer",
-                        "doneWhen": "The buffer is in my Buffer and goals pot",
+                        "doneWhen": "The buffer is set aside in Future",
                         "firstStep": "Decide the amount and set up the monthly transfer"
                     },
                     "pay_off_debt": {
@@ -2080,7 +2087,7 @@
                     "amount_earn_hint": "Your net income per month. It does not come out of a pot.",
                     "per_month": "≈ {amount} per month until December",
                     "jar": "Which pot?",
-                    "jar_hint": "Planned spends live in Buffer and goals.",
+                    "jar_hint": "Planned spends live in Future.",
                     "jar_placeholder": "Choose a pot",
                     "shared_note": "A goal with an amount is shared with your household in Money.",
                     "amount_locked": "Amounts on goals come with a plan that includes money goals. The goal itself is saved.",
@@ -2313,15 +2320,37 @@
                 "method_name": "Rumtelo Pots",
                 "BASIS": {
                     "title": "Base",
-                    "line": "What has to be paid, every month."
+                    "line": "What has to be paid, every month.",
+                    "purpose": "Rent, bills, groceries, transport"
                 },
                 "FUTURE": {
                     "title": "Futur",
-                    "line": "What you build."
+                    "line": "What you build.",
+                    "purpose": "Buffer, goals, investing, learning"
                 },
                 "FREE": {
                     "title": "Libre",
-                    "line": "What you choose."
+                    "line": "What you choose.",
+                    "purpose": "Fun, hobbies, giving"
+                },
+                "refine": {
+                    "title": "Refine {group}",
+                    "intro": "Split {group} into more pots if you want. {group} stays {percent}% of your income.",
+                    "optional_label": "Optional",
+                    "turn_on": "Turn on",
+                    "turn_off": "Turn off",
+                    "turned_on": "On",
+                    "turned_off": "Off",
+                    "refined_badge": "Refined",
+                    "not_refined_hint": "{group} is one pot. Turn on a pot below to split it.",
+                    "turn_on_effect": "{share}% moves from {main} to {pot}. {group} stays {percent}%.",
+                    "turn_off_effect": "{share}% goes back to {main}.",
+                    "turn_off_blocked": "{pot} still holds transactions, fixed costs or goals. Move them to {main} first, then turn it off.",
+                    "share_too_small": "{main} has too little share left to turn this on. Raise {group} in your split first.",
+                    "main_renamed_hint": "{group} now shows as {main} and {pot}.",
+                    "save_first": "Save your split first, then turn pots on or off.",
+                    "toast_turned_on": "{pot} is on",
+                    "toast_turned_off": "{pot} is off — its share is back in {main}"
                 },
                 "order_hint": "Money flows in this order.",
                 "all_placed": "Everything has a place",
@@ -2339,7 +2368,7 @@
                 },
                 "eyebrow": "RUMTELO POTS",
                 "title": "Chaque pièce a une fonction qui lui est attribuée avant même son arrivée.",
-                "lead": "Income lands and splits the same second. Money in Investing is set aside to invest. You invest it yourself.",
+                "lead": "Income lands and splits the same second. Rumtelo shows the split; moving and investing the money is yours to do.",
                 "on_track": "{on} / {total} en bonne voie",
                 "move_between": "Move between pots",
                 "add_transaction": "+ Ajouter une transaction",
@@ -2356,20 +2385,29 @@
                 "left_label": "Left this month",
                 "left_label_stacked": "Left over the span",
                 "names": {
-                    "NECESSITIES": "Fixed costs and daily",
+                    "NECESSITIES": "Fixed costs",
+                    "DAILY": "Daily",
+                    "LONG_TERM_SAVINGS": "Buffer",
+                    "GOALS": "Goals",
                     "FINANCIAL_FREEDOM": "Investing",
-                    "LONG_TERM_SAVINGS": "Buffer and goals",
                     "EDUCATION": "Learning",
                     "PLAY": "Fun",
                     "GIVE": "Giving"
                 },
                 "purpose": {
-                    "NECESSITIES": "Rent, food, bills",
-                    "FINANCIAL_FREEDOM": "Invest, never spend",
-                    "LONG_TERM_SAVINGS": "For emergencies and setbacks, and your big plans.",
+                    "NECESSITIES": "Rent, bills, insurance",
+                    "DAILY": "Groceries, transport, everyday spends",
+                    "LONG_TERM_SAVINGS": "For emergencies and setbacks.",
+                    "GOALS": "Saving for the big things you plan",
+                    "FINANCIAL_FREEDOM": "Set aside for you to invest",
                     "EDUCATION": "Courses, books, skills",
                     "PLAY": "Going out, hobbies, spent freely",
                     "GIVE": "Donate, help others"
+                },
+                "inactive": {
+                    "title": "{pot} is off",
+                    "body": "{pot} is an optional pot inside {group}. Turn it on and it gets its own share of {group} — your three main numbers stay the same.",
+                    "cta": "Turn on {pot}"
                 },
                 "this_month": "Ce mois",
                 "this_month_of": "{available} sur {allocated} ce mois",
@@ -2384,13 +2422,13 @@
                 "guides": {
                     "NECESSITIES": {
                         "subtitle": "Paiements obligatoires",
-                        "note": "Rent, energy, insurance, groceries, transport. What has to be paid, every month.",
+                        "note": "Rent, energy, insurance, phone, debt instalments — and everyday spending like groceries and transport, unless you turned on Daily. What has to be paid, every month.",
                         "not_allowed": "Not for eating out, clothes or outings — that is Fun.",
                         "allowed": {
                             "rent": "Loyer",
                             "energy_water": "Énergie et eau",
-                            "groceries": "Produits d'épicerie",
-                            "transport_fuel": "Transports et carburant",
+                            "groceries": "Groceries — unless Daily is on",
+                            "transport_fuel": "Transport & fuel — unless Daily is on",
                             "insurance": "Assurance",
                             "debt_instalments": "Versements de dette",
                             "phone_internet": "Téléphone et Internet"
@@ -2398,6 +2436,21 @@
                         "links": {
                             "fixed_costs": "Coûts fixes",
                             "debt": "Dette",
+                            "transactions": "Transactions"
+                        }
+                    },
+                    "DAILY": {
+                        "subtitle": "Everyday spending",
+                        "note": "Groceries, transport, pharmacy and drugstore, household things. What you spend week to week — bills stay in Fixed costs.",
+                        "not_allowed": "Not for bills or subscriptions — those stay in Fixed costs. Not for eating out — that is Fun.",
+                        "allowed": {
+                            "groceries": "Groceries",
+                            "transport_fuel": "Transport & fuel",
+                            "pharmacy": "Pharmacy & drugstore",
+                            "household": "Household things"
+                        },
+                        "links": {
+                            "fixed_costs": "Fixed costs",
                             "transactions": "Transactions"
                         }
                     },
@@ -2424,18 +2477,33 @@
                         "sub_note": "Trading is allowed, but only from this small corner — never from the rest. Lose it and you lose a month, not your future."
                     },
                     "LONG_TERM_SAVINGS": {
-                        "subtitle": "De grandes choses",
-                        "note": "Fonds d'urgence, voiture, apport initial. Dépenses connues, prévues, non urgentes.",
-                        "not_allowed": "Prévu, connu, mais pas urgent. Urgent et imprévu ? C'est justement à cela que sert le fonds d'urgence.",
+                        "subtitle": "Buffer first",
+                        "note": "An emergency fund first. Then the big things you plan — car, deposit, renovation — unless you turned on Goals.",
+                        "not_allowed": "Not for anything you want this month. Urgent and unexpected? That is exactly what this pot is for.",
                         "allowed": {
                             "emergency_fund": "Fonds d'urgence",
-                            "car_purchase": "Une voiture ou un achat important",
-                            "down_payment": "Acompte",
-                            "renovation": "Rénovation",
+                            "car_purchase": "Car or big purchase — unless Goals is on",
+                            "down_payment": "Down payment — unless Goals is on",
+                            "renovation": "Renovation — unless Goals is on",
                             "tax_bill": "Projet de loi fiscale"
                         },
                         "links": {
                             "goals": "Objectifs",
+                            "transactions": "Transactions"
+                        }
+                    },
+                    "GOALS": {
+                        "subtitle": "Named plans",
+                        "note": "The things you save for by name — a big purchase, a home deposit, a trip. Not the buffer: that stays for setbacks.",
+                        "not_allowed": "Not for emergencies — that is Buffer. Not for what you want this month — that is Fun.",
+                        "allowed": {
+                            "big_purchase": "Car or big purchase",
+                            "home_deposit": "Home deposit",
+                            "trip": "A trip",
+                            "renovation": "Renovation"
+                        },
+                        "links": {
+                            "goals": "Goals",
                             "transactions": "Transactions"
                         }
                     },
@@ -3323,8 +3391,8 @@
                     "no_payments_short": "Aucun paiement n'a encore été enregistré.",
                     "open_debt": "Dette en cours ›",
                     "planned_payment": "Paiement prévu",
-                    "necessities": "Fixed costs and daily",
-                    "no_fixed_linked": "No recurring bill linked yet. Add one so Fixed costs and daily counts this payment.",
+                    "necessities": "Basics",
+                    "no_fixed_linked": "No recurring bill linked yet. Add one so Basics counts this payment.",
                     "add_to_necessities": "Add to fixed costs",
                     "apr": "{rate} % de TAEG",
                     "validation_amount_required": "Le montant est obligatoire",
@@ -3569,6 +3637,9 @@
                 "empty_auto_body": "Add a fixed cost on the Giving pot to plan monthly gifts.",
                 "empty_ledger_title": "Pas de dons triés cette année.",
                 "empty_ledger_body": "Gifts that leave Giving show up here once sorted.",
+                "pot_off_title": "Giving is off",
+                "pot_off_body": "Giving is an optional pot inside Free. Turn it on and a share of Free goes to gifts and causes before you spend it — Free itself stays the same.",
+                "pot_off_cta": "Turn on Giving",
                 "no_org": "Aucune organisation n'a encore été désignée",
                 "received_year": "Reçu cette année",
                 "to_whom": "À qui",
@@ -3587,7 +3658,7 @@
                 "check_3_body": "Des nouvelles qui expliquent ce qui a changé pour les personnes ou les animaux — pas une carte de remerciement.",
                 "check_4_title": "Il y a encore de la place",
                 "check_4_body": "Une réponse claire à la question « À quoi servirait une somme supplémentaire ? » S'ils ne peuvent pas répondre, l'argent reste sur place.",
-                "coach_tip_1": "Pas besoin que ce soit beaucoup. Cinq pour cent, transférés automatiquement, vers un compte que vous aurez choisi à dessein. Ce n’est pas le montant qui compte, mais l’habitude.",
+                "coach_tip_1": "It does not have to be much. A small share, transferred automatically, to a place you chose on purpose. The amount is not the point — the habit is.",
                 "coach_tip_2": "Choisissez à quoi servir cet argent comme vous choisissez tout le reste ici : en vous basant sur des faits, et non sur un logo. Une organisation qui publie le détail de ses dépenses et les changements qu’elle a apportés est une organisation à laquelle vous pouvez continuer à faire des dons pendant des années.",
                 "causes": {
                     "GLOBAL_HEALTH": {
@@ -3849,7 +3920,7 @@
                     "sections": {
                         "what_for": {
                             "heading": "What the pots are for",
-                            "body": "Rumtelo Pots give your income a destination, in three groups: Basics, Future, Free. Each pot has a job and a percentage you set. Together they make 100% of your income."
+                            "body": "Rumtelo Pots give your income a destination: three pots — Basics, Future, Free. Each has a job and a percentage you set; together they make 100% of your income. Want more detail? Refine a pot into smaller ones — its percentage stays the same."
                         },
                         "how": {
                             "heading": "Comment ça marche ?",
@@ -3924,7 +3995,7 @@
                     "sections": {
                         "what_for": {
                             "heading": "À quoi cela sert-il ?",
-                            "body": "Track what you still owe and the monthly bite it takes. Debt instalments usually leave from Fixed costs and daily — this page keeps the balance in view."
+                            "body": "Track what you still owe and the monthly bite it takes. Debt instalments usually leave from Basics — this page keeps the balance in view."
                         },
                         "how": {
                             "heading": "Comment ça marche ?",
@@ -4274,11 +4345,11 @@
             "jars_section": {
                 "eyebrow": "RUMTELO POTS",
                 "headline": "Every amount gets a job, so none has to decide for itself.",
-                "lead": "Every pot has a rule you can read in one line — what belongs, what doesn’t. The percentages are yours to change. The habit is the point."
+                "lead": "Start with three pots, each with a rule you can read in one line. Refine one into smaller pots when you want. The percentages are yours to change. The habit is the point."
             },
             "jars": {
                 "nec": {
-                    "name": "Fixed costs and daily",
+                    "name": "Fixed costs",
                     "line": "Loyer, énergie, assurances, courses, transports. Toutes ces dépenses qui s'imposent, qu'on le veuille ou non.",
                     "not": "Not for eating out or clothes — that is Fun."
                 },
@@ -4293,7 +4364,7 @@
                     "not": "Ce n'est pas ce genre de gadgets que l'on appelle de la recherche."
                 },
                 "lts": {
-                    "name": "Buffer and goals",
+                    "name": "Buffer",
                     "line": "D'abord le fonds d'urgence, puis la voiture, la caution, la facture d'impôts que tu sais inévitable.",
                     "not": "Ce n'est pas pour quelque chose que tu souhaites ce mois-ci."
                 },
@@ -4398,7 +4469,7 @@
                     "soul": "Le silence · 6e jour"
                 },
                 "coach_lines": {
-                    "money": "Fun is €38 over its line. One move: shift it from Buffer and goals — or let it ride.",
+                    "money": "Fun is €38 over its line. One move: shift it from Buffer — or let it ride.",
                     "growth": "La réduction des coûts a une limite. L'augmentation des revenus, non. Les revenus complémentaires représentent 20 % du chemin à parcourir.",
                     "energy": "Three nights under 6h30 — and Fun rose on those days. Sleep first. Then decide.",
                     "soul": "L'intention est fixée. Une seule phrase suffit : la semaine a désormais un cap."
@@ -4424,7 +4495,7 @@
                 "growth_goals": {
                     "emergency": {
                         "name": "Fonds d'urgence",
-                        "meta": "Buffer and goals · Mar 2027"
+                        "meta": "Buffer · Mar 2027"
                     },
                     "side_income": {
                         "name": "Revenu complémentaire de 500 € par mois",
@@ -4532,7 +4603,7 @@
                 "demo": {
                     "money": {
                         "kind": "CETTE SEMAINE",
-                        "text": "Fun is €38 over its line. Move it from Buffer and goals once — or let it ride and keep next week’s dinner in.",
+                        "text": "Fun is €38 over its line. Move it from Buffer once — or let it ride and keep next week’s dinner in.",
                         "cta": "Open pots"
                     },
                     "growth": {
@@ -5394,17 +5465,20 @@
             "income_error_decimals": "Use at most two decimals.",
             "income_error_large": "That's above what Rumtelo handles per month. Check the amount.",
             "split_title": "Here's where your {amount} goes.",
-            "split_lead": "Each pot has one job. Change the percentages any time — the habit matters more than the numbers.",
+            "split_lead": "Three pots to start: Basics, Future, Free. Each has one job. Change the percentages any time — the habit matters more than the numbers.",
             "split_list_aria": "Your split",
             "split_row_aria": "{jar}, {percent} percent, {amount}",
             "split_jobs": {
-                "NECESSITIES": "rent, bills, groceries",
-                "FINANCIAL_FREEDOM": "money set aside to invest — never spent",
+                "NECESSITIES": "rent, bills, groceries, transport",
+                "LONG_TERM_SAVINGS": "a buffer first, then goals, investing, learning",
+                "PLAY": "fun, hobbies, giving — spent freely",
+                "DAILY": "groceries, transport, everyday spends",
+                "GOALS": "the big things you plan",
+                "FINANCIAL_FREEDOM": "money set aside for you to invest — never spent",
                 "EDUCATION": "courses, books, a new skill",
-                "LONG_TERM_SAVINGS": "big buys and a safety buffer",
-                "PLAY": "fun without guilt — spend it all",
                 "GIVE": "gifts and causes you care about"
             },
+            "split_refine_later": "Want more pots — Daily, Goals, Giving? Refine a pot later in Settings; the three percentages stay as they are.",
             "split_main_account": "All your pots sit on one main account for now. Add your bank when it suits you.",
             "split_note": "Rumtelo never moves money. Savings pots at your bank? Move it there yourself — we show the split.",
             "split_change_later": "Change the percentages any time in Money › Pots.",
@@ -5422,9 +5496,9 @@
             "continue": "Continuer",
             "banks_setup": {
                 "accounts_title": "Nommez vos comptes",
-                "accounts_body": "Name the main account where money lands (Fixed costs and daily). Need more? Add them here — then you link the pots. You can rename later in Settings.",
+                "accounts_body": "Name the main account where money lands (Basics). Need more? Add them here — then you link the pots. You can rename later in Settings.",
                 "map_title": "Link pots to accounts",
-                "map_body": "Fixed costs and daily stays on your main account. Put the other pots on the right savings account. Change this any time in Settings → Pots.",
+                "map_body": "Basics stays on your main account. Put the other pots on the right savings account. Change this any time in Settings → Pots.",
                 "map_body_one": "You have one account — every pot is already linked to it. Change this later in Settings → Pots if you add more accounts.",
                 "read_only_link": "Open bank settings",
                 "map_required": "Choose an account for every pot before you finish.",
@@ -5447,7 +5521,7 @@
                     "main_checking": "Compte principal",
                     "savings": "Économies",
                     "freedom": "Investing",
-                    "lts": "Buffer and goals",
+                    "lts": "Buffer",
                     "education": "Learning",
                     "play": "Fun",
                     "give": "Giving"
@@ -5457,7 +5531,7 @@
                     "sub_savings": "Sous-épargne"
                 },
                 "tips": {
-                    "one_account": "Start with one main account (Fixed costs and daily). Add spaarpotjes as extra accounts only if you already bank that way — then link each pot on the next screen.",
+                    "one_account": "Start with one main account (Basics). Add spaarpotjes as extra accounts only if you already bank that way — then link each pot on the next screen.",
                     "familiar": "Start with your main account. Add any other accounts you already use, then link each pot.",
                     "already_set_up": "Notez simplement les comptes que vous avez déjà. Rumtelo ne touche pas à votre vraie banque."
                 }
@@ -6151,7 +6225,7 @@
                 },
                 "jars_placement": {
                     "eyebrow": "Where each pot sits",
-                    "blurb": "Mix freely — Fixed costs and daily on your current account, the rest as savings pots at your bank, Investing on its own account.",
+                    "blurb": "Mix freely — Basics on your current account, the rest as savings pots at your bank. Investing can sit on its own account.",
                     "accounts_one": "Compte {count}",
                     "accounts_other": "{count} comptes",
                     "no_accounts": "Aucun compte",
@@ -6427,7 +6501,7 @@
                         },
                         "sweep": {
                             "name": "Reprendre l'excédent",
-                            "desc": "Whatever is left in Fixed costs and daily on the 1st moves to Investing."
+                            "desc": "Whatever is left in Basics on the 1st moves to Investing."
                         }
                     }
                 },
@@ -6931,7 +7005,7 @@
                     },
                     "jars": {
                         "title": "Comment Rumtelo s’y rattache",
-                        "body": "Fixed costs and daily lives on your hoofdrekening (main account): salary and bills land there. The other pots — Buffer and goals, Investing, Learning, Fun, Giving — can be spaarpotjes. Rumtelo tracks the split; your bank holds the euros."
+                        "body": "Basics lives on your hoofdrekening (main account): salary and bills land there. Future and Free — and any pots you refine them into — can be spaarpotjes. Rumtelo tracks the split; your bank holds the euros."
                     },
                     "banks": {
                         "title": "Ce que propose en général votre banque",

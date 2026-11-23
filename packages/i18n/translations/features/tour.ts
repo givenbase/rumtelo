@@ -238,7 +238,7 @@ const tour = {
             sections: {
                 what_for: {
                     heading: 'What the pots are for',
-                    body: 'Rumtelo Pots give your income a destination, in three groups: Basics, Future, Free. Each pot has a job and a percentage you set. Together they make 100% of your income.',
+                    body: 'Rumtelo Pots give your income a destination: three pots — Basics, Future, Free. Each has a job and a percentage you set; together they make 100% of your income. Want more detail? Refine a pot into smaller ones — its percentage stays the same.',
                 },
                 how: {
                     heading: 'How it works',
@@ -316,7 +316,7 @@ const tour = {
             sections: {
                 what_for: {
                     heading: 'What this is for',
-                    body: 'Track what you still owe and the monthly bite it takes. Debt instalments usually leave from Fixed costs and daily — this page keeps the balance in view.',
+                    body: 'Track what you still owe and the monthly bite it takes. Debt instalments usually leave from Basics — this page keeps the balance in view.',
                 },
                 how: {
                     heading: 'How it works',

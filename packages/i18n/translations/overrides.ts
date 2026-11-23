@@ -301,7 +301,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.growth.course.preset.learn_language.rhythm': '3× per week oefenen',
         'features.growth.course.preset.emergency_buffer.name': 'Een noodbuffer opbouwen',
         'features.growth.course.preset.emergency_buffer.doneWhen':
-            'De buffer staat in mijn potje Buffer en doelen',
+            'De buffer staat apart in Toekomst',
         'features.growth.course.preset.emergency_buffer.firstStep':
             'Bepaal het bedrag en stel de maandelijkse overboeking in',
         'features.growth.course.preset.pay_off_debt.name': 'Een schuld aflossen',
@@ -464,7 +464,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Je netto inkomen per maand. Het komt niet uit een potje.',
         'features.growth.course.plan.per_month': '≈ {amount} per maand tot december',
         'features.growth.course.plan.jar': 'Welk potje?',
-        'features.growth.course.plan.jar_hint': 'Geplande uitgaven horen bij Buffer en doelen.',
+        'features.growth.course.plan.jar_hint': 'Geplande uitgaven horen bij Toekomst.',
         'features.growth.course.plan.jar_placeholder': 'Kies een potje',
         'features.growth.course.plan.shared_note':
             'Een doel met een bedrag deel je met je huishouden bij Geld.',
@@ -574,8 +574,8 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.landing.jars_section.headline':
             'Elk bedrag krijgt een taak, zodat geen enkel bedrag zelf hoeft te beslissen.',
         'pages.landing.jars_section.lead':
-            'Elk potje heeft een regel die je in één zin leest: wat erin hoort en wat niet. De percentages kun je zelf aanpassen. Het gaat om de gewoonte.',
-        'pages.landing.jars.nec.name': 'Vaste kosten en dagelijks',
+            'Begin met drie potjes, elk met een regel die je in één zin leest. Verfijn er één in kleinere potjes wanneer je wilt. De percentages kun je zelf aanpassen. Het gaat om de gewoonte.',
+        'pages.landing.jars.nec.name': 'Vaste kosten',
         'pages.landing.jars.nec.line':
             'Huur, energie, verzekeringen, boodschappen, vervoer. De dingen die komen, of je het nu leuk vindt of niet.',
         'pages.landing.jars.nec.not': 'Niet voor uit eten of kleding — dat is Plezier.',
@@ -586,7 +586,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.landing.jars.edu.line':
             'Boeken, cursussen, een mentor, een hulpmiddel waar je beter van wordt. Het enige potje waar uitgeven je meer waard maakt.',
         'pages.landing.jars.edu.not': 'Niet voor gadgets die je onderzoek noemt.',
-        'pages.landing.jars.lts.name': 'Buffer en doelen',
+        'pages.landing.jars.lts.name': 'Buffer',
         'pages.landing.jars.lts.line':
             'Eerst een noodfonds, dan de auto, de borg en de belastingaanslag waarvan je weet dat die eraan komt.',
         'pages.landing.jars.lts.not': 'Niet voor iets wat je deze maand wilt.',
@@ -621,7 +621,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.landing.coach_section.demo_feed_eyebrow': 'De Coach · in elk portaal',
         'pages.landing.coach_section.demo_kicker': 'één tip · één stap · jij kiest',
         'pages.landing.coach_section.demo.money.text':
-            'Plezier zit €38 boven de lijn. Haal het één keer uit Buffer en doelen — of laat het staan en houd het diner van volgende week erin.',
+            'Plezier zit €38 boven de lijn. Haal het één keer uit Buffer — of laat het staan en houd het diner van volgende week erin.',
         'pages.landing.coach_section.demo.money.cta': 'Open potjes',
         'pages.landing.coach_section.demo.growth.kind': 'DE HEFBOOM',
         'pages.landing.coach_section.demo.growth.text':
@@ -633,7 +633,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'De intentie van deze week is nog leeg. Eén zin is genoeg: wat maakt dit een goede week?',
         'pages.landing.coach_section.demo.soul.cta': 'Intentie kiezen',
         'pages.landing.portal_demo.coach_lines.money':
-            'Plezier zit €38 boven de lijn. Eén zet: haal het uit Buffer en doelen — of laat het staan.',
+            'Plezier zit €38 boven de lijn. Eén zet: haal het uit Buffer — of laat het staan.',
         'pages.landing.portal_demo.coach_lines.growth':
             'Kosten besparen heeft een bodem. Meer verdienen niet. Je bijverdienste is al 20% op weg.',
         'pages.landing.portal_demo.coach_lines.energy':
@@ -892,17 +892,23 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Dat is meer dan Rumtelo per maand aankan. Controleer het bedrag.',
         'pages.onboarding.split_title': 'Hier gaat je {amount} naartoe.',
         'pages.onboarding.split_lead':
-            'Elk potje heeft één taak. Pas de percentages aan wanneer je wilt — de gewoonte telt meer dan de getallen.',
+            'Drie potjes om mee te beginnen: Basis, Toekomst, Vrij. Elk heeft één taak. Pas de percentages aan wanneer je wilt — de gewoonte telt meer dan de getallen.',
         'pages.onboarding.split_list_aria': 'Je verdeling',
         'pages.onboarding.split_row_aria': '{jar}, {percent} procent, {amount}',
         // "vaste kosten", not "vaste lasten": the locale normaliser rewrites it anyway.
-        'pages.onboarding.split_jobs.NECESSITIES': 'huur, vaste kosten, boodschappen',
+        // Three pots by default: the main-pot jobs describe their whole group (2026-11-23).
+        'pages.onboarding.split_jobs.NECESSITIES': 'huur, vaste kosten, boodschappen, vervoer',
+        'pages.onboarding.split_jobs.LONG_TERM_SAVINGS':
+            'eerst een buffer, dan doelen, beleggen, leren',
+        'pages.onboarding.split_jobs.PLAY': 'plezier, hobby’s, geven — vrij te besteden',
+        'pages.onboarding.split_jobs.DAILY': 'boodschappen, vervoer, dagelijkse uitgaven',
+        'pages.onboarding.split_jobs.GOALS': 'de grote dingen die je plant',
         'pages.onboarding.split_jobs.FINANCIAL_FREEDOM':
-            'geld dat apart staat om te beleggen — nooit uitgeven',
+            'geld dat apart staat zodat jij zelf belegt — nooit uitgeven',
         'pages.onboarding.split_jobs.EDUCATION': 'lessen, boeken, een nieuwe vaardigheid',
-        'pages.onboarding.split_jobs.LONG_TERM_SAVINGS': 'grote aankopen en een veiligheidsbuffer',
-        'pages.onboarding.split_jobs.PLAY': 'plezier zonder schuldgevoel — geef het helemaal uit',
         'pages.onboarding.split_jobs.GIVE': 'cadeaus en goede doelen waar je om geeft',
+        'pages.onboarding.split_refine_later':
+            'Meer potjes — Dagelijks, Doelen, Geven? Verfijn een potje later in Instellingen; de drie percentages blijven zoals ze zijn.',
         'pages.onboarding.split_main_account':
             'Al je potjes staan voor nu op één hoofdrekening. Voeg je bank toe wanneer het jou uitkomt.',
         'pages.onboarding.split_note':
@@ -969,13 +975,23 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.capabilities.growth-course.gain':
             'Zet je week rond de drie dingen die je doelen vooruit helpen.',
         'common.message.error.api.jar_split_keys':
-            'De verdeling moet elk potje precies één keer bevatten',
+            'De verdeling moet elk van je potjes precies één keer bevatten',
+        // Refine a group (three pots by default, optional pots inside a group), 2026-11-23.
+        'common.message.error.api.jar_not_optional':
+            'Dit is een van je drie hoofdpotjes, dus het blijft aan. Pas liever het aandeel aan in je verdeling.',
+        'common.message.error.api.jar_already_active': 'Dit potje staat al aan.',
+        'common.message.error.api.jar_not_empty':
+            'Dit potje heeft nog transacties, vaste kosten of doelen. Zet ze eerst over naar een ander potje en zet het daarna uit.',
+        'common.message.error.api.jar_share_too_small':
+            'Het hoofdpotje heeft hier te weinig aandeel voor over. Verhoog eerst het aandeel van de groep in je verdeling.',
         // Terminology (CL-14): jars = potjes (not pot/potten/spaarpot), with het/dit/elk agreement.
         'common.message.error.api.goal_save_only_jar_focus':
             'Alleen SAVE-doelen kunnen focus op een potje hebben',
         'common.message.error.api.goal_save_needs_jar_focus':
             'Het SAVE-doel heeft een potje nodig voordat het focus kan zijn',
         'common.message.error.api.goal_no_jar_spend': 'Het doel heeft geen potje om uit te geven',
+        'common.message.error.api.goal_give_needs_give_jar':
+            'Een geeftoezegging heeft het potje Geven nodig. Zet Geven aan in je verdeling en doe daarna de toezegging.',
         'common.message.error.api.jar_split_total':
             'De potjesverdeling moet samen 100% zijn; ontvangen: {total}%',
         'ui.form.jar': 'Potje',
@@ -1057,19 +1073,27 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             '{on} / {total} potjes op schema · opgestapeld gedurende {months} maanden',
         'features.money.jars.footer_period': '{on} / {total}-potjes liggen deze periode op schema',
         // Jar tile: literal, positive. Names apply only while the household jar has its seed name.
-        'features.money.jars.names.NECESSITIES': 'Vaste kosten en dagelijks',
+        // Refined names (a group split into more pots); alone, a main pot shows its group title.
+        'features.money.jars.names.NECESSITIES': 'Vaste kosten',
+        'features.money.jars.names.DAILY': 'Dagelijks',
+        'features.money.jars.names.LONG_TERM_SAVINGS': 'Buffer',
+        'features.money.jars.names.GOALS': 'Doelen',
         'features.money.jars.names.FINANCIAL_FREEDOM': 'Beleggen',
-        'features.money.jars.names.LONG_TERM_SAVINGS': 'Buffer en doelen',
         'features.money.jars.names.EDUCATION': 'Leren',
         'features.money.jars.names.PLAY': 'Plezier',
         'features.money.jars.names.GIVE': 'Geven',
-        'features.money.jars.purpose.NECESSITIES': 'Huur, eten, rekeningen',
-        'features.money.jars.purpose.FINANCIAL_FREEDOM': 'Beleggen, nooit uitgeven',
-        'features.money.jars.purpose.LONG_TERM_SAVINGS':
-            'Voor nood en tegenvallers, en je grote plannen.',
-        'features.money.jars.purpose.EDUCATION': 'Cursussen, boeken, groei',
+        'features.money.jars.purpose.NECESSITIES': 'Huur, rekeningen, verzekeringen',
+        'features.money.jars.purpose.DAILY': 'Boodschappen, vervoer, dagelijkse uitgaven',
+        'features.money.jars.purpose.LONG_TERM_SAVINGS': 'Voor nood en tegenvallers.',
+        'features.money.jars.purpose.GOALS': 'Sparen voor de grote dingen die je plant',
+        'features.money.jars.purpose.FINANCIAL_FREEDOM': 'Apart gezet zodat jij zelf belegt',
+        'features.money.jars.purpose.EDUCATION': 'Cursussen, boeken, vaardigheden',
         'features.money.jars.purpose.PLAY': 'Uitgaan, hobby’s, vrij te besteden',
         'features.money.jars.purpose.GIVE': 'Doneren, anderen helpen',
+        'features.money.jars.inactive.title': '{pot} staat uit',
+        'features.money.jars.inactive.body':
+            '{pot} is een optioneel potje binnen {group}. Zet het aan en het krijgt een eigen deel van {group} — je drie hoofdgetallen blijven gelijk.',
+        'features.money.jars.inactive.cta': 'Zet {pot} aan',
         'features.money.jars.tile_of': 'van {amount} deze maand',
         'features.money.jars.tile_saved': 'Gespaard',
         'features.money.jars.tile_open_bills':
@@ -1232,23 +1256,23 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         // Necessity jar = Noodzakelijk (not Noodzaak / Necessities); jar names match the landing page.
         'features.coach.split_tips.nec-high':
             'Vaste kosten en dagelijks boven 60% knijpt elk ander potje af. Vaste kosten verlagen helpt meestal meer dan minder beleggen.',
-        'features.brand.auth_manifesto.jars.necessity.name': 'Vaste kosten en dagelijks',
+        'features.brand.auth_manifesto.jars.necessity.name': 'Vaste kosten',
         'features.brand.auth_manifesto.jars.education.name': 'Leren',
-        'features.brand.auth_manifesto.jars.savings.name': 'Buffer en doelen',
+        'features.brand.auth_manifesto.jars.savings.name': 'Buffer',
         'features.brand.auth_manifesto.jars.play.name': 'Plezier',
         'features.brand.auth_manifesto.jars.give.name': 'Geven',
         'features.coach.money_coach.necessities_share.text':
-            'Vaste kosten en dagelijks staat op {pct}%, boven de 55% waarmee de standaardverdeling begint. Prima voor nu — wil je het omlaag, verlaag dan vaste kosten of verhoog je inkomen, en laat Beleggen staan.',
+            'Basis staat op {pct}%, boven de 55% waarmee de standaardverdeling begint. Prima voor nu — wil je het omlaag, verlaag dan vaste kosten of verhoog je inkomen.',
         'features.growth.goals.detail.advice_give_gap_body':
             'Met ongeveer {amount} meer per maand haal je de toezegging op tijd. Een vaste maandelijkse gift uit Geven maakt het saai — op een goede manier.',
         'features.money.debt.detail.no_fixed_linked':
-            'Nog geen terugkerende rekening gekoppeld. Voeg er een toe, zodat Vaste kosten en dagelijks deze betaling meetelt.',
+            'Nog geen terugkerende rekening gekoppeld. Voeg er een toe, zodat Basis deze betaling meetelt.',
         'features.money.debt.form.link_fixed_title': 'Voeg ook toe als vaste kosten in Basis',
         'features.money.debt.toast_monthly_added': 'Maandbedrag toegevoegd aan vaste kosten',
         'features.tour.pages.debt.sections.what_for.body':
-            'Houd bij wat je nog schuldig bent en wat het elke maand kost. Aflossingen gaan meestal uit Vaste kosten en dagelijks — deze pagina houdt het saldo in beeld.',
+            'Houd bij wat je nog schuldig bent en wat het elke maand kost. Aflossingen gaan meestal uit Basis — deze pagina houdt het saldo in beeld.',
         'pages.settings.panels.automation.rules.sweep.desc':
-            'Wat op de 1e nog in Vaste kosten en dagelijks staat, gaat naar Beleggen.',
+            'Wat op de 1e nog in Basis staat, gaat naar Beleggen.',
         // CL-15: The Secret dropped from the book list (decision D10).
         'pages.landing.footer.attribution':
             'Rumtelo · Amsterdam, Nederland. Eerst door de oprichters voor zichzelf ontwikkeld — en vervolgens op de markt gebracht zodat ook anderen er gebruik van kunnen maken. Gebaseerd op boeken als ‘Rich Dad Poor Dad’, ‘Think and Grow Rich’, ‘Secrets of the Millionaire Mind’ en ‘The Psychology of Money’. Onafhankelijk product — niet gelieerd aan, goedgekeurd door of in licentie gegeven door deze auteurs.',
@@ -1623,8 +1647,8 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.growth.income_simulator.gap_to_go': 'nog {amount}',
         'features.growth.income_simulator.gap_met': 'Doel bereikt',
         'features.growth.income_simulator.gap_over': '{amount} boven je doel',
-        // Rumtelo Pots (2026-11-23): Basis · Toekomst · Vrij; pot names Vaste kosten en dagelijks,
-        // Buffer en doelen, Beleggen, Leren, Plezier, Geven. Hand-set, not machine output.
+        // Rumtelo Pots (2026-11-23): three pots Basis · Toekomst · Vrij; refined pot names Vaste
+        // kosten, Dagelijks, Buffer, Doelen, Beleggen, Leren, Plezier, Geven. Hand-set, not machine output.
         'features.brand.auth_manifesto.jars.education.short': 'LEREN',
         'features.brand.auth_manifesto.jars.freedom.name': 'Beleggen',
         'features.brand.auth_manifesto.jars.freedom.short': 'BELEGGEN',
@@ -1653,19 +1677,27 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Plezier boven 10% kan gezond zijn als je zelden iets voor plezier uitgeeft — haal het alleen niet uit Beleggen.',
         'features.coach.split_tips.saver-play':
             'Je patroon neigt naar sparen — met iets meer Plezier houd je de verdeling vol. Geplande vreugde is geen verspilling.',
+        // Group-level split tips (Rumtelo Pots, 2026-11-23).
+        'features.coach.split_tips.basics-high':
+            'Basis zit boven 60% van je inkomen — wat moet, neemt het meeste in. Kijk eerst naar je grootste vaste kostenpost; aan de verdeling hoef je niet te knijpen.',
+        'features.coach.split_tips.future-low':
+            'Toekomst zit onder 10% van je inkomen, dus er blijft weinig over om mee op te bouwen. Zet 1–2% van Vrij naar Toekomst.',
+        // Giving is optional now: no default share in the tip.
+        'features.soul.giving.coach_tip_1':
+            'Het hoeft niet veel te zijn. Een klein deel, automatisch overgemaakt, naar een plek die je bewust koos. Het bedrag is niet het punt — de gewoonte wel.',
         'features.coach.split_tips.spender-ff':
             'Je patroon neigt naar uitgeven — probeer 1–2% extra naar Beleggen voordat je Plezier verhoogt.',
         'features.growth.goals.detail.advice_give_planned_body':
             'Automatiseer een maandelijkse gift als wilskracht het knelpunt is — de toezegging vult zich met wat echt uit het potje Geven ging.',
         'features.growth.net_worth.empty_body':
-            'Voeg je eerste bezit toe (bijvoorbeeld een belegging). Buffer en doelen, Beleggen en je schulden tellen al mee. Tel spaargeld niet dubbel: niet als contant bezit én in die potjes.',
+            'Voeg je eerste bezit toe (bijvoorbeeld een belegging). Je spaargeld in Toekomst en je schulden tellen al mee. Tel spaargeld niet dubbel: niet als contant bezit én in die potjes.',
         'features.growth.net_worth.page_lead':
-            'Bezit plus wat in Beleggen en in Buffer en doelen staat, minus open schulden. Gekoppelde inkomsten en rekeningen zijn geld in beweging, geen verlanglijst.',
+            'Bezit plus je spaargeld in Toekomst (Buffer en Beleggen), minus open schulden. Gekoppelde inkomsten en rekeningen zijn geld in beweging, geen verlanglijst.',
         'features.growth.net_worth.stat_jars': 'Buffer + Beleggen',
         'features.growth.net_worth.summary':
             'Je nettovermogen is {net} — {owned} bezit min {owed} schuld. Tel spaargeld in je potjes of als contant bezit — niet allebei.',
         'features.money.debt.detail.add_to_necessities': 'Toevoegen aan vaste kosten',
-        'features.money.debt.detail.necessities': 'Vaste kosten en dagelijks',
+        'features.money.debt.detail.necessities': 'Basis',
         'features.money.expense_form.give_one_time_hint':
             'Eenmalige gift — staat bij Geven en bij Uitgaand. Voor een terugkerende gift voeg je vaste kosten toe.',
         'features.money.hub.line': 'Grip op je geld — je potjes, wat binnenkomt, wat eruit gaat.',
@@ -1676,17 +1708,59 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.money.jars.guides.NECESSITIES.not_allowed':
             'Niet voor uit eten, kleding of uitjes — dat is Plezier.',
         'features.money.jars.guides.NECESSITIES.note':
-            'Huur, energie, verzekeringen, boodschappen, vervoer. Wat moet, elke maand.',
+            'Huur, energie, verzekeringen, telefoon, aflossingen — en dagelijkse uitgaven zoals boodschappen en vervoer, tenzij je Dagelijks hebt aangezet. Wat moet, elke maand.',
+        // Guides true both alone (Basis/Toekomst) and refined (2026-11-23).
+        'features.money.jars.guides.NECESSITIES.allowed.groceries':
+            'Boodschappen — tenzij Dagelijks aan staat',
+        'features.money.jars.guides.NECESSITIES.allowed.transport_fuel':
+            'Vervoer en brandstof — tenzij Dagelijks aan staat',
+        'features.money.jars.guides.DAILY.subtitle': 'Dagelijkse uitgaven',
+        'features.money.jars.guides.DAILY.note':
+            'Boodschappen, vervoer, apotheek en drogist, huishouden. Wat je week na week uitgeeft — rekeningen blijven in Vaste kosten.',
+        'features.money.jars.guides.DAILY.not_allowed':
+            'Niet voor rekeningen of abonnementen — die blijven in Vaste kosten. Niet voor uit eten — dat is Plezier.',
+        'features.money.jars.guides.DAILY.allowed.groceries': 'Boodschappen',
+        'features.money.jars.guides.DAILY.allowed.transport_fuel': 'Vervoer en brandstof',
+        'features.money.jars.guides.DAILY.allowed.pharmacy': 'Apotheek en drogist',
+        'features.money.jars.guides.DAILY.allowed.household': 'Huishoudelijke spullen',
+        'features.money.jars.guides.DAILY.links.fixed_costs': 'Vaste kosten',
+        'features.money.jars.guides.DAILY.links.transactions': 'Transacties',
+        'features.money.jars.guides.LONG_TERM_SAVINGS.subtitle': 'Eerst een buffer',
+        'features.money.jars.guides.LONG_TERM_SAVINGS.note':
+            'Eerst een noodfonds. Daarna de grote dingen die je plant — auto, aanbetaling, renovatie — tenzij je Doelen hebt aangezet.',
+        'features.money.jars.guides.LONG_TERM_SAVINGS.not_allowed':
+            'Niet voor iets wat je deze maand wilt. Dringend en onverwacht? Daar is dit potje precies voor.',
+        'features.money.jars.guides.LONG_TERM_SAVINGS.allowed.car_purchase':
+            'Auto of grote aankoop — tenzij Doelen aan staat',
+        'features.money.jars.guides.LONG_TERM_SAVINGS.allowed.down_payment':
+            'Aanbetaling — tenzij Doelen aan staat',
+        'features.money.jars.guides.LONG_TERM_SAVINGS.allowed.renovation':
+            'Renovatie — tenzij Doelen aan staat',
+        'features.money.jars.guides.GOALS.subtitle': 'Plannen met een naam',
+        'features.money.jars.guides.GOALS.note':
+            'Waar je met naam voor spaart — een grote aankoop, een aanbetaling voor een huis, een reis. Niet de buffer: die blijft voor tegenvallers.',
+        'features.money.jars.guides.GOALS.not_allowed':
+            'Niet voor nood — daarvoor is Buffer. Niet voor wat je deze maand wilt — dat is Plezier.',
+        'features.money.jars.guides.GOALS.allowed.big_purchase': 'Auto of grote aankoop',
+        'features.money.jars.guides.GOALS.allowed.home_deposit': 'Aanbetaling voor een huis',
+        'features.money.jars.guides.GOALS.allowed.trip': 'Een reis',
+        'features.money.jars.guides.GOALS.allowed.renovation': 'Renovatie',
+        'features.money.jars.guides.GOALS.links.goals': 'Doelen',
+        'features.money.jars.guides.GOALS.links.transactions': 'Transacties',
         'features.money.jars.lead':
-            'Inkomen komt binnen en wordt meteen verdeeld. Geld in Beleggen staat apart om te beleggen. Dat doe je zelf.',
+            'Inkomen komt binnen en wordt meteen verdeeld. Rumtelo laat de verdeling zien; het geld verplaatsen en beleggen doe je zelf.',
         'features.money.move.sidebar_hint':
             'Alleen potjes met geld erin kunnen sturen. Beleggen staat apart en geef je niet uit.',
         'features.soul.giving.empty_auto_title': 'Er gaat nog niets automatisch uit Geven.',
         'features.soul.giving.empty_ledger_body':
             'Giften uit Geven verschijnen hier zodra ze gesorteerd zijn.',
         'features.soul.giving.jar_pct': 'Potje Geven · {pct}%',
+        'features.soul.giving.pot_off_title': 'Geven staat uit',
+        'features.soul.giving.pot_off_body':
+            'Geven is een optioneel potje binnen Vrij. Zet het aan, dan gaat een deel van Vrij naar giften en goede doelen voordat je het uitgeeft — Vrij zelf blijft gelijk.',
+        'features.soul.giving.pot_off_cta': 'Zet Geven aan',
         'features.tour.pages.jars.sections.what_for.body':
-            'Met de Rumtelo-potjes geef je je inkomen een bestemming, in drie groepen: Basis, Toekomst, Vrij. Elk potje heeft een taak en een percentage dat jij kiest. Samen is dat 100% van je inkomen.',
+            'Met de Rumtelo-potjes geef je je inkomen een bestemming: drie potjes — Basis, Toekomst, Vrij. Elk heeft een taak en een percentage dat jij kiest; samen is dat 100% van je inkomen. Meer detail? Verfijn een potje in kleinere potjes — het percentage blijft gelijk.',
         'pages.dashboard.hero.six_jars': '✦ Je potjes',
         'pages.landing.floaters.f10': 'Basis · Toekomst · Vrij',
         'pages.landing.floaters.f6': '−€38,65 → Basis',
@@ -1695,7 +1769,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.settings.panels.course_calendar.last_fetched':
             'Laatst opgehaald {when, date, short} {when, time, short}',
         'pages.landing.jars.play.name': 'Plezier',
-        'pages.landing.portal_demo.growth_goals.emergency.meta': 'Buffer en doelen · maart 2027',
+        'pages.landing.portal_demo.growth_goals.emergency.meta': 'Buffer · maart 2027',
         'pages.landing.portal_demo.money_rows.coffee.jar': 'Plezier',
         'pages.landing.portal_demo.money_rows.debt.jar': 'Basis',
         'pages.landing.portal_demo.money_rows.salary.jar': 'Verdelen → drie groepen',
@@ -1709,20 +1783,20 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.meta.app_description':
             'Basis, Toekomst, Vrij. Een rustige wekelijkse routine, ruimte om te groeien.',
         'pages.onboarding.banks_setup.accounts_body':
-            'Geef de hoofdrekening een naam waar geld binnenkomt (Vaste kosten en dagelijks). Heb je meer rekeningen? Voeg ze hier toe — daarna koppel je de potjes. Hernoemen kan later in Instellingen.',
+            'Geef de hoofdrekening een naam waar geld binnenkomt (Basis). Heb je meer rekeningen? Voeg ze hier toe — daarna koppel je de potjes. Hernoemen kan later in Instellingen.',
         'pages.onboarding.banks_setup.map_body':
-            'Vaste kosten en dagelijks blijft op je hoofdrekening. Zet de andere potjes op de juiste spaarrekening. Aanpassen kan altijd via Instellingen → Potjes.',
+            'Basis blijft op je hoofdrekening. Zet de andere potjes op de juiste spaarrekening. Aanpassen kan altijd via Instellingen → Potjes.',
         'pages.onboarding.banks_setup.suggested_names.education': 'Leren',
         'pages.onboarding.banks_setup.suggested_names.freedom': 'Beleggen',
         'pages.onboarding.banks_setup.suggested_names.give': 'Geven',
-        'pages.onboarding.banks_setup.suggested_names.lts': 'Buffer en doelen',
+        'pages.onboarding.banks_setup.suggested_names.lts': 'Buffer',
         'pages.onboarding.banks_setup.suggested_names.play': 'Plezier',
         'pages.onboarding.banks_setup.tips.one_account':
-            'Begin met één hoofdrekening (Vaste kosten en dagelijks). Voeg spaarpotjes alleen toe als je zo al bankiert — koppel daarna elk potje op het volgende scherm.',
+            'Begin met één hoofdrekening (Basis). Voeg spaarpotjes alleen toe als je zo al bankiert — koppel daarna elk potje op het volgende scherm.',
         'pages.settings.panels.automation.rules.split.desc':
             'Alles wat binnenkomt gaat meteen naar de potjes, volgens de verdeling die je instelt.',
         'pages.settings.panels.jars_placement.blurb':
-            'Combineer vrij — Vaste kosten en dagelijks op je betaalrekening, de rest als spaarpotjes bij je bank, Beleggen op een eigen rekening.',
+            'Combineer vrij — Basis op je betaalrekening, de rest als spaarpotjes bij je bank. Beleggen kan op een eigen rekening.',
         'pages.shell.viewer.chooser_household_bullet_1':
             'Basis, Toekomst, Vrij en een helder maandoverzicht',
         'pages.support.hub.cards.spaarpotjes.body':
@@ -1731,7 +1805,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.support.spaarpotjes.sections.banks.body':
             'De meeste Nederlandse en veel EU-banken laten je meerdere spaarpotjes onder één rekening openen. Noem ze naar je Rumtelo-potjes (of houd de banknamen en koppel ze in Rumtelo). Je hebt geen aparte bankrekening per potje nodig.',
         'pages.support.spaarpotjes.sections.jars.body':
-            'Vaste kosten en dagelijks staat op je hoofdrekening: salaris en rekeningen komen daar binnen. De andere potjes — Buffer en doelen, Beleggen, Leren, Plezier, Geven — kunnen spaarpotjes zijn. Rumtelo houdt de verdeling bij; je bank bewaart de euro’s.',
+            'Basis staat op je hoofdrekening: salaris en rekeningen komen daar binnen. Toekomst en Vrij — en de potjes waarin je ze verfijnt — kunnen spaarpotjes zijn. Rumtelo houdt de verdeling bij; je bank bewaart de euro’s.',
         'pages.support.spaarpotjes.title': 'Spaarpotjes en Rumtelo-potjes',
         'pages.why.meaning.assign.body':
             'Inkomsten komen binnen en worden verdeeld over Basis, Toekomst en Vrij. Eerst verdelen. Pas daarna uitgeven. Rumtelo verplaatst nooit geld op je bankrekening — dat doe je zelf. Wij geven je het overzicht.',
@@ -1741,10 +1815,13 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.money.groups.method_name': 'Rumtelo-potjes',
         'features.money.groups.BASIS.title': 'Basis',
         'features.money.groups.BASIS.line': 'Wat moet, elke maand.',
+        'features.money.groups.BASIS.purpose': 'Huur, rekeningen, boodschappen, vervoer',
         'features.money.groups.FUTURE.title': 'Toekomst',
         'features.money.groups.FUTURE.line': 'Wat je opbouwt.',
+        'features.money.groups.FUTURE.purpose': 'Buffer, doelen, beleggen, leren',
         'features.money.groups.FREE.title': 'Vrij',
         'features.money.groups.FREE.line': 'Wat je kiest.',
+        'features.money.groups.FREE.purpose': 'Plezier, hobby’s, geven',
         'features.money.groups.order_hint': 'Je geld stroomt in deze volgorde.',
         'features.money.groups.all_placed': 'Alles heeft een plek',
         'features.money.groups.left_to_place': 'Nog {amount} te verdelen',
@@ -1753,6 +1830,31 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.money.groups.open_group': 'Open {group}',
         'features.money.groups.view_label': 'Toon',
         'features.money.groups.bar_label': 'Aandeel van je inkomen per groep: {shares}',
+        // Refine a group: optional pots take their share out of the group; the group % stays.
+        'features.money.groups.refine.title': 'Verfijn {group}',
+        'features.money.groups.refine.intro':
+            'Verdeel {group} over meer potjes als je wilt. {group} blijft {percent}% van je inkomen.',
+        'features.money.groups.refine.optional_label': 'Optioneel',
+        'features.money.groups.refine.turn_on': 'Aanzetten',
+        'features.money.groups.refine.turn_off': 'Uitzetten',
+        'features.money.groups.refine.turned_on': 'Aan',
+        'features.money.groups.refine.turned_off': 'Uit',
+        'features.money.groups.refine.refined_badge': 'Verfijnd',
+        'features.money.groups.refine.not_refined_hint':
+            '{group} is één potje. Zet hieronder een potje aan om het te verdelen.',
+        'features.money.groups.refine.turn_on_effect':
+            '{share}% gaat van {main} naar {pot}. {group} blijft {percent}%.',
+        'features.money.groups.refine.turn_off_effect': '{share}% gaat terug naar {main}.',
+        'features.money.groups.refine.turn_off_blocked':
+            '{pot} heeft nog transacties, vaste kosten of doelen. Zet ze eerst over naar {main} en zet het daarna uit.',
+        'features.money.groups.refine.share_too_small':
+            '{main} heeft te weinig aandeel over om dit aan te zetten. Verhoog eerst {group} in je verdeling.',
+        'features.money.groups.refine.main_renamed_hint': '{group} staat nu als {main} en {pot}.',
+        'features.money.groups.refine.save_first':
+            'Sla eerst je verdeling op, zet daarna potjes aan of uit.',
+        'features.money.groups.refine.toast_turned_on': '{pot} staat aan',
+        'features.money.groups.refine.toast_turned_off':
+            '{pot} staat uit — het aandeel staat weer in {main}',
         // EN jar → pot (2026-11-23). The Dutch already said potje(s); kept as it was so the
         // changed English does not send these back through machine translation.
         'features.auth.invite.sign_in_body':

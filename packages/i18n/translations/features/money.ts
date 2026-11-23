@@ -36,14 +36,52 @@ const money = {
         },
     },
     /**
-     * Rumtelo Pots — the three groups the six pots sit in (Basics → Future → Free).
-     * Keys `BASIS` / `FUTURE` / `FREE` are the group ids; pot names stay under `jars.names`.
+     * Rumtelo Pots — three pots by default (Basics → Future → Free); a household can refine
+     * a group into more pots. Keys `BASIS` / `FUTURE` / `FREE` are the group ids. While a
+     * group holds one pot, that pot shows the group `title` + `purpose`; once refined, each
+     * pot shows its own name from `jars.names`.
      */
     groups: {
         method_name: 'Rumtelo Pots',
-        BASIS: { title: 'Basics', line: 'What has to be paid, every month.' },
-        FUTURE: { title: 'Future', line: 'What you build.' },
-        FREE: { title: 'Free', line: 'What you choose.' },
+        BASIS: {
+            title: 'Basics',
+            line: 'What has to be paid, every month.',
+            /** Shown on the main pot while it is the only pot in Basics. */
+            purpose: 'Rent, bills, groceries, transport',
+        },
+        FUTURE: {
+            title: 'Future',
+            line: 'What you build.',
+            purpose: 'Buffer, goals, investing, learning',
+        },
+        FREE: {
+            title: 'Free',
+            line: 'What you choose.',
+            purpose: 'Fun, hobbies, giving',
+        },
+        /** Refine a group: turn optional pots on/off inside it. The group share never changes. */
+        refine: {
+            title: 'Refine {group}',
+            intro: 'Split {group} into more pots if you want. {group} stays {percent}% of your income.',
+            optional_label: 'Optional',
+            turn_on: 'Turn on',
+            turn_off: 'Turn off',
+            turned_on: 'On',
+            turned_off: 'Off',
+            refined_badge: 'Refined',
+            not_refined_hint: '{group} is one pot. Turn on a pot below to split it.',
+            turn_on_effect: '{share}% moves from {main} to {pot}. {group} stays {percent}%.',
+            turn_off_effect: '{share}% goes back to {main}.',
+            turn_off_blocked:
+                '{pot} still holds transactions, fixed costs or goals. Move them to {main} first, then turn it off.',
+            share_too_small:
+                '{main} has too little share left to turn this on. Raise {group} in your split first.',
+            main_renamed_hint: '{group} now shows as {main} and {pot}.',
+            /** Next to the disabled Turn on / Turn off buttons while the split has unsaved edits. */
+            save_first: 'Save your split first, then turn pots on or off.',
+            toast_turned_on: '{pot} is on',
+            toast_turned_off: '{pot} is off — its share is back in {main}',
+        },
         order_hint: 'Money flows in this order.',
         all_placed: 'Everything has a place',
         left_to_place: '{amount} left to place',
@@ -63,7 +101,7 @@ const money = {
         },
         eyebrow: 'RUMTELO POTS',
         title: 'Every coin gets a job before it arrives.',
-        lead: 'Income lands and splits the same second. Money in Investing is set aside to invest. You invest it yourself.',
+        lead: 'Income lands and splits the same second. Rumtelo shows the split; moving and investing the money is yours to do.',
         on_track: '{on} / {total} on track',
         move_between: 'Move between pots',
         add_transaction: '+ Add transaction',
@@ -80,23 +118,36 @@ const money = {
         tile_meter_over: 'Overspent',
         left_label: 'Left this month',
         left_label_stacked: 'Left over the span',
-        /** Display names for jars that still carry their seed name; a renamed jar keeps its own. */
+        /**
+         * Pot names once a group is refined (a renamed jar keeps its own). While a main pot
+         * (NECESSITIES, LONG_TERM_SAVINGS, PLAY) is alone in its group it shows `groups.<GROUP>.title`.
+         */
         names: {
-            NECESSITIES: 'Fixed costs and daily',
+            NECESSITIES: 'Fixed costs',
+            DAILY: 'Daily',
+            LONG_TERM_SAVINGS: 'Buffer',
+            GOALS: 'Goals',
             FINANCIAL_FREEDOM: 'Investing',
-            LONG_TERM_SAVINGS: 'Buffer and goals',
             EDUCATION: 'Learning',
             PLAY: 'Fun',
             GIVE: 'Giving',
         },
-        /** One literal line per jar on the jar tiles: what the money is for. */
+        /** One literal line per pot on the tiles: what the money is for. */
         purpose: {
-            NECESSITIES: 'Rent, food, bills',
-            FINANCIAL_FREEDOM: 'Invest, never spend',
-            LONG_TERM_SAVINGS: 'For emergencies and setbacks, and your big plans.',
+            NECESSITIES: 'Rent, bills, insurance',
+            DAILY: 'Groceries, transport, everyday spends',
+            LONG_TERM_SAVINGS: 'For emergencies and setbacks.',
+            GOALS: 'Saving for the big things you plan',
+            FINANCIAL_FREEDOM: 'Set aside for you to invest',
             EDUCATION: 'Courses, books, skills',
             PLAY: 'Going out, hobbies, spent freely',
             GIVE: 'Donate, help others',
+        },
+        /** A screen needs a pot that is off (optional pot not turned on). */
+        inactive: {
+            title: '{pot} is off',
+            body: '{pot} is an optional pot inside {group}. Turn it on and it gets its own share of {group} — your three main numbers stay the same.',
+            cta: 'Turn on {pot}',
         },
         this_month: 'This month',
         this_month_of: '{available} of {allocated} this month',
@@ -111,13 +162,13 @@ const money = {
         guides: {
             NECESSITIES: {
                 subtitle: 'Must-pays',
-                note: 'Rent, energy, insurance, groceries, transport. What has to be paid, every month.',
+                note: 'Rent, energy, insurance, phone, debt instalments — and everyday spending like groceries and transport, unless you turned on Daily. What has to be paid, every month.',
                 not_allowed: 'Not for eating out, clothes or outings — that is Fun.',
                 allowed: {
                     rent: 'Rent',
                     energy_water: 'Energy & water',
-                    groceries: 'Groceries',
-                    transport_fuel: 'Transport & fuel',
+                    groceries: 'Groceries — unless Daily is on',
+                    transport_fuel: 'Transport & fuel — unless Daily is on',
                     insurance: 'Insurance',
                     debt_instalments: 'Debt instalments',
                     phone_internet: 'Phone & internet',
@@ -125,6 +176,23 @@ const money = {
                 links: {
                     fixed_costs: 'Fixed costs',
                     debt: 'Debt',
+                    transactions: 'Transactions',
+                },
+            },
+            /** Optional pot in Basics: everyday spending, taken out of the Basics share. */
+            DAILY: {
+                subtitle: 'Everyday spending',
+                note: 'Groceries, transport, pharmacy and drugstore, household things. What you spend week to week — bills stay in Fixed costs.',
+                not_allowed:
+                    'Not for bills or subscriptions — those stay in Fixed costs. Not for eating out — that is Fun.',
+                allowed: {
+                    groceries: 'Groceries',
+                    transport_fuel: 'Transport & fuel',
+                    pharmacy: 'Pharmacy & drugstore',
+                    household: 'Household things',
+                },
+                links: {
+                    fixed_costs: 'Fixed costs',
                     transactions: 'Transactions',
                 },
             },
@@ -153,16 +221,33 @@ const money = {
                     'Trading is allowed, but only from this small corner — never from the rest. Lose it and you lose a month, not your future.',
             },
             LONG_TERM_SAVINGS: {
-                subtitle: 'Big things',
-                note: 'Emergency fund, car, down payment. Known, planned, not urgent.',
+                subtitle: 'Buffer first',
+                note: 'An emergency fund first. Then the big things you plan — car, deposit, renovation — unless you turned on Goals.',
                 not_allowed:
-                    'Known, planned, not urgent. Urgent and unexpected? That is exactly what the emergency fund is for.',
+                    'Not for anything you want this month. Urgent and unexpected? That is exactly what this pot is for.',
                 allowed: {
                     emergency_fund: 'Emergency fund',
-                    car_purchase: 'Car or big purchase',
-                    down_payment: 'Down payment',
-                    renovation: 'Renovation',
+                    car_purchase: 'Car or big purchase — unless Goals is on',
+                    down_payment: 'Down payment — unless Goals is on',
+                    renovation: 'Renovation — unless Goals is on',
                     tax_bill: 'Tax bill',
+                },
+                links: {
+                    goals: 'Goals',
+                    transactions: 'Transactions',
+                },
+            },
+            /** Optional pot in Future: named things you save for, taken out of the Future share. */
+            GOALS: {
+                subtitle: 'Named plans',
+                note: 'The things you save for by name — a big purchase, a home deposit, a trip. Not the buffer: that stays for setbacks.',
+                not_allowed:
+                    'Not for emergencies — that is Buffer. Not for what you want this month — that is Fun.',
+                allowed: {
+                    big_purchase: 'Car or big purchase',
+                    home_deposit: 'Home deposit',
+                    trip: 'A trip',
+                    renovation: 'Renovation',
                 },
                 links: {
                     goals: 'Goals',
@@ -1084,9 +1169,8 @@ const money = {
             no_payments_short: 'No payments logged yet.',
             open_debt: 'Open debt ›',
             planned_payment: 'Planned payment',
-            necessities: 'Fixed costs and daily',
-            no_fixed_linked:
-                'No recurring bill linked yet. Add one so Fixed costs and daily counts this payment.',
+            necessities: 'Basics',
+            no_fixed_linked: 'No recurring bill linked yet. Add one so Basics counts this payment.',
             add_to_necessities: 'Add to fixed costs',
             apr: '{rate}% APR',
             validation_amount_required: 'Amount is required',

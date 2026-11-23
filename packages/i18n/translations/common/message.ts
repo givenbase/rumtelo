@@ -31,6 +31,8 @@ const message = {
             goal_save_only_achieved: 'Only SAVE goals can be marked achieved this way',
             goal_not_active: 'Goal is not active',
             goal_no_jar_spend: 'Goal has no pot to spend from',
+            goal_give_needs_give_jar:
+                'A giving pledge needs the Giving pot. Turn on Giving in your split, then make the pledge.',
             payment_amount_positive: 'Payment amount must be positive',
             bill_paused_no_settlement: 'Paused or ended bills cannot take new settlements.',
             due_month_required: 'Pick which month you are charged for quarterly or yearly bills.',
@@ -83,7 +85,14 @@ const message = {
             cannot_remove_owner: 'The household owner cannot be removed',
             member_remove_failed: 'Could not remove that member. Try again.',
             jar_split_total: 'Pot split must total 100%, received {total}%',
-            jar_split_keys: 'The split must list every pot exactly once',
+            jar_split_keys: 'The split must list each of your pots exactly once',
+            jar_not_optional:
+                'This is one of your three main pots, so it stays on. Change its share in your split instead.',
+            jar_already_active: 'This pot is already on.',
+            jar_not_empty:
+                'This pot still holds transactions, fixed costs or goals. Move them to another pot first, then turn it off.',
+            jar_share_too_small:
+                'The main pot has too little share left for this. Raise the group’s share in your split first.',
             jar_placement_account_invalid: 'That bank account is not in this household.',
             book_catalog_unavailable: 'The book catalog did not answer.',
             contact_send_failed:

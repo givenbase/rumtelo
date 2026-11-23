@@ -39,7 +39,7 @@ const support = {
             },
             jars: {
                 title: 'How Rumtelo maps to that',
-                body: 'Fixed costs and daily lives on your hoofdrekening (main account): salary and bills land there. The other pots — Buffer and goals, Investing, Learning, Fun, Giving — can be spaarpotjes. Rumtelo tracks the split; your bank holds the euros.',
+                body: 'Basics lives on your hoofdrekening (main account): salary and bills land there. Future and Free — and any pots you refine them into — can be spaarpotjes. Rumtelo tracks the split; your bank holds the euros.',
             },
             banks: {
                 title: 'What your bank usually offers',

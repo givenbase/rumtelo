@@ -123,6 +123,11 @@ const coach = {
             'Your pattern leans spender — try 1–2% more into Investing before adding to Fun.',
         'saver-play':
             'Your pattern leans saver — a little more Fun helps you keep the split up. Joy that is planned is not waste.',
+        // Group-level tips for Rumtelo Pots (three pots by default); limits in GROUP_SOFT_CEILING / _FLOOR.
+        'basics-high':
+            'Basics is above 60% of your income — what must be paid takes most of it. Look at your biggest fixed cost first; the split is not the thing to squeeze.',
+        'future-low':
+            'Future is under 10% of your income, so little is left to build with. Move 1–2% from Free to Future.',
     },
     helpers: {
         mark_title: 'From The Coach — turn on-screen tips on or off in Settings → Preferences',
@@ -173,7 +178,7 @@ const coach = {
             },
         },
         necessities_share: {
-            text: 'Fixed costs and daily is at {pct}%, above the 55% the default split starts from. Fine for now — to bring it down, trim fixed costs or raise income, and leave Investing as it is.',
+            text: 'Basics is at {pct}%, above the 55% the default split starts from. Fine for now — to bring it down, trim fixed costs or raise income.',
             cta: 'Review pots',
         },
         /** Household-wide fixed-cost tips (`money.fixed_costs.*` keys). */

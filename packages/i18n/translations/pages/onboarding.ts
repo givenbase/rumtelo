@@ -17,17 +17,26 @@ const onboarding = {
     // ── Screen 2 · Here's where it goes ───────────────────────────────────
     split_title: "Here's where your {amount} goes.",
     split_lead:
-        'Each pot has one job. Change the percentages any time — the habit matters more than the numbers.',
+        'Three pots to start: Basics, Future, Free. Each has one job. Change the percentages any time — the habit matters more than the numbers.',
     split_list_aria: 'Your split',
     split_row_aria: '{jar}, {percent} percent, {amount}',
+    /**
+     * One job per pot, lowercase. Onboarding always shows the three main pots unrefined,
+     * so NECESSITIES / LONG_TERM_SAVINGS / PLAY describe their whole group; the optional
+     * keys match `features.money.jars.purpose` for later use.
+     */
     split_jobs: {
-        NECESSITIES: 'rent, bills, groceries',
-        FINANCIAL_FREEDOM: 'money set aside to invest — never spent',
+        NECESSITIES: 'rent, bills, groceries, transport',
+        LONG_TERM_SAVINGS: 'a buffer first, then goals, investing, learning',
+        PLAY: 'fun, hobbies, giving — spent freely',
+        DAILY: 'groceries, transport, everyday spends',
+        GOALS: 'the big things you plan',
+        FINANCIAL_FREEDOM: 'money set aside for you to invest — never spent',
         EDUCATION: 'courses, books, a new skill',
-        LONG_TERM_SAVINGS: 'big buys and a safety buffer',
-        PLAY: 'fun without guilt — spend it all',
         GIVE: 'gifts and causes you care about',
     },
+    split_refine_later:
+        'Want more pots — Daily, Goals, Giving? Refine a pot later in Settings; the three percentages stay as they are.',
     split_main_account:
         'All your pots sit on one main account for now. Add your bank when it suits you.',
     split_note:
@@ -52,10 +61,10 @@ const onboarding = {
     banks_setup: {
         accounts_title: 'Name your accounts',
         accounts_body:
-            'Name the main account where money lands (Fixed costs and daily). Need more? Add them here — then you link the pots. You can rename later in Settings.',
+            'Name the main account where money lands (Basics). Need more? Add them here — then you link the pots. You can rename later in Settings.',
         map_title: 'Link pots to accounts',
         map_body:
-            'Fixed costs and daily stays on your main account. Put the other pots on the right savings account. Change this any time in Settings → Pots.',
+            'Basics stays on your main account. Put the other pots on the right savings account. Change this any time in Settings → Pots.',
         map_body_one:
             'You have one account — every pot is already linked to it. Change this later in Settings → Pots if you add more accounts.',
         read_only_link: 'Open bank settings',
@@ -79,7 +88,7 @@ const onboarding = {
             main_checking: 'Main account',
             savings: 'Savings',
             freedom: 'Investing',
-            lts: 'Buffer and goals',
+            lts: 'Buffer',
             education: 'Learning',
             play: 'Fun',
             give: 'Giving',
@@ -90,7 +99,7 @@ const onboarding = {
         },
         tips: {
             one_account:
-                'Start with one main account (Fixed costs and daily). Add spaarpotjes as extra accounts only if you already bank that way — then link each pot on the next screen.',
+                'Start with one main account (Basics). Add spaarpotjes as extra accounts only if you already bank that way — then link each pot on the next screen.',
             familiar:
                 'Start with your main account. Add any other accounts you already use, then link each pot.',
             already_set_up:

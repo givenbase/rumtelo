@@ -51,10 +51,10 @@ const brand = {
             soul: { name: 'Soul', short: 'SOUL' },
         },
         jars: {
-            necessity: { name: 'Fixed costs and daily', short: 'FIXED' },
+            necessity: { name: 'Fixed costs', short: 'FIXED' },
             freedom: { name: 'Investing', short: 'INVEST' },
             education: { name: 'Learning', short: 'LEARN' },
-            savings: { name: 'Buffer and goals', short: 'BUFFER' },
+            savings: { name: 'Buffer', short: 'BUFFER' },
             play: { name: 'Fun', short: 'FUN' },
             give: { name: 'Giving', short: 'GIVING' },
         },

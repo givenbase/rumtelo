@@ -116,11 +116,11 @@ const landing = {
     jars_section: {
         eyebrow: 'RUMTELO POTS',
         headline: 'Every amount gets a job, so none has to decide for itself.',
-        lead: 'Every pot has a rule you can read in one line — what belongs, what doesn’t. The percentages are yours to change. The habit is the point.',
+        lead: 'Start with three pots, each with a rule you can read in one line. Refine one into smaller pots when you want. The percentages are yours to change. The habit is the point.',
     },
     jars: {
         nec: {
-            name: 'Fixed costs and daily',
+            name: 'Fixed costs',
             line: 'Rent, energy, insurance, groceries, transport. The things that arrive whether you like it or not.',
             not: 'Not for eating out or clothes — that is Fun.',
         },
@@ -135,7 +135,7 @@ const landing = {
             not: 'Not for gadgets you call research.',
         },
         lts: {
-            name: 'Buffer and goals',
+            name: 'Buffer',
             line: 'Emergency fund first, then the car, the deposit, the tax bill you know is coming.',
             not: 'Not for anything you want this month.',
         },
@@ -242,7 +242,7 @@ const landing = {
             soul: 'Stillness · day 6',
         },
         coach_lines: {
-            money: 'Fun is €38 over its line. One move: shift it from Buffer and goals — or let it ride.',
+            money: 'Fun is €38 over its line. One move: shift it from Buffer — or let it ride.',
             growth: 'Cutting costs has a floor. Raising income does not. Side income is 20% of the way.',
             energy: 'Three nights under 6h30 — and Fun rose on those days. Sleep first. Then decide.',
             soul: 'Intention set. One line is enough — the week has a direction now.',
@@ -254,7 +254,7 @@ const landing = {
             debt: { label: 'Debt payment', jar: 'Basics' },
         },
         growth_goals: {
-            emergency: { name: 'Emergency fund', meta: 'Buffer and goals · Mar 2027' },
+            emergency: { name: 'Emergency fund', meta: 'Buffer · Mar 2027' },
             side_income: { name: 'Side income €500 / month', meta: 'Income · the second lever' },
             course: { name: 'Course · data analysis', meta: 'Learning pot' },
         },
@@ -357,7 +357,7 @@ const landing = {
         demo: {
             money: {
                 kind: 'THIS WEEK',
-                text: 'Fun is €38 over its line. Move it from Buffer and goals once — or let it ride and keep next week’s dinner in.',
+                text: 'Fun is €38 over its line. Move it from Buffer once — or let it ride and keep next week’s dinner in.',
                 cta: 'Open pots',
             },
             growth: {

@@ -261,7 +261,7 @@ const growth = {
         page_eyebrow: '✦ MY NET WORTH',
         page_title: 'What you already own — and what it pays or costs.',
         page_lead:
-            'Holdings plus what sits in Investing and in Buffer and goals, minus open debts. Linked income and bills are money in motion, not a wish list.',
+            'Holdings plus your savings in Future (Buffer and Investing), minus open debts. Linked income and bills are money in motion, not a wish list.',
         add_asset: '+ Add asset',
         horizon_eyebrow: '✦ How far this takes you',
         stat_holdings: 'Holdings',
@@ -294,7 +294,7 @@ const growth = {
         per_month_short: 'p/m',
         empty_title: 'No holdings yet',
         empty_body:
-            'Add your first asset (for example an investment). Buffer and goals, Investing and your debts already count. Do not double-count savings as a Cash asset and in those pots.',
+            'Add your first asset (for example an investment). Your savings in Future and your debts already count. Do not double-count savings as a Cash asset and in those pots.',
         debt_empty_title: 'No debts logged',
         debt_empty_body: 'Debts you add in Money → Debt appear here automatically.',
         month_score_eyebrow: 'Month score',
@@ -749,7 +749,7 @@ const growth = {
             },
             emergency_buffer: {
                 name: 'Build an emergency buffer',
-                doneWhen: 'The buffer is in my Buffer and goals pot',
+                doneWhen: 'The buffer is set aside in Future',
                 firstStep: 'Decide the amount and set up the monthly transfer',
             },
             pay_off_debt: {
@@ -900,7 +900,7 @@ const growth = {
             amount_earn_hint: 'Your net income per month. It does not come out of a pot.',
             per_month: '≈ {amount} per month until December',
             jar: 'Which pot?',
-            jar_hint: 'Planned spends live in Buffer and goals.',
+            jar_hint: 'Planned spends live in Future.',
             jar_placeholder: 'Choose a pot',
             shared_note: 'A goal with an amount is shared with your household in Money.',
             amount_locked:
