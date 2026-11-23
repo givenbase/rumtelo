@@ -17,13 +17,54 @@ These override the names used further down, which still show the first draft ("N
 | Drill-down | Tapping a group opens a group page with its pots in order; tapping a pot opens the pot |
 | Default shares | "A logical split": proposed start 55% Vast · 20% Toekomst · 25% Vrij, then Vast is derived from real fixed costs; Toekomst at least 10%; Noodpot gets most of Toekomst until full. Numbers are a proposal, to confirm |
 
+Further decisions the same day:
+
+| Topic | Decision |
+| --- | --- |
+| What the first group means | **What must be paid**, not "what recurs". A recurring cost the household chooses (cinema pass, streaming, gym) is paid from Vrij. When adding a recurring cost the app asks "Moet dit, of kies je dit?" |
+| Grote uitgaven | **Dropped as a pot** (it reads like "Vaste kosten"). Yearly and quarterly bills are fixed costs with a yearly/quarterly cadence; repairs and replacement come from the emergency pot; planned purchases are goals |
+
 Pots per group after these decisions:
 
-| Group | On by default | Optional |
+| Group | Line under it | On by default | Optional |
+| --- | --- | --- | --- |
+| **Vast** (see §0.1: "Basis" recommended) | Wat moet, elke maand | Vaste kosten, Dagelijks | — |
+| **Toekomst** | Wat je opbouwt | Noodpot (see §0.1: "Buffer" recommended), Doelen | Beleggen, Leren |
+| **Vrij** | Wat je kiest | Plezier, showing how much is already committed to subscriptions | Geven |
+
+### 0.1 Terminology check against the standards (2026-11-23)
+
+Checked against Nibud's budgeting method, the official EU/CBS classification of household spending (ECOICOP v2), bank apps and open-banking category lists. Sources: [Nibud method](https://www.nibud.nl/onderwerpen/rondkomen/plannen-en-begroten/nibud-methode-van-budgetteren/), [Nibud on subscriptions](https://www.nibud.nl/onderwerpen/uitgaven/abonnementen/), [Nibud leefgeld](https://www.nibud.nl/onderwerpen/geldproblemen/leefgeld-in-de-schuldhulpverlening/), [CBS ECOICOP v2](https://www.cbs.nl/nl-nl/longread/diversen/2026/de-ecoicopv2-indeling?onepage=true), [Plaid taxonomy](https://plaid.com/documents/pfc-taxonomy-all.csv), [Yapily categories](https://docs.yapily.com/data/data-plus/categorisation-list.md).
+
+**Finding 1 — two separate axes.** No authority merges "does it recur?" with "is it necessary?". Nibud sorts by recurrence: *vaste lasten* (contractual, recurring — **including subscriptions**), *reserveringsuitgaven* (certain, timing unknown: clothing, household goods, own risk, holidays) and *huishoudelijke uitgaven* (frequent, varying: food, care, cleaning). Necessity is a separate lens ("basispakket"). The transaction taxonomies have no need/want axis at all. So the product needs two fields per cost: **recurrence** and **must / choose**.
+
+**Finding 2 — word by word.**
+
+| Our word | Standard term | Verdict |
 | --- | --- | --- |
-| **Vast** | Vaste kosten, Dagelijks | — |
-| **Toekomst** | Noodpot, Grote uitgaven, Doelen | Beleggen, Leren |
-| **Vrij** | Plezier | Geven |
+| Vast (group, meaning "what must") | Nibud's "vast" means contractual and recurring and includes subscriptions | **Change recommended: Basis / Basics** (Nibud's own word for necessities is "basispakket"). "Vast" for essentials contradicts the standard and our own subscription rule |
+| Toekomst / Future | none | Keep |
+| Vrij / Free | "vrij besteedbaar" is a standard phrase | Keep |
+| Vaste kosten | "Vaste lasten" is the standard (Nibud, ABN AMRO, Knab, CPB); "vaste kosten" is an understood synonym | Keep (deliberate: no "lasten"); map to Nibud "vaste lasten" in data |
+| Dagelijks | Nibud "huishoudelijke uitgaven"; debt help "leefgeld" | Keep; map to "huishoudelijke uitgaven" |
+| Noodpot | "Buffer" / "financiële buffer" (Nibud BufferBerekenaar, banks). "Noodpot" was found only on one blog | **Change recommended: Buffer**, with the line "Voor nood en tegenvallers" so people looking for "nood" find it |
+| Doelen | banks say "spaardoelen" (not verified) | Keep; goals come from Planning and are not only savings |
+| Beleggen | not checked | Keep; never names a product |
+| Leren | ECOICOP 10 "Onderwijs" | Keep; map to Onderwijs |
+| Plezier | ECOICOP 09 "Recreatie, sport en cultuur", 11 "Restaurants en accommodatie" | Keep |
+| Geven | tax term "giften" | Keep the pot name; category "Giften" |
+| "Moet dit, of kies je dit?" | English advisers warn that "needs vs wants" reads as deprivation or shame; no Dutch wording research found | Keep: "kies je" is a choice, not a want. Test in interviews |
+
+**Finding 3 — categories.** The app has about 55 spending categories. Against the standards:
+
+- `SUBSCRIPTIONS` can only sit under Necessities today, so a cinema pass lands in "what must". It needs to be allowed under Plezier with a default of "choose".
+- Clothing exists only as `FASHION` under Play; Nibud counts clothing as a necessary reservation. Add a clothing category under the first group.
+- No telecom category ("Internet, tv en telefoon", ECOICOP 08).
+- Recommended: keep the existing categories and give each one three tags — an ECOICOP division (01–13), a Nibud group (vast / reservering / huishoudelijk) and a default must/choose — so household data can later be compared with CBS and Nibud reference figures. Eighteen top-level groups are enough for reporting: Wonen, Energie en water, Verzekeringen, Zorg, Internet tv en telefoon, Abonnementen, Boodschappen, Verzorging en schoonmaak, Vervoer, Kleding, Inboedel en onderhoud, Onderwijs, Uitgaan en restaurants, Vrije tijd sport en cultuur, Vakantie, Giften, Sparen en beleggen, Overig.
+
+Work: category tags are a contract + template change with a hand-written migration (Medium, M, 3–5 h, medium confidence) and belong with step S2.
+
+Not verified: the full category lists of ING, Rabobank and ABN AMRO; Tink, Salt Edge and GoCardless lists; where ECOICOP places donations and health insurance.
 
 ## 1. Why replace the six jars
 
