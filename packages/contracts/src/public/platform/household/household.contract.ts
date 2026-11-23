@@ -26,7 +26,7 @@ import {
 // ====================================================================
 
 /**
- * Provision a household in one call: organization, six jars, settings, the
+ * Provision a household in one call: organization, the pots (three by default), settings, the
  * creator's account settings, income (when > 0) and one "Main account" with
  * every jar placed on it.
  */
@@ -49,7 +49,7 @@ export const householdInvite = oc
 // ====================================================================
 
 /**
- * Split preview for onboarding: income into six jars in minor units. Needs a
+ * Split preview for onboarding: income into the pots in minor units. Needs a
  * signed-in session but no household; nothing is written.
  */
 export const householdPreviewSplit = oc

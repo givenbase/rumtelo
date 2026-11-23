@@ -106,6 +106,8 @@ export const JarTemplate = CatalogItemBase.extend({
     percentage: z.number().min(0).max(100),
     capabilities: JarCapabilities,
     guide: JarGuide.nullable(),
+    /** True for the three main pots every new household starts with. */
+    isDefault: z.boolean(),
 });
 
 export const IncomeSourcePreset = CatalogItemBase.extend({

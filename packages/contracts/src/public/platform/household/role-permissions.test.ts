@@ -55,6 +55,15 @@ describe('permissionActionFromPath', () => {
         }
     });
 
+    it('classifies optional pot activate/deactivate like updateSplit (UPDATE)', () => {
+        for (const leaf of ['updateSplit', 'activate', 'deactivate']) {
+            assert.equal(
+                permissionActionFromPath(`/money/jars/${leaf}`, 'POST'),
+                HouseholdPermissionAction.UPDATE
+            );
+        }
+    });
+
     it('classifies fixed-cost jar/settlement reads as READ despite POST', () => {
         assert.equal(
             permissionActionFromPath('/money/fixedCosts/byJar', 'POST'),

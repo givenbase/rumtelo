@@ -250,7 +250,7 @@ export function permissionActionFromPath(
         return HouseholdPermissionAction.CREATE;
     }
     if (
-        /^(update|apply|dismiss|sort|schedule|change|set|carry|tick|untick|pause|resume|confirm|renew|snooze|enable|rotate|disable)/.test(
+        /^(update|apply|dismiss|sort|schedule|change|set|carry|tick|untick|pause|resume|confirm|renew|snooze|enable|rotate|disable|activate|deactivate)/.test(
             leaf
         )
     ) {

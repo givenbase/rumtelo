@@ -1,6 +1,6 @@
 /**
  * Jar Contract
- * oRPC procedures for jar list, balances, split, and categories.
+ * oRPC procedures for jar list, balances, split, optional pots, and categories.
  */
 
 import { oc } from '@orpc/contract';
@@ -13,9 +13,27 @@ import {
     Money,
     PeriodKey,
 } from '../../../../common/common.schema';
-import { Category, Jar, JarBalance, UpdateJarPlacement, UpdateJarSplit } from './jar.schema';
+import {
+    ActivateJar,
+    Category,
+    DeactivateJar,
+    Jar,
+    JarBalance,
+    UpdateJarPlacement,
+    UpdateJarSplit,
+} from './jar.schema';
 
 const ok = z.object({ ok: z.literal(true) });
+
+// ====================================================================
+// ? CREATE Operations
+// ====================================================================
+
+/**
+ * Turn on an optional pot (DAILY, GOALS, FINANCIAL_FREEDOM, EDUCATION, GIVE). Returns the
+ * new jar. The service throws a bad-request when the pot is already on.
+ */
+export const jarActivate = oc.input(ActivateJar).output(Jar);
 
 // ====================================================================
 // ? READ Operations
@@ -61,12 +79,19 @@ export const jarUpdateCategory = oc
 // ? DELETE Operations
 // ====================================================================
 
+/**
+ * Turn off an optional pot; its share returns to its group's main pot. Main pots cannot
+ * be turned off — the service throws a bad-request for them.
+ */
+export const jarDeactivate = oc.input(DeactivateJar).output(ok);
+
 export const jarDeleteCategory = oc
     .input(z.object({ householdId: HouseholdId, id: Id }))
     .output(ok);
 
 /** Nested contract object mounted at `contract.money.jars`. */
 export const jarContract = {
+    activate: jarActivate,
     list: jarList,
     balances: jarBalances,
     update: jarUpdate,
@@ -75,4 +100,5 @@ export const jarContract = {
     createCategory: jarCreateCategory,
     updateCategory: jarUpdateCategory,
     deleteCategory: jarDeleteCategory,
+    deactivate: jarDeactivate,
 };

@@ -12,6 +12,7 @@ import { JarKey } from '../../money/enums';
 /** Jars that hold wealth, not this month’s operating cash. */
 export const NET_WORTH_JAR_KEYS: ReadonlySet<JarKey> = new Set([
     JarKey.LONG_TERM_SAVINGS,
+    JarKey.GOALS,
     JarKey.FINANCIAL_FREEDOM,
 ]);
 

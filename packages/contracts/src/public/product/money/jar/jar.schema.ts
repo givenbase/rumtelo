@@ -1,6 +1,6 @@
 /**
  * Jar Schemas
- * T. Harv Eker's six-jar model — allocation, categories, balances.
+ * Pots (jars) — allocation, categories, balances. Three main pots by default, up to five optional ones.
  * Zod only — no `export type`.
  */
 
@@ -8,6 +8,7 @@ import { z } from 'zod';
 
 import { HouseholdId, Id, Money, PeriodKey } from '../../../../common/common.schema';
 import { JarKey } from '../enums';
+import { OPTIONAL_JAR_KEYS } from './jar.util';
 
 export const JarCapabilities = z.object({
     /** Day-to-day expenses / inbox sorting may land here. */
@@ -105,6 +106,22 @@ export const UpdateJarSplit = z.object({
         .max(Object.values(JarKey).length),
 });
 
+/**
+ * Turn on one optional pot. Only the five optional keys are accepted: the three main
+ * pots (NECESSITIES, LONG_TERM_SAVINGS, PLAY) always exist. The service carves the pot's
+ * default share out of its group's main pot, so the group total does not change.
+ */
+export const ActivateJar = z.object({
+    householdId: HouseholdId,
+    key: z.enum(OPTIONAL_JAR_KEYS),
+});
+
+/** Turn off one optional pot; its share goes back to its group's main pot. */
+export const DeactivateJar = z.object({
+    householdId: HouseholdId,
+    jarId: Id,
+});
+
 // Inferred types (same-module merge for consumers)
 export type JarCapabilities = z.infer<typeof JarCapabilities>;
 export type Category = z.infer<typeof Category>;
@@ -112,3 +129,5 @@ export type Jar = z.infer<typeof Jar>;
 export type JarBalance = z.infer<typeof JarBalance>;
 export type UpdateJarSplit = z.infer<typeof UpdateJarSplit>;
 export type UpdateJarPlacement = z.infer<typeof UpdateJarPlacement>;
+export type ActivateJar = z.infer<typeof ActivateJar>;
+export type DeactivateJar = z.infer<typeof DeactivateJar>;

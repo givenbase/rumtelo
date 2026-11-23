@@ -10,4 +10,6 @@ export type {
     JarBalance,
     UpdateJarSplit,
     UpdateJarPlacement,
+    ActivateJar,
+    DeactivateJar,
 } from './jar.schema';

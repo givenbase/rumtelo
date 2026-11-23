@@ -194,6 +194,10 @@ export const HouseholdSeatUsage = z.object({
     maxViewer: z.int().nullable(),
 });
 
+/** A household has one main pot per group (3) and at most every JarKey. */
+const MIN_JARS = 3;
+const MAX_JARS = Object.values(JarKey).length;
+
 /** One jar's share in a custom split (percent, at most 2 decimals). */
 export const JarSplitShare = z.object({
     key: z.enum(JarKey),
@@ -202,7 +206,7 @@ export const JarSplitShare = z.object({
 });
 
 /**
- * Onboarding writes household + income + six jars + prefs + one "Main account"
+ * Onboarding writes household + income + the pots (three by default) + prefs + one "Main account"
  * (no bank, no IBAN, every jar placed on it) in one transaction.
  */
 export const OnboardingInput = z.object({
@@ -220,10 +224,10 @@ export const OnboardingInput = z.object({
     /** Net monthly income in integer minor units; 0 = no income yet (no income source is made). */
     monthlyNetIncome: z.int().min(0).max(100_000_000),
     /**
-     * Optional custom split: every JarKey exactly once, total exactly 100.00.
-     * Omitted = the jar template defaults, the same split `previewSplit` shows.
+     * Optional custom split: 3 to every JarKey, each at most once, total exactly 100.00.
+     * Omitted = the three default pots (`defaultJarSplitFor`), the same split `previewSplit` shows.
      */
-    split: z.array(JarSplitShare).length(6).optional(),
+    split: z.array(JarSplitShare).min(MIN_JARS).max(MAX_JARS).optional(),
     why: z.string().max(500).nullable().default(null),
 });
 
@@ -232,18 +236,19 @@ export const OnboardingSplitPreviewInput = z.object({
     currency: z.enum(Currency),
     /** Net monthly income in integer minor units. 0 is allowed (no income yet). */
     monthlyNetIncome: z.int().min(0).max(100_000_000),
-    /** Optional custom split: every JarKey exactly once, total exactly 100. Omitted = jar template defaults. */
-    split: z.array(JarSplitShare).length(6).optional(),
+    /** Optional custom split: 3 to every JarKey, each at most once, total exactly 100. Omitted = the three default pots. */
+    split: z.array(JarSplitShare).min(MIN_JARS).max(MAX_JARS).optional(),
 });
 
-/** Income split into the six jars, in jar template `sortOrder`. */
+/** Income split into the household's pots (3 to 8), in jar template `sortOrder`. */
 export const OnboardingSplitPreview = z.object({
     currency: z.enum(Currency),
     monthlyNetIncome: Money,
     /** The sum of `amount` always equals `monthlyNetIncome`. */
     jars: z
         .array(z.object({ key: z.enum(JarKey), percentage: z.number(), amount: Money }))
-        .length(6),
+        .min(MIN_JARS)
+        .max(MAX_JARS),
 });
 
 // Inferred types (same-module merge for consumers)
