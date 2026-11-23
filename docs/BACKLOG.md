@@ -68,3 +68,5 @@ Source and copy: [`docs/product/clarity-audit.md`](/docs/product/clarity-audit.m
 | --- | --- | --- | --- | --- |
 | 12 | **Growth levers and milestones** beyond list/CRUD. | Low | M | `modules/public/product/growth/{lever,milestone}`, [`docs/engineering/growth-cascade-plan.md`](/docs/engineering/growth-cascade-plan.md) |
 | 13 | **Design** — finish porting Money screens against artboards; design surfaces the Kluis export never covered (Growth, Energy, Soul, Practice, billing). | Low | XL | [`docs/design/README.md`](/docs/design/README.md), HANDOFF §8 |
+
+- **S0 · `updateSplit` validation (High, S)** — `jar.service.ts` only checks that the submitted entries total 100; a partial payload can leave the household split off 100%, and the plain `Error` returns a 500. Found by reading on 2026-11-23, not reproduced. See `docs/product/split-system-proposal.md` §8.
