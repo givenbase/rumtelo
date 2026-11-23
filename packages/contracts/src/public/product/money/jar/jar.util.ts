@@ -7,23 +7,6 @@ import { JarGroup, JarKey } from '../enums';
 import type { JarCapabilities } from './jar.types';
 
 /**
- * The three-pot default over all eight keys: one main pot per group, the five optional
- * pots at 0 (a household starts without them).
- *
- * @deprecated Use {@link defaultJarSplitFor} with the keys the household actually has.
- */
-export const DEFAULT_JAR_SPLIT: Record<JarKey, number> = {
-    [JarKey.NECESSITIES]: 55,
-    [JarKey.LONG_TERM_SAVINGS]: 20,
-    [JarKey.PLAY]: 25,
-    [JarKey.FINANCIAL_FREEDOM]: 0,
-    [JarKey.EDUCATION]: 0,
-    [JarKey.GIVE]: 0,
-    [JarKey.DAILY]: 0,
-    [JarKey.GOALS]: 0,
-};
-
-/**
  * Soft ceilings — going above these triggers a coach tip (defaults are the floor for FF/LTS).
  * Shared by the in-app split coach and the server money coach so both speak at the same %.
  */

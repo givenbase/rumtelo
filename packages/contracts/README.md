@@ -191,6 +191,25 @@ z.enum(DebtKind); // ✅ Zod 4 — not z.nativeEnum
   inside `*.schema.ts` (e.g. tour status, billing interval).
 - Backend: `NativeEnum({ DebtKind, domain: 'money' })` → Postgres `money_debt_kind`
   (see `apps/backend/docs/ENTITY_STYLE.md`).
+- **Adding a value to a native enum** needs a migration of its own that is non-transactional
+  (`isTransactional(): false`, `add value if not exists`): Postgres cannot use the new value in the
+  transaction that added it (`docs/engineering/traps.md`). Postgres cannot drop a value either.
+
+### Pots: `JarKey`, `JarGroup`
+
+`JarKey` has eight members; the user-facing word is **pot**, the code says `jar`. Everything about
+which pots exist is in `public/product/money/jar/jar.util.ts`, not in the enum:
+
+- `JarGroup` (`BASIS`, `FUTURE`, `FREE`) is a display group, a pure mapping (`JAR_GROUP_BY_KEY`),
+  never stored.
+- One **main pot** per group (`JAR_MAIN_KEY_BY_GROUP`: `NECESSITIES`, `LONG_TERM_SAVINGS`, `PLAY`);
+  the other five are **optional** (`OPTIONAL_JAR_KEYS`) and a household may turn them on or off
+  (`contract.money.jars.activate` / `deactivate`). Code must not assume an optional pot exists:
+  resolve with `resolveJarKeyForHousehold`.
+- Default split `DEFAULT_GROUP_SPLIT` 55 / 20 / 25; `OPTIONAL_JAR_SHARE` is what an optional pot
+  takes out of its group's main pot. Use `defaultJarSplitFor(keys)` for the split of the pots a
+  household has. The onboarding split accepts 3 to 8 entries, each key once, total exactly 100.00.
+- Behaviour and error keys: `apps/backend/src/modules/public/product/money/README.md`.
 
 ---
 

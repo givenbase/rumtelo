@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
+import { contract } from '../../../routers';
 import { HouseholdRole } from '../enums';
 import {
     HouseholdPermissionAction,
@@ -182,5 +183,102 @@ describe('household seats (invite UIs)', () => {
             roleCan(HouseholdRole.VIEWER, section, HouseholdPermissionAction.CREATE),
             false
         );
+    });
+});
+
+describe('device registry', () => {
+    const write = [
+        ['/device/create', HouseholdPermissionAction.CREATE],
+        ['/device/update', HouseholdPermissionAction.UPDATE],
+        ['/device/delete', HouseholdPermissionAction.DELETE],
+    ] as const;
+
+    it('maps every /device procedure to a section, so the role interceptor applies', () => {
+        for (const path of ['/device/list', '/device/kinds', ...write.map(([route]) => route)]) {
+            assert.equal(permissionSectionFromPath(path), HouseholdPermissionSection.HOME, path);
+        }
+    });
+
+    it('classifies the catalog read as READ despite POST, and writes as writes', () => {
+        assert.equal(
+            permissionActionFromPath('/device/kinds', 'POST'),
+            HouseholdPermissionAction.READ
+        );
+        assert.equal(
+            permissionActionFromPath('/device/list', 'POST'),
+            HouseholdPermissionAction.READ
+        );
+        for (const [path, action] of write) {
+            assert.equal(permissionActionFromPath(path, 'POST'), action, path);
+        }
+    });
+
+    it('lets OWNER and MEMBER pair, edit and forget, and VIEWER only read', () => {
+        const section = HouseholdPermissionSection.HOME;
+        for (const role of [HouseholdRole.OWNER, HouseholdRole.MEMBER]) {
+            for (const [, action] of write) assert.equal(roleCan(role, section, action), true);
+        }
+        for (const [, action] of write) {
+            assert.equal(roleCan(HouseholdRole.VIEWER, section, action), false);
+        }
+        for (const role of Object.values(HouseholdRole)) {
+            assert.equal(roleCan(role, section, HouseholdPermissionAction.READ), true);
+        }
+    });
+});
+
+/**
+ * Guard against the device gap coming back: every procedure of the real router that is not
+ * on this list must map to a role section. A new top-level router with no section would
+ * otherwise be open to every role, VIEWER and Practice previews included.
+ */
+describe('every household-scoped procedure is role-gated', () => {
+    /** Procedures that are deliberately not gated by the household role matrix, and why. */
+    const OPEN_BY_DESIGN: readonly string[] = [
+        // Person-scoped (theme, locale, board gate): no household needed.
+        '/account/',
+        // Public / signed-in, no household data.
+        '/plans/',
+        '/contact/',
+        // Pure maths over the jar catalog, nothing stored (see `permissionSectionFromPath`).
+        '/household/previewSplit',
+        // Household dual consent: the service enforces "household OWNER" itself
+        // (`assertHouseholdOwnerOrAdmin`), which is stricter than the matrix.
+        '/household/practiceLinks/',
+        // Practice control plane: authorised by `PracticeRole`, not the household role.
+        '/practice/',
+    ];
+
+    function procedurePaths(node: unknown, prefix: string[] = []): string[] {
+        if (!node || typeof node !== 'object') return [];
+        if ('~orpc' in node) return [`/${prefix.join('/')}`];
+        return Object.entries(node).flatMap(([key, child]) =>
+            procedurePaths(child, [...prefix, key])
+        );
+    }
+
+    const paths = procedurePaths(contract);
+
+    it('walks the real router', () => {
+        assert.ok(paths.length > 150, `expected the full router, got ${paths.length} paths`);
+        assert.ok(paths.includes('/device/create'));
+    });
+
+    it('maps every procedure to a section unless it is open by design', () => {
+        const unmapped = paths.filter(
+            path =>
+                permissionSectionFromPath(path) === null &&
+                !OPEN_BY_DESIGN.some(open => path.startsWith(open))
+        );
+        assert.deepEqual(unmapped, [], `no role section for: ${unmapped.join(', ')}`);
+    });
+
+    it('keeps the open-by-design list honest: every entry still matches a real procedure', () => {
+        for (const open of OPEN_BY_DESIGN) {
+            assert.ok(
+                paths.some(path => path.startsWith(open)),
+                `${open} matches no procedure; remove it from the list`
+            );
+        }
     });
 });

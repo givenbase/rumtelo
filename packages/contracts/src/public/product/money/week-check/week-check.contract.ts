@@ -7,7 +7,7 @@ import { oc } from '@orpc/contract';
 import { z } from 'zod';
 
 import { HouseholdId, HouseholdScoped, WeekKey } from '../../../../common/common.schema';
-import { WeekCheckStage } from '../enums';
+import { JarKey, WeekCheckStage } from '../enums';
 import { WeekCheck, WeekCheckAllocation } from './week-check.schema';
 
 // ====================================================================
@@ -30,7 +30,8 @@ export const weekCheckAdvance = oc
             householdId: HouseholdId,
             week: WeekKey,
             stage: z.enum(WeekCheckStage),
-            allocations: z.array(WeekCheckAllocation).nullish(),
+            // One allocation per pot at most: never more than there are pots.
+            allocations: z.array(WeekCheckAllocation).max(Object.values(JarKey).length).nullish(),
             intention: z.string().max(280).nullish(),
         })
     )

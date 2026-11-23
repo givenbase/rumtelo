@@ -220,6 +220,12 @@ export function permissionSectionFromPath(pathname: string): HouseholdPermission
     if (path.startsWith('/home') || path.includes('/home/')) {
         return HouseholdPermissionSection.HOME;
     }
+    // Device registry (wearables, hubs, scales) is household gear: members pair and forget it,
+    // a look-along seat only reads. HOME (not ENERGY) because VIEWER has no ENERGY read and the
+    // Settings devices tab must still open for a VIEWER.
+    if (path.startsWith('/device') || path.includes('/device/')) {
+        return HouseholdPermissionSection.HOME;
+    }
     return null;
 }
 
@@ -240,7 +246,7 @@ export function permissionActionFromPath(
 
     if (
         /^(list|get|find)/.test(leaf) ||
-        /^(status|current|feed|session|summary|history|balances|members|settings|profile|inbox|plan|period|year|projections|byjar|levels|recap|forweek|logs|suggestions)$/.test(
+        /^(status|current|feed|session|summary|history|balances|members|settings|profile|inbox|plan|period|year|projections|byjar|levels|recap|forweek|logs|suggestions|kinds)$/.test(
             leaf
         )
     ) {
