@@ -11,6 +11,7 @@ Start here to understand the whole project — product direction, brand, researc
 | [product/audience.md](./product/audience.md) | Who we build for |
 | [product/practice.md](./product/practice.md) | Rumtelo for practices — who, what it does today, pricing, pitch, gaps |
 | [product/coach-readiness.md](./product/coach-readiness.md) | The Coach surfaces — ship / preview / backlog per row |
+| [product/market-research-2026-11.md](./product/market-research-2026-11.md) | Market research, product-market-fit verdict, product map and names (Nov 2026) |
 | [brand/positioning.md](./brand/positioning.md) | Name, voice, visual direction |
 | [brand/quotes.md](./brand/quotes.md) | Approved slogans & quote bank |
 | [explain/README.md](./explain/README.md) | AI-avatar scripts — L1 Rumtelo → L2 products → L3 features |
