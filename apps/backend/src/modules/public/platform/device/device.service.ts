@@ -11,6 +11,8 @@ import {
 import { apiBadRequest, apiNotFound } from '../../../../common/errors/api-user-error';
 import { HouseholdScopedRepository } from '../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../common/household/household.context';
+import { AuthMember } from '../../../auth/household/managed/member/auth-member.entity';
+import { Account } from '../../../auth/user/account/account.entity';
 import { AccountService } from '../../../auth/user/account/account.service';
 import { DeviceKindService } from '../../../backoffice/reference/device-kind/device-kind.service';
 import { Device } from './device.entity';
@@ -51,6 +53,7 @@ export class DeviceService {
             }
         } else {
             accountId = input.accountId;
+            await this.assertWearerInHousehold(accountId);
         }
 
         const entity = this.repo.create({
@@ -94,7 +97,10 @@ export class DeviceService {
         if (!entity) throw apiNotFound('device_not_found');
 
         if (input.name !== undefined) entity.name = input.name;
-        if (input.accountId !== undefined) entity.account = input.accountId;
+        if (input.accountId !== undefined) {
+            await this.assertWearerInHousehold(input.accountId);
+            entity.account = input.accountId;
+        }
         if (input.capabilities !== undefined) {
             entity.capabilities = [...input.capabilities];
         }
@@ -118,6 +124,22 @@ export class DeviceService {
         this.repo.remove(entity);
         await this.em.flush();
         return { ok: true };
+    }
+
+    /**
+     * The wearer comes from the client and `account` is a bare FK on the person: it must be
+     * a member of this household, never any account id that happens to exist.
+     */
+    private async assertWearerInHousehold(accountId: string | null): Promise<void> {
+        if (!accountId) return;
+        const account = await this.em.findOne(Account, { id: accountId });
+        const seat = account
+            ? await this.em.findOne(AuthMember, {
+                  user: account.user.id,
+                  household: currentHouseholdId(),
+              })
+            : null;
+        if (!seat) throw apiBadRequest('member_not_found');
     }
 }
 

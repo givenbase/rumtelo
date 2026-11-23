@@ -13,7 +13,7 @@ import {
     currentHouseholdContext,
     currentHouseholdId,
 } from '../../../../../common/household/household.context';
-import { Jar } from '../plan/jar/jar.entity';
+import { requireOwnJars } from '../own-reference.util';
 import { MoneyWeekCheck } from './money-week-check.entity';
 import { WeekCheckAllocation } from './week-check-allocation.entity';
 
@@ -92,6 +92,12 @@ export class WeekCheckService {
         allocations?: { jarId: string; amount: number }[];
         intention?: string;
     }) {
+        // Jar ids come from the client: resolve all of them in this household (one query)
+        // before the week check row or anything else is written.
+        const allocationJars = await requireOwnJars(
+            this.em,
+            (input.allocations ?? []).map(allocation => allocation.jarId)
+        );
         let weekCheck = await this.weekChecks.findOne({ week: input.week });
         if (!weekCheck) {
             weekCheck = this.em.create(MoneyWeekCheck, {
@@ -117,7 +123,7 @@ export class WeekCheckService {
                 this.em.create(WeekCheckAllocation, {
                     household: currentHouseholdId(),
                     weekCheck,
-                    jar: this.em.getReference(Jar, allocation.jarId),
+                    jar: allocationJars.get(allocation.jarId),
                     amount: allocation.amount,
                 } as never);
             }

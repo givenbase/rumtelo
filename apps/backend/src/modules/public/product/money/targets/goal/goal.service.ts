@@ -9,6 +9,7 @@ import { PlanAccessService } from '../../../../../../common/capability';
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
 import { TransactionService } from '../../ledger/transaction/transaction.service';
+import { requireOwnJar } from '../../own-reference.util';
 import { Jar } from '../../plan/jar/jar.entity';
 import { JarService } from '../../plan/jar/jar.service';
 
@@ -58,13 +59,19 @@ export class GoalService {
         const isGive = kind === GoalKind.GIVE;
         const isSave = kind === GoalKind.SAVE;
         const jarId = kind === GoalKind.EARN ? null : (input.jarId ?? null);
-        if (isGive) await this.assertGiveJar(jarId);
+        // The pot comes from the client: a GIVE pledge is checked against the household's Give
+        // pot, anything else must at least be one of the household's own pots.
+        const jar = isGive
+            ? await this.assertGiveJar(jarId)
+            : jarId
+              ? await requireOwnJar(this.em, jarId)
+              : null;
         const sortOrder = isSave && jarId ? await this.nextSortOrder(jarId) : 0;
 
         const entity = this.em.create(Goal, {
             household: currentHouseholdId(),
             kind,
-            jar: jarId ? this.em.getReference(Jar, jarId) : null,
+            jar,
             name: input.name,
             icon: input.icon ?? null,
             target: input.target,
@@ -235,9 +242,10 @@ export class GoalService {
      * Give pot (looked up through the scoped repository, so another household's pot is simply
      * not found). With the Give pot off there is no pledge to make: turn the pot on first.
      */
-    private async assertGiveJar(jarId: string | null): Promise<void> {
+    private async assertGiveJar(jarId: string | null): Promise<Jar> {
         const jar = jarId ? await this.jarRepo.findOne({ id: jarId }) : null;
         if (jar?.key !== JarKey.GIVE) throw apiBadRequest('goal_give_needs_give_jar');
+        return jar;
     }
 
     /**
@@ -286,7 +294,7 @@ export class GoalService {
                 entity.kind === GoalKind.EARN
                     ? null
                     : patch.jarId
-                      ? this.em.getReference(Jar, patch.jarId)
+                      ? await requireOwnJar(this.em, patch.jarId)
                       : null;
         }
         // Only when the edit can change where a pledge points (its kind or its pot): a plain

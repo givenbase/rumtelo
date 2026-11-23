@@ -4,6 +4,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
 import { MerchantPresetService } from '../../../../../backoffice/product/money/preset/merchant/merchant.service';
+import { requireOwnCategory, requireOwnJar } from '../../own-reference.util';
 import { Category } from '../../plan/jar/category.entity';
 import { Jar } from '../../plan/jar/jar.entity';
 import { type RuleField, type RuleMatcher, TransactionStatus } from '@rumtelo/contracts';
@@ -44,13 +45,18 @@ export class SortRuleService {
         priority?: number;
         isActive?: boolean;
     }) {
+        // The jar and category come from the client: resolve them inside this household.
+        const jar = await requireOwnJar(this.em, input.jarId);
+        const category = input.categoryId
+            ? await requireOwnCategory(this.em, input.categoryId)
+            : null;
         const entity = this.em.create(SortRule, {
             household: currentHouseholdId(),
             field: input.field as RuleField,
             matcher: input.matcher as RuleMatcher,
             matchValue: input.matchValue.trim(),
-            jar: this.em.getReference(Jar, input.jarId),
-            category: input.categoryId ? this.em.getReference(Category, input.categoryId) : null,
+            jar,
+            category,
             priority: input.priority ?? EXPLICIT_RULE_PRIORITY,
             isActive: input.isActive ?? true,
             hitCount: 0,
@@ -84,11 +90,13 @@ export class SortRuleService {
         );
 
         if (existing) {
-            await this.em.populate(existing, ['jar', 'category']);
-            existing.jar = this.em.getReference(Jar, input.jarId);
-            existing.category = input.categoryId
-                ? this.em.getReference(Category, input.categoryId)
+            const jar = await requireOwnJar(this.em, input.jarId);
+            const category = input.categoryId
+                ? await requireOwnCategory(this.em, input.categoryId)
                 : null;
+            await this.em.populate(existing, ['jar', 'category']);
+            existing.jar = jar;
+            existing.category = category;
             if (input.explicit && existing.priority > EXPLICIT_RULE_PRIORITY) {
                 existing.priority = EXPLICIT_RULE_PRIORITY;
             }
@@ -133,15 +141,16 @@ export class SortRuleService {
         }>
     ) {
         const entity = await this.repo.findOneOrFail({ id });
+        // Resolve client ids first so a foreign id leaves the row untouched.
+        const jar = patch.jarId !== undefined ? await requireOwnJar(this.em, patch.jarId) : null;
+        const category = patch.categoryId
+            ? await requireOwnCategory(this.em, patch.categoryId)
+            : null;
         if (patch.field !== undefined) entity.field = patch.field as RuleField;
         if (patch.matcher !== undefined) entity.matcher = patch.matcher as RuleMatcher;
         if (patch.matchValue !== undefined) entity.matchValue = patch.matchValue.trim();
-        if (patch.jarId !== undefined) entity.jar = this.em.getReference(Jar, patch.jarId);
-        if (patch.categoryId !== undefined) {
-            entity.category = patch.categoryId
-                ? this.em.getReference(Category, patch.categoryId)
-                : null;
-        }
+        if (jar) entity.jar = jar;
+        if (patch.categoryId !== undefined) entity.category = category;
         if (patch.priority !== undefined) entity.priority = patch.priority;
         if (patch.isActive !== undefined) entity.isActive = patch.isActive;
         await this.em.flush();

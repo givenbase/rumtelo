@@ -239,6 +239,11 @@ create() {
   see `public/product/money/dashboard`, which composes services rather than joining tables.
 - **Household-owned entities extend `HouseholdEntity`** and are read through
   `HouseholdScopedRepository`, never `em.find` directly on those entities.
+- **Ids from the client are resolved through the scoped repository, never `em.getReference`.**
+  A foreign key is on the id alone, so `em.getReference(Jar, idFromClient)` would attach a row
+  to another household's pot. Money services use `requireOwnJar` / `requireOwnCategory` /
+  `requireOwnDebt` / `requireOwnBankAccount` / `requireOwnJars` (`money/own-reference.util.ts`),
+  which refuse a foreign id like an unknown one (`*_not_found`) before anything is written.
 - **Person-attributed entities extend `PersonalHouseholdEntity`** and are read through
   `PersonalScopedRepository` with their `VisibilityArea`. It filters what the viewer may
   see; services never add their own `account = me` filter. Rules live in

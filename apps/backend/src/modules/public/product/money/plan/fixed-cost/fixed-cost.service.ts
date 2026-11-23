@@ -26,10 +26,9 @@ import { HouseholdScopedRepository } from '../../../../../../common/household/ho
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
 import { resolveAssetLink } from '../../asset-link.util';
 import { Transaction } from '../../ledger/transaction/transaction.entity';
-import { Debt } from '../../targets/debt/debt.entity';
+import { requireOwnCategory, requireOwnDebt, requireOwnJar } from '../../own-reference.util';
 import { DebtService } from '../../targets/debt/debt.service';
-import { Category } from '../jar/category.entity';
-import { Jar } from '../jar/jar.entity';
+import { type Jar } from '../jar/jar.entity';
 import { JarService } from '../jar/jar.service';
 import { type CounterpartyPatch, PartyService } from '../party/party.service';
 import { assertPeriodOpen } from '../../month-score/period-lock.util';
@@ -77,7 +76,13 @@ export class FixedCostService {
             presetKey?: string | null;
         }
     ) {
-        await assertJarAllowsFixedCosts(this.em, input.jarId);
+        // Ids from the client are resolved inside this household before anything is written.
+        const jar = await requireOwnJar(this.em, input.jarId);
+        assertJarAllowsFixedCosts(jar);
+        const category = input.categoryId
+            ? await requireOwnCategory(this.em, input.categoryId)
+            : null;
+        const debt = input.debtId ? await requireOwnDebt(this.em, input.debtId) : null;
         const cadence = (input.cadence as Cadence) ?? Cadence.MONTHLY;
         const dueMonth = normalizeDueMonth(input.dueMonth, cadence);
         assertDueMonthForCadence(cadence, dueMonth);
@@ -85,9 +90,9 @@ export class FixedCostService {
         const asset = (await resolveAssetLink(this.em, this.planAccess, input.assetId)) ?? null;
         const entity = this.em.create(FixedCost, {
             household: currentHouseholdId(),
-            jar: this.em.getReference(Jar, input.jarId),
-            category: input.categoryId ? this.em.getReference(Category, input.categoryId) : null,
-            debt: input.debtId ? this.em.getReference(Debt, input.debtId) : null,
+            jar,
+            category,
+            debt,
             asset,
             name: input.name,
             presetKey: input.presetKey ?? null,
@@ -443,18 +448,16 @@ export class FixedCostService {
             }>
     ) {
         const entity = await this.repo.findOneOrFail({ id });
-        if (patch.jarId !== undefined) {
-            await assertJarAllowsFixedCosts(this.em, patch.jarId);
-            entity.jar = this.em.getReference(Jar, patch.jarId);
-        }
-        if (patch.categoryId !== undefined) {
-            entity.category = patch.categoryId
-                ? this.em.getReference(Category, patch.categoryId)
-                : null;
-        }
-        if (patch.debtId !== undefined) {
-            entity.debt = patch.debtId ? this.em.getReference(Debt, patch.debtId) : null;
-        }
+        // Resolve client ids first so a foreign id leaves the row untouched.
+        const jar = patch.jarId !== undefined ? await requireOwnJar(this.em, patch.jarId) : null;
+        if (jar) assertJarAllowsFixedCosts(jar);
+        const category = patch.categoryId
+            ? await requireOwnCategory(this.em, patch.categoryId)
+            : null;
+        const debt = patch.debtId ? await requireOwnDebt(this.em, patch.debtId) : null;
+        if (jar) entity.jar = jar;
+        if (patch.categoryId !== undefined) entity.category = category;
+        if (patch.debtId !== undefined) entity.debt = debt;
         const asset = await resolveAssetLink(this.em, this.planAccess, patch.assetId);
         if (asset !== undefined) entity.asset = asset;
         if (patch.name !== undefined) entity.name = patch.name;
@@ -512,8 +515,7 @@ export class FixedCostService {
     }
 }
 
-async function assertJarAllowsFixedCosts(em: EntityManager, jarId: string) {
-    const jar = await em.findOneOrFail(Jar, jarId);
+function assertJarAllowsFixedCosts(jar: Jar) {
     if (!jarCapabilitiesFor(jar.key).allowsFixedCosts) {
         throw new BadRequestException(
             'Recurring bills belong on Necessities, Play, Education, or Give — not Financial Freedom or Long-term savings.'
