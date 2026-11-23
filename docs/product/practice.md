@@ -17,7 +17,7 @@ The practice door is invisible today. There is no website section, no pricing an
 
 | Practice type | Typical situation | Fit |
 |---|---|---|
-| **Budget and money coaches** | Coach households 1:1 on spending, bills and saving | **Core**: the six jars are their method in software |
+| **Budget and money coaches** | Coach households 1:1 on spending, bills and saving | **Core**: the pots (Basics, Future, Free, refined per household) are their method in software |
 | **Debt-help and social-work teams** | Help households get stable and stay stable | **Core**: dual consent and read-only access suit careful work |
 | **Financial advisors and planners** | Advise on goals, debt and freedom number | **Good**: clients arrive with a current picture |
 | **Life and career coaches** | Coach direction, energy and habits | **Secondary**: Growth, Energy and Soul give them a shared language |
@@ -110,7 +110,7 @@ Same key as the household story, decoded for a practice:
 
 ### The three proof points
 
-1. **A current picture before every session.** Clients keep six jars, fixed costs and a weekly ten-minute check. You open their board and start where they are.
+1. **A current picture before every session.** Clients keep their pots, fixed costs and a weekly ten-minute check. You open their board and start where they are.
 2. **Progress continues between sessions.** The weekly check and The Coach's small tips (bills due, inbox to sort) keep clients moving without you chasing them.
 3. **Consent-first and calm.** The client accepts before anything is shared. Read-only. EU hosting in Amsterdam. Either side can end it. Rumtelo never moves money.
 
@@ -135,7 +135,7 @@ These collisions confuse practice buyers today.
 
 ## 30-second talk track
 
-> You know how sessions start with digging up numbers? With Rumtelo your clients keep their own picture: six jars, their fixed costs, a ten-minute check each week. With their yes, you see it from one desk, for every client. Between sessions the app gives them small nudges, like "two bills are still due", so they keep moving. You spend the session on decisions. Looking along is free for clients. If you want them on the full plan, you sponsor it for €6.75 a month — less than they'd pay themselves.
+> You know how sessions start with digging up numbers? With Rumtelo your clients keep their own picture: their pots, their fixed costs, a ten-minute check each week. With their yes, you see it from one desk, for every client. Between sessions the app gives them small nudges, like "two bills are still due", so they keep moving. You spend the session on decisions. Looking along is free for clients. If you want them on the full plan, you sponsor it for €6.75 a month — less than they'd pay themselves.
 
 ### Objections
 
@@ -158,7 +158,7 @@ A section between Pricing and FAQ, with its own anchor `#practices`.
 
 - **Eyebrow:** FOR COACHES & ADVISORS
 - **Headline:** Stop wondering where your clients stand.
-- **Lead:** Your clients keep their own Rumtelo board: six jars, fixed costs, a ten-minute week check. With their yes, you follow every board from one desk, so sessions go to decisions instead of collecting numbers.
+- **Lead:** Your clients keep their own Rumtelo board: their pots, fixed costs, a ten-minute week check. With their yes, you follow every board from one desk, so sessions go to decisions instead of collecting numbers.
 - **Points**
   - Their yes first: nothing is shared until the client accepts.
   - One desk: active clients, pending invites, a snapshot per client.
@@ -170,7 +170,7 @@ A section between Pricing and FAQ, with its own anchor `#practices`.
 
 - **Eyebrow:** VOOR COACHES & ADVISEURS
 - **Headline:** Niet meer gissen waar je cliënten staan.
-- **Lead:** Je cliënten houden hun eigen Rumtelo-bord bij: zes potjes, vaste kosten, tien minuten per week. Met hun ja volg je elk bord vanuit één bureau, zodat sessies over keuzes gaan in plaats van over cijfers verzamelen.
+- **Lead:** Je cliënten houden hun eigen Rumtelo-bord bij: potjes, vaste kosten, tien minuten per week. Met hun ja volg je elk bord vanuit één bureau, zodat sessies over keuzes gaan in plaats van over cijfers verzamelen.
 - **Points**
   - Eerst hun ja: er wordt niets gedeeld tot de cliënt accepteert.
   - Eén bureau: actieve cliënten, open uitnodigingen, een momentopname per cliënt.

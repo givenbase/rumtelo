@@ -11,7 +11,7 @@ Visual source lives in the repo’s [`design/`](../../design/) folder: `Kluis Fi
 
 - Some components follow an artboard and cite it in their doc comment, e.g.
   `Kluis Finance App.dc.html:689-839` (jars), `:1236-1357` (net worth), `:2942` (nav), portal hub/widget.
-- Most other screens were built from the domain (six jars, inbox, week check, month score, portals) without an artboard.
+- Most other screens were built from the domain (pots, inbox, week check, month score, portals) without an artboard.
 - The app has outgrown the design: Kluis is money-only. Growth (Course, learn, net worth), Energy, Soul,
   Practice, billing and settings have no artboard.
 

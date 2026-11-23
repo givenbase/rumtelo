@@ -6,7 +6,7 @@ The one place to find open work. Each row is one item and points to the doc with
 
 **Ways of working:** no local DB — `dev` deploys to Railway staging, `main` to production; pushing migrations to `dev` runs `db-migrate.yml`. Claude commits; Given pushes. Hand-written migrations stay "unverified" until they run on staging.
 
-Last updated: 2026-11-16.
+Last updated: 2026-11-23 (Rumtelo Pots sections).
 
 ## Waiting for Given
 
@@ -78,21 +78,42 @@ Step 1 (three groups, new pot names, split validation) is on `dev`. See `docs/pr
 - **Coach lines composed in the backend still use the stored pot name (Medium, S).** `money-coach.service.ts:175` and `fixed-cost-coach.util.ts:77` — e.g. "Noodzakelijk bills come to …". Needs the name resolved by key server-side or the text composed in the application.
 - **Archive restore is not transactional (Medium, M).** A service-level failure in a later section (income, debts, fixed costs, goals) leaves a half-applied import; the dry run can promise rows the real run rejects. Wrap the real run in one transaction or pre-validate each section.
 - **Application unit tests are not part of `pnpm test` (Low, S).** `apps/application` has no `test` script; its 16 node:test files only run by hand. Needs `tsx` as a devDependency — Given's approval.
-- **Decisions for Given:** remove the "Secrets of the Millionaire Mind / T. Harv Eker" book card (`apps/website/app/_components/landing/landing-why.tsx:9`) and footer attribution (`pages/landing.ts:387`); the brand line replacing "Six jars. Ten minutes a week." (`docs/brand/quotes.md`); the Coach tip that names 55% as the default starting point (changes with the default split in step 2); the pot name "Beleggen / Investing".
-- **Step 2 (needs a migration):** separate Buffer pot that fills first, Giving off by default, subscriptions under Fun with "Moet dit, of kies je dit?", category tags (ECOICOP, Nibud group, must/choose), default split 55/20/25 and Basis derived from real fixed costs.
+- **Decisions for Given:** remove the "Secrets of the Millionaire Mind / T. Harv Eker" book card (`landing-why.tsx`, copy in `pages/landing.ts`) and the footer attribution (`pages/landing.ts`) — being done in the working tree on 2026-11-23, not committed yet; the brand line replacing "Six jars. Ten minutes a week." (`docs/brand/quotes.md`); the Coach tip that names 55% as the default starting point (changes with the default split in step 2); the pot name "Beleggen / Investing".
+- **Step 2 (done) and step 3:** the three-pot default, Giving off by default and the must/choose question are built; Buffer that fills first, category tags (ECOICOP, Nibud group, must/choose) and automatic Basis from real fixed costs are open — see the step 2 table below.
 
 ## Rumtelo Pots — follow-ups after step 2 (2026-11-23)
 
-Step 2 = three pots by default (55 / 20 / 25), optional pots turned on inside a group. Migrations `Migration20261123100000_JarKeyDailyGoals` and `Migration20261123100100_JarTemplateMainPots` are hand-written and **unverified until staging**.
+Step 2 = three pots by default (55 / 20 / 25), optional pots turned on inside a group. Migrations `Migration20261123100000_JarKeyDailyGoals`, `Migration20261123100100_JarTemplateMainPots` and `Migration20261123120000_JarShare` (pot share history) are hand-written and **unverified until staging**. Staging checklist in order: [`HANDOFF.md`](/HANDOFF.md) §14.
 
 | Priority | Item | Note |
 | --- | --- | --- |
-| High | Cross-household reference on write (pre-existing) | `transaction.service.ts`, `fixed-cost.service.ts`, `sort-rule.service.ts` take a jar/category id from the client via `em.getReference` / `findOneOrFail` without a household check; a member who knows another household's id can attach own rows to it. Resolve through `HouseholdScopedRepository`. Found by the security review; not introduced by step 2 |
-| High | Staging check after deploy | No household onboarded in the window between migration and new backend with a split that is not 100%; turn pots on/off in two tabs; split save during an activation |
+| Done (uncommitted) | Cross-household reference on write | Fixed 2026-11-23: `own-reference.util.ts` (`requireOwn*`) resolves every jar, category, debt, fixed cost and bank account id from the client through `HouseholdScopedRepository`; applied to transactions, sort rules, fixed costs, goals and week-check allocations; the device wearer must be a household member. Debt and fixed-cost links are validated before a transaction is written. Verify with the read-only queries in `HANDOFF.md` §14 |
+| Medium | Category may belong to another pot of the same household | A category id is checked against the household, not against the chosen pot; a transaction can carry a category of a different pot (security pass) |
+| Low | Composite foreign keys `(id, household_id)` | Defence in depth: let the database refuse a cross-household reference even if a service forgets the check |
+| Low | Demo passwords in the root `README.md` | Owner to decide whether they belong there; do not copy them anywhere |
+| High | Staging check after deploy | No household onboarded in the window between the migration and the new backend (the old backend reads all eight templates, 141%); the backend that reads `money_jar_share` must not start before `Migration20261123120000_JarShare` has run; the rest of the list is `HANDOFF.md` §14 |
 | Medium | Given confirms | `OPTIONAL_JAR_SHARE` (Daily 20, Goals 6, Investing 5, Learning 5, Giving 5); Coach tips `basics-high` / `future-low`; MEMBER may turn pots on/off (same as the split); sweep rule "Basics surplus → Investing" when Investing is off |
-| Medium | Step 3 | Buffer fills first; "Moet dit, of kies je dit?"; Basics derived from real fixed costs; category tags |
+| Medium | Step 3, what is left | Built (uncommitted): "Moet dit, of kies je dit?" on the fixed-cost form (picks the pot, stores nothing) and the "Basics fit" hint in split settings (a button that fills in the split). Not built: Buffer fills first (options A–D and four open questions in [`split-step3-decisions.md`](/docs/product/split-step3-decisions.md)), category tags, automatic derivation of Basics from real fixed costs |
 | Medium | Bill preset for an optional pot that is off | `fixed-cost.service.ts` ~515: an Education bill preset resolved to Future's main pot is refused (pot takes no bills) — decide whether Buffer may carry bills |
-| Low | `packages/utils` `coach-readiness.test.ts:69` fails (pre-existing) | asserts `GROWTH_TIP_PRODUCERS` is backlog, code has SHIP; makes root `pnpm test` red |
-| Low | Dead copy and constants | old `features.coach.split_tips.*` keys, `features.brand.auth_manifesto.jars.*`, `AUTH_MANIFESTO_JAR_VISUALS` / "Six jars" in `packages/ui` AuthManifesto, `DEFAULT_JAR_SPLIT` (deprecated), `.claude/rules/frontend.md` "six jars" |
+| Low | Dead copy keys | old `features.coach.split_tips.*` ids (`play-above-default`, `give-above-default`, … see `split-coach/README.md`) and `features.brand.auth_manifesto.jars.*` are still in `packages/i18n/translations` (`features/coach.ts`, `features/brand.ts`) though nothing renders them. `DEFAULT_JAR_SPLIT` and `AUTH_MANIFESTO_JAR_VISUALS` are gone. `.claude/rules/frontend.md` "six jars" is in the prepared instruction patch |
 | Low | Guide card for a lone main pot | shows the key's guide, not the group purpose; `giving-finder.tsx:262` hard-codes the Give key; NL `guides.LONG_TERM_SAVINGS.links.goals` says "Doelstellingen" |
 | Low | Archive restore | warning `goal_give_pot_missing` has no translated text yet; restore is still not transactional |
+| Medium | "Sweep surplus" is a toggle with no code behind it | Settings → Automation (`automation-settings.tsx`, `AUTO_RULE_KEYS` `split` / `guard` / `sweep` in `settings-shared.ts`): the three switches are component `useState` defaults; nothing is saved and nothing in the backend reads them. Decide: hide the switches or build the rules |
+| Medium | Archive restore warnings are never shown | `archive.service.ts` returns `warnings` (`fixed_cost_jar_unmapped`, `goal_give_pot_missing`, `account_reconnect_needed`, …); `import-settings.tsx` stores the result but renders no warning, and no key has translated text |
+| Medium | The role interceptor lets unmapped household paths through | `RolePermissionInterceptor` skips any path `permissionSectionFromPath` does not map (a new area is open to a VIEWER until someone maps it). Decide: default-deny for household paths |
+| Low | Docs left for the copywriter | `docs/explain/*` scripts (L1-P, L2 Money, L3 Jars, L3 Income) got a short factual correction only; they need a voice pass for "pots". `docs/product/practice.md` pitch texts and `docs/engineering/outreach-pis.md` mails say "six jars" / "zes potjes" in copy that is not ours to rewrite. `docs/demo/demo-2026-11-18.md` (untracked) says "zes potjes". `.claude/**` and `CLAUDE.md` still say "six jars" (needs Given's go-ahead, patch prepared) |
+| Low | Code comments and one catalog line still say six | `plan.util.ts:62` ("The six jars — core money model."), `jar.entity.ts:16` and `:55`, `plan.module.ts:9`, `necessities-pressure.ts:5` and `:22` ("Eker envelope", "defaults to Eker 55") |
+
+## Found by the reviews on 2026-11-23 (night) — waiting for Given
+
+| Priority | Item | Note |
+| --- | --- | --- |
+| High | Practice invite redeem is not OWNER-only (pre-existing) | `practice.service.ts` `redeemClientInvite` (~303–318, 644–654, 816–828) only checks household membership: a VIEWER or MEMBER whose email matches can create a link and reset an ACTIVE link to INVITED (clears `householdAcceptedAt` and the sponsor flag). Fix: `assertHouseholdOwnerOrAdmin` first; never reset an ACTIVE link from redeem. Practice consent — Given decides |
+| Medium | Income edits change closed months | Pausing an income without an end date, deleting it, or back-dating `startedOn` / `amountEffectiveFrom` changes pot balances of past months, including closed ones; income writes have no period-lock check and no audit trail. Options: pausing sets `endsOn` to today; end instead of delete; `assertPeriodOpen` on back-dated dates. Money doctrine — Given decides |
+| Medium | Share history is not in the export | `money_jar_share` is not in the household export or archive; a restore starts every pot at a baseline. Deletion is covered (cascade). Privacy/GDPR — Given decides |
+| Low | A month's income is "as of its last day" | An income that ends on the 15th counts 0 for that month, one that starts on the 15th counts in full; dashboard and month score read "as of today" and can differ from `allocated` in the current month |
+| Low | Month boundary uses server time | `currentPeriodKey` uses local server time; on UTC a split saved just after midnight on the 1st (NL time) is dated to the previous month |
+| Low | Income amount periods have no cap | one per source per day, back-dating allowed; the balance walk grows with them |
+| Low | Deactivating a pot shifts cents in past months | the remainder rule re-runs on fewer pots: up to a few cents per month per pot; the household total stays exact |
+| Low | Learn library still lists "Secrets of the Millionaire Mind" | `book.seed-data.ts:43`; a book in a catalog, not a credit for the method — keep or remove |
+| Low | Dead i18n keys | `pages.landing.why.books.millionaire_mind.*`, `pages.landing.why.more_books`, old `features.coach.split_tips.*`, `features.brand.auth_manifesto.jars.*` |

@@ -1,5 +1,7 @@
 # The Coach, redesigned: your data first, one line after it
 
+> **Note (2026-11-23):** This document was written when every household had six jars. A new household now starts with three pots (Basics 55 · Future 20 · Free 25) and refines them; existing households keep six. Read "six jars" below as "the household's pots" and the six-name lists as the old names. Current model: [split-system-proposal.md](./split-system-proposal.md).
+
 **Date:** 2026-11-20 · **Owner:** ux-ui-designer · **Status:** design proposal, nothing built.
 **Problem (Given):** The Coach shows up on almost every page as large cards and bars above the household's own data. It gets in the way and makes the board feel busy.
 **Inputs:** `docs/product/coach-readiness.md`, `packages/contracts/src/public/platform/coach/coach-readiness.ts`, `docs/brand/positioning.md`, the clarity decisions (literal and positive labels, features stay in their product, your own entries first), and the application code on `dev` at `63c9aa40`.

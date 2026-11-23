@@ -1,5 +1,7 @@
 # Clarity 2: design (CL-4, CL-5, CL-6, CL-8, CL-9)
 
+> **Note (2026-11-23):** This document was written when every household had six jars. A new household now starts with three pots (Basics 55 · Future 20 · Free 25) and refines them; existing households keep six. Read "six jars" below as "the household's pots" and the six-name lists as the old names. Current model: [split-system-proposal.md](./split-system-proposal.md).
+
 **Date:** 2026-11-17 · **Owner:** ux-ui-designer · **Status:** design ready for build. Nothing is built.
 **Inputs:** [`clarity-2-stories.md`](./clarity-2-stories.md), including *Decisions on the open questions*, which are final here. Also [`clarity-audit.md`](./clarity-audit.md) §4, §6 and §7.
 **Mockups (375 px, brand tokens):** [`clarity-2/week-check-stepper.svg`](./clarity-2/week-check-stepper.svg) · [`clarity-2/onboarding-income.svg`](./clarity-2/onboarding-income.svg) · [`clarity-2/more-sheet.svg`](./clarity-2/more-sheet.svg) · [`clarity-2/lock-card.svg`](./clarity-2/lock-card.svg). The split screen is still [`clarity-audit/onboarding-split.svg`](./clarity-audit/onboarding-split.svg), with three changes listed in §3.3.

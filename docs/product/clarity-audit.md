@@ -1,5 +1,7 @@
 # Clarity audit: what Rumtelo does, said once and shown first
 
+> **Note (2026-11-23):** This document was written when every household had six jars. A new household now starts with three pots (Basics 55 · Future 20 · Free 25) and refines them; existing households keep six. Read "six jars" below as "the household's pots" and the six-name lists as the old names. Current model: [split-system-proposal.md](./split-system-proposal.md).
+
 **Date:** 2026-11-16 · **Method:** `.claude/skills/product-audit` (product-manager, ux-ui-designer and brand-copywriter in parallel; the orchestrator merged and spot-checked) · **Status:** proposal, nothing built.
 
 **Problem (Given):** *"It's still very unclear to customers what Rumtelo does and how it can help them. There's too much going on."*

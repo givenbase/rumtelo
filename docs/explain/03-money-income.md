@@ -8,19 +8,19 @@
 Income is what comes in each month.  
 
 Add each source. Add a start date. End it when it stops.  
-That income fills your six jars.  
+That income fills your pots.  
 
 Want to see what a raise does? That’s in Growth.  
 Here you keep your sources clear.  
 
-Save means save the form — not “save money.” Then check the jars.
+Save means save the form — not “save money.” Then check the pots.
 
 ## Spoken — NL
 
 Inkomen is wat elke maand binnenkomt.  
 
 Voeg elke bron toe. Zet een startdatum. Stop hem als hij stopt.  
-Dat inkomen vult je zes potjes.  
+Dat inkomen vult je potjes.  
 
 Wil je zien wat een verhoging doet? Dat zit bij Groei.  
 Hier houd je je bronnen duidelijk.  

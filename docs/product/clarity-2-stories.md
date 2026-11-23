@@ -1,5 +1,7 @@
 # Clarity 2: stories for the first week (CL-4, CL-5, CL-6, CL-8, CL-9)
 
+> **Note (2026-11-23):** This document was written when every household had six jars. A new household now starts with three pots (Basics 55 · Future 20 · Free 25) and refines them; existing households keep six. Read "six jars" below as "the household's pots" and the six-name lists as the old names. Current model: [split-system-proposal.md](./split-system-proposal.md).
+
 **Date:** 2026-11-17 · **Owner:** product-manager · **Status:** ready for design and build, nothing built yet.
 **Source:** [`clarity-audit.md`](./clarity-audit.md) §4, §6, §8. Given accepted decisions **D1–D11** as recommended. This release covers **CL-4, CL-5, CL-6, CL-8 and CL-9**.
 

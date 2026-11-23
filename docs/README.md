@@ -6,13 +6,13 @@ Start here to understand the whole project — product direction, brand, researc
 
 | Path | What it is |
 |---|---|
-| [product/overview.md](./product/overview.md) | What Rumtelo is, the loop, four portals |
+| [product/overview.md](./product/overview.md) | What Rumtelo is, the loop, four portals (names under revision) |
 | [product/principles.md](./product/principles.md) | Non-negotiable product principles |
 | [product/audience.md](./product/audience.md) | Who we build for |
 | [product/practice.md](./product/practice.md) | Rumtelo for practices — who, what it does today, pricing, pitch, gaps |
 | [product/coach-readiness.md](./product/coach-readiness.md) | The Coach surfaces — ship / preview / backlog per row |
 | [product/market-research-2026-11.md](./product/market-research-2026-11.md) | Market research, product-market-fit verdict, product map and names (Nov 2026) |
-| [product/split-system-proposal.md](./product/split-system-proposal.md) | Proposal: own split system Nodig · Later · Vrij replacing the six jars — rules, names, mapping, steps |
+| [product/split-system-proposal.md](./product/split-system-proposal.md) | Rumtelo Pots (three pots 55 / 20 / 25, refine inside a group): decisions, what is built and next, terminology research; first draft kept as history |
 | [brand/positioning.md](./brand/positioning.md) | Name, voice, visual direction |
 | [brand/quotes.md](./brand/quotes.md) | Approved slogans & quote bank |
 | [explain/README.md](./explain/README.md) | AI-avatar scripts — L1 Rumtelo → L2 products → L3 features |

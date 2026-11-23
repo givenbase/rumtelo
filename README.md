@@ -3,7 +3,7 @@
 **Stop wondering where it went.** **Rumtelo — grip on life.**
 
 See where your money, life, energy and time went — then get grip again. Clear tools,
-a tip from The Coach, you choose. Six jars are often the door.
+a tip from The Coach, you choose. Three pots are often the door.
 
 > Rijkdom is geen getal. Het is grip op je leven.
 
@@ -11,8 +11,9 @@ a tip from The Coach, you choose. Six jars are often the door.
 
 ## The loop
 
-Income arrives and splits into six jars the same second. Fixed costs draw from
-those jars, so you see them coming. Transactions land in an Inbox and get sorted —
+Income arrives and splits into pots the same second — three to start (Basics 55 %,
+Future 20 %, Free 25 %), refined per household. Fixed costs draw from
+those pots, so you see them coming. Transactions land in an Inbox and get sorted —
 by rule or by hand. Once a week, a ten-minute week check redirects the surplus and
 sets an intention. Once a month, the turn closes with a score and a log.
 

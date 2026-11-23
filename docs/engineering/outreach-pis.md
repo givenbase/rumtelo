@@ -17,7 +17,7 @@ Before sending, fill in the `[…]` placeholders. Do not invent user numbers —
 
 > Hi Enable Banking team,
 >
-> We are Rumtelo, an Amsterdam-based household-finance coach (six-jar budgeting + a weekly coach). We already have your AIS adapter stubbed in our backend and plan to go from restricted production to full production for Dutch households — ING, Rabobank, ABN AMRO, bunq and Revolut Bank UAB.
+> We are Rumtelo, an Amsterdam-based household-finance coach (split-first budgeting in pots + a weekly coach). We already have your AIS adapter stubbed in our backend and plan to go from restricted production to full production for Dutch households — ING, Rabobank, ABN AMRO, bunq and Revolut Bank UAB.
 >
 > Two questions:
 >
@@ -46,7 +46,7 @@ Before sending, fill in the `[…]` placeholders. Do not invent user numbers —
 
 > Hoi team Flow,
 >
-> Wij zijn Rumtelo, een Amsterdamse coach-app voor huishoudens: zes potjes, een wekelijkse check van tien minuten, en een Coach die geld koppelt aan slaap, doelen en richting. Geen bank, geen adviseur — een overzicht en een mentor.
+> Wij zijn Rumtelo, een Amsterdamse coach-app voor huishoudens: potjes, een wekelijkse check van tien minuten, en een Coach die geld koppelt aan slaap, doelen en richting. Geen bank, geen adviseur — een overzicht en een mentor.
 >
 > Wij bouwen bewust *geen* betaalinstelling. Maar onze gebruikers willen precies wat jullie kunnen: salaris komt binnen, potjes worden gevuld. Met FlowOS lijkt dat combineerbaar.
 >
@@ -54,7 +54,7 @@ Before sending, fill in the `[…]` placeholders. Do not invent user numbers —
 >
 > - **Betaalinitiatie onder jullie vergunning** — de gebruiker keurt in Rumtelo een voorgestelde verdeling goed, FlowOS voert de overboekingen uit (SEPA, SCA per betaling waar de bank dat eist).
 > - **Triggers** bij binnenkomend salaris (bunq realtime; andere banken zoals jullie die nu ook doen).
-> - **Bunq-subrekeningen als potjes** — mapping van onze zes potjes op echte IBAN's.
+> - **Bunq-subrekeningen als potjes** — mapping van onze potjes (3 tot 8 per huishouden) op echte IBAN's.
 >
 > Rumtelo blijft het brein (verdeling, Coach, energie, doelen); Flow levert de rails. Wij zijn [pre-launch / N huishoudens], EN-first, NL-tweede, EU-hosting in Amsterdam.
 >

@@ -2,7 +2,7 @@
 
 **Stop wondering where it went.** → *Wondering what? All of it — money, life, energy, time.* → **Rumtelo — grip on life.**
 
-Not a budget app. Clear tools so you see where it went and get grip again — with The Coach tipping and you choosing. Today: **Money · Growth · Energy · Soul** (expandable). Money is often the door. Decode the slogan only on L1 / Why. Explain scripts: [`docs/explain/`](../explain/README.md).
+Not a budget app. Clear tools so you see where it went and get grip again — with The Coach tipping and you choosing. Today: **Money · Growth · Energy · Soul** (expandable; the names are under revision — "Soul" is becoming Mindset in user-facing wording and "Growth" is no longer a product name in the owner's map, code keys unchanged). Money is often the door. Decode the slogan only on L1 / Why. Explain scripts: [`docs/explain/`](../explain/README.md).
 
 > Rijkdom is geen getal. Het is grip op je leven.  
 > *(Wealth isn’t a number. It’s grip on your life.)*
@@ -11,8 +11,8 @@ Not a budget app. Clear tools so you see where it went and get grip again — wi
 
 ## The loop
 
-1. **Income lands** and splits into **six jars** the same second.
-2. **Fixed costs** draw from those jars, so you see them coming.
+1. **Income lands** and splits into **pots** the same second — three to start: Basics 55%, Future 20%, Free 25% (**Rumtelo Pots**). A household can refine a pot by turning on optional ones.
+2. **Fixed costs** draw from those pots, so you see them coming.
 3. **Transactions** land in an **Inbox** and get sorted — by rule or by hand.
 4. **Once a week**, a ten-minute **week check** redirects surplus and sets an intention.
 5. **Once a month**, the **turn** closes with a score and a log.

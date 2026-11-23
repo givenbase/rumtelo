@@ -20,7 +20,7 @@ This document carries the **direction**, the **decisions and why**, and the
 research briefs live under [`docs/`](./docs/README.md); this file remains the
 living engineering handoff.
 
-**State in one line:** Money is the deepest product (jars → inbox → week check →
+**State in one line:** Money is the deepest product (pots → inbox → week check →
 month close, CSV + optional Enable Banking sync); Growth has Course (Koers), goals,
 income, net worth and learn; Energy and Soul are thinner. Billing (Stripe), i18n
 (EN/NL/ES/FR) and Practice (B2B) are live code. Screens are a *partial* port of the
@@ -30,8 +30,10 @@ design — see §8. Status detail: §7; priorities: §9.
 
 ## 2. The product
 
-Income arrives and splits into six jars the same second. Fixed costs draw from
-those jars, so you see them coming. Transactions land in an **Inbox** and get
+Income arrives and splits into **pots** the same second: three to start —
+Basics 55 %, Future 20 %, Free 25 % (**Rumtelo Pots**, NL *Rumtelo-potjes*) — and a
+household can refine a pot by turning on optional ones (§7). Fixed costs draw from
+those pots, so you see them coming. Transactions land in an **Inbox** and get
 sorted, by rule or by hand. Once a week a **ten-minute week check** redirects the
 surplus and sets an intention. Once a month the **month score** closes with a
 score and a log — the Monopoly framing.
@@ -227,7 +229,19 @@ aggregates.
 
 **Backed by the database and working:**
 
-- **Money:** jar balances (one grouped query, not N+1); transactions and inbox;
+- **Money:** pots (`jar` in code): a new household gets three main pots (one per
+  group `BASIS` / `FUTURE` / `FREE`, 55 / 20 / 25) and turns optional pots on or off
+  inside a group (`money.jars.activate` / `deactivate`); existing households keep their
+  six. Source: `packages/contracts/src/public/product/money/jar/jar.util.ts`, behaviour
+  in `apps/backend/src/modules/public/product/money/README.md`. **Built (uncommitted when
+  written):** the fixed-cost form asks "Moet dit, of kies je dit?" (the answer only picks
+  the pot; nothing new is stored — `features/forms/fixed-cost-pot-choice.tsx`), and split
+  settings show a "Basics fit" hint (`app/_lib/basics-fit.ts`,
+  `settings/_components/jars-basics-fit.tsx`): a button that fills in the split, never
+  automatic, and the "room" case only when Daily is on. A pot's running balance ("saved")
+  is priced month by month from a share history (`money_jar_share`, §13). **Not built
+  yet:** Buffer fills first, category tags, automatic derivation of Basics from real fixed
+  costs — `docs/BACKLOG.md`. Jar balances (one grouped query, not N+1); transactions and inbox;
   CSV import with SHA-256 dedupe; Dutch decimal parsing (`EUR 1.234,56`); rule
   replay (`ledger/sort-rule/sort-rule.service.ts` `replay()`); week check with
   stages (`week-check.service.ts` `advance()`); month-score close
@@ -387,6 +401,16 @@ node scripts/rename-project.mjs <new-name>
   contract's literal unions; DTOs are derived from the contract instead.
 - **An overspent jar must render a full red meter, not an empty one.** Empty reads
   as "no data", the opposite of what it means.
+- **A Postgres enum value added in a migration cannot be used in the same
+  transaction.** MikroORM runs pending migrations in one master transaction;
+  `alter type … add value` followed by an `insert` of that value fails ("unsafe use
+  of new value"). Put the `add value` in its own migration with
+  `isTransactional() { return false; }` (`Migration20261123100000_JarKeyDailyGoals`),
+  and the rows that use it in the next one.
+- **Never bake a stored pot name into text.** A pot's name depends on its group and on
+  whether it is refined ("Basics" alone, "Fixed costs" once refined) and a household can
+  rename it. Resolve the name by `JarKey` at render time. Two backend-composed Coach
+  lines still do this wrong (`docs/BACKLOG.md`).
 - **Free open banking is gone.** GoCardless Bank Account Data (ex-Nordigen) closed
   to new signups. **Enable Banking** has a free *restricted production* tier
   limited to accounts you link yourself, which fits the owner-plus-friends phase
@@ -415,3 +439,216 @@ returns an error that looks like "taken" — pace queries and retry.
 
 Before committing further, run a **BOIP** (Benelux) and **EUIPO** trademark
 search, classes 36 and 42.
+
+---
+
+## 13. Release notes
+
+### 2026-11-23 — Rumtelo Pots: three pots by default, refine inside a group
+
+Commits `28d470d3` … `ef5ad43f` on `dev`, plus work that was still uncommitted in the worktree when this entry was written (marked below). Checked against the code; **migrations and every
+screen are unverified until Given has run them on staging.**
+
+**Breaking**
+
+- `JarKey` has two new members, `DAILY` and `GOALS` (eight keys). Exhaustive `switch`es and
+  `Record<JarKey, …>` maps in consumers need the new entries.
+- The onboarding split (`OnboardingInput.split`, `OnboardingSplitPreviewInput.split`) accepts
+  **3 to 8** entries, each key at most once, total exactly 100.00 (was exactly 6, every key).
+  `OnboardingSplitPreview.jars` returns 3 to 8 entries. A custom split must name the three main
+  pots (`NECESSITIES`, `LONG_TERM_SAVINGS`, `PLAY`) and nothing else (`jar_split_keys` otherwise).
+- A new household gets **three** pots, not six. Clients that assumed six rows must read the list.
+- `DEFAULT_JAR_SPLIT` is **removed** (it was deprecated); use `defaultJarSplitFor(keys)`.
+- `@rumtelo/ui` `AuthManifesto`: the `strip` prop is now **required**; the `footer` prop, the
+  `AuthManifestoFooter` type and `AUTH_MANIFESTO_JAR_VISUALS` are gone (the caller passes a
+  translated strip; `showShare` on the strip puts each share in the tooltip). The old built-in
+  English "Six jars" and "Four portals" strips are removed.
+- `@rumtelo/utils` `jarPotBalance`: the input takes `cumulativeDeposit` instead of `allocated` +
+  `monthCount` (see "A pot's running balance" below).
+- Contract limits tightened: bulk sort `transactionIds` at most 500; week-check `allocations` at
+  most one per pot (8).
+- New API error keys: `jar_not_optional`, `jar_already_active`, `jar_not_empty`,
+  `jar_share_too_small`, `goal_give_needs_give_jar`, and (uncommitted) `jar_not_found`,
+  `category_not_found`, `transaction_not_found`, `debt_not_found`, `fixed_cost_not_found`. They
+  need i18n text under `common.message.error.api`.
+- Writes that take a jar, category, debt, fixed cost or bank account id from the client now
+  resolve it inside the household and answer `*_not_found` for an id that is not the
+  household's (indistinguishable from one that does not exist).
+- Device writes now follow the role matrix: `/device` maps to the `HOME` section
+  (`permissionSectionFromPath` in `role-permissions.ts`), so MEMBER keeps day-to-day access and a
+  VIEWER can read (`device.list`, `device.kinds`) but `device.create`, `device.update` and `device.delete` answer `viewer_read_only`. A device's wearer must be a
+  member of the household (`member_not_found` otherwise).
+- Migrations (both hand-written, **unverified until staging**, run by `db-migrate.yml` on a push of
+  `dev` with changes under `apps/backend/src/database/migrations/**`):
+  - `Migration20261123100000_JarKeyDailyGoals` — adds `DAILY` and `GOALS` to the native enum
+    `money_jar_key`. Non-transactional on purpose; `down()` leaves the values in place.
+  - `Migration20261123100100_JarTemplateMainPots` — adds `is_default` to the jar template table,
+    sets NECESSITIES / LONG_TERM_SAVINGS / PLAY as default at 55 / 20 / 25 and the optional
+    templates' shares, inserts the `DAILY` and `GOALS` templates with nl/es/fr names and category
+    links. Household data is not touched.
+- `Migration20261123120000_JarShare` (uncommitted when written; hand-written, **unverified until
+  staging**) — creates `public.money_jar_share` (one row per pot per month in which its share
+  changed; unique `(jar_id, period)`, cascade from `money_jar`, `YYYY-MM` and 0–100 checks) and
+  backfills one baseline row (`period` `1970-01`) per existing pot with its current percentage. No
+  existing money row changes. `down()` drops the table (the history only lives there).
+- **Deploy order for the share history:** the backend that reads `money_jar_share` must not start
+  before this migration has run (a read of a missing table fails every pot list). A pot with no
+  share row at all (created in a deploy window) is read as one baseline row with its current
+  percentage; nothing is written on read.
+- **Deploy order:** the new backend must be live with, or before, onboarding resuming after the
+  migration. The previous backend reads every active template (now eight rows totalling 141 %), so
+  an onboarding in that window fails the 100 % check or creates the wrong pots. Do not onboard a
+  household between the migration and the new backend.
+
+**Added** (Money)
+
+- Pots in three groups on the board, Home, onboarding and Settings; Basics · Future · Free
+  (NL Basis · Toekomst · Vrij).
+- Optional pots per group: Daily (Basics); Goals, Investing, Learning (Future); Giving (Free).
+  New procedures `money.jars.activate` and `money.jars.deactivate` (role UPDATE). A pot takes its
+  share out of its group's main pot, so the three group totals do not change; turning off is only
+  possible while nothing references the pot.
+- `@rumtelo/contracts`: `JarGroup`, `JAR_GROUP_BY_KEY`, `JAR_MAIN_KEY_BY_GROUP`,
+  `OPTIONAL_JAR_KEYS`, `OPTIONAL_JAR_SHARE`, `DEFAULT_GROUP_SPLIT`, `defaultJarSplitFor`,
+  `resolveJarKeyForHousehold`, `sumPercentageByGroup`.
+- Landing and sign-up show the three groups at 55 / 20 / 25; es/fr copy regenerated.
+
+**Changed**
+
+- **A pot's running balance ("saved") is priced month by month.** It used to be months × this
+  month's allocation (today's income × today's share), so every split change, turning a pot on and
+  every income change re-priced the whole past. Now each month is priced at that month's income
+  and that month's share of the pot (`jar-share.util.ts`, `money_jar_share`, income history in
+  `money_income_amount_period`). A household that never changed its split or income sees
+  identical numbers; one that did sees corrected past figures; months before the first income
+  count 0; the history starts at the split in force when `Migration20261123120000_JarShare` runs
+  (the baseline row). Turning a pot off adds its history to the main pot's, so what both pots
+  deposited is kept (the main pot can differ by a few cents from the old two-pot sum; the
+  household total is exact). Looking Ahead still carries the current split forward.
+- The fixed-cost form asks "Moet dit, of kies je dit?" (the answer only picks the pot) and split
+  settings show a "Basics fit" hint with a button that fills in the split. Both uncommitted when
+  written.
+- A main pot shows the group name while alone and its own name once refined (Fixed costs,
+  Buffer, Fun).
+- Anything aimed at a pot that is off (presets, merchants, categories, archive restore) lands in
+  the group's main pot. A Give pledge needs the Giving pot (`goal_give_needs_give_jar`).
+- The split coach and the server money coach speak at group level (Basics above 60 %, Future below
+  10 %); the per-pot tips are gone.
+- Existing households keep their six pots and count as refined.
+- Landing: the book card for "Secrets of the Millionaire Mind" and the footer attribution to the
+  six-jar method are being replaced by "Rumtelo Pots is our own method". This was uncommitted work
+  when these notes were written — check `git log` before telling anyone it shipped.
+
+**Fixed**
+
+- Turning on Daily (or changing a split) no longer moves months that already happened: the
+  per-pot "saved" figure of the past stays at the split it had (see Changed).
+- `updateSplit` checks the whole split: every pot once, total exactly 100.00 in basis points,
+  a clean `jar_split_total` / `jar_split_keys` error instead of a 500.
+
+**Security**
+
+- Split save, activate and deactivate lock all of the household's pots so concurrent writes cannot
+  leave the total off 100 %.
+- **Fixed (uncommitted when written):** jar, category, debt, fixed cost and bank account ids from
+  the client were not checked against the household on transaction, fixed-cost, sort-rule, goal and
+  week-check writes, so a member who knew another household's id could attach own rows to it
+  (pre-existing, not from this change). `own-reference.util.ts` (`requireOwn*`) now resolves each id
+  through `HouseholdScopedRepository`, applied to transactions, sort rules, fixed costs, goals,
+  week-check allocations and the device wearer; debt and fixed-cost links are validated before a
+  transaction is written. Remaining, in `docs/BACKLOG.md`: a category can belong to another pot of
+  the same household (Medium), composite foreign keys `(id, household_id)` as defence in depth
+  (Low), demo credentials in the root `README.md` (Low, for the owner to decide).
+
+**To verify on staging before `main`:** the ordered checklist is §14. Open follow-ups:
+`docs/BACKLOG.md` ("Rumtelo Pots — follow-ups").
+
+---
+
+## 14. Staging checklist — Rumtelo Pots (for Given, in order)
+
+Nothing here has run on a database. All SQL below is read-only (`select`); run it against staging
+only, never production before staging passes. Queries return ids, never names or amounts.
+
+1. **The three migrations ran.** After the `dev` push, `db-migrate.yml` is green. Then
+   `select name from mikro_orm_migrations order by id desc limit 5;` shows
+   `Migration20261123100000_JarKeyDailyGoals`, `Migration20261123100100_JarTemplateMainPots` and
+   `Migration20261123120000_JarShare` (MikroORM's default table name; the config does not override it).
+   `select enumlabel from pg_enum e join pg_type t on t.oid = e.enumtypid where t.typname = 'money_jar_key';`
+   lists `DAILY` and `GOALS`.
+2. **Every pot has a share row.** Right after the migration the counts are equal; later a pot can
+   have several rows (one per share change), so the lasting check is the second query (must be 0).
+
+   ```sql
+   select (select count(*) from public.money_jar_share) as share_rows,
+          (select count(*) from public.money_jar) as pots;
+
+   select j.id from public.money_jar j
+   where not exists (select 1 from public.money_jar_share s where s.jar_id = j.id);
+   ```
+3. **No cross-household reference.** Each statement must return 0 rows. A row means a money row
+   points at another household's jar, category, debt, fixed cost or bank account.
+
+   ```sql
+   select 'transaction' as row_kind, t.id from public.money_transaction t
+   left join public.money_jar j on j.id = t.jar_id
+   left join public.money_category c on c.id = t.category_id
+   left join public.money_debt d on d.id = t.debt_id
+   left join public.money_fixed_cost f on f.id = t.fixed_cost_id
+   left join public.money_bank_account b on b.id = t.account_id
+   where j.household_id <> t.household_id or c.household_id <> t.household_id
+      or d.household_id <> t.household_id or f.household_id <> t.household_id
+      or b.household_id <> t.household_id
+   union all
+   select 'sort_rule', r.id from public.money_sort_rule r
+   left join public.money_jar j on j.id = r.jar_id
+   left join public.money_category c on c.id = r.category_id
+   where j.household_id <> r.household_id or c.household_id <> r.household_id
+   union all
+   select 'fixed_cost', f.id from public.money_fixed_cost f
+   left join public.money_jar j on j.id = f.jar_id
+   left join public.money_category c on c.id = f.category_id
+   left join public.money_debt d on d.id = f.debt_id
+   where j.household_id <> f.household_id or c.household_id <> f.household_id
+      or d.household_id <> f.household_id
+   union all
+   select 'goal', g.id from public.money_goal g
+   join public.money_jar j on j.id = g.jar_id
+   where j.household_id <> g.household_id
+   union all
+   select 'week_check_allocation', a.id from public.money_week_check_allocation a
+   join public.money_jar j on j.id = a.jar_id
+   where j.household_id <> a.household_id;
+
+   -- Devices whose wearer is not a member of the device's household.
+   select d.id from public.platform_device d
+   where d.account_id is not null
+     and not exists (
+       select 1 from auth.account a
+       join auth.member m on m.user_id = a.user_id and m.household_id = d.household_id
+       where a.id = d.account_id
+     );
+   ```
+
+   A device row can also show up because its wearer left the household later: that is stale data,
+   not a leak. Look at the row before deciding.
+4. **Onboarding gives three pots.** Onboard an EN and an NL household: three pots at 55 / 20 / 25,
+   names Basics / Future / Free; the split preview shows the same three.
+5. **Turn a pot on and off.** Turn Daily on, then off (refused while anything points at it:
+   `jar_not_empty`); do it in two tabs; save the split while a pot is being activated. The three
+   group totals never change; the household total stays 100 %.
+6. **"Saved" per pot, an older household.** Open an older household (six pots, or one that has
+   changed split or income) and note "saved" per pot. Turn Daily on and compare: the past months
+   must not move, only the months from now on. A household that never changed split or income must
+   show exactly the numbers it showed before the deploy.
+7. **Must or choose on a new fixed cost.** The form asks "Moet dit, of kies je dit?"; must lands the
+   bill in the Basics main pot, choose in the Free main pot; the other-pot link opens the full picker;
+   nothing extra appears on the saved bill.
+8. **Basics fit.** In split settings the hint appears when fixed costs on Basics exceed the bills
+   pot's share; the button fills in the form but does not save; the "room" case appears only with
+   Daily on.
+9. **VIEWER cannot write devices.** As a VIEWER open Settings → devices (it must open and list);
+   `device.create`, `device.update` and `device.delete` (pair, edit, forget in the UI) must answer `viewer_read_only`. As a MEMBER they still work, and
+   a wearer who is not a member is refused with `member_not_found`.
+10. **Last:** the pot board and onboarding at 360 / 430 / 768 px, and an existing six-pot household
+    (it keeps six pots).

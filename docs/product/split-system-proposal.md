@@ -1,10 +1,10 @@
-# Proposal — Rumtelo's own split system: Nodig · Later · Vrij
+# Rumtelo Pots — the split system (decisions, state, research)
 
-Status: **proposal, not decided.** Date: 2026-11-23. Money doctrine (which pots exist, default shares, the order) is Given's call. Sources are listed inline; where a figure is press- or vendor-sourced it says so. Companion: [market-research-2026-11.md](./market-research-2026-11.md).
+Status: **decided and partly built** (2026-11-23). Read §0, §0.2 and "What is built, what is next" for the current state. §0.1 (terminology) is still valid research. Everything under "Earlier drafts" is the first draft written the same morning, kept as history with its sources; it uses names that were later replaced. Money doctrine (which pots exist, default shares, the order) is Given's call. Where a figure is press- or vendor-sourced it says so. Companion: [market-research-2026-11.md](./market-research-2026-11.md).
 
 ## 0. Decisions so far (Given, 2026-11-23)
 
-These override the names used further down, which still show the first draft ("Nodig · Later · Vrij", "Af en toe"). Read Nodig as Basis and Later as Toekomst.
+These override the names used under "Earlier drafts" further down ("Nodig · Later · Vrij", "Af en toe"). Read Nodig as Basis and Later as Toekomst.
 
 | Topic | Decision |
 | --- | --- |
@@ -38,15 +38,45 @@ Given's rule: **55 / 20 / 25 is the split at group level; inside a group a house
 | Pot that is off | Presets, merchants, categories and archive rows that target it land in the group's main pot. A Give pledge needs the Giving pot (no fallback) |
 | Share an optional pot takes when turned on | **Proposal, to confirm:** Dagelijks 20, Doelen 6, Beleggen 5, Leren 5, Geven 5 (`OPTIONAL_JAR_SHARE`) |
 | Coach | Group level: Basis above 60% and Toekomst under 10% (thresholds unchanged from before; copy to confirm) |
-| Not built (step 3) | "Buffer fills first", "Moet dit, of kies je dit?" on fixed costs, Basis derived from real fixed costs, category tags (ECOICOP/Nibud) |
+| Step 3, built (uncommitted at the time of writing) | "Moet dit, of kies je dit?" on the fixed-cost form (the answer only picks the pot, Basics or Free; nothing new is stored); a "Basics fit" hint in split settings (a button that fills in the split, never automatic) |
+| Not built | "Buffer fills first", category tags (ECOICOP/Nibud), Basis derived automatically from real fixed costs |
 
-Pots per group after these decisions:
+Pots per group today (the earlier "on by default" column was replaced by 0.2):
 
-| Group | Line under it | On by default | Optional |
+| Group | Line under it | Main pot (every household) | Optional (turned on per household) |
 | --- | --- | --- | --- |
-| **Basis** | Wat moet, elke maand | Vaste kosten, Dagelijks | — |
-| **Toekomst** | Wat je opbouwt | Buffer, Doelen | Beleggen, Leren |
-| **Vrij** | Wat je kiest | Plezier, showing how much is already committed to subscriptions | Geven |
+| **Basis** | Wat moet, elke maand | `NECESSITIES` — "Basis" while alone, "Vaste kosten" once refined | Dagelijks (`DAILY`) |
+| **Toekomst** | Wat je opbouwt | `LONG_TERM_SAVINGS` — "Toekomst" while alone, "Buffer" once refined | Doelen (`GOALS`), Beleggen (`FINANCIAL_FREEDOM`), Leren (`EDUCATION`) |
+| **Vrij** | Wat je kiest | `PLAY` — "Vrij" while alone, "Plezier" once refined | Geven (`GIVE`) |
+
+Planned, not built: Plezier showing how much is already committed to subscriptions.
+
+## What is built, what is next
+
+Verified against the code on `dev` plus the uncommitted work in the worktree (2026-11-23; marked where it is not committed yet). Open follow-ups, priorities and the staging checklist live in [`docs/BACKLOG.md`](../BACKLOG.md) ("Rumtelo Pots — follow-ups").
+
+**Built**
+
+| Step | What | Where |
+| --- | --- | --- |
+| Step 1 | Three display groups (`JarGroup`: `BASIS`, `FUTURE`, `FREE`), group headers and stacked bar on the pot board, onboarding split and settings; one pot name on every screen; split validation (every pot once, total exactly 100.00 in basis points) | `jar.util.ts`, `apps/backend/src/common/utils/jar-split.util.ts` |
+| Step 2 | New households start with three main pots at 55 / 20 / 25; five optional pots (`DAILY`, `GOALS`, `FINANCIAL_FREEDOM`, `EDUCATION`, `GIVE`) turned on and off in Settings (`money.jars.activate` / `deactivate`); an optional pot takes its share out of its group's main pot (`OPTIONAL_JAR_SHARE`); fallback to the main pot for presets, merchants, categories and archive rows; group-level split coach (Basics above 60%, Future below 10%); landing and sign-up show the three groups | contracts `jar.util.ts`, `jar.service.ts`, migrations `Migration20261123100000_JarKeyDailyGoals` and `Migration20261123100100_JarTemplateMainPots` (hand-written, **unverified until staging**) |
+| Step 3 (part) | The fixed-cost form asks "Moet dit, of kies je dit?": must → the Basics main pot, choose → the Free main pot, a quiet link opens the full pot picker. The answer only picks the pot. Split settings show a "Basics fit" hint: fixed costs on Basics against the bills pot's share, with one button that fills the form (the household still presses Save). The "room" case (spare share on the bills pot goes to Future) is only offered when Daily is on, because with Daily off the bills pot also pays groceries. Nothing is automatic | `apps/application/app/_components/features/forms/fixed-cost-pot-choice.tsx`, `apps/application/app/_lib/basics-fit.ts`, `settings/_components/jars-basics-fit.tsx` |
+| Pot history | A pot's running balance ("saved") is priced month by month at that month's income and share; new table `money_jar_share` (`Migration20261123120000_JarShare`, **unverified until staging**) | `jar-share.util.ts`, `jar.service.ts` |
+| Draft steps S0, S1 | Done (S0 = `updateSplit` validation; S1 = groups and names). S2 (Needs as three lines) is replaced by the optional Daily pot | see "Earlier drafts" §8 |
+
+**Next (planned, not built)**
+
+- Buffer fills first, then hands its share on when full (draft rule 2, step S3). Options and a recommendation: [split-step3-decisions.md](./split-step3-decisions.md).
+- Basis derived **automatically** from real fixed costs (today only a hint the household applies); Future at least 10% (draft rule 3, step S4). The 55 / 20 / 25 default is a proposal the owner still confirms, like `OPTIONAL_JAR_SHARE`.
+- Category tags (ECOICOP division, Nibud group, default must/choose) — a contract and template change with a hand-written migration (§0.1 finding 3).
+- Resolve the stored pot name by key in backend-composed Coach lines (`money-coach.service.ts`, `fixed-cost-coach.util.ts`).
+
+**Not decided or not planned**
+
+- A Belasting / Tax group and pot (draft step S5): not part of the decisions above; belongs with the Bedrijf product.
+- Custom and extra pots beyond the eight keys (draft step S6).
+- "Grote uitgaven" as a pot: dropped (see §0).
 
 ### 0.1 Terminology check against the standards (2026-11-23)
 
@@ -81,6 +111,12 @@ Checked against Nibud's budgeting method, the official EU/CBS classification of 
 Work: category tags are a contract + template change with a hand-written migration (Medium, M, 3–5 h, medium confidence) and belong with step S2.
 
 Not verified: the full category lists of ING, Rabobank and ABN AMRO; Tink, Salt Edge and GoCardless lists; where ECOICOP places donations and health insurance.
+
+---
+
+## Earlier drafts (history, not current)
+
+Everything from here to the end is the first draft of the same morning. It shows the first names ("Nodig · Later · Vrij", "Af en toe", "Grote uitgaven"), a five-pot start, a Tax group and the steps table S0–S6. The decisions in §0 and §0.2 replace it; the research and sources stay because the decisions rest on them.
 
 ## 1. Why replace the six jars
 
@@ -210,7 +246,7 @@ S1 and S2 give most of the customer-visible change without touching the database
 - Behavioural effect sizes. A separate labelled pot and automatic transfers have the best support ([J-PAL](https://www.povertyactionlab.org/evaluation/constraints-saving-health-expenditures-kenya)); "fewer categories" and "weekly review" are weakly supported.
 - S3's cheaper route through goal priority.
 
-## 11. Decisions for Given
+## 11. Decisions for Given (answered in §0; kept for history)
 
 1. Replace the six jars with Nodig · Later · Vrij — yes or no.
 2. The system name (recommended: the three words) and the group labels.
@@ -218,3 +254,5 @@ S1 and S2 give most of the customer-visible change without touching the database
 4. Buffer guidance: one buffer with a target the household sets, or separate buffers for repairs and for income loss.
 5. Default shares, and whether Needs is derived from real fixed costs.
 6. Start with S0 + S1 now, before the customer interviews, or after.
+
+Answers: 1 yes. 2 method **Rumtelo Pots** (to confirm), groups Basis · Toekomst · Vrij. 3 Leren in Toekomst, Geven in Vrij. 4 one pot called Buffer, target set by the household. 5 default 55 / 20 / 25 as a proposal; "derived from real fixed costs" is planned (step 3). 6 S0 and S1 were built first.
