@@ -30,7 +30,7 @@ const GROUP_TONE: Record<JarGroup, string> = {
 };
 
 /**
- * Desktop auth manifesto — marketing quotes; jars on sign-up, portals elsewhere.
+ * Desktop auth manifesto — marketing quotes; the three pots on sign-up, portals elsewhere.
  * Respects prefers-reduced-motion (first quote stays; no video).
  */
 export function AuthAside() {
@@ -39,7 +39,6 @@ export function AuthAside() {
     const videoRef = useRef<HTMLVideoElement>(null);
     const [reduceMotion, setReduceMotion] = useState(false);
     const isSignUp = pathname.includes('/sign-up');
-    const footer = isSignUp ? 'jars' : 'portals';
     /** docs/brand/quotes.md — sign-up leads with how-it-works. */
     const initialIndex = isSignUp ? 1 : 0;
 
@@ -56,8 +55,9 @@ export function AuthAside() {
     const tablistAriaLabel = t('features.brand.auth_manifesto.brand_lines_aria');
 
     const strip: AuthManifestoStrip = useMemo(() => {
-        if (footer === 'jars') {
+        if (isSignUp) {
             return {
+                showShare: true,
                 eyebrow: t('features.brand.auth_manifesto.jars_eyebrow'),
                 line: t('features.brand.auth_manifesto.jars_line'),
                 // The strip uppercases `short`, so the group title serves as both labels.
@@ -84,7 +84,7 @@ export function AuthAside() {
                 share: 100 / LIVE_PORTAL_ITEMS.length,
             })),
         };
-    }, [footer, t]);
+    }, [isSignUp, t]);
 
     useEffect(() => {
         const media = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -122,7 +122,6 @@ export function AuthAside() {
             <AuthManifesto
                 quotes={quotes}
                 reduceMotion={reduceMotion}
-                footer={footer}
                 initialIndex={initialIndex}
                 tablistAriaLabel={tablistAriaLabel}
                 strip={strip}

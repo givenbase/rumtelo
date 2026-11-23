@@ -6,8 +6,7 @@ import { cn } from '@rumtelo/utils';
 
 import { CARD, Eyebrow } from './landing-primitives';
 
-const PRIMARY_BOOK_KEYS = ['rich_dad', 'think_grow', 'millionaire_mind'] as const;
-const MORE_BOOK_KEYS = ['psychology'] as const;
+const BOOK_KEYS = ['rich_dad', 'think_grow', 'psychology'] as const;
 
 /**
  * Why we exist — one spine:
@@ -57,7 +56,7 @@ export function LandingWhy() {
                             {t('books_lead')}
                         </Typography>
                         <ul className="mt-6 grid gap-3">
-                            {PRIMARY_BOOK_KEYS.map(bookKey => (
+                            {BOOK_KEYS.map(bookKey => (
                                 <li key={bookKey} className={cn(CARD, 'grid gap-1 p-4')}>
                                     <span className="text-sm font-semibold text-fg">
                                         {t(`books.${bookKey}.title`)}
@@ -70,30 +69,6 @@ export function LandingWhy() {
                                     </span>
                                 </li>
                             ))}
-                            {MORE_BOOK_KEYS.length > 0 ? (
-                                <details className="group">
-                                    <summary className="cursor-pointer font-mono text-xs tracking-wide text-accent uppercase">
-                                        {t('more_books')}
-                                    </summary>
-                                    <ul className="mt-3 grid gap-3">
-                                        {MORE_BOOK_KEYS.map(bookKey => (
-                                            <li
-                                                key={bookKey}
-                                                className={cn(CARD, 'grid gap-1 p-4')}>
-                                                <span className="text-sm font-semibold text-fg">
-                                                    {t(`books.${bookKey}.title`)}
-                                                </span>
-                                                <span className="font-mono text-xs text-fg-faint">
-                                                    {t(`books.${bookKey}.author`)}
-                                                </span>
-                                                <span className="text-sm text-fg-secondary">
-                                                    {t(`books.${bookKey}.line`)}
-                                                </span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </details>
-                            ) : null}
                         </ul>
                     </div>
                 </div>

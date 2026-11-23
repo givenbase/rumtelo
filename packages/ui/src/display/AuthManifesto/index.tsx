@@ -11,8 +11,6 @@ export type AuthManifestoQuote = {
     support: string;
 };
 
-export type AuthManifestoFooter = 'portals' | 'jars';
-
 export type AuthManifestoStripItem = {
     name: string;
     short: string;
@@ -24,73 +22,43 @@ export type AuthManifestoStrip = {
     eyebrow: string;
     line: string;
     items: readonly AuthManifestoStripItem[];
+    /** Put each item's share in its tooltip (`Basics 55%`) — for a money split, not for portals. */
+    showShare?: boolean;
 };
 
 const ROTATE_MS = 7000;
 
-/** Four product portals — visual only. */
-const PORTALS: AuthManifestoStrip = {
-    eyebrow: 'Four portals',
-    line: 'Money. Growth. Energy. Soul — in balance.',
-    items: [
-        { name: 'Money', short: 'MONEY', tone: 'bg-jar-give', share: 25 },
-        { name: 'Growth', short: 'GROWTH', tone: 'bg-jar-lts', share: 25 },
-        { name: 'Energy', short: 'ENERGY', tone: 'bg-jar-play', share: 25 },
-        { name: 'Soul', short: 'SOUL', tone: 'bg-portal-soul', share: 25 },
-    ],
-};
-
-/** Canonical six-jar split — visual only; households set their own. */
-const JARS: AuthManifestoStrip = {
-    eyebrow: 'Six jars',
-    line: 'Paycheck in. Already assigned.',
-    items: [
-        { name: 'Necessity', short: 'NEC', tone: 'bg-jar-nec', share: 55 },
-        { name: 'Freedom', short: 'FF', tone: 'bg-jar-ff', share: 10 },
-        { name: 'Education', short: 'EDU', tone: 'bg-jar-edu', share: 10 },
-        { name: 'Savings', short: 'LTS', tone: 'bg-jar-lts', share: 10 },
-        { name: 'Play', short: 'PLAY', tone: 'bg-jar-play', share: 10 },
-        { name: 'Give', short: 'GIVE', tone: 'bg-jar-give', share: 5 },
-    ],
-};
-
-/** Tone/share for callers merging i18n labels. */
-export const AUTH_MANIFESTO_PORTAL_VISUALS = PORTALS.items.map(({ tone, share }) => ({
-    tone,
-    share,
-}));
-
-/** Tone/share for callers merging i18n labels. */
-export const AUTH_MANIFESTO_JAR_VISUALS = JARS.items.map(({ tone, share }) => ({
-    tone,
-    share,
-}));
+/** Tone/share of the four product portals, in Money · Growth · Energy · Soul order — for callers merging i18n labels. */
+export const AUTH_MANIFESTO_PORTAL_VISUALS = [
+    { tone: 'bg-jar-give', share: 25 },
+    { tone: 'bg-jar-lts', share: 25 },
+    { tone: 'bg-jar-play', share: 25 },
+    { tone: 'bg-portal-soul', share: 25 },
+] as const;
 
 const QUOTE_SHADOW = '0 0 1px rgb(255 255 255 / 0.35), 0 2px 18px rgb(255 255 255 / 0.18)';
 
 /**
  * Setup 1 (locked): full-bleed video + slim strip at the bottom.
- * `footer="portals"` = product balance; `footer="jars"` = money split (sign-up).
+ * The caller supplies the strip: product portals, or the three-pot split (`showShare`).
  */
 export function AuthManifesto({
     quotes,
     reduceMotion,
     autoRotate = true,
-    footer = 'portals',
     initialIndex = 0,
     tablistAriaLabel = 'Brand lines',
-    strip: stripProp,
+    strip,
 }: {
     quotes: readonly AuthManifestoQuote[];
     reduceMotion: boolean;
     /** When false, stays on the first quote until the user clicks a tick. */
     autoRotate?: boolean;
-    footer?: AuthManifestoFooter;
     /** Which quote to open on (e.g. sign-up leads with how-it-works). */
     initialIndex?: number;
     tablistAriaLabel?: string;
-    /** Bottom strip copy + labels; defaults to English portals/jars by footer. */
-    strip?: AuthManifestoStrip;
+    /** Bottom strip copy + labels (translated by the caller). */
+    strip: AuthManifestoStrip;
 }) {
     const [quoteIndex, setQuoteIndex] = useState(() => {
         if (quotes.length === 0) return 0;
@@ -108,8 +76,6 @@ export function AuthManifesto({
 
     const quote = quotes[quoteIndex] ?? quotes[0];
     if (!quote) return null;
-
-    const strip = stripProp ?? (footer === 'jars' ? JARS : PORTALS);
 
     return (
         <div className="absolute inset-0 z-10 flex flex-col justify-end">
@@ -195,11 +161,7 @@ export function AuthManifesto({
                             key={item.short}
                             className="min-w-0"
                             style={{ flexGrow: item.share, flexBasis: 0 }}
-                            title={
-                                'share' in item && footer === 'jars'
-                                    ? `${item.name} ${item.share}%`
-                                    : item.name
-                            }>
+                            title={strip.showShare ? `${item.name} ${item.share}%` : item.name}>
                             <div className={cn(item.tone, 'h-2 rounded-sm')} />
                             <p className="mt-1 truncate font-mono text-[8px] tracking-wide text-white/75 uppercase">
                                 {item.short}
