@@ -30,6 +30,8 @@ import type { CategoryTemplate, FixedCostPreset, MerchantPreset } from '@rumtelo
 import {
     Cadence,
     FlowDirection,
+    JAR_MAIN_KEY_BY_GROUP,
+    JarGroup,
     JarKey,
     defaultGiveCategoryTemplate,
     jarCapabilitiesFor,
@@ -37,7 +39,7 @@ import {
 } from '@rumtelo/contracts';
 
 import { audienceKeysFromFixedCostPreset } from '@/app/_lib/household-audience-from-money';
-import { jarForKey } from '@/app/_lib/jar-for-key';
+import { billJarForKey, jarForKey } from '@/app/_lib/jar-for-key';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { viewedPeriodDefaultIso } from '@/app/_lib/viewed-period-date';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
@@ -70,6 +72,7 @@ import { CATALOG_CHIP_IDLE_LIMIT, CatalogChipPicker } from './catalog-chip-picke
 import { ConfirmActionButton } from './confirm-action-button';
 import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
 import { FormDatePicker } from './form-date-picker';
+import { FixedCostPotChoice, potChoiceFor, type PotChoice } from './fixed-cost-pot-choice';
 import { FormInput } from './form-input';
 import { HoldingField } from './holding-field';
 import { existingCounterparty, PartyField } from './party-field';
@@ -198,6 +201,8 @@ export function FixedCostForm({
     const [vendorQuery, setVendorQuery] = useState('');
     /** Edit: resolve bill preset + payee chips once catalogs are ready. */
     const [editCatalogHydrated, setEditCatalogHydrated] = useState(mode !== 'edit');
+    /** The full pot picker is behind a quiet "other pot" link while must/choose answers the question. */
+    const [potPickerOpen, setPotPickerOpen] = useState(false);
     /** Create-only: bypass Huishoudprofiel filter for this form session. */
     const [showAllPresets, setShowAllPresets] = useState(false);
     /** Give only — null until the household picks a path (or prefill resolves one). */
@@ -911,8 +916,9 @@ export function FixedCostForm({
 
     /** Jar by catalog key (main pot of its group when off) → household category; falls back to a pending template when unknown. */
     function applyJarAndCategory(jarKey: JarKey, categoryTemplateKey: string) {
-        // A preset for a pot the household has not turned on lands in the group's main pot.
-        const jar = jarForKey(jars, jarKey);
+        // A preset for a pot the household has not turned on lands in the group's main pot; when
+        // that pot takes no bills (Future's), the bill is a must-pay and lands in Basics.
+        const jar = billJarForKey(billJars, jars, jarKey);
         if (jar) {
             form.setValue('jarId', jar.id);
             applyCategoryFromTemplate(jar.id, categoryTemplateKey);
@@ -925,7 +931,7 @@ export function FixedCostForm({
     /** Give jar owns a "to whom" chooser; any other jar clears it. */
     function syncGiveMode(jarKey: JarKey) {
         // Judge the pot the bill actually lands in: a Give preset without a Give pot is a Free bill.
-        const give = jarForKey(jars, jarKey)?.key === JarKey.GIVE;
+        const give = billJarForKey(billJars, jars, jarKey)?.key === JarKey.GIVE;
         setGivePayeeMode(give ? 'known' : null);
         setGiveModeHydrated(give);
     }
@@ -999,6 +1005,34 @@ export function FixedCostForm({
     const activeCategory = activeCategoryTemplateKey
         ? categoryByKey.get(activeCategoryTemplateKey)
         : null;
+    // "Must or choose?" — only for bills (income has no such question) and only with both pots on
+    // offer: Basics' bills pot (must) and Free's main pot (choose), each only if the server takes
+    // fixed costs there. Otherwise the plain pot picker stays as it was.
+    const mustJar = billJars.find(jar => jar.key === JAR_MAIN_KEY_BY_GROUP[JarGroup.BASIS]);
+    const chooseJar = billJars.find(jar => jar.key === JAR_MAIN_KEY_BY_GROUP[JarGroup.FREE]);
+    const showPotChoice = !incoming && Boolean(mustJar && chooseJar);
+    const selectedJar = jars.find(jar => jar.id === selectedJarId) ?? null;
+    const potChoice = potChoiceFor(selectedJarKey);
+    // A pot picked by hand (Giving, Education) answers neither: keep the picker in view for it.
+    const showPotPicker =
+        !showPotChoice || potPickerOpen || (selectedJar !== null && potChoice === null);
+
+    /**
+     * The answer picks the pot; a bill type or vendor already chosen keeps its name and payee,
+     * only its category follows the pot (same category name inside the other pot).
+     */
+    function choosePot(choice: PotChoice) {
+        const target = choice === 'must' ? mustJar : chooseJar;
+        if (!target || target.id === selectedJarId) return;
+        form.setValue('jarId', target.id, { shouldDirty: true });
+        if (activeCategoryTemplateKey) {
+            applyCategoryFromTemplate(target.id, activeCategoryTemplateKey);
+        } else {
+            form.setValue('categoryId', null);
+        }
+        syncGiveMode(target.key);
+    }
+
     const vendorChrome = catalogMarkChrome({
         icon: activeCategory?.icon,
         billName: activeCategory?.name,
@@ -1174,41 +1208,56 @@ export function FixedCostForm({
                 }}
             />
 
-            <FormField
-                control={form.control}
-                name="jarId"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>{tForm('jar')}</FormLabel>
-                        <FormSelect
-                            value={toFormSelectValue(field.value)}
-                            onValueChange={value => {
-                                if (value === FORM_SELECT_NONE) return;
-                                field.onChange(value);
-                                form.setValue('categoryId', null);
-                                setPendingCategoryTemplateKey(null);
-                                setNameLock(null);
-                                setPayee('', { dirty: false });
-                                setGivePayeeMode(null);
-                                setGiveModeHydrated(false);
-                            }}>
-                            {billJars.length === 0 ? (
-                                <FormSelectItem value={FORM_SELECT_NONE} disabled>
-                                    {tFixed('no_jars')}
-                                </FormSelectItem>
-                            ) : (
-                                billJars.map(jar => (
-                                    <FormSelectItem key={jar.id} value={jar.id}>
-                                        {jar.icon ? `${jar.icon} ` : ''}
-                                        {jarName(jar)}
+            {showPotChoice && mustJar && chooseJar ? (
+                <FixedCostPotChoice
+                    value={potChoice}
+                    mustPot={jarName(mustJar)}
+                    choosePot={jarName(chooseJar)}
+                    landsIn={selectedJar ? jarName(selectedJar) : null}
+                    showOtherPot={!showPotPicker}
+                    disabled={busy}
+                    onChange={choosePot}
+                    onOtherPot={() => setPotPickerOpen(true)}
+                />
+            ) : null}
+
+            {showPotPicker ? (
+                <FormField
+                    control={form.control}
+                    name="jarId"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>{tForm('jar')}</FormLabel>
+                            <FormSelect
+                                value={toFormSelectValue(field.value)}
+                                onValueChange={value => {
+                                    if (value === FORM_SELECT_NONE) return;
+                                    field.onChange(value);
+                                    form.setValue('categoryId', null);
+                                    setPendingCategoryTemplateKey(null);
+                                    setNameLock(null);
+                                    setPayee('', { dirty: false });
+                                    setGivePayeeMode(null);
+                                    setGiveModeHydrated(false);
+                                }}>
+                                {billJars.length === 0 ? (
+                                    <FormSelectItem value={FORM_SELECT_NONE} disabled>
+                                        {tFixed('no_jars')}
                                     </FormSelectItem>
-                                ))
-                            )}
-                        </FormSelect>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
+                                ) : (
+                                    billJars.map(jar => (
+                                        <FormSelectItem key={jar.id} value={jar.id}>
+                                            {jar.icon ? `${jar.icon} ` : ''}
+                                            {jarName(jar)}
+                                        </FormSelectItem>
+                                    ))
+                                )}
+                            </FormSelect>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            ) : null}
 
             <FormField
                 control={form.control}

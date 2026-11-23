@@ -84,7 +84,6 @@ export function AuthAside() {
                 quotes={quotes}
                 reduceMotion={reduceMotion}
                 autoRotate={false}
-                footer="portals"
                 tablistAriaLabel={tablistAriaLabel}
                 strip={strip}
             />

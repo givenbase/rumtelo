@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { JarKey } from '@rumtelo/contracts';
+import { JarKey, jarGroupFor } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
 import { Icon } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
@@ -19,7 +19,8 @@ import {
 } from '@/app/_lib/jar-copy';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
-import { useJarName } from '@/app/_lib/use-jar-name';
+import { isAloneInGroup } from '@/app/_lib/jar-group';
+import { useJarName, usePresentJarKeys } from '@/app/_lib/use-jar-name';
 import { GivingFinder } from '@/components/features/money/giving-finder';
 
 type JarGuideCardProps = {
@@ -46,6 +47,8 @@ export function JarGuideCard({
 }: JarGuideCardProps) {
     const t = useTranslations('features.coach.jar_guide');
     const tJars = useTranslations('features.money.jars');
+    const tGroups = useTranslations('features.money.groups');
+    const presentKeys = usePresentJarKeys();
     const displayJarName = useJarName();
     const router = useRouter();
     const { formatMoney } = useHouseholdCurrency();
@@ -53,6 +56,12 @@ export function JarGuideCard({
     const guide = guideFor(jarKey);
     const catalog = byKey.get(jarKey);
     const isGive = jarKey === JarKey.GIVE;
+    // A main pot that is the only pot in its group stands for the whole group, so the card
+    // opens with the group's purpose; the guide note below still names Daily/Goals as the way to split it.
+    const groupPurpose =
+        presentKeys.length > 0 && isAloneInGroup(jarKey, presentKeys)
+            ? tGroups(`${jarGroupFor(jarKey)}.purpose`)
+            : null;
 
     if (!guide) return null;
 
@@ -79,7 +88,10 @@ export function JarGuideCard({
             </summary>
 
             <div className="border-t border-line">
-                <div className="px-4 py-3.5">
+                <div className="grid gap-1.5 px-4 py-3.5">
+                    {groupPurpose ? (
+                        <p className="text-sm font-semibold text-pretty text-fg">{groupPurpose}</p>
+                    ) : null}
                     <p className="text-sm leading-relaxed text-pretty text-fg-secondary">
                         {jarGuideNote(tJars, jarKey, guide.note)}
                     </p>

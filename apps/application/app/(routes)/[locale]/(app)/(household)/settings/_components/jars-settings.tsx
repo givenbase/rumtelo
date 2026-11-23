@@ -6,7 +6,14 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
-import { JAR_GROUP_ORDER, mainJarKeyFor, sumPercentageByGroup, type Jar } from '@rumtelo/contracts';
+import {
+    JAR_GROUP_ORDER,
+    JarGroup,
+    jarGroupFor,
+    mainJarKeyFor,
+    sumPercentageByGroup,
+    type Jar,
+} from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import {
@@ -26,6 +33,7 @@ import {
 import { cn, formatIban, formatPercent, sumMonthly } from '@rumtelo/utils';
 
 import { useApiError } from '@/app/_lib/api-error-messages';
+import { planBasicsFit } from '@/app/_lib/basics-fit';
 import {
     GROUP_CHROME,
     defaultSharesById,
@@ -46,6 +54,7 @@ import { useHouseholdShell } from '@/components/features/shell/household-shell-c
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { accountBankMark, countryFromCurrency } from '../_utils/resolve-account-bank';
 import { JAR_COLOR, accountKindLabel } from '../_utils/settings-shared';
+import { JarsBasicsFit } from './jars-basics-fit';
 import { JarsRefineGroup } from './jars-refine-group';
 import { SettingsInkCard, SettingsPanel, SettingsPill, SettingsRow } from './settings-chrome';
 
@@ -208,6 +217,36 @@ export function JarsSettings() {
         live
     );
     const monthlyNet = useMemo(() => sumMonthly(incomeQuery.data ?? []), [incomeQuery.data]);
+
+    // Basics fit: the real fixed costs on Basics pots (`committedOut`, monthly) against the period
+    // income. The balances already carry both — the pots' `allocated` always add up to the income —
+    // so nothing is recomputed from stored data here.
+    const balancesQuery = useLiveQuery(
+        apiQuery.money.jars.balances.queryOptions({ input: { householdId: householdId! } }),
+        null,
+        live
+    );
+    const currentShares = useMemo(
+        () => Object.fromEntries(jars.map(jar => [jar.id, pct[jar.id] ?? jar.percentage])),
+        [jars, pct]
+    );
+    const basicsFit = useMemo(() => {
+        const balances = balancesQuery.data;
+        if (!balances || jars.length === 0) return null;
+        const incomeMinor = balances.reduce((running, jar) => running + jar.allocated, 0);
+        const basicsCostsMinor = balances
+            .filter(jar => jarGroupFor(jar.key) === JarGroup.BASIS)
+            .reduce((running, jar) => running + jar.committedOut, 0);
+        return {
+            basicsCostsMinor,
+            fit: planBasicsFit({
+                jars,
+                shares: currentShares,
+                incomeMinor,
+                basicsCostsMinor,
+            }),
+        };
+    }, [balancesQuery.data, jars, currentShares]);
 
     const saveSplit = useMutation({
         mutationFn: async () => {
@@ -386,6 +425,18 @@ export function JarsSettings() {
                     <Badge tone={balanced ? 'success' : 'danger'}>{formatPercent(total)}</Badge>
                 }>
                 <div className="grid gap-0">
+                    {/* Only for roles that can save the split: the button fills it in, Save stays the household's move. */}
+                    {canRefine && basicsFit ? (
+                        <JarsBasicsFit
+                            fit={basicsFit.fit}
+                            costs={formatMoney(basicsFit.basicsCostsMinor)}
+                            shares={currentShares}
+                            onApply={shares => {
+                                form.setValue('pct', { ...pct, ...shares }, { shouldDirty: true });
+                                setDismissedTips({});
+                            }}
+                        />
+                    ) : null}
                     {visibleGroups.map((group, groupIndex) => {
                         const groupJars = jarsInGroup(jars, group);
                         const headingId = `split-group-${groupSlug(group)}`;
