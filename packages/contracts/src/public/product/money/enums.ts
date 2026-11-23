@@ -9,6 +9,20 @@ export enum JarKey {
     GIVE = 'GIVE',
 }
 
+/**
+ * Display group a jar belongs to (NL Basis · Toekomst · Vrij). Presentation only:
+ * the six jars stay the stored unit, a group is derived from the key via
+ * `JAR_GROUP_BY_KEY` and never persisted or sent on the wire.
+ */
+export enum JarGroup {
+    /** What must be paid. */
+    BASIS = 'BASIS',
+    /** What you build. */
+    FUTURE = 'FUTURE',
+    /** What you choose. */
+    FREE = 'FREE',
+}
+
 export enum DebtKind {
     CREDIT_CARD = 'CREDIT_CARD',
     LOAN = 'LOAN',
