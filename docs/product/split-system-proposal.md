@@ -2,6 +2,29 @@
 
 Status: **proposal, not decided.** Date: 2026-11-23. Money doctrine (which pots exist, default shares, the order) is Given's call. Sources are listed inline; where a figure is press- or vendor-sourced it says so. Companion: [market-research-2026-11.md](./market-research-2026-11.md).
 
+## 0. Decisions so far (Given, 2026-11-23)
+
+These override the names used further down, which still show the first draft ("Nodig · Later · Vrij", "Buffer", "Af en toe").
+
+| Topic | Decision |
+| --- | --- |
+| Replace the six jars | Yes |
+| Group labels | **Vast · Toekomst · Vrij** (EN **Fixed · Future · Free**; ES Fijo · Futuro · Libre; FR Fixe · Futur · Libre). Set by hand per language, not machine-translated |
+| Method name | Given's suggestion: **Rumtelo-potjes** (EN "Rumtelo Pots") — to confirm |
+| Emergency pot | Called **Noodpot** (EN "Emergency fund"), not "Buffer": Given looked for "nood" and could not find it. Line: "Voor als er iets misgaat." One pot, target set by the household |
+| Known irregular costs | A pot in **Toekomst**, not in Vast. "Af en toe" is rejected as a name; proposed: **Grote uitgaven** (EN "Big expenses"), line "Je weet dat ze komen." — to confirm |
+| Geven | Optional pot, off by default; existing households keep theirs |
+| Drill-down | Tapping a group opens a group page with its pots in order; tapping a pot opens the pot |
+| Default shares | "A logical split": proposed start 55% Vast · 20% Toekomst · 25% Vrij, then Vast is derived from real fixed costs; Toekomst at least 10%; Noodpot gets most of Toekomst until full. Numbers are a proposal, to confirm |
+
+Pots per group after these decisions:
+
+| Group | On by default | Optional |
+| --- | --- | --- |
+| **Vast** | Vaste kosten, Dagelijks | — |
+| **Toekomst** | Noodpot, Grote uitgaven, Doelen | Beleggen, Leren |
+| **Vrij** | Plezier | Geven |
+
 ## 1. Why replace the six jars
 
 The six jars are T. Harv Eker's method with fixed shares (55/10/10/10/10/5). It is free to use, but it is not ours, and it has five weak spots:
