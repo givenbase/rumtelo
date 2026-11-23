@@ -69,6 +69,24 @@ export class JarTemplateService {
         ) as unknown as JarTemplate[];
     }
 
+    /**
+     * The templates a new household starts with: active and flagged `isDefault` (the three
+     * main pots), in display order. Optional pots are copied later, one at a time, by
+     * `JarService.activate`. English seed copy, like onboarding has always used.
+     */
+    async listDefault(): Promise<JarTemplate[]> {
+        return this.em.find(
+            JarTemplate,
+            { isActive: true, isDefault: true },
+            { orderBy: { sortOrder: 'ASC' } }
+        );
+    }
+
+    /** The active template of one key (what an optional pot is copied from), or null. */
+    async findActive(key: JarKey): Promise<JarTemplate | null> {
+        return this.em.findOne(JarTemplate, { key, isActive: true });
+    }
+
     /** EN seed name/subtitle for rename-safe overlays on household jars. */
     englishDefaultsFor(key: JarKey): { name: string; subtitle: string } | null {
         const seed = JAR_TEMPLATE_SEED.find(row => row.key === key);

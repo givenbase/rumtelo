@@ -8019,6 +8019,23 @@
           "enumItems": [],
           "mappedType": "boolean"
         },
+        "is_default": {
+          "name": "is_default",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "false",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
         "key": {
           "name": "key",
           "type": "money_jar_key",
@@ -8039,7 +8056,9 @@
             "EDUCATION",
             "LONG_TERM_SAVINGS",
             "PLAY",
-            "GIVE"
+            "GIVE",
+            "DAILY",
+            "GOALS"
           ],
           "mappedType": "unknown",
           "nativeEnumName": "money_jar_key"
@@ -9361,7 +9380,9 @@
             "EDUCATION",
             "LONG_TERM_SAVINGS",
             "PLAY",
-            "GIVE"
+            "GIVE",
+            "DAILY",
+            "GOALS"
           ],
           "mappedType": "unknown",
           "nativeEnumName": "money_jar_key"
@@ -16157,7 +16178,9 @@
             "EDUCATION",
             "LONG_TERM_SAVINGS",
             "PLAY",
-            "GIVE"
+            "GIVE",
+            "DAILY",
+            "GOALS"
           ],
           "mappedType": "unknown",
           "nativeEnumName": "money_jar_key"
@@ -21301,7 +21324,9 @@
         "EDUCATION",
         "LONG_TERM_SAVINGS",
         "PLAY",
-        "GIVE"
+        "GIVE",
+        "DAILY",
+        "GOALS"
       ]
     },
     "money_merchant_highlight": {

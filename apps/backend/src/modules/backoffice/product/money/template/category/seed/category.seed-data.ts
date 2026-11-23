@@ -8,6 +8,10 @@ type CategorySeedRow = {
     icon: string;
 };
 
+/**
+ * Every pot, main pots first so the primary (first) key stays NECESSITIES and the original
+ * six keep their pivot order; the optional DAILY / GOALS pots come last.
+ */
 const allJars = [
     JarKey.NECESSITIES,
     JarKey.FINANCIAL_FREEDOM,
@@ -15,16 +19,27 @@ const allJars = [
     JarKey.EDUCATION,
     JarKey.PLAY,
     JarKey.GIVE,
+    JarKey.DAILY,
+    JarKey.GOALS,
 ] as const;
+
+/**
+ * Everyday spending: NECESSITIES stays primary (three-pot households are unaffected), DAILY is
+ * offered too for households that turned it on.
+ */
+const everydayJars = [JarKey.NECESSITIES, JarKey.DAILY] as const;
+
+/** Named savings goals: LONG_TERM_SAVINGS stays primary, GOALS is offered alongside. */
+const goalJars = [JarKey.LONG_TERM_SAVINGS, JarKey.GOALS] as const;
 
 /** English category spine — single source of truth for preset categoryTemplateKey. */
 export const CATEGORY_TEMPLATE_SEED: readonly CategorySeedRow[] = [
     // NECESSITIES
     { key: 'HOUSING', name: 'Housing', jarKeys: [JarKey.NECESSITIES], icon: '🏠' },
-    { key: 'GROCERIES', name: 'Groceries', jarKeys: [JarKey.NECESSITIES], icon: '🛒' },
+    { key: 'GROCERIES', name: 'Groceries', jarKeys: [...everydayJars], icon: '🛒' },
     { key: 'UTILITIES', name: 'Utilities', jarKeys: [JarKey.NECESSITIES], icon: '💡' },
     { key: 'INSURANCE', name: 'Insurance', jarKeys: [JarKey.NECESSITIES], icon: '🛡️' },
-    { key: 'TRANSPORT', name: 'Transport', jarKeys: [JarKey.NECESSITIES], icon: '🚌' },
+    { key: 'TRANSPORT', name: 'Transport', jarKeys: [...everydayJars], icon: '🚌' },
     { key: 'SUBSCRIPTIONS', name: 'Subscriptions', jarKeys: [JarKey.NECESSITIES], icon: '📱' },
     {
         key: 'HOSTING',
@@ -42,15 +57,15 @@ export const CATEGORY_TEMPLATE_SEED: readonly CategorySeedRow[] = [
         icon: '🧒',
     },
     { key: 'DEBT_PAYMENTS', name: 'Debt payments', jarKeys: [JarKey.NECESSITIES], icon: '💳' },
-    { key: 'PHARMACY', name: 'Pharmacy', jarKeys: [JarKey.NECESSITIES], icon: '💊' },
-    { key: 'DRUGSTORE', name: 'Drugstore', jarKeys: [JarKey.NECESSITIES], icon: '🧴' },
+    { key: 'PHARMACY', name: 'Pharmacy', jarKeys: [...everydayJars], icon: '💊' },
+    { key: 'DRUGSTORE', name: 'Drugstore', jarKeys: [...everydayJars], icon: '🧴' },
     { key: 'NUTRITION', name: 'Nutrition', jarKeys: [JarKey.NECESSITIES], icon: '🥗' },
     { key: 'MEDICAL', name: 'Medical', jarKeys: [JarKey.NECESSITIES], icon: '🏥' },
     { key: 'DENTAL', name: 'Dental', jarKeys: [JarKey.NECESSITIES], icon: '🦷' },
     { key: 'OPTICIAN', name: 'Optician', jarKeys: [JarKey.NECESSITIES], icon: '👓' },
     { key: 'THERAPY', name: 'Therapy', jarKeys: [JarKey.NECESSITIES], icon: '🧠' },
     { key: 'PETS', name: 'Pets', jarKeys: [JarKey.NECESSITIES], icon: '🐾' },
-    { key: 'CLEANING', name: 'Cleaning & laundry', jarKeys: [JarKey.NECESSITIES], icon: '🧹' },
+    { key: 'CLEANING', name: 'Cleaning & laundry', jarKeys: [...everydayJars], icon: '🧹' },
     { key: 'HOME_SERVICES', name: 'Home services', jarKeys: [JarKey.NECESSITIES], icon: '🔧' },
     { key: 'POST', name: 'Post & parcels', jarKeys: [JarKey.NECESSITIES], icon: '📦' },
     { key: 'BANKING', name: 'Banking', jarKeys: [JarKey.NECESSITIES], icon: '🏦' },
@@ -70,13 +85,13 @@ export const CATEGORY_TEMPLATE_SEED: readonly CategorySeedRow[] = [
     {
         key: 'BIG_PURCHASES',
         name: 'Big purchases',
-        jarKeys: [JarKey.LONG_TERM_SAVINGS],
+        jarKeys: [...goalJars],
         icon: '🎯',
     },
     {
         key: 'HOME_DEPOSIT',
         name: 'Home deposit',
-        jarKeys: [JarKey.LONG_TERM_SAVINGS],
+        jarKeys: [...goalJars],
         icon: '🔑',
     },
     // EDUCATION (+ shared)
