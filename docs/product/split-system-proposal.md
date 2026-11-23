@@ -12,7 +12,7 @@ These override the names used further down, which still show the first draft ("N
 | Group labels | **Vast · Toekomst · Vrij** (EN **Fixed · Future · Free**; ES Fijo · Futuro · Libre; FR Fixe · Futur · Libre). Set by hand per language, not machine-translated |
 | Method name | Given's suggestion: **Rumtelo-potjes** (EN "Rumtelo Pots") — to confirm |
 | Emergency pot | Called **Noodpot** (EN "Emergency fund"), not "Buffer": Given looked for "nood" and could not find it. Line: "Voor als er iets misgaat." One pot, target set by the household |
-| Known irregular costs | A pot in **Toekomst**, not in Vast. "Af en toe" is rejected as a name; proposed: **Grote uitgaven** (EN "Big expenses"), line "Je weet dat ze komen." — to confirm |
+| Known irregular costs | A pot in **Toekomst**, not in Vast. "Af en toe" is rejected as a name; decided: **Grote uitgaven** (EN "Big expenses"), line "Je weet dat ze komen." |
 | Geven | Optional pot, off by default; existing households keep theirs |
 | Drill-down | Tapping a group opens a group page with its pots in order; tapping a pot opens the pot |
 | Default shares | "A logical split": proposed start 55% Vast · 20% Toekomst · 25% Vrij, then Vast is derived from real fixed costs; Toekomst at least 10%; Noodpot gets most of Toekomst until full. Numbers are a proposal, to confirm |
