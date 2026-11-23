@@ -48,6 +48,10 @@ import { IncomeAmountPeriod } from '../../../modules/public/product/money/plan/i
 import { IncomeSource } from '../../../modules/public/product/money/plan/income/income-source.entity';
 import { Party } from '../../../modules/public/product/money/plan/party/party.entity';
 import { Jar } from '../../../modules/public/product/money/plan/jar/jar.entity';
+import {
+    JAR_SHARE_BASELINE_PERIOD,
+    JarShare,
+} from '../../../modules/public/product/money/plan/jar/jar-share.entity';
 import { Category } from '../../../modules/public/product/money/plan/jar/category.entity';
 import { Debt } from '../../../modules/public/product/money/targets/debt/debt.entity';
 import { Goal } from '../../../modules/public/product/money/targets/goal/goal.entity';
@@ -373,6 +377,7 @@ export class DemoHouseholdSeeder extends Seeder {
             { orderBy: { sortOrder: 'ASC' } }
         );
         const jarMap = toJarMap(jars);
+        await this.ensureBaselineShares(em, householdId, jars);
 
         const incomeCount = await em.count(IncomeSource, { household: householdId });
         if (incomeCount === 0) {
@@ -1685,6 +1690,37 @@ export class DemoHouseholdSeeder extends Seeder {
             status: input.status,
             source: input.source ?? TransactionSource.MANUAL,
         } as never);
+    }
+
+    /**
+     * One baseline share row per demo pot (period {@link JAR_SHARE_BASELINE_PERIOD}) carrying the
+     * pot's current percentage, like the migration that created `money_jar_share` wrote for real
+     * households. A re-run brings an existing baseline row in line with the persona split.
+     */
+    private async ensureBaselineShares(
+        em: EntityManager,
+        householdId: string,
+        jars: Jar[]
+    ): Promise<void> {
+        const baselines = await em.find(JarShare, {
+            household: householdId,
+            period: JAR_SHARE_BASELINE_PERIOD,
+        });
+        const baselineByJar = new Map(baselines.map(share => [share.jar.id, share]));
+        for (const jar of jars) {
+            const baseline = baselineByJar.get(jar.id);
+            if (baseline) {
+                baseline.percentage = jar.percentage;
+                continue;
+            }
+            em.create(JarShare, {
+                household: householdId,
+                jar,
+                period: JAR_SHARE_BASELINE_PERIOD,
+                percentage: jar.percentage,
+            } as never);
+        }
+        await em.flush();
     }
 
     /**

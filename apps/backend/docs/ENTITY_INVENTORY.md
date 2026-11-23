@@ -1,6 +1,6 @@
 # Entity inventory
 
-Generated from MikroORM metadata (83 entities, 6 implicit pivot tables). Regenerate after entity changes — do not hand-edit tables.
+Generated from MikroORM metadata (84 entities, 6 implicit pivot tables). Regenerate after entity changes — do not hand-edit tables.
 
 Planes: `auth` = identity (better-auth + Rumtelo person/household rows) · `public` = household-written product data · `backoffice` = Rumtelo-written catalogs. Bases: see `ENTITY_STYLE.md`.
 
@@ -42,7 +42,7 @@ Planes: `auth` = identity (better-auth + Rumtelo person/household rows) · `publ
 | `PracticeMember` | `BaseEntity` | `public.platform_practice_member` | `modules/public/platform/practice/practice-member/practice-member.entity.ts` | `practice` N:1 → Practice (mapToPk) on delete cascade<br>`account` N:1 → Account (mapToPk) on delete cascade |
 | `Practice` | `BaseEntity` | `public.platform_practice` | `modules/public/platform/practice/practice/practice.entity.ts` | — |
 
-## public · money (17)
+## public · money (18)
 
 | Entity | Base | Table | File | Relations |
 |---|---|---|---|---|
@@ -57,6 +57,7 @@ Planes: `auth` = identity (better-auth + Rumtelo person/household rows) · `publ
 | `IncomeSource` | `HouseholdEntity` | `public.money_income_source` | `modules/public/product/money/plan/income/income-source.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`party` N:1 → Party (mapToPk) on delete set null<br>`asset` N:1 → Asset (mapToPk) on delete set null<br>`bank` N:1 → Bank (mapToPk) on delete set null<br>`account` N:1 → BankAccount (mapToPk) on delete set null<br>`presetKey` N:1 → IncomeSourcePreset (mapToPk) on delete set null<br>`merchantKey` N:1 → MerchantPreset (mapToPk) on delete set null |
 | `Category` | `HouseholdEntity` | `public.money_category` | `modules/public/product/money/plan/jar/category.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`jar` N:1 → Jar on delete cascade |
 | `Jar` | `HouseholdEntity` | `public.money_jar` | `modules/public/product/money/plan/jar/jar.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`defaultAccount` N:1 → BankAccount (mapToPk) on delete set null<br>`categories` 1:N → Category |
+| `JarShare` | `HouseholdEntity` | `public.money_jar_share` | `modules/public/product/money/plan/jar/jar-share.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`jar` N:1 → Jar on delete cascade |
 | `PartySuggestion` | `HouseholdEntity` | `public.money_party_suggestion` | `modules/public/product/money/plan/party/party-suggestion.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`party` N:1 → Party on delete cascade<br>`suggestion` N:1 → MerchantSuggestion on delete restrict |
 | `Party` | `HouseholdEntity` | `public.money_party` | `modules/public/product/money/plan/party/party.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`merchantKey` N:1 → MerchantPreset (mapToPk) on delete set null |
 | `Debt` | `HouseholdEntity` | `public.money_debt` | `modules/public/product/money/targets/debt/debt.entity.ts` | `household` N:1 → AuthHousehold (mapToPk) on delete cascade<br>`party` N:1 → Party (mapToPk) on delete set null<br>`presetKey` N:1 → DebtPreset (mapToPk) on delete set null<br>`merchantKey` N:1 → MerchantPreset (mapToPk) on delete set null |
