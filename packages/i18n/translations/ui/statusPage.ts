@@ -28,7 +28,7 @@ const status = {
     maintenance: {
         title: 'Rumtelo is briefly offline',
         description:
-            'We are doing a short update. Your jars and data are safe — try again in a few minutes.',
+            'We are doing a short update. Your pots and data are safe — try again in a few minutes.',
     },
     offline: {
         title: 'You appear to be offline',

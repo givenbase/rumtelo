@@ -14,11 +14,11 @@ const capabilities = {
     },
     'money-overview': {
         name: 'Overview',
-        description: 'Money overview and jar pulse.',
+        description: 'Money overview and pot pulse.',
     },
     'money-jars': {
-        name: 'Jars',
-        description: 'The six jars — core money model.',
+        name: 'Pots',
+        description: 'Rumtelo Pots — the core money model.',
     },
     'money-spending': {
         name: 'Transactions',
@@ -48,7 +48,7 @@ const capabilities = {
     },
     'growth-goals': {
         name: 'Goals',
-        description: 'Goals with a date, jar, and progress.',
+        description: 'Goals with a date, pot, and progress.',
     },
     'growth-income': {
         name: 'Income',
@@ -99,7 +99,7 @@ const capabilities = {
     },
     'soul-giving': {
         name: 'Giving',
-        description: 'Why the Give jar exists, where it goes, and how to choose well.',
+        description: 'Why the Giving pot exists, where it goes, and how to choose well.',
     },
     'soul-intent': {
         name: 'Intent',

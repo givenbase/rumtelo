@@ -20,7 +20,7 @@ const settings = {
         security: { label: 'Security', sub: 'Password and sign-in' },
         practice: { label: 'Practice coaches', sub: 'Accept or unlink coaches' },
         plan: { label: 'Plan', sub: 'What you use and pay' },
-        jars: { label: 'Jars', sub: 'Split, accounts, coach' },
+        jars: { label: 'Pots', sub: 'Split, accounts, coach' },
         debt: { label: 'Debt', sub: 'Payoff method' },
         parties: { label: 'Parties', sub: 'Saved names across money' },
         bank: { label: 'Bank', sub: 'Accounts and PSD2' },
@@ -70,7 +70,7 @@ const settings = {
         },
     },
     delete: {
-        body: 'Your household, jars, and full transaction history will be deleted. This cannot be undone — export your data first.',
+        body: 'Your household, pots, and full transaction history will be deleted. This cannot be undone — export your data first.',
     },
     plan: {
         members_unlimited: 'Unlimited members',
@@ -149,7 +149,7 @@ const settings = {
         /** Account tab: the "Show everything now" switch (labels reuse `pages.nav.show_all.*`). */
         start: {
             eyebrow: 'Your start',
-            blurb: 'New boards start with jars, transactions and the week check. The rest joins your menu after your first week check and your first closed month.',
+            blurb: 'New boards start with pots, transactions and the week check. The rest joins your menu after your first week check and your first closed month.',
         },
         profile: {
             eyebrow: 'Profile',
@@ -165,7 +165,7 @@ const settings = {
         },
         money_style: {
             eyebrow: 'How you handle money',
-            blurb: 'Personal style — partners can differ. Tips on the jar split use this. Debt payoff order lives under Debt settings for the whole board.',
+            blurb: 'Personal style — partners can differ. Tips on the pot split use this. Debt payoff order lives under Debt settings for the whole board.',
             spender: 'Spender',
             spender_sub: 'Joy first',
             saver: 'Saver',
@@ -188,7 +188,7 @@ const settings = {
         },
         household: {
             eyebrow: 'Household',
-            blurb_suffix: 'Members share jars, rules, and transaction history.',
+            blurb_suffix: 'Members share pots, rules, and transaction history.',
             members_stub: 'Members appear here once you have a household.',
             last_seen: 'Last seen {when}',
             last_seen_never: 'Not signed in yet',
@@ -288,17 +288,17 @@ const settings = {
         },
         coach: {
             eyebrow: 'The Coach',
-            blurb: 'The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money, growth, energy, and soul.',
+            blurb: 'The Coach never scolds — only clear next moves. On-screen tips (why-lines, pot cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money, growth, energy, and soul.',
             blurb_core:
-                'The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money and growth.',
+                'The Coach never scolds — only clear next moves. On-screen tips (why-lines, pot cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money and growth.',
             toggle: 'Show The Coach on screens',
             hint_on: 'On — look for the ✦ The Coach mark. Your tips stay at Home → The Coach.',
             hint_off:
                 'Off — on-screen tips hidden. Your tips are still at Home → The Coach anytime.',
         },
         jars_placement: {
-            eyebrow: 'Where each jar sits',
-            blurb: 'Mix freely — Necessity on your current account, the rest as pots, Financial Freedom on a real savings account.',
+            eyebrow: 'Where each pot sits',
+            blurb: 'Mix freely — Fixed costs and daily on your current account, the rest as savings pots at your bank, Investing on its own account.',
             accounts_one: '{count} account',
             accounts_other: '{count} accounts',
             no_accounts: 'No accounts',
@@ -421,7 +421,7 @@ const settings = {
                 'Prefer CAMT.053 from your bank. MT940 or CSV work too. After import, sort what waits under To sort and link matching fixed costs.',
             account_label: 'Account label',
             account_label_hint:
-                'Shown in jars and CSV — e.g. Operating checking, or Creditcard · t.n.v. Avery Chen.',
+                'Shown in pots and CSV — e.g. Operating checking, or Creditcard · t.n.v. Avery Chen.',
             type: 'Type',
             search_bank: 'Search bank — e.g. ING, Bunq',
             type_bank_name: 'Type a bank name…',
@@ -565,7 +565,7 @@ const settings = {
         },
         stillness: {
             eyebrow: 'Your daily stillness',
-            blurb: 'How long you sit. Short and daily beats long and occasional — this is the one routine that costs nothing and protects every jar.',
+            blurb: 'How long you sit. Short and daily beats long and occasional — this is the one routine that costs nothing and protects every pot.',
             minutes_aria: 'Daily stillness minutes',
             minutes: '{count} min',
             stub: 'Intention templates and reminders — coming soon.',
@@ -580,15 +580,15 @@ const settings = {
             rules: {
                 split: {
                     name: 'Auto-split on income',
-                    desc: 'Everything that arrives goes straight into the jars, 55/10/10/10/10/5.',
+                    desc: 'Everything that arrives goes straight into the pots, by the split you set.',
                 },
                 guard: {
-                    name: 'Jar guard',
-                    desc: 'Warn as soon as a jar passes 90% of its allocation.',
+                    name: 'Pot guard',
+                    desc: 'Warn as soon as a pot passes 90% of its allocation.',
                 },
                 sweep: {
                     name: 'Sweep surplus',
-                    desc: 'Whatever is left in Necessity on the 1st moves to Financial Freedom.',
+                    desc: 'Whatever is left in Fixed costs and daily on the 1st moves to Investing.',
                 },
             },
         },
@@ -596,9 +596,8 @@ const settings = {
             eyebrow: 'What you use and pay',
             blurb: 'Three plans: Basic, Plus, and Max. Start on Basic — nothing you have entered is ever locked away.',
             card_basic_tag: 'From {price}',
-            card_basic_line:
-                'Solo board — the six jars and the routine underneath. No bank needed.',
-            card_basic_feats: '{members} · Solo only · MONEY jars · 1 goal · Coach',
+            card_basic_line: 'Solo board — your pots and the routine underneath. No bank needed.',
+            card_basic_feats: '{members} · Solo only · MONEY pots · 1 goal · Coach',
             card_plus_tag: 'Most chosen',
             card_plus_line:
                 'Share the board with family or friends — debt, Learn, energy week, and more goals.',
@@ -666,20 +665,20 @@ const settings = {
             sheet_parties_cols: 'name · aliases · branding',
             sheet_accounts: 'Bank accounts',
             sheet_accounts_cols: 'name · bank · IBAN · reconnect',
-            sheet_jars: 'Jars',
+            sheet_jars: 'Pots',
             sheet_jars_cols: 'key · name · % · allocated',
             sheet_income: 'Income',
             sheet_income_cols: 'label · amount · kind',
             sheet_fixed: 'Fixed costs',
-            sheet_fixed_cols: 'name · amount · jar',
+            sheet_fixed_cols: 'name · amount · pot',
             sheet_transactions: 'Transactions',
             sheet_transactions_cols: 'date · amount · description · payee',
             sheet_debts: 'Debts',
             sheet_debts_cols: 'name · rate · balance',
             sheet_goals: 'Goals',
-            sheet_goals_cols: 'name · target · jar',
+            sheet_goals_cols: 'name · target · pot',
             sheet_rules: 'Rules',
-            sheet_rules_cols: 'match · jar · priority',
+            sheet_rules_cols: 'match · pot · priority',
             sheet_rows_one: '{count} row',
             sheet_rows_other: '{count} rows',
             sheet_rows_loading: '…',
@@ -688,12 +687,12 @@ const settings = {
             download_json: 'Download JSON',
             download_csv: 'Download CSV',
             format_note:
-                'Everything downloads a zip with one real CSV file per subject (settings, jars, income, transactions, …). Transactions-only and this month are a single CSV with portable columns (date, amount, description, payee, jar, note). JSON is the full Rumtelo archive — use Import to restore it later.',
+                'Everything downloads a zip with one real CSV file per subject (settings, pots, income, transactions, …). Transactions-only and this month are a single CSV with portable columns (date, amount, description, payee, pot, note). JSON is the full Rumtelo archive — use Import to restore it later.',
             sign_in_stub: 'Sign in to download exports.',
         },
         import: {
             eyebrow: 'Restore a Rumtelo file',
-            blurb: 'Choose a JSON archive, a CSV zip, or a single CSV sheet from Export. Board and account settings apply when present; jars remap by key; duplicates are skipped. Debts and goals follow your plan.',
+            blurb: 'Choose a JSON archive, a CSV zip, or a single CSV sheet from Export. Board and account settings apply when present; pots remap by key; duplicates are skipped. Debts and goals follow your plan.',
             choose: 'Choose JSON, CSV, or zip',
             preview: 'Preview import',
             confirm: 'Import into this household',
@@ -708,8 +707,8 @@ const settings = {
             found_parties_other: '{count} parties',
             found_accounts_one: '{count} bank account',
             found_accounts_other: '{count} bank accounts',
-            found_jars_one: '{count} jar',
-            found_jars_other: '{count} jars',
+            found_jars_one: '{count} pot',
+            found_jars_other: '{count} pots',
             found_income_one: '{count} income',
             found_income_other: '{count} income',
             found_fixed_one: '{count} fixed cost',
@@ -728,10 +727,10 @@ const settings = {
             will: '{count} will import',
             skipped: '{count} skipped',
             skipped_plan: '{count} skipped (plan)',
-            split_ok: 'Jar split will be applied',
-            split_skip: 'Jar split unchanged',
+            split_ok: 'Pot split will be applied',
+            split_skip: 'Pot split unchanged',
             format_note:
-                'Accepts Rumtelo JSON, the CSV zip from Export, or one sheet (settings.csv, jars.csv, transactions.csv, …). We detect the sheet from the file name or columns. Bank statement CSVs still go under Bank.',
+                'Accepts Rumtelo JSON, the CSV zip from Export, or one sheet (settings.csv, pots.csv, transactions.csv, …). We detect the sheet from the file name or columns. Bank statement CSVs still go under Bank.',
             sign_in_stub: 'Sign in to import data.',
         },
         sign_out_sub: 'You stay signed in for 30 days on this device',

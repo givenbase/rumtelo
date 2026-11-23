@@ -2,7 +2,7 @@ const onboarding = {
     // ── Screen 1 · Your income ────────────────────────────────────────────
     income: 'Your income',
     income_lead:
-        "Type what lands in your account each month. Next you'll see it split into six jars.",
+        "Type what lands in your account each month. Next you'll see it split over Basics, Future and Free.",
     currency: 'Currency',
     net_income_label: 'Net monthly income',
     net_income_hint: 'After tax — what lands in your account.',
@@ -17,26 +17,26 @@ const onboarding = {
     // ── Screen 2 · Here's where it goes ───────────────────────────────────
     split_title: "Here's where your {amount} goes.",
     split_lead:
-        'Each jar has one job. Change the percentages any time — the habit matters more than the numbers.',
+        'Each pot has one job. Change the percentages any time — the habit matters more than the numbers.',
     split_list_aria: 'Your split',
     split_row_aria: '{jar}, {percent} percent, {amount}',
     split_jobs: {
         NECESSITIES: 'rent, bills, groceries',
-        FINANCIAL_FREEDOM: 'money that works for you — never spent',
+        FINANCIAL_FREEDOM: 'money set aside to invest — never spent',
         EDUCATION: 'courses, books, a new skill',
         LONG_TERM_SAVINGS: 'big buys and a safety buffer',
         PLAY: 'fun without guilt — spend it all',
         GIVE: 'gifts and causes you care about',
     },
     split_main_account:
-        'All six jars sit on one main account for now. Add your bank when it suits you.',
+        'All your pots sit on one main account for now. Add your bank when it suits you.',
     split_note:
         'Rumtelo never moves money. Savings pots at your bank? Move it there yourself — we show the split.',
-    split_change_later: 'Change the percentages any time in Money › Jars.',
-    split_zero: 'No income yet? Your jars wait — they split it the second it lands.',
+    split_change_later: 'Change the percentages any time in Money › Pots.',
+    split_zero: 'No income yet? Your pots wait — they split it the second it lands.',
     split_cta: 'Looks right — open my board',
     split_cta_pending: 'Opening your board…',
-    split_error: "We couldn't load the jars — try again.",
+    split_error: "We couldn't load the pots — try again.",
     onboard_error: "Your board wasn't created yet. Try again.",
 
     // ── Shared ────────────────────────────────────────────────────────────
@@ -52,14 +52,14 @@ const onboarding = {
     banks_setup: {
         accounts_title: 'Name your accounts',
         accounts_body:
-            'Name the main account where money lands (Necessity). Need more? Add them here — then you link the jars. You can rename later in Settings.',
-        map_title: 'Link jars to accounts',
+            'Name the main account where money lands (Fixed costs and daily). Need more? Add them here — then you link the pots. You can rename later in Settings.',
+        map_title: 'Link pots to accounts',
         map_body:
-            'Necessity stays on your main account. Put the other jars on the right savings account. Change this any time in Settings → Jars.',
+            'Fixed costs and daily stays on your main account. Put the other pots on the right savings account. Change this any time in Settings → Pots.',
         map_body_one:
-            'You have one account — every jar is already linked to it. Change this later in Settings → Jars if you add more accounts.',
+            'You have one account — every pot is already linked to it. Change this later in Settings → Pots if you add more accounts.',
         read_only_link: 'Open bank settings',
-        map_required: 'Choose an account for every jar before you finish.',
+        map_required: 'Choose an account for every pot before you finish.',
         bank_label: 'Bank',
         account_name_label: 'Account name',
         iban_label: 'IBAN',
@@ -78,11 +78,11 @@ const onboarding = {
         suggested_names: {
             main_checking: 'Main account',
             savings: 'Savings',
-            freedom: 'Freedom savings',
-            lts: 'Long-term savings',
-            education: 'Education savings',
-            play: 'Play savings',
-            give: 'Give savings',
+            freedom: 'Investing',
+            lts: 'Buffer and goals',
+            education: 'Learning',
+            play: 'Fun',
+            give: 'Giving',
         },
         preview: {
             main_account: 'Main account',
@@ -90,9 +90,9 @@ const onboarding = {
         },
         tips: {
             one_account:
-                'Start with one main account (Necessity). Add spaarpotjes as extra accounts only if you already bank that way — then link each jar on the next screen.',
+                'Start with one main account (Fixed costs and daily). Add spaarpotjes as extra accounts only if you already bank that way — then link each pot on the next screen.',
             familiar:
-                'Start with your main account. Add any other accounts you already use, then link each jar.',
+                'Start with your main account. Add any other accounts you already use, then link each pot.',
             already_set_up:
                 'Just record the accounts you already have. Rumtelo will not touch your real bank.',
         },

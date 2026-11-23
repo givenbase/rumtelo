@@ -3,8 +3,8 @@ const meta = {
     home: 'Home',
     money: 'Money',
     money_overview: 'Money',
-    jars: 'Jars',
-    jar: 'Jar',
+    jars: 'Pots',
+    jar: 'Pot',
     transactions: 'Transactions',
     transaction: 'Transaction',
     debts: 'Debts',
@@ -45,7 +45,7 @@ const meta = {
     settings_practice: 'Practice coaches — Settings',
     settings_export: 'Export — Settings',
     settings_import: 'Import — Settings',
-    settings_jars: 'Jars — Settings',
+    settings_jars: 'Pots — Settings',
     settings_debt: 'Debt — Settings',
     settings_parties: 'Parties — Settings',
     settings_bank: 'Bank — Settings',
@@ -62,7 +62,7 @@ const meta = {
     coming_soon_title: 'Coming soon',
     coming_soon_body: 'New accounts open shortly. If you already have access, sign in to continue.',
     not_found_document: 'Page not found · Rumtelo',
-    app_description: 'Control that compounds. Six jars, calm weekly rhythm, room to grow.',
+    app_description: 'Basics, Future, Free. A calm weekly routine, room to grow.',
 } as const;
 
 export default meta;

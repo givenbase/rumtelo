@@ -42,7 +42,7 @@ const brand = {
         portals_line: 'Money. Growth. Energy. Soul — tools for grip on life.',
         /** While Energy + Soul are held back in production. */
         portals_line_core: 'Money. Growth — tools for grip on life, with more to come.',
-        jars_eyebrow: 'Six jars',
+        jars_eyebrow: 'Rumtelo Pots',
         jars_line: 'Paycheck in. Already assigned.',
         portals: {
             money: { name: 'Money', short: 'MONEY' },
@@ -51,12 +51,12 @@ const brand = {
             soul: { name: 'Soul', short: 'SOUL' },
         },
         jars: {
-            necessity: { name: 'Necessity', short: 'NEC' },
-            freedom: { name: 'Freedom', short: 'FF' },
-            education: { name: 'Education', short: 'EDU' },
-            savings: { name: 'Savings', short: 'LTS' },
-            play: { name: 'Play', short: 'PLAY' },
-            give: { name: 'Give', short: 'GIVE' },
+            necessity: { name: 'Fixed costs and daily', short: 'FIXED' },
+            freedom: { name: 'Investing', short: 'INVEST' },
+            education: { name: 'Learning', short: 'LEARN' },
+            savings: { name: 'Buffer and goals', short: 'BUFFER' },
+            play: { name: 'Fun', short: 'FUN' },
+            give: { name: 'Giving', short: 'GIVING' },
         },
     },
     /** Application auth — pull them back into the habit. */
@@ -64,12 +64,12 @@ const brand = {
         money_picture: {
             eyebrow: 'Your money',
             headline: 'Know where it went. Know where it’s going.',
-            support: 'See where it went. Get grip again. Six jars decide.',
+            support: 'See where it went. Get grip again. Split first, spend second.',
         },
         how_it_works: {
             eyebrow: 'Today',
             headline: 'Paycheck in. Picture clear.',
-            support: 'Assign it. Then spend it. Six jars decide.',
+            support: 'Assign it. Then spend it. Basics, Future, Free.',
         },
         energy: {
             eyebrow: 'Your capacity',

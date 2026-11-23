@@ -39,7 +39,7 @@ const legal = {
                 items: [
                     'Provide accurate registration details (including name and email) and keep them current. Date of birth, if you give it, must be accurate.',
                     'Keep login credentials and two-factor codes confidential. You are responsible for activity under your account unless you told us of unauthorized access without delay.',
-                    'A household is a shared workspace. People you invite can see that household’s jars, transactions, goals and related data. Invite only people you trust and only if you are allowed to share that data with them.',
+                    'A household is a shared workspace. People you invite can see that household’s pots, transactions, goals and related data. Invite only people you trust and only if you are allowed to share that data with them.',
                     'If you are invited, you must use household data only for the household’s own overview — not to copy, publish, or misuse another member’s information.',
                     'We may refuse, suspend, or close an account that is inaccurate, abusive, or creates a security or legal risk.',
                 ],
@@ -158,7 +158,7 @@ const legal = {
                 items: [
                     'Identity and contact: name, email address, optional date of birth, language and locale preferences.',
                     'Account security: password hash (we never store your password in plain text), session identifiers, optional two-factor authentication status and secrets we must keep to operate 2FA, email verification status.',
-                    'Household money data you enter or import: jars, transactions, goals, debts, income splits, week checks, and related product data.',
+                    'Household money data you enter or import: pots, transactions, goals, debts, income splits, week checks, and related product data.',
                     'Optional growth, energy and soul data you choose to log (for example goals, sleep, training, food, rest, intention). You can use Rumtelo without filling those portals.',
                     'Household membership: who you invite, their email, and their role in the household.',
                     'Billing: plan, renewal dates, Stripe customer and subscription identifiers. Card numbers are collected by Stripe, not by us.',
@@ -185,7 +185,7 @@ const legal = {
                 title: 'Purposes and legal bases (GDPR)',
                 body: 'We do not sell personal data. We use it for the following purposes. Each purpose has a GDPR legal basis (Article 6; Article 9 where special-category data is involved):',
                 items: [
-                    'Contract (Art. 6(1)(b)) — create and authenticate your account, run the household workspace, show jars, Coach tips and portals you use, provide export, and deliver transactional email (verify, reset, security).',
+                    'Contract (Art. 6(1)(b)) — create and authenticate your account, run the household workspace, show pots, Coach tips and portals you use, provide export, and deliver transactional email (verify, reset, security).',
                     'Legitimate interests (Art. 6(1)(f)) — keep the Service secure, prevent abuse and fraud, debug outages, understand aggregated product usage without building advertising profiles, and establish or defend legal claims. You may object; we will stop unless we have overriding grounds.',
                     'Consent (Art. 6(1)(a) and, where needed, Art. 9(2)(a)) — optional energy/soul logs; optional bank connect; any future marketing email or non-essential cookies. You may withdraw consent at any time without affecting processing before withdrawal.',
                     'Legal obligation (Art. 6(1)(c)) — tax, accounting and consumer-law records for paid plans; respond to lawful requests from authorities.',
@@ -193,7 +193,7 @@ const legal = {
             },
             automated: {
                 title: 'Profiling and automated decisions',
-                body: 'The Coach may generate suggestions from data you already stored (for example a jar that is over the line). That is in-product assistance, not a decision that produces legal or similarly significant effects about you (GDPR Article 22). We do not use solely automated processing to grant credit, set a price uniquely for you, or refuse an account without human review where the law requires it. You can ignore Coach tips; they never move money.',
+                body: 'The Coach may generate suggestions from data you already stored (for example a pot that is over the line). That is in-product assistance, not a decision that produces legal or similarly significant effects about you (GDPR Article 22). We do not use solely automated processing to grant credit, set a price uniquely for you, or refuse an account without human review where the law requires it. You can ignore Coach tips; they never move money.',
             },
             household: {
                 title: 'Household sharing',
@@ -327,7 +327,7 @@ const legal = {
             purposes: {
                 title: 'Purposes and legal bases',
                 items: [
-                    'Contract — create and run your account, household workspace, jars, Coach tips, export, and the product features you use.',
+                    'Contract — create and run your account, household workspace, pots, Coach tips, export, and the product features you use.',
                     'Legitimate interest — security, fraud and abuse prevention, reliability, and product improvement that does not require advertising profiles; balanced against your rights, with an opt-out for improvement analytics if we ever add optional measurement.',
                     'Consent — optional bank connect; optional energy and soul logs (and Article 9 explicit consent where those logs are special-category data); any future marketing or non-essential cookies.',
                     'Legal obligation — tax, accounting, and consumer records for paid plans; lawful requests.',

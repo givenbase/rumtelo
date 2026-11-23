@@ -62,7 +62,7 @@ const energy = {
         page_title: 'My week',
         eyebrow: 'My week',
         title: 'Every hour gets a job too.',
-        lead: 'Log where a day went, in hours. The week is compared with what public-health bodies and field studies on three continents actually found — not with your jar percentages.',
+        lead: 'Log where a day went, in hours. The week is compared with what public-health bodies and field studies on three continents actually found — not with your pot percentages.',
         metric_sleep: 'Sleep',
         metric_train: 'Training',
         metric_food: 'Nutrition',

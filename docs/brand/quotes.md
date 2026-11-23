@@ -29,11 +29,12 @@ Keep the same punch: *where it went / no mystery / clear picture*.
 
 | Line | Best use |
 |---|---|
-| **Assign it before you wonder where it went.** | Product / jars / how-it-works |
+| **Assign it before you wonder where it went.** | Product / pots / how-it-works |
 | **No more “where did it go?”** | Short social, eyebrow, CTA support |
 | **Know where it went. Know where it’s going.** | Money portal, overview, manifesto pair |
 | **Paycheck in. Picture clear.** | Income split, hero secondary, demo caption |
-| **Six jars. Ten minutes a week.** | Short form of the positioning line — chips, ads, app-store subtitle |
+| **Basics. Future. Free. Ten minutes a week.** | *Proposed 2026-11-23, for Given.* Short form of the positioning line — chips, ads, app-store subtitle. Names the Rumtelo Pots groups instead of counting jars |
+| ~~Six jars. Ten minutes a week.~~ | *Retired 2026-11-23* — the six jars are replaced by Rumtelo Pots (Basics · Future · Free) |
 
 ---
 
@@ -79,14 +80,16 @@ Add to pages when you need more copy. Stay in this voice — don’t drift back 
 - Every amount gets a job.
 - Split first. Spend second.
 - Assign it. Then spend it.
-- Income lands. Six jars decide.
+- Income lands. Basics, Future, Free. *(proposed 2026-11-23)*
+- ~~Income lands. Six jars decide.~~ *(retired 2026-11-23)*
 - Give money a job before it arrives.
 - Your money, assigned. Not guessed.
 
 ### Paycheck / overview
 - Paycheck in. Direction set.
 - Income lands. You see the split.
-- Six jars. One calm overview.
+- Three groups. One calm overview. *(proposed 2026-11-23)*
+- ~~Six jars. One calm overview.~~ *(retired 2026-11-23)*
 - One overview. No mystery.
 - From paycheck to picture.
 
@@ -170,7 +173,7 @@ See [product/practice.md](../product/practice.md).
 | Energy section | Stop wondering what you’re running on. |
 | Soul section | Stop wondering why you’re doing this. |
 | Growth section | Stop wondering how to earn more. |
-| Product proof | Six jars. One calm overview. |
+| Product proof | Three groups. One calm overview. *(proposed 2026-11-23; was “Six jars. One calm overview.”, retired)* |
 | Principle | Money gets a job. · Split first. Spend second. |
 | Audience | Built for people who are doing well — and for people who are ready to. |
 | Manifesto | Don’t chase the number. Own the direction. |
@@ -197,8 +200,11 @@ See [product/practice.md](../product/practice.md).
 | Money gets a job. | Geld krijgt een job. |
 | Every amount gets a job. | Elk bedrag krijgt een job. |
 | Split first. Spend second. | Eerst verdelen. Dan uitgeven. |
-| Six jars. One calm overview. | Zes potjes. Één rustig overzicht. |
-| Six jars. Ten minutes a week. | Zes potjes. Tien minuten per week. |
+| Three groups. One calm overview. *(proposed 2026-11-23)* | Drie groepen. Eén rustig overzicht. |
+| Basics. Future. Free. Ten minutes a week. *(proposed 2026-11-23)* | Basis. Toekomst. Vrij. Tien minuten per week. |
+| Income lands. Basics, Future, Free. *(proposed 2026-11-23)* | Inkomen binnen. Basis, Toekomst, Vrij. |
+| ~~Six jars. One calm overview.~~ *(retired 2026-11-23)* | ~~Zes potjes. Één rustig overzicht.~~ |
+| ~~Six jars. Ten minutes a week.~~ *(retired 2026-11-23)* | ~~Zes potjes. Tien minuten per week.~~ |
 | Not just money. Where your life goes. | Niet alleen geld. Waar je leven naartoe gaat. |
 | Money. Energy. Growth. Soul. One overview. | Geld. Energie. Groei. Ziel. Één overzicht. |
 | Stop wondering what you’re running on. | Stop met gissen waar je op draait. |

@@ -18,7 +18,7 @@ const nav = {
     children: {
         coach: 'The Coach',
         why: 'Why Rumtelo',
-        jars: 'Jars',
+        jars: 'Pots',
         transactions: 'Transactions',
         debt: 'Debt',
         fixed_costs: 'Fixed costs',
@@ -76,7 +76,7 @@ const nav = {
         },
         row_aria: 'Coming up: {next}',
         title: 'Coming up',
-        lead: 'Rumtelo starts with your jars, transactions and week check. More joins as your board fills in.',
+        lead: 'Rumtelo starts with your pots, transactions and week check. More joins as your board fills in.',
         next_eyebrow: 'Next',
         trigger: {
             week_check: 'Do your first week check — ten minutes.',

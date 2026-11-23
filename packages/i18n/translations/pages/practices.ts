@@ -7,12 +7,12 @@ const practices = {
     meta: {
         title: 'Rumtelo for practices',
         description:
-            'One desk for every client’s jars and week check — only after they say yes. Rumtelo never moves money.',
+            'One desk for every client’s pots and week check — only after they say yes. Rumtelo never moves money.',
     },
     hero: {
         eyebrow: 'FOR COACHES & ADVISORS',
         headline: 'Stop wondering where your clients stand.',
-        lead: 'One desk for every client’s jars and week check — only after they say yes. Rumtelo never moves money.',
+        lead: 'One desk for every client’s pots and week check — only after they say yes. Rumtelo never moves money.',
         microline: 'Looking along is free for your clients.',
     },
     how: {
@@ -30,7 +30,7 @@ const practices = {
             },
             desk: {
                 title: 'One desk',
-                body: 'See every accepted client’s board, read-only, with a snapshot per client: income, jars, spending, week check.',
+                body: 'See every accepted client’s board, read-only, with a snapshot per client: income, pots, spending, week check.',
             },
         },
     },
@@ -40,7 +40,7 @@ const practices = {
         points: {
             picture: {
                 title: 'A current picture before every session',
-                body: 'Your clients keep six jars, their fixed costs and a ten-minute week check. You open their board and start where they are.',
+                body: 'Your clients keep their pots, their fixed costs and a ten-minute week check. You open their board and start where they are.',
             },
             between: {
                 title: 'Progress continues between sessions',

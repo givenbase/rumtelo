@@ -9,10 +9,10 @@ const why = {
     meaning_eyebrow: '✦ How Rumtelo helps you',
     meaning: {
         money_leaves_body:
-            'When money leaves, you see which jar it came from — and how much is left for that job. Not a spreadsheet after the fact.',
+            'When money leaves, you see which pot it came from — and how much is left for that job. Not a spreadsheet after the fact.',
         assign: {
             line: 'Give money a job before you spend it.',
-            body: 'Income comes in and goes into six jars. Split first. Spend second. Rumtelo never moves money at your bank — you do. We show the overview.',
+            body: 'Income comes in and splits over Basics, Future and Free. Split first. Spend second. Rumtelo never moves money at your bank — you do. We show the overview.',
         },
         direction: {
             body: 'Looking back is only half the story. Growth helps you move forward — skills, goals, learning, and income if you want.',
@@ -26,7 +26,7 @@ const why = {
     portals: {
         money: {
             line: 'Grip on your money.',
-            body: 'Six jars. Income, bills, what’s left. You enter what comes in and goes out. Rumtelo shows the plan — not a budget app that only counts afterwards.',
+            body: 'Basics, Future, Free. Income, bills, what’s left. You enter what comes in and goes out. Rumtelo shows the split — not a budget app that only counts afterwards.',
         },
         growth: {
             line: 'Grip on your growth.',
@@ -44,7 +44,7 @@ const why = {
     closing_title: 'You stay in control.',
     closing_body:
         'See where it went. Get grip again. New here or already on your way: clear tools, tips you can act on. Information, never shame — spent more than planned is a signal to adjust, not a judgment on you.',
-    cta_jars: 'View my jars',
+    cta_jars: 'View my pots',
     cta_week_check: 'Week check',
     /** One-line Coach whisper above page content — keyed by route slug, not path. */
 } as const;

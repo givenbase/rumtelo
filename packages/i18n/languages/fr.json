@@ -51,12 +51,12 @@
                 "update_failed": "Impossible de mettre à jour",
                 "send_failed": "Impossible d'envoyer",
                 "api": {
-                    "goal_save_only_jar_focus": "Seuls les objectifs SAVE retiennent l'attention",
-                    "goal_save_needs_jar_focus": "L'objectif SAVE doit être placé dans un bocal avant de pouvoir être mis au point",
+                    "goal_save_only_jar_focus": "Only SAVE goals have pot focus",
+                    "goal_save_needs_jar_focus": "SAVE goal needs a pot before it can be focus",
                     "goal_only_active_focus": "Seuls les objectifs actifs peuvent faire l'objet d'une attention particulière.",
                     "goal_save_only_achieved": "Seuls les objectifs « SAVE » peuvent être considérés comme atteints de cette manière",
                     "goal_not_active": "L'objectif n'est pas actif",
-                    "goal_no_jar_spend": "Goal ne dispose d'aucune réserve financière à utiliser",
+                    "goal_no_jar_spend": "Goal has no pot to spend from",
                     "payment_amount_positive": "Le montant du paiement doit être positif",
                     "bill_paused_no_settlement": "Les factures suspendues ou clôturées ne peuvent pas faire l'objet de nouveaux règlements.",
                     "due_month_required": "Choisissez le mois au cours duquel vous souhaitez être facturé pour les factures trimestrielles ou annuelles.",
@@ -97,8 +97,8 @@
                     "member_not_found": "Ce membre du foyer n'est plus parmi nous",
                     "cannot_remove_owner": "Le chef de famille ne peut pas être exclu",
                     "member_remove_failed": "Impossible de supprimer ce membre. Veuillez réessayer.",
-                    "jar_split_total": "La répartition du pot doit totaliser 100 %, reçu {total} %",
-                    "jar_split_keys": "Jar split must list each of the six jars exactly once",
+                    "jar_split_total": "Pot split must total 100%, received {total}%",
+                    "jar_split_keys": "The split must list every pot exactly once",
                     "jar_placement_account_invalid": "Ce compte bancaire n'appartient pas à ce foyer.",
                     "book_catalog_unavailable": "Le catalogue de livres n'a pas répondu.",
                     "contact_send_failed": "Nous n'avons pas pu envoyer votre message. Veuillez réessayer ou nous envoyer un e-mail directement.",
@@ -309,10 +309,10 @@
                 "valid_amount": "Saisissez un montant valide",
                 "name_required": "Le nom est obligatoire",
                 "message_min": "Le message doit comporter au moins {count} caractères.",
-                "choose_jar": "Choisissez un bocal",
-                "choose_from_jar": "Choisissez un bocal dans lequel puiser",
-                "choose_to_jar": "Choisissez un bocal à envoyer à",
-                "different_jars": "Choisissez deux bocaux différents",
+                "choose_jar": "Choose a pot",
+                "choose_from_jar": "Choose a pot to take from",
+                "choose_to_jar": "Choose a pot to send to",
+                "different_jars": "Pick two different pots",
                 "interest_required": "Le taux d'intérêt est obligatoire",
                 "interest_range": "La valeur de « interest » doit être comprise entre 0 et 100",
                 "who_owe_required": "Il est obligatoire d'indiquer à qui vous devez de l'argent",
@@ -358,7 +358,7 @@
             },
             "maintenance": {
                 "title": "Rumtelo est brièvement hors ligne",
-                "description": "Nous faisons une courte mise à jour. Tes pots et tes données sont en sécurité — réessaie dans quelques minutes."
+                "description": "We are doing a short update. Your pots and data are safe — try again in a few minutes."
             },
             "offline": {
                 "title": "Tu sembles hors ligne",
@@ -398,7 +398,7 @@
             },
             "sign_up": {
                 "title": "Créez votre compte",
-                "subtitle": "Six bocaux. Une vue d'ensemble sereine.",
+                "subtitle": "Three groups. One calm overview.",
                 "subtitle_practice": "Un bureau pour chaque client.",
                 "submit": "Créer un compte",
                 "have_account": "Vous avez déjà un compte ?",
@@ -462,10 +462,10 @@
             },
             "invite": {
                 "title": "Rejoignez cette famille",
-                "sign_in_body": "Sign in (or create an account) with the invited email — then join. You will not set up income or jars; those belong to the household already.",
+                "sign_in_body": "Use the invited email — we send a one-time code. No password. You will not set up income or pots.",
                 "create_account": "Créer un compte",
                 "body": "Acceptez d'intégrer ce foyer en tant que membre. Vous n'aurez pas à effectuer de procédure d'enregistrement de vos fonds personnels.",
-                "body_named": "Acceptez de rejoindre {name}. Vous n'aurez pas à apporter de vaisselle ni de bocaux : le foyer en dispose déjà.",
+                "body_named": "Accept to join {name}. You will not set up income or pots — the household already has those.",
                 "no_onboarding": "Les spectateurs et les membres ne remplissent pas le questionnaire destiné aux créateurs.",
                 "accept": "Rejoindre un foyer",
                 "go_home": "Retour à Rumtelo",
@@ -514,7 +514,7 @@
                 "portals_eyebrow": "Prendre la vie à bras-le-corps",
                 "portals_line": "L'argent. La croissance. L'énergie. L'âme : autant d'outils pour prendre sa vie en main.",
                 "portals_line_core": "L'argent. La croissance : des outils pour prendre sa vie en main, et bien d'autres encore à venir.",
-                "jars_eyebrow": "Six bocaux",
+                "jars_eyebrow": "Rumtelo Pots",
                 "jars_line": "Salaire versé. Déjà attribué.",
                 "portals": {
                     "money": {
@@ -536,28 +536,28 @@
                 },
                 "jars": {
                     "necessity": {
-                        "name": "Nécessité",
-                        "short": "NEC"
+                        "name": "Fixed costs and daily",
+                        "short": "FIXED"
                     },
                     "freedom": {
-                        "name": "Liberté",
-                        "short": "FF"
+                        "name": "Investing",
+                        "short": "INVEST"
                     },
                     "education": {
-                        "name": "Éducation",
-                        "short": "EDU"
+                        "name": "Learning",
+                        "short": "LEARN"
                     },
                     "savings": {
-                        "name": "Économies",
-                        "short": "LTS"
+                        "name": "Buffer and goals",
+                        "short": "BUFFER"
                     },
                     "play": {
-                        "name": "Jouer",
-                        "short": "PLAY"
+                        "name": "Fun",
+                        "short": "FUN"
                     },
                     "give": {
-                        "name": "Donner",
-                        "short": "GIVE"
+                        "name": "Giving",
+                        "short": "GIVING"
                     }
                 }
             },
@@ -565,12 +565,12 @@
                 "money_picture": {
                     "eyebrow": "Votre argent",
                     "headline": "Sachez où cela est allé. Sachez où cela va.",
-                    "support": "Regarde où ça a mené. Retrouve tes repères. Six bocaux vont trancher."
+                    "support": "See where it went. Get grip again. Split first, spend second."
                 },
                 "how_it_works": {
                     "eyebrow": "Aujourd'hui",
                     "headline": "Le salaire est versé. Tout est clair.",
-                    "support": "Répartissez-le. Puis dépensez-le. Six bocaux décident."
+                    "support": "Assign it. Then spend it. Basics, Future, Free."
                 },
                 "energy": {
                     "eyebrow": "Votre capacité",
@@ -599,11 +599,11 @@
             },
             "money-overview": {
                 "name": "Présentation générale",
-                "description": "Aperçu des finances et « Jar Pulse »."
+                "description": "Money overview and pot pulse."
             },
             "money-jars": {
                 "name": "Pots",
-                "description": "Les six bocaux — le modèle de la monnaie de base."
+                "description": "Rumtelo Pots — the core money model."
             },
             "money-spending": {
                 "name": "Transactions",
@@ -633,7 +633,7 @@
             },
             "growth-goals": {
                 "name": "Objectifs",
-                "description": "Objectifs avec une date, un bocal et un suivi de progression."
+                "description": "Goals with a date, pot, and progress."
             },
             "growth-income": {
                 "name": "Revenus",
@@ -683,7 +683,7 @@
             },
             "soul-giving": {
                 "name": "Donner",
-                "description": "Pourquoi le « Give jar » existe, où il va et comment bien choisir."
+                "description": "Why the Giving pot exists, where it goes, and how to choose well."
             },
             "soul-intent": {
                 "name": "Objectif",
@@ -712,8 +712,8 @@
             "eyebrow": "Sur tous les portails",
             "lead": "Un conseil à la fois sur l'argent, l'épanouissement, l'énergie et l'âme — pour que vous gardiez le cap. Jamais de reproches. C'est vous qui choisissez.",
             "empty_title": "Rien à entraîner pour l'instant",
-            "empty_body": "Des revenus, des bocaux ou du sommeil… Le Coach s'exprime quand il y a suffisamment d'éléments à prendre en compte.",
-            "empty_quiet": "Il n'y a pas de conseils disponibles pour le moment. Le Coach intervient lorsqu'un « bocal », une habitude ou une semaine a besoin d'un petit coup de pouce.",
+            "empty_body": "Log income, pots, or sleep — the Coach speaks when there is enough to see.",
+            "empty_quiet": "No open tips right now. The Coach speaks when a pot, habit, or week needs a nudge.",
             "open_week": "Voir mon agenda de la semaine →",
             "open_week_check": "Afficher le récapitulatif hebdomadaire →",
             "session": {
@@ -726,7 +726,7 @@
                 "answer_label": "Votre réponse",
                 "insights_title": "Perspectives",
                 "insights_lead": "Conseils tirés des portails — ignorez-les lorsqu'ils ne vous sont plus utiles.",
-                "prompt_inbox": "Quel pot pour {who} ({amount}) ?",
+                "prompt_inbox": "Which pot for {who} ({amount})?",
                 "prompt_inbox_fallback": "cette transaction",
                 "prompt_due_bill": "Le paiement de {name} ({amount}) a-t-il été effectué ce mois-ci, ou faut-il le sauter ?",
                 "prompt_time_day": "{day} était-il un {kind} typique ?",
@@ -736,7 +736,7 @@
                 "prompt_score_food": "Tu t'es bien alimenté aujourd'hui ?",
                 "prompt_score_train": "Tu t'es entraîné aujourd'hui ? Comment s'est passée la séance ?",
                 "prompt_score_mind": "Le calme aujourd’hui… Dans quelle mesure vous sentez-vous apaisé(e) ?",
-                "prompt_week_look": "Dix minutes pour faire le point sur les finances de cette semaine — commencez par jeter un œil aux bocaux.",
+                "prompt_week_look": "Ten minutes for this week’s money check — look at the pots first.",
                 "prompt_week_redirect": "Il vous reste {amount} cette semaine. Souhaitez-vous en transférer une partie ?",
                 "prompt_week_redirect_empty": "Il n'y a pas d'excédent à réaffecter — poursuivez comme prévu.",
                 "prompt_week_intend": "Une phrase pour cette semaine — assez courte pour qu'on puisse la garder en tête.",
@@ -768,7 +768,7 @@
                 "metric_food": "Avez-vous bien mangé ? — Ce n'est pas un journal alimentaire.",
                 "metric_train": "Évaluez la qualité de la séance si vous vous êtes entraîné ; passez cette étape si ce n'est pas le cas.",
                 "metric_mind": "Le calme / l'esprit serein — c'est la même partition que compose l'Âme.",
-                "toast_sorted": "Mises dans un bocal",
+                "toast_sorted": "Sorted into a pot",
                 "toast_paid": "Marqué comme payé",
                 "toast_skipped": "Non publié ce mois-ci",
                 "toast_time_logged": "Journée enregistrée comme habituelle",
@@ -804,17 +804,17 @@
             "got_it": "D'accord",
             "split_more": "{count, plural, =1 {1 more tip} other {# more tips}}",
             "split_tips": {
-                "play-above-default": "La part consacrée aux loisirs, supérieure à 10 %, provient généralement de la liberté financière ou de l'épargne à long terme. Ces deux éléments vous assurent un avenir ; les loisirs, quant à eux, représentent les dépenses du mois.",
-                "play-above-default-saver": "Une part de loisirs supérieure à 10 % peut être bénéfique si vous ne sacrifiez pas votre bonheur — mais veillez à ne pas la financer au détriment de votre liberté financière.",
-                "give-above-default": "Donner plus de 5 % est déjà généreux — veillez à ce que votre « liberté financière » reste d’au moins 10 % afin que vos dons ne prennent pas le pas sur le fait de vous rémunérer en priorité.",
-                "edu-above-soft": "L'éducation augmente le potentiel de revenus — veillez toutefois à préserver votre liberté financière à 10 % afin que l'apprentissage ne prenne pas le pas sur l'investissement.",
-                "ff-below-default": "Une liberté financière inférieure à 10 % signifie que vous payez d'abord tout le monde. Réintégrez-vous dans le partage avant de choisir entre « Jouer » et « Donner ».",
-                "lts-below-default": "Une épargne à long terme inférieure à 10 % ne laisse aucune marge de manœuvre pour les grands projets prévus. Augmentez ce pourcentage avant de développer Play.",
-                "future-vs-fun": "Vous investissez aujourd’hui (Jeu / Don) tout en limitant vos perspectives d’avenir (Liberté + Long terme). Je préfère privilégier ces deux aspects avant le divertissement.",
-                "nec-high": "Un taux de nécessité supérieur à 60 % met tous les autres pots sous pression. Réduire les coûts fixes est généralement plus efficace que de réduire la « liberté ».",
-                "nec-low": "Un taux de nécessité inférieur à 45 % est difficile à respecter pour la plupart des ménages : vérifiez que le loyer, les primes d'assurance et les mensualités de remboursement de vos dettes restent abordables.",
-                "spender-ff": "Votre comportement de dépense tend à être un peu trop généreux : essayez d'augmenter de 1 à 2 % la part consacrée à la « liberté financière » avant d'augmenter celle consacrée aux loisirs.",
-                "saver-play": "Votre approche est plutôt prudente : un peu plus de « jeu » pourrait rendre ce projet viable. La joie planifiée n'est pas du gaspillage."
+                "play-above-default": "Fun above 10% usually comes out of Investing or Buffer and goals. Those two build your future; Fun spends this month.",
+                "play-above-default-saver": "Fun above 10% can be healthy if you rarely spend on joy — just don’t pay for it by cutting Investing.",
+                "give-above-default": "Giving above 5% is generous — keep Investing at 10% or more so giving doesn’t replace paying yourself first.",
+                "edu-above-soft": "Learning raises your earning power — still keep Investing at 10% so learning doesn’t crowd out investing.",
+                "ff-below-default": "Investing under 10% means you’re paying everyone else first. Put yourself back in the split before raising Fun or Giving.",
+                "lts-below-default": "Buffer and goals under 10% leaves little room for setbacks and planned big things. Raise this before raising Fun.",
+                "future-vs-fun": "You’re funding today (Fun, Giving) while shrinking tomorrow (Investing, Buffer and goals). Raise those two before fun.",
+                "nec-high": "Fixed costs and daily above 60% squeezes every other pot. Cutting fixed costs usually helps more than cutting Investing.",
+                "nec-low": "Fixed costs and daily under 45% is tight for most households — check that rent, insurance and debt instalments still fit.",
+                "spender-ff": "Your pattern leans spender — try 1–2% more into Investing before adding to Fun.",
+                "saver-play": "Your pattern leans saver — a little more Fun helps you keep the split up. Joy that is planned is not waste."
             },
             "helpers": {
                 "mark_title": "Conseil de The Coach : activez ou désactivez les astuces à l'écran dans Paramètres → Préférences",
@@ -829,8 +829,8 @@
                 "give_recurring_hint": "Le choix d'une organisation donne lieu à un don récurrent (montant fixe). Pour un don ponctuel, utilisez",
                 "add_transaction": "Ajouter une transaction",
                 "learn_nudge_title": "Grandir avec Apprendre",
-                "learn_nudge": "Mettez des titres sur votre rayon Apprendre, parcourez la bibliothèque pour l'inspiration, et ajoutez un objectif sur ce pot quand vous êtes prêt à revendiquer la dépense.",
-                "split_inside": "Diviser à l'intérieur de ce bocal"
+                "learn_nudge": "Put titles on your Learn shelf, browse the library for inspiration, and add a goal on this pot when you are ready to claim the spend.",
+                "split_inside": "Split inside this pot"
             },
             "money_coach": {
                 "due_bills": {
@@ -839,12 +839,12 @@
                     "cta": "Coûts fixes variables"
                 },
                 "inbox_unsorted": {
-                    "text": "{count} transactions are waiting to be sorted. Sort them into jars so the picture stays honest.",
+                    "text": "{count} transactions are waiting to be sorted. Sort them into pots so the picture stays honest.",
                     "cta": "Sort transactions"
                 },
                 "fixed_costs": {
                     "over_necessities": {
-                        "text": "{jar} bills come to {amount} a month more than the jar gets.",
+                        "text": "{jar} bills come to {amount} a month more than the pot gets.",
                         "cta": "Add income",
                         "cta_secondary": "Open the biggest fixed cost"
                     },
@@ -859,11 +859,11 @@
                     }
                 },
                 "necessities_share": {
-                    "text": "Le taux de « Necessities » est de {pct} % — l'objectif est de 55 %. Ça va pour l'instant ; pour combler l'écart, réduisez les coûts fixes ou augmentez vos revenus, sans toucher à la catégorie « Freedom ».",
-                    "cta": "Avis sur les bocaux"
+                    "text": "Fixed costs and daily is at {pct}%, above the 55% the default split starts from. Fine for now — to bring it down, trim fixed costs or raise income, and leave Investing as it is.",
+                    "cta": "Review pots"
                 },
                 "over_necessities": {
-                    "text": "{jar} bills come to {amount} a month more than the jar gets.",
+                    "text": "{jar} bills come to {amount} a month more than the pot gets.",
                     "cta": "Add income",
                     "cta_secondary": "Open the biggest fixed cost"
                 },
@@ -972,7 +972,7 @@
                 "page_title": "Ma semaine",
                 "eyebrow": "Ma semaine",
                 "title": "Chaque heure a aussi une tâche à accomplir.",
-                "lead": "Notez le déroulement de votre journée, en heures. La semaine est comparée aux résultats réels des organismes de santé publique et des études de terrain menées sur trois continents — et non à vos pourcentages calculés à partir de votre bocal.",
+                "lead": "Log where a day went, in hours. The week is compared with what public-health bodies and field studies on three continents actually found — not with your pot percentages.",
                 "metric_sleep": "Sommeil",
                 "metric_train": "Formation",
                 "metric_food": "Nutrition",
@@ -1276,7 +1276,7 @@
             "goals": {
                 "page_eyebrow": "✦ OBJECTIFS",
                 "page_title": "Chaque objectif correspond à une décision que vous avez déjà prise.",
-                "page_lead": "Mettez de l'argent de côté dans une tirelire, augmentez vos revenus ou tenez votre engagement de don. Commencez par l'intention, le montant viendra ensuite.",
+                "page_lead": "Save toward a pot, raise what you earn, or keep a give pledge. Direction first — the number follows.",
                 "page_lead_future": "Perspectives pour {label}. Les objectifs qui s'inscrivent dans ce plan passent à la catégorie « Atteints », avec indication du mois où ils ont été atteints.",
                 "page_lead_past": "Rétrospective {label}. Seuls les objectifs déjà atteints à cette date sont considérés comme atteints.",
                 "tab_on_track": "En bonne voie",
@@ -1284,7 +1284,7 @@
                 "filter_all": "Tout",
                 "filter_label": "Filtre",
                 "filter_kind_aria": "Filtrer par type",
-                "filter_jar_aria": "Filtrer par bocal",
+                "filter_jar_aria": "Filter by pot",
                 "search_placeholder": "Rechercher le nom d'un but…",
                 "search_aria": "Objectifs de recherche",
                 "empty_search_title": "Aucun résultat.",
@@ -1315,7 +1315,7 @@
                 "progress_eta_unknown": "pas encore de date",
                 "of": "de",
                 "per_month": "/mois",
-                "share_jar_hint": "Les objectifs figurant dans le même bocal se partagent l'espace alloué chaque mois. Plus il y a d'objectifs, plus chacun d'entre eux prend généralement plus de temps à être atteint — sauf s'il s'agit d'un objectif « Priorité ».",
+                "share_jar_hint": "Goals on the same pot share monthly room. More goals there usually means each one takes longer — unless one is Focus.",
                 "group_aria": "{kind} buts ({count})",
                 "form": {
                     "save_goal": "Arrêt décisif",
@@ -1323,18 +1323,18 @@
                     "kind_save": "Enregistrer",
                     "kind_earn": "Gagner",
                     "kind_give": "Donner",
-                    "kind_save_line": "Mettez de l'argent de côté dans un bocal",
+                    "kind_save_line": "Put money aside in a pot",
                     "kind_earn_line": "Atteindre un objectif de revenu mensuel",
                     "kind_give_line": "Engagez-vous à faire un don cette année",
                     "give_mode_manual": "Je sais qui",
                     "give_mode_org": "Aide-moi à choisir",
                     "give_mode_open": "Laissez-le ouvert",
                     "pledge_tip_link": "Pourquoi le don figure-t-il dans une application financière ? → Soul",
-                    "pledge_tip_body": "Chaque somme triée qui sort de votre tirelire « Give » cette année est prise en compte — pas besoin de tout transférer manuellement.",
+                    "pledge_tip_body": "Every sorted amount that leaves your Giving pot this year counts toward it — nothing to move by hand.",
                     "cause_label": "Cause (objectif)",
                     "cause_aria": "Donner lieu à",
                     "cause_any": "Toute cause",
-                    "cause_open_hint": "Engagement libre — tout don versé dans la « cagnotte Give » est pris en compte.",
+                    "cause_open_hint": "Open pledge — anything given from the Giving pot counts.",
                     "organization": "Organisation",
                     "give_mode_aria": "Dans quelle mesure cet engagement est-il précis ?",
                     "give_mode_hint": "Je sais à qui : indiquez le nom de l'organisme auquel vous faites déjà des dons. Aidez-moi à choisir : une sélection de coachs avec des vérifications indépendantes. Laissez la question ouverte : indiquez uniquement la cause, sans préciser d'organisme pour l'instant.",
@@ -1365,19 +1365,19 @@
                 "reached_empty_body": "Continue comme ça, ton premier touchdown n'en est qu'à ses débuts.",
                 "toast_focus": "C'est là-dessus que tu dois te concentrer maintenant",
                 "toast_focus_error": "Impossible de faire la mise au point",
-                "toast_achieve_spend": "But marqué — argent prélevé dans la tirelire",
-                "toast_achieve_keep": "Objectif atteint — l'argent reste dans le bocal",
+                "toast_achieve_spend": "Goal claimed — spent from the pot",
+                "toast_achieve_keep": "Goal achieved — cash stays in the pot",
                 "toast_achieve_error": "Impossible de marquer comme « atteint »",
                 "jar_accordion": {
                     "yearly_pledge": "Engagement annuel",
                     "income_target": "Objectif de revenu",
-                    "empty": "Aucun objectif n'a encore été défini pour ce bocal.",
+                    "empty": "No goals on this pot yet.",
                     "reached": "Atteint",
                     "focus_badge": "Focus · n° 1",
                     "next_rank": "Suivant · #{rank}",
                     "save": "Enregistrer",
-                    "jar_available": "Un bocal est disponible dans le cadre de cet objectif.",
-                    "fill_jar_first": "Remplis d'abord ce bocal, puis atteins ton objectif quand tu seras prêt.",
+                    "jar_available": "Pot available toward this focus goal.",
+                    "fill_jar_first": "Fill this pot first — then claim the goal when you're ready.",
                     "waiting_behind": "En attente derrière la mise au point — fonds n° {rank} après le n° 1.",
                     "left": "À gauche",
                     "monthly": "Mensuel",
@@ -1391,13 +1391,13 @@
                 "setting_focus": "Contexte…",
                 "mark_achieved": "Mark a réussi",
                 "claim_title": "Récupérer « {name} » ?",
-                "claim_enough": "Le bocal contient {available} — de quoi faire {target}.",
-                "claim_short": "Le pot contient {available} ; l'objectif est de {target}. Vous pouvez toujours récupérer l'argent du pot et le conserver, ou dépenser ce que vous pouvez plus tard.",
-                "claim_default": "Cochez cette case pour indiquer que l'objectif est atteint. Décidez si l'argent doit sortir du bocal dès maintenant.",
-                "achieve_keep": "Réalisé — à conserver dans un bocal",
+                "claim_enough": "The pot has {available} — enough for {target}.",
+                "claim_short": "Pot has {available}; target is {target}. You can still claim and keep cash in the pot, or spend what you can later.",
+                "claim_default": "Mark this goal reached. Choose whether money leaves the pot now.",
+                "achieve_keep": "Achieved — keep in pot",
                 "achieve_keep_pending": "Enregistrement en cours…",
                 "achieve_spend": "Commande passée — montant : {amount}",
-                "achieve_spend_blocked": "Dépense (la cible doit être entièrement placée dans le bocal)",
+                "achieve_spend_blocked": "Spend (need full target in pot)",
                 "cancel": "Annuler",
                 "detail": {
                     "loading": "Chargement en cours…",
@@ -1405,9 +1405,9 @@
                     "not_found": "But introuvable.",
                     "kind_earn": "Rémunération · nette mensuelle",
                     "kind_give": "Faire un don · engagement annuel",
-                    "kind_save": "Épargner · dans une tirelire",
+                    "kind_save": "Save · toward a pot",
                     "progress": "Progrès",
-                    "jar_toward_focus": "Se concentrer sur le bocal",
+                    "jar_toward_focus": "Pot toward focus",
                     "focus_rank": "Focus · n° 1",
                     "rank": "#{rank}",
                     "reached": "Atteint",
@@ -1423,17 +1423,17 @@
                     "save_pace_open": "◇ Définissez un montant mensuel pour savoir combien de mois",
                     "date_open": "date d'ouverture",
                     "pct_with_months": "{pct} % · {months} mois",
-                    "jar_context": "Contexte du pot",
+                    "jar_context": "Pot context",
                     "available": "Disponible",
                     "fixed_out": "Corrigé",
                     "headroom": "Hauteur libre",
-                    "other_goals": "Autres objectifs sur ce bocal",
+                    "other_goals": "Other goals on this pot",
                     "sibling_pace": "{monthly}/mois · {months} mois",
                     "sibling_no_plan": "pas d'abonnement mensuel",
                     "how_to_get_there": "✦ Comment s'y rendre",
                     "opportunities": "✦ Opportunités",
                     "open_link": "Ouvrir ›",
-                    "open_jar": "Ouvrir le bocal",
+                    "open_jar": "Open pot",
                     "giving": "Donner",
                     "giving_sub": "Engagements et organisations",
                     "income": "Revenus",
@@ -1448,44 +1448,44 @@
                     "advice_made_it_title": "Tu as réussi !",
                     "advice_made_it_body": "Conservez vos gains. Gardez l'habitude qui vous a permis d'en arriver là : même un petit montant mensuel suffit à entretenir la routine.",
                     "advice_earn_engine_title": "Le revenu est le moteur",
-                    "advice_earn_engine_body": "Augmentez vos revenus nets en augmentant vos recettes ou en réduisant vos dépenses avant de remplir les bocaux. L'objectif de revenus correspond à un seuil de vie minimum, et non à un simple souhait.",
+                    "advice_earn_engine_body": "Raise net by growing inflow or trimming what leaves before the pots. The earn target is a lifestyle floor, not a wish.",
                     "advice_earn_short_title": "Toujours en deçà du seuil minimum",
                     "advice_earn_short_body": "Consultez vos revenus et vérifiez leurs sources. Une augmentation ou une réduction des dépenses fixes, même tardive, permet souvent de combler le déficit plus rapidement qu'on ne le pense.",
                     "advice_give_planned_title": "Le don est une sortie de fonds planifiée",
                     "advice_give_planned_body_jar": "Les sommes versées depuis {jar} sont prises en compte dans cet engagement. Si vous avez du mal à vous y tenir, mettez en place un don mensuel automatique.",
-                    "advice_give_planned_body": "Si votre volonté fait défaut, automatisez un don mensuel : le montant de la contribution sera prélevé sur ce qui reste effectivement dans la tirelire « Give ».",
+                    "advice_give_planned_body": "Automate a monthly give if willpower is the bottleneck — the pledge fills from what actually left the Giving pot.",
                     "advice_give_gap_title": "Combler l'écart mensuel",
-                    "advice_give_gap_body": "Il ne manque plus que {amount} par mois pour que la contribution soit versée à temps. Un don fixe via « Necessities » ou « Give » rend le tout un peu monotone — dans le bon sens du terme.",
+                    "advice_give_gap_body": "About {amount} more per month lands the pledge on time. A fixed monthly gift from Giving makes it boring — in a good way.",
                     "advice_save_amount_title": "Définir un montant mensuel",
-                    "advice_save_amount_body": "Un objectif sans échéance n'est qu'un vœu pieux. Choisis le montant que ce tirelire peut te permettre de mettre de côté chaque mois — la date d'achèvement s'affichera alors automatiquement.",
+                    "advice_save_amount_body": "A target without a pace is a wish. Pick what this pot can spare each month — then the finish date appears.",
                     "advice_save_pace_title": "Sur la bonne voie — gardez le rythme",
                     "advice_save_pace_body_date": "À {monthly} par mois, vous arrivez à environ {date}. La régularité l'emporte sur les mois exceptionnels.",
                     "advice_save_pace_body": "Vous avancez. La régularité l'emporte sur les mois de performances exceptionnelles.",
-                    "advice_save_room_title": "De la place dans le bocal",
+                    "advice_save_room_title": "Room in the pot",
                     "advice_save_room_body": "{jar} dispose encore d'une marge d'environ {amount} après prise en compte des coûts fixes et des autres objectifs. Modifier légèrement le budget mensuel implique d'utiliser les fonds que vous avez déjà alloués.",
                     "advice_save_fuel_title": "Ce projet a besoin de carburant",
-                    "advice_save_fuel_body_gap": "Il vous faudra environ {amount} de plus par mois (ou un délai plus long) pour y parvenir. Augmentez vos revenus, libérez le flux de trésorerie ou assouplissez l'échéance : choisissez un levier.",
-                    "advice_save_fuel_body": "Augmentez vos revenus, libérez le flux de trésorerie ou assouplissez les délais : choisissez un seul levier plutôt que de vouloir tout faire à la fois.",
+                    "advice_save_fuel_body_gap": "Roughly {amount} more per month (or a longer date) gets you there. Raise income, free pot flow, or ease the deadline — pick one lever.",
+                    "advice_save_fuel_body": "Raise income, free pot flow, or ease the deadline — pick one lever instead of pushing all three.",
                     "advice_siblings_title": "{count} autres parts de but {jar}",
                     "advice_siblings_title_plural": "{count} autres buts, total : {jar}",
-                    "advice_siblings_body": "Ils se disputent le même budget mensuel. Concentrez-vous sur l'un d'entre eux pour éviter que le budget ne soit trop étiré.",
+                    "advice_siblings_body": "They share the same monthly pot room after bills. Every euro planned for another goal lengthens this finish — pick one Focus so the rest wait behind.",
                     "advice_default_title": "Une décision à la fois",
                     "advice_default_body": "Indiquez le prochain virement. Les objectifs évoluent au gré des mouvements d'argent — et non lorsque vous réexaminez le montant.",
-                    "this_jar": "Ce bocal"
+                    "this_jar": "This pot"
                 }
             },
             "net_worth": {
                 "page_eyebrow": "✦ MON PATRIMOINE NET",
                 "page_title": "Où se trouve votre argent — et non comment il évolue.",
-                "page_lead": "Tout ce que vous possédez, moins tout ce que vous devez. Patrimoine, épargne à long terme et liberté financière — pas les tirelires destinées aux dépenses de ce mois-ci.",
+                "page_lead": "Holdings plus what sits in Investing and in Buffer and goals, minus open debts. Linked income and bills are money in motion, not a wish list.",
                 "add_asset": "+ Ajouter un élément",
                 "horizon_eyebrow": "✦ Jusqu'où cela vous mènera-t-il ?",
                 "stat_holdings": "Portefeuille",
-                "stat_jars": "LTS + Liberté",
+                "stat_jars": "Buffer + Investing",
                 "stat_monthly_income": "Revenu mensuel",
                 "stat_debt": "Dette totale",
                 "none_yet": "Aucun pour l'instant",
-                "summary": "Votre patrimoine net s'élève à {net} — {owned} d'actifs détenus moins {owed} de dettes. Placez votre épargne dans un plan LTS/Freedom ou sous forme d'actifs liquides — mais pas les deux à la fois.",
+                "summary": "Your net worth is {net} — {owned} owned minus {owed} owed. Count savings in your pots or as a Cash asset — not both.",
                 "show": "Afficher",
                 "filter_all": "Tout",
                 "search_placeholder": "Recherche en cours…",
@@ -1508,13 +1508,13 @@
                 "not_available_yet": "pas encore disponible",
                 "per_month_short": "p/m",
                 "empty_title": "Aucun titre en portefeuille pour l'instant",
-                "empty_body": "Ajoutez votre premier actif (par exemple, un placement). Les bocaux « LTS » et « Freedom », ainsi que les dettes, sont déjà pris en compte. Ne comptez pas deux fois votre épargne : à la fois comme actif en liquidités et dans ces bocaux.",
+                "empty_body": "Add your first asset (for example an investment). Buffer and goals, Investing and your debts already count. Do not double-count savings as a Cash asset and in those pots.",
                 "debt_empty_title": "Aucune dette enregistrée",
                 "debt_empty_body": "Les dettes que vous ajoutez dans « Argent → Dettes » s'affichent automatiquement ici.",
                 "month_score_eyebrow": "Score mensuel",
                 "month_score_title": "À venir",
                 "month_score_empty_title": "Pas encore de données disponibles",
-                "month_score_empty_body": "Le score mensuel, les niveaux et l'historique seront disponibles ultérieurement. Les actifs, les « jars » et les dettes sont déjà pris en compte dans le patrimoine net.",
+                "month_score_empty_body": "Month score, levels and log are coming later. Holdings, pots and debts already count toward net worth.",
                 "detail": {
                     "loading": "Chargement en cours…",
                     "not_found": "Élément introuvable.",
@@ -1537,15 +1537,15 @@
                     "add_bill": "+ Bill",
                     "add_expense": "+ Ponctuel",
                     "open_in_money": "Ouvrir dans Money →",
-                    "money_note": "Les factures et les revenus restent dans leur bocal. Cette page ne présente que ce qui appartient à ce fonds.",
+                    "money_note": "Bills and income keep their pot. This page only shows what belongs to this holding.",
                     "delete_linked_warning": "La suppression des liens entraîne la suppression des liens vers {income} revenus, {bills} factures et {transactions} opérations. Ceux-ci restent enregistrés dans Money."
                 },
                 "setup": {
                     "eyebrow": "Enregistrer le flux",
                     "step_in_title": "Qu'est-ce que {name} apporte ?",
-                    "step_in_body": "Ajoutez-y les revenus que vous en tirez : salaire, dividendes, loyers. Ils atterrissent dans vos « bocaux » comme n'importe quel autre revenu ; c'est simplement ce placement qui en retire le mérite.",
+                    "step_in_body": "Add the income you draw from it — salary, dividend, rent. It lands in your pots like any other income; this holding just gets the credit.",
                     "step_out_title": "Combien vous coûte {name} chaque mois ?",
-                    "step_out_body": "Hébergement, assurance, logiciels… ajoutez-y les factures que vous payez pour ces services. Chaque facture reste dans son pot.",
+                    "step_out_body": "Hosting, insurance, software — add the bills you pay for it. Each bill keeps its pot.",
                     "step_of": "Étape {step} sur 2",
                     "skip": "Passer",
                     "done": "Terminé",
@@ -1713,7 +1713,7 @@
                 "empty_search_title": "Aucun résultat.",
                 "empty_search_body": "Essayez un autre nom ou effacez votre recherche pour afficher toutes les sources.",
                 "empty_live_title": "Aucune source de revenus pour l'instant.",
-                "empty_live_body": "Ajoutez-en un pour remplir vos bocaux.",
+                "empty_live_body": "Add one to feed your pots.",
                 "empty_guest_title": "Connectez-vous pour gérer vos revenus.",
                 "empty_guest_body": "Les sources de revenus s'affichent ici une fois que vous êtes connecté."
             },
@@ -1723,7 +1723,7 @@
                 "gap_to_go": "{amount} to go",
                 "gap_met": "Target reached",
                 "gap_over": "{amount} above your target",
-                "intro": "Faites glisser le montant net mensuel. La répartition reste inchangée ; chaque pot se déplace avec lui.",
+                "intro": "Drag the monthly net. The split stays; each pot moves with it.",
                 "cleared_intro": "On arrive à {name}. Je ne choisirai pas un nombre plus élevé.",
                 "set_next_target": "Définir l'objectif suivant",
                 "aria_simulate_income": "Simuler des revenus",
@@ -1735,13 +1735,13 @@
                 "done_sentence": "C'est fait.",
                 "no_goals_yet": "Aucun objectif pour l'instant. Ajoutez-en un pour voir quand ce revenu vous permettra d'y parvenir.",
                 "add_goal": "+ Ajouter un objectif",
-                "no_jar": "Pas de bocal",
+                "no_jar": "No pot",
                 "saved_of_target": "{saved} sur {target}",
                 "planned_per_month": " · {amount} par mois prévu",
                 "amount_free": "{amount} gratuit",
                 "amount_short": "{amount} court",
                 "jar_headroom": "à {jar}, après le paiement des factures et la réalisation d'autres objectifs.",
-                "not_funded_from_jar": "Ce montant ne provient pas d'une cagnotte, donc les revenus ne changent pas à cette date.",
+                "not_funded_from_jar": "Not funded from a pot, so income does not change this date.",
                 "done_around": "Environ",
                 "date_unknown": "—",
                 "months_at_plan": "{months} mois à {amount} par mois",
@@ -1755,11 +1755,11 @@
                 "reset_to_your_date": "Réinitialiser à votre date",
                 "reset_to_pace": "Revenir au rythme habituel",
                 "next_goal": "Suivant : {name}",
-                "tip_no_plan": "Il n'y a pas de montant mensuel, donc pas de date.",
+                "tip_no_plan": "No monthly amount, so there is no finish month yet. Set how much goes in each month — then we show how many months and which month you land. Other goals on the same pot share that room, so more goals usually stretch each finish.",
                 "tip_set_monthly_amount": "Définir le montant mensuel",
-                "tip_behind_room": "{need} par mois permettrait de terminer cela en {months} mois. Il reste de la place dans le bocal.",
+                "tip_behind_room": "{need}/mo would finish this in {months} months. The pot has room.",
                 "tip_raise_monthly_amount": "Augmenter le montant mensuel",
-                "tip_behind_income_no_jar": "{need} par mois permettrait de terminer ce projet en {months} mois. Mettez cet argent de côté dans une tirelire pour voir si vos revenus suffisent à couvrir cette dépense.",
+                "tip_behind_income_no_jar": "{need}/mo would finish this in {months} months. Fund it from a pot to see if income covers that.",
                 "tip_behind_income": "{need} par mois permettrait de terminer cela en {months} mois. {jar} ne peut pas prendre cela en charge ici."
             },
             "course": {
@@ -1935,7 +1935,7 @@
                     },
                     "emergency_buffer": {
                         "name": "Build an emergency buffer",
-                        "doneWhen": "The buffer is in my Long Term Savings jar",
+                        "doneWhen": "The buffer is in my Buffer and goals pot",
                         "firstStep": "Decide the amount and set up the monthly transfer"
                     },
                     "pay_off_debt": {
@@ -2077,11 +2077,11 @@
                     "amount_save": "Amount to save by the end of the year",
                     "amount_save_hint": "The total you want to have put aside.",
                     "amount_earn": "Monthly income to reach",
-                    "amount_earn_hint": "Your net income per month. It does not come out of a jar.",
+                    "amount_earn_hint": "Your net income per month. It does not come out of a pot.",
                     "per_month": "≈ {amount} per month until December",
-                    "jar": "Which jar?",
-                    "jar_hint": "Planned spends live in Long Term Savings.",
-                    "jar_placeholder": "Choose a jar",
+                    "jar": "Which pot?",
+                    "jar_hint": "Planned spends live in Buffer and goals.",
+                    "jar_placeholder": "Choose a pot",
                     "shared_note": "A goal with an amount is shared with your household in Money.",
                     "amount_locked": "Amounts on goals come with a plan that includes money goals. The goal itself is saved.",
                     "remove_goal": "Remove this goal",
@@ -2116,7 +2116,7 @@
                     "error": {
                         "name_required": "Give the goal a name",
                         "amount_invalid": "Enter an amount above zero",
-                        "jar_required": "Choose a jar",
+                        "jar_required": "Choose a pot",
                         "target_invalid": "Enter a number that fits",
                         "routine_name_required": "Give the routine a name"
                     }
@@ -2278,11 +2278,11 @@
             "hub": {
                 "eyebrow": "Argent · ce mois-ci",
                 "title": "Comment circule votre argent.",
-                "line": "Maîtrisez vos finances : six bocaux pour noter vos recettes et vos dépenses.",
+                "line": "Grip on your money — your pots, what comes in, what goes out.",
                 "cards": {
                     "jars": {
                         "name": "Pots",
-                        "note_period": "les bocaux sont en bonne voie ce mois-ci",
+                        "note_period": "pots on track this month",
                         "note_stacked_goals": "{fulfilled}/{total} objectifs en bonne voie · réalisés en plus de {months} mois",
                         "note_stacked_horizon": "mis en place au cours des {months} derniers mois"
                     },
@@ -2309,19 +2309,42 @@
                     }
                 }
             },
+            "groups": {
+                "method_name": "Rumtelo Pots",
+                "BASIS": {
+                    "title": "Base",
+                    "line": "What has to be paid, every month."
+                },
+                "FUTURE": {
+                    "title": "Futur",
+                    "line": "What you build."
+                },
+                "FREE": {
+                    "title": "Libre",
+                    "line": "What you choose."
+                },
+                "order_hint": "Money flows in this order.",
+                "all_placed": "Everything has a place",
+                "left_to_place": "{amount} left to place",
+                "share_of_income": "{percent}% of your income",
+                "all": "All",
+                "open_group": "Open {group}",
+                "view_label": "Show",
+                "bar_label": "Share of your income per group: {shares}"
+            },
             "jars": {
                 "coach_line": {
                     "necessities_over": "{jar} needs {amount} more than it gets this month.",
                     "open_fixed": "Open fixed costs"
                 },
-                "eyebrow": "LES SIX BOÎTES",
+                "eyebrow": "RUMTELO POTS",
                 "title": "Chaque pièce a une fonction qui lui est attribuée avant même son arrivée.",
-                "lead": "Avec les biens immobiliers générateurs de revenus, la répartition s'effectue instantanément. La liberté financière ne se dépense jamais : elle ne fait l'objet que d'investissements.",
+                "lead": "Income lands and splits the same second. Money in Investing is set aside to invest. You invest it yourself.",
                 "on_track": "{on} / {total} en bonne voie",
-                "move_between": "Passer d'un bocal à l'autre",
+                "move_between": "Move between pots",
                 "add_transaction": "+ Ajouter une transaction",
-                "allocated": "{count} jars · {pct} % alloué",
-                "tap_hint": "Cliquez sur un pot pour voir les coûts fixes, les dépenses et le solde restant",
+                "allocated": "{count} pots · {pct}% set aside",
+                "tap_hint": "Tap a pot for fixed costs, other spends, and what is left",
                 "summary_nothing": "Je n'ai rien prévu ni dépensé ce mois-ci",
                 "of_amount": "de {amount}",
                 "tile_of": "of {amount} this month",
@@ -2333,19 +2356,19 @@
                 "left_label": "Left this month",
                 "left_label_stacked": "Left over the span",
                 "names": {
-                    "NECESSITIES": "Necessity",
-                    "FINANCIAL_FREEDOM": "Financial Freedom",
-                    "LONG_TERM_SAVINGS": "Long Term Savings",
-                    "EDUCATION": "Education",
-                    "PLAY": "Play",
-                    "GIVE": "Give"
+                    "NECESSITIES": "Fixed costs and daily",
+                    "FINANCIAL_FREEDOM": "Investing",
+                    "LONG_TERM_SAVINGS": "Buffer and goals",
+                    "EDUCATION": "Learning",
+                    "PLAY": "Fun",
+                    "GIVE": "Giving"
                 },
                 "purpose": {
                     "NECESSITIES": "Rent, food, bills",
                     "FINANCIAL_FREEDOM": "Invest, never spend",
-                    "LONG_TERM_SAVINGS": "Big plans, buffer",
+                    "LONG_TERM_SAVINGS": "For emergencies and setbacks, and your big plans.",
                     "EDUCATION": "Courses, books, skills",
-                    "PLAY": "Fun, spent freely",
+                    "PLAY": "Going out, hobbies, spent freely",
                     "GIVE": "Donate, help others"
                 },
                 "this_month": "Ce mois",
@@ -2355,14 +2378,14 @@
                 "activity_added": "{amount} ajouté",
                 "activity_spent": "{amount} dépensé",
                 "activity_categories": "{count} catégories",
-                "footer_stacked": "{on} / {total} bocaux en cours de préparation · empilés sur une période de {months} mois",
-                "footer_period": "{on} / {total} bocaux prévus pour cette période",
-                "income_link": "Quel serait l'impact d'une augmentation sur ces bocaux ? → Revenus",
+                "footer_stacked": "{on} / {total} pots on track · stacked over {months} months",
+                "footer_period": "{on} / {total} pots on track this period",
+                "income_link": "What would a raise do to these pots? → Income",
                 "guides": {
                     "NECESSITIES": {
                         "subtitle": "Paiements obligatoires",
-                        "note": "Loyer, énergie, assurances, courses, transports. Le tout, c'est de ne pas dépasser les 55 %.",
-                        "not_allowed": "Ce n'est pas pour aller au restaurant, s'habiller ou s'amuser : ça, c'est « Play ».",
+                        "note": "Rent, energy, insurance, groceries, transport. What has to be paid, every month.",
+                        "not_allowed": "Not for eating out, clothes or outings — that is Fun.",
                         "allowed": {
                             "rent": "Loyer",
                             "energy_water": "Énergie et eau",
@@ -2380,7 +2403,7 @@
                     },
                     "FINANCIAL_FREEDOM": {
                         "subtitle": "Ne dépensez jamais",
-                        "note": "Ce pot sert à acheter des actifs. L'argent y entre et n'en ressort jamais — seuls les rendements en sortent.",
+                        "note": "This pot is set aside for assets you buy yourself. Money goes in and is meant to stay — only what it earns comes out.",
                         "not_allowed": "Ne retirez jamais d'argent pour acheter quelque chose. Seul l'argent du remboursement peut être retiré — et mieux vaut même le laisser sur le compte.",
                         "allowed": {
                             "index_funds": "Fonds indiciels et ETF",
@@ -2398,7 +2421,7 @@
                             "crypto": "Crypto",
                             "trading": "Trading et expérimentations"
                         },
-                        "sub_note": "Le trading est autorisé, mais uniquement à partir de cette tranche de 10 % — jamais à partir du reste. Si vous la perdez, vous perdez un mois, pas votre avenir."
+                        "sub_note": "Trading is allowed, but only from this small corner — never from the rest. Lose it and you lose a month, not your future."
                     },
                     "LONG_TERM_SAVINGS": {
                         "subtitle": "De grandes choses",
@@ -2418,8 +2441,8 @@
                     },
                     "EDUCATION": {
                         "subtitle": "Épanouissez-vous",
-                        "note": "Livres, formations, mentors, outils. La seule dépense qui augmente votre capacité à gagner. Utilisez Apprendre pour ce que vous travaillez, parcourez la bibliothèque pour l'inspiration, et placez un objectif sur ce pot quand vous êtes prêt à le revendiquer.",
-                        "not_allowed": "À condition que cela vous permette d'augmenter vos revenus. Une formation que vous ne terminez jamais a sa place dans la rubrique « Play ».",
+                        "note": "Books, courses, mentors, tools. The only spend that raises your earning power. Use Learn for what you are working through, browse the library for inspiration, and put a goal on this pot when you are ready to claim it.",
+                        "not_allowed": "Only if it raises your earning power. A course you never finish belongs in Fun.",
                         "allowed": {
                             "books": "Livres",
                             "courses": "Cours et formations",
@@ -2437,7 +2460,7 @@
                     "PLAY": {
                         "subtitle": "Sans culpabilité",
                         "note": "Dépensez-le chaque mois. Un projet qui ne procure aucun plaisir ne peut pas durer.",
-                        "not_allowed": "Pas de frein, pas de remords… mais pas question non plus de se resservir dans un autre bocal quand celui-ci est vide.",
+                        "not_allowed": "No brakes, no guilt — but no top-up from another pot when it is empty either.",
                         "allowed": {
                             "eating_out": "Manger et boire à l'extérieur",
                             "outings": "Sorties et concerts",
@@ -2473,19 +2496,19 @@
                     "planned": "Prévu",
                     "spent": "Dépensé",
                     "over_under": "Plus / moins",
-                    "goals_on_jar": "✦ Objectifs inscrits sur ce bocal",
+                    "goals_on_jar": "✦ Goals on this pot",
                     "add_goal": "+ Ajouter un objectif",
                     "focus_of": "Focus · N° 1 sur {total}",
-                    "fill_jar_first": "Remplis d'abord ce bocal, puis atteins ton objectif quand tu seras prêt.",
+                    "fill_jar_first": "Fill this pot first — then claim the goal when you're ready.",
                     "other_activity": "✦ Autres activités au cours de cette période",
                     "all_transactions": "Toutes les transactions ›",
-                    "no_tx_month_title": "Aucune activité liée aux bocaux ce mois-ci.",
-                    "no_tx_month_body": "Rien n'a encore été rangé dans ce bocal.",
+                    "no_tx_month_title": "No pot activity this month.",
+                    "no_tx_month_body": "Nothing has been sorted into this pot yet.",
                     "all_nested_title": "Tout est imbriqué ci-dessus.",
                     "all_nested_body": "Tous les paiements périodiques relèvent des catégories ci-dessus.",
                     "stacked_footnote": "Cumul sur {months} mois. L'activité ci-dessous correspond toujours au mois sélectionné.",
-                    "loading_jar": "Chargement du pot…",
-                    "back_jars": "← Bocaux",
+                    "loading_jar": "Loading pot…",
+                    "back_jars": "← Pots",
                     "pct_of_net": "{pct} % du montant net",
                     "no_categories": "Aucune catégorie pour l'instant.",
                     "nothing_booked": "Aucune réservation n'a encore été effectuée dans cette catégorie.",
@@ -2493,7 +2516,7 @@
                     "bucket_uncategorized": "Non classé",
                     "mobile_spent": "Dépensé {amount}",
                     "mobile_over_under": "{amount} plus / moins",
-                    "open_jar_link": "Ouvrir le bocal ▸"
+                    "open_jar_link": "Open pot ▸"
                 }
             },
             "fixed": {
@@ -2507,12 +2530,12 @@
                 "every_month_out": "Chaque mois, en sortie",
                 "filter_label": "Filtre",
                 "filter_all": "Tout",
-                "filter_jar_aria": "Filtrer par bocal",
+                "filter_jar_aria": "Filter by pot",
                 "search_placeholder": "Rechercher un nom ou un bénéficiaire…",
                 "search_aria": "Search fixed costs",
                 "empty_search_title": "Aucun résultat.",
                 "empty_search_body": "Essayez un autre nom ou effacez votre recherche pour afficher la liste complète.",
-                "empty_jar_title": "Il n'y a rien dans ce bocal.",
+                "empty_jar_title": "Nothing in this pot.",
                 "empty_jar_body": "Aucun coût fixe n'est imputé ici.",
                 "empty_all_title": "Il n'y a pas encore de coûts fixes.",
                 "empty_all_body": "Ajoutez une dépense récurrente pour qu'elle apparaisse dans cette liste.",
@@ -2555,7 +2578,7 @@
                 "select_due": "Sélectionner",
                 "select_cancel": "Annuler",
                 "select_all_due": "Sélectionner tous les éléments arrivés à échéance",
-                "select_group_due": "Sélectionner tous les éléments à mettre dans ce bocal",
+                "select_group_due": "Select all due in this pot",
                 "mark_selected": "Mark {count} a payé",
                 "mark_selected_confirm": "Mark {count} a-t-il payé ?",
                 "toast_paid_all": "{count} factures marquées comme payées",
@@ -2576,7 +2599,7 @@
                 "toast_pick_date": "Choisissez une date aujourd'hui ou antérieure",
                 "confirm_pause_title": "Suspendre ce projet de loi ?",
                 "confirm_end_title": "Mettre fin à ce projet de loi ?",
-                "confirm_pause_body": "Il reste sur votre liste, mais ne sera pas pris en compte dans le calcul de la pression du bocal ni dans les « tâches en attente » tant que vous ne l'aurez pas repris.",
+                "confirm_pause_body": "It stays on your list but won't count toward pot pressure or “still due” until you turn it back on.",
                 "confirm_end_body": "Il n'est plus pris en compte dans votre forfait. Vous pourrez le réactiver ultérieurement si nécessaire.",
                 "when_ended": "Quand est-ce que ça s'est terminé ?",
                 "today": "Aujourd'hui",
@@ -2621,7 +2644,7 @@
             "transactions": {
                 "eyebrow": "✦ TRANSACTIONS",
                 "title": "Seulement ce qui change. Les coûts fixes relèvent d'un autre domaine.",
-                "lead": "Une « sortie » correspond à une dépense. Une « entrée » correspond à un cadeau, un remboursement d'impôt, un remboursement ou de l'argent que vous mettez dans une tirelire. La connexion à une banque est un paramètre.",
+                "lead": "Out is spend. In is a gift, tax return, refund, or money you add to a pot. Connecting a bank is a setting.",
                 "add_in": "+ Ajouter",
                 "add_out": "+ Ajouter",
                 "apply_rules": "Appliquer les règles",
@@ -2630,13 +2653,13 @@
                 "tab_out": "Sortie",
                 "tab_in": "Dans",
                 "tab_rules": "Règles",
-                "out_lead": "L'argent qui est sorti d'un bocal. Appuyez sur une ligne pour la modifier ou la supprimer.",
-                "in_lead": "Cadeaux, remboursements, déclarations d'impôts et ajouts à la tirelire. Appuyez sur une ligne pour la modifier.",
+                "out_lead": "Money that left a pot. Tap a row to edit or delete it.",
+                "in_lead": "Gifts, refunds, tax returns, and pot top-ups. Tap a row to edit.",
                 "ledger_layout_aria": "Mise en page du grand livre",
                 "layout_list": "Liste",
-                "layout_by_jar": "Par jar",
+                "layout_by_jar": "By pot",
                 "empty_out_title": "Aucune transaction de sortie n'a encore été effectuée.",
-                "empty_out_body": "Aucun bocal n'a été conservé de cette période.",
+                "empty_out_body": "Nothing left a pot in this period.",
                 "empty_in_title": "Il n'y a pas encore de transactions.",
                 "empty_in_body": "Les cadeaux, les remboursements et les recharges apparaissent ici une fois triés.",
                 "search_placeholder": "Rechercher un bénéficiaire ou une description…",
@@ -2644,7 +2667,7 @@
                 "empty_search_title": "Aucun résultat.",
                 "empty_search_body": "Essayez une autre recherche ou effacez les critères pour afficher toutes les transactions de ce mois-ci.",
                 "filter_all": "Tout",
-                "filter_jar_aria": "Filtrer par bocal",
+                "filter_jar_aria": "Filter by pot",
                 "filter_amount_aria": "Trier par montant",
                 "filter_amount_label": "Montant",
                 "filter_amount_clear": "Effacer",
@@ -2675,7 +2698,7 @@
                 "hits_one": "{count} résultat",
                 "hits_other": "{count} résultats",
                 "inbox_empty_title": "Il n'y a plus rien à trier.",
-                "inbox_empty_body": "Chaque paiement correspond à une cagnotte. Revenez demain — ou associez un compte bancaire ci-dessous.",
+                "inbox_empty_body": "Every payment has a pot. Come back tomorrow — or connect a bank below.",
                 "import_hint_lead": "Un téléchargement bancaire sous la main ?",
                 "import_hint_link": "Importer un relevé",
                 "statement_import": {
@@ -2691,7 +2714,7 @@
                     "drop_active": "Relâchez pour joindre",
                     "drop_hint": "CAMT.053 · MT940 · CSV",
                     "clear_file": "Retirer le fichier",
-                    "after_import": "Les lignes arrivent dans À trier. Associez-les aux cagnottes — et liez les coûts fixes quand le payeur correspond à une facture mensuelle.",
+                    "after_import": "Rows land in To sort. Match them to pots — and link fixed costs when the payee matches a monthly bill.",
                     "account": "Compte",
                     "no_accounts": "Ajoutez d'abord un compte bancaire dans Paramètres",
                     "choose_file": "Choisir un fichier",
@@ -2718,7 +2741,7 @@
                     "toast_bank_mismatch": "Compte incorrect pour ce fichier — importation bloquée."
                 },
                 "rules_sign_in_title": "Connectez-vous pour gérer les règles.",
-                "rules_sign_in_body": "Rules automatically sort new transactions into the right jar.",
+                "rules_sign_in_body": "Rules automatically sort new transactions into the right pot.",
                 "rules_empty_title": "Il n'y a pas encore de règles.",
                 "rules_empty_body": "Choose “Always this” on a transaction to sort to teach a rule. Manage them here afterwards.",
                 "toast_sorted": "Tri effectué et règle enregistrée",
@@ -2759,7 +2782,7 @@
                     "source_bank": "Flux bancaire",
                     "source_recurring": "À partir d'un abonnement récurrent",
                     "status_inbox": "Waiting to be sorted",
-                    "status_sorted": "Mises dans un bocal",
+                    "status_sorted": "Sorted into a pot",
                     "status_ignored": "Non pris en compte (ne figure pas dans les calculs budgétaires)",
                     "hint_linked_settlement": "Règlement lié pour cette période",
                     "hint_suggested_bill": "Facture récurrente suggérée — lien lors du tri",
@@ -2770,7 +2793,7 @@
                     "hint_manage_rules": "Gérer les règles sur la page « Transactions »",
                     "hint_catalog_sorted": "Aucune règle interne ne correspondait — le catalogue du commerçant classait cet article",
                     "inbox_still": "Still to sort",
-                    "inbox_assign_jar": "Attribuer un pot pour l'inclure dans le budget",
+                    "inbox_assign_jar": "Assign a pot to include it in the budget",
                     "linked_debt_fallback": "Dette liée",
                     "hint_on_jar_planned": "Le {jar} · prévu le {amount}",
                     "hint_debt_remaining": "{balance} restant · {rate} % de TAEG",
@@ -2784,7 +2807,7 @@
                     "related": "✦ À lire également",
                     "also_from": "✦ Également de {payee}",
                     "debt_chip": "Dette",
-                    "rule_to_jar": "« {value} » → jar",
+                    "rule_to_jar": "\"{value}\" → pot",
                     "empty_dash": "—"
                 }
             },
@@ -2833,7 +2856,7 @@
             },
             "holding_link": {
                 "label": "Fait partie d'un groupe",
-                "hint": "Facultatif. Comptez-le dans le total de votre entreprise, d'un bien immobilier ou d'une autre participation. Le bocal reste le même.",
+                "hint": "Optional. Count this toward your company, a property or another holding. The pot stays the same.",
                 "none": "Ne fait pas partie d'un groupe",
                 "locked_eyebrow": "Détention",
                 "locked_hint": "Pris en compte dans ce portefeuille",
@@ -2857,12 +2880,12 @@
                 "save_in": "Enregistrer dans",
                 "save_out": "Enregistrer",
                 "inflow_placeholder": "Cadeau, déclaration d'impôts…",
-                "into_jar": "Dans un bocal",
+                "into_jar": "Into pot",
                 "direction": "Direction",
                 "direction_out": "Sortie",
                 "direction_in": "Dans",
                 "money_in": "Argent entrant",
-                "this_jar": "Ce bocal",
+                "this_jar": "This pot",
                 "where_from": "D'où ça vient ?",
                 "to_whom": "À qui",
                 "what_was_it": "Qu'est-ce que c'était ?",
@@ -2873,9 +2896,9 @@
                 "import_instead_link": "Importer un relevé",
                 "note_placeholder_in": "Facultatif — par exemple, de la part d'une tante",
                 "note_placeholder_out": "Facultatif — par exemple, le déjeuner des enfants",
-                "no_jars": "Pas de pots — procédez d'abord à l'installation complète",
+                "no_jars": "No pots — complete setup first",
                 "default_description": "Transaction",
-                "give_one_time_hint": "Don ponctuel — apparaît dans les transactions « Don » et « Sortie ». Pour un don récurrent, ajoutez plutôt un coût fixe."
+                "give_one_time_hint": "One-time gift — shows on Giving and in Out transactions. For a recurring gift, add a fixed cost instead."
             },
             "income_form": {
                 "save": "Enregistrer le revenu",
@@ -2921,7 +2944,7 @@
                 "save_for_next_time_hint": "Conservez ce nom dans vos groupes pour qu'il s'affiche automatiquement dans les rubriques « revenus », « factures » et « prêts »."
             },
             "move": {
-                "toast_moved": "Transferts d'argent entre des bocaux",
+                "toast_moved": "Money moved between pots",
                 "toast_sign_in": "Connectez-vous pour effectuer un virement",
                 "toast_failed": "Impossible de transférer de l'argent",
                 "note_placeholder": "Facultatif — pourquoi cette décision ?",
@@ -2932,25 +2955,25 @@
                 "moving": "Déménagement…",
                 "submit": "Transférer de l'argent",
                 "cancel": "Annuler",
-                "choose_source_first": "Commencez par choisir un pot source.",
-                "source_blocked": "Choisissez un autre pot source : celui-ci ne permet pas d'effectuer des virements.",
+                "choose_source_first": "Choose a source pot first.",
+                "source_blocked": "Pick a different source pot — this one can’t send money out.",
                 "use_max": "Utiliser max ({amount})",
                 "max_from": "Max de {jar} : {amount}",
                 "choose_destination": "Choisissez où l'argent doit être versé.",
                 "moving_preview": "Déplacement de {amount} de {from} vers {to}",
                 "balance_after": "{jar} {before} → {after}",
                 "to_arrow": "↓ Vers",
-                "sidebar_hint": "Seuls les pots contenant encore de l’argent peuvent effectuer des virements. La « Liberté financière » reste investie.",
+                "sidebar_hint": "Only pots with money left can send. Investing is set aside, not spent.",
                 "left": "Il reste {amount}",
                 "cannot_send": "Impossible d'envoyer depuis ici",
                 "sending_from": "Envoi depuis ici",
                 "selected": "Sélectionné",
                 "tap_to_choose": "Appuyez pour choisir",
-                "aria_from": "Pot à emporter",
-                "aria_to": "Bocal à envoyer à",
+                "aria_from": "Pot to take from",
+                "aria_to": "Pot to send to",
                 "eligibility": {
                     "protected": "Protégé — investir uniquement, ne jamais déménager",
-                    "cannot_send": "Ce pot ne permet pas d'envoyer de l'argent",
+                    "cannot_send": "This pot cannot send money",
                     "overspent": "Dépenses excessives — il ne reste plus rien à transférer",
                     "nothing_left": "Il ne reste plus rien à déplacer"
                 },
@@ -2961,16 +2984,16 @@
             "expense_intent": {
                 "pick_from_list": "Faites votre choix dans la liste",
                 "type_a_name": "Saisissez un nom",
-                "catalog_hint": "Faites votre choix dans le catalogue de ce pot si vous connaissez le magasin ou le type de produit, ou saisissez un nom personnalisé.",
+                "catalog_hint": "Pick from this pot’s catalog when you know the shop or type — or type a custom name.",
                 "vendor_manual_placeholder": "Nom du commerçant — par exemple : épicerie de quartier",
                 "vendor_search_placeholder": "Fournisseur ou catégorie — par exemple : AH, produits d'épicerie",
                 "vendor_type_placeholder": "Saisissez le nom du magasin — par exemple, Zara",
                 "know_vendor": "Vous connaissez ce fournisseur ?",
                 "use_as_vendor": "Utilisez « {name} » comme fournisseur",
                 "no_matches_enter": "Aucun résultat — appuyez sur Entrée pour utiliser « {name} » comme fournisseur.",
-                "no_types_custom": "Aucun type n'est encore défini pour ce pot — saisissez plutôt un nom personnalisé.",
+                "no_types_custom": "No types for this pot yet — type a custom name instead.",
                 "no_match_use": "Aucune correspondance — utilisez « {name} » comme fournisseur",
-                "custom_jar_hint": "Choisissez un bocal parmi ceux ci-dessous — ou modifiez votre choix et sélectionnez un type afin que nous puissions le classer.",
+                "custom_jar_hint": "Pick a pot below — or change and choose a type so we can categorize it.",
                 "vendors": "Fournisseurs",
                 "types": "Types",
                 "saved": "Vos parties",
@@ -3049,7 +3072,7 @@
                 "course_load_failed": "We couldn't load this part of Course. Try again, or skip it this week.",
                 "toast_done": "Le bilan hebdomadaire est fait. À la semaine prochaine.",
                 "save_failed": "Not saved. Your answers are still here.",
-                "error_no_jars": "We couldn't load your jars. Try again.",
+                "error_no_jars": "We couldn't load your pots. Try again.",
                 "done_eyebrow": "✦ Terminé",
                 "done_title": "Done for week {week}.",
                 "done_lead": "One look, one move, one intention.",
@@ -3110,7 +3133,7 @@
                 "cadence_quarterly_hint": "Tous les trois mois",
                 "cadence_yearly": "Annuelle",
                 "cadence_yearly_hint": "Une fois par an",
-                "no_jars": "Pas de pots — procédez d'abord à l'installation complète",
+                "no_jars": "No pots — complete setup first",
                 "category_auto": "Automatique à partir du nom / d'un préréglage",
                 "category_from_preset": "À partir du préréglage ({name})",
                 "paid_to": "Versé à (facultatif)",
@@ -3244,8 +3267,8 @@
                     "term_count": "Nombre de versements",
                     "term_placeholder": "par ex. 24",
                     "pay_off_by": "Rembourser d'ici le",
-                    "link_fixed_title": "Ajouter également cette dépense aux coûts fixes de première nécessité",
-                    "link_fixed_body": "Permet de maintenir le versement prévu dans votre budget « tirelire » à ce rythme.",
+                    "link_fixed_title": "Also add as a fixed cost in Basics",
+                    "link_fixed_body": "Keeps the planned payment in your pot budget at this cadence.",
                     "kind_credit_card": "Carte de crédit",
                     "kind_loan": "Prêt",
                     "kind_student": "Prêt étudiant",
@@ -3255,7 +3278,7 @@
                 },
                 "toast_payment_recorded": "Paiement enregistré",
                 "toast_payment_failed": "Échec du paiement",
-                "toast_monthly_added": "Paiement mensuel ajouté à la rubrique « Besoins essentiels »",
+                "toast_monthly_added": "Monthly payment added to fixed costs",
                 "toast_fixed_failed": "Impossible d'ajouter les coûts fixes",
                 "show_payments_aria": "Afficher {name} paiements",
                 "hide_payments_aria": "Masquer {name} paiements",
@@ -3300,9 +3323,9 @@
                     "no_payments_short": "Aucun paiement n'a encore été enregistré.",
                     "open_debt": "Dette en cours ›",
                     "planned_payment": "Paiement prévu",
-                    "necessities": "Produits de première nécessité",
-                    "no_fixed_linked": "Aucun prélèvement automatique n'est encore associé. Ajoutez-en un pour que Necessities puisse prendre en compte ce paiement.",
-                    "add_to_necessities": "Ajouter à la liste des produits de première nécessité",
+                    "necessities": "Fixed costs and daily",
+                    "no_fixed_linked": "No recurring bill linked yet. Add one so Fixed costs and daily counts this payment.",
+                    "add_to_necessities": "Add to fixed costs",
                     "apr": "{rate} % de TAEG",
                     "validation_amount_required": "Le montant est obligatoire",
                     "validation_amount_valid": "Saisissez un montant valide",
@@ -3430,7 +3453,7 @@
                 "toast_logged": "Le calme enregistré comme score mental",
                 "mind_note": "{minutes} min de silence",
                 "why_title": "✦ Pourquoi cette fonctionnalité se trouve-t-elle dans une application financière ?",
-                "mind_tie": "A restless mind does not steer money — it spends it and calls that a decision. Stillness is not meditative, it is strategic: the only routine here that costs nothing and protects everything else. Every coin you do not spend impulsively is a coin that chooses a jar.",
+                "mind_tie": "A restless mind does not steer money — it spends it and calls that a decision. Stillness is not meditative, it is strategic: the only routine here that costs nothing and protects everything else. Every coin you do not spend impulsively is a coin that chooses a pot.",
                 "practices": {
                     "breathing": {
                         "meta": "2 à 5 min",
@@ -3474,7 +3497,7 @@
                 "example": "Dix minutes de calme avant d'ouvrir ma boîte de réception.",
                 "my_intention": "Mon intention",
                 "set_for_week": "✦ Programme de cette semaine",
-                "tip": "Une bonne intention est modeste, concrète et porte sur un comportement — et non sur un résultat. « Je vérifie mes bocaux tous les dimanches » fonctionne mieux que « Je suis plus attentif à mes finances ».",
+                "tip": "A good intention is small, concrete, and about behavior — not an outcome. \"I check my pots every Sunday\" works better than \"I am more financially aware.\"",
                 "stillness_link": "Aller vers le calme →"
             },
             "centers": {
@@ -3523,29 +3546,29 @@
             "giving": {
                 "eyebrow": "Donner",
                 "headline": "Donner permet à l'argent de rester un outil et non un maître.",
-                "lead": "Le bocal « Give » est le plus petit des six et celui qui influence le plus votre rapport à l’argent. Lorsqu’une partie fixe de votre argent part avant que vous n’ayez pu la dépenser, l’argent cesse d’être quelque chose à quoi s’accrocher.",
+                "lead": "The Giving pot is often the smallest, and the one that does the most for your relationship with money. When a fixed share leaves before you can spend it, money stops being something to hold on to.",
                 "add_recurring": "+ Ajouter un don récurrent",
-                "open_jar": "Ouvrez le bocal « Give »",
+                "open_jar": "Open the Giving pot",
                 "this_year": "Cette année",
-                "jar_pct": "Faire un don · {pct} %",
+                "jar_pct": "Giving pot · {pct}%",
                 "pledged_of": "sur {amount} promis",
-                "reached_by": "On est arrivé à {when}. Le pot continue de se vider — c'était justement le but.",
+                "reached_by": "Reached {when}. The pot keeps flowing — that was the point.",
                 "reached_by_fallback": "d'ici là",
-                "pledge_met": "Objectif atteint. Le bocal continue de se remplir — c'était justement le but.",
+                "pledge_met": "Pledge met. The pot keeps flowing — that was the point.",
                 "pledge_on_track": "{planned} part chaque mois — de quoi atteindre l'objectif alors qu'il reste encore {months} mois.",
                 "pledge_on_track_plural": "{planned} part chaque mois — ce qui suffit pour atteindre l'objectif alors qu'il reste encore {months} mois.",
                 "pledge_gap": "{needed} par mois suffirait ; {planned} est prévu. Cet écart est un choix, pas un échec.",
                 "pledge_no_date": "Aucune date n'a encore été fixée pour cet engagement.",
                 "open_pledge": "Engagement ouvert ›",
                 "given_so_far": "données jusqu'à présent",
-                "pledge_pitch": "Une promesse de don permet de fixer un objectif annuel pour le pot. Chaque montant trié qui quitte Give est pris en compte dans ce total — pas besoin de tout transférer manuellement.",
+                "pledge_pitch": "A pledge gives the pot a finish line for the year. Every sorted amount that leaves Giving counts toward it — nothing to move by hand.",
                 "set_pledge": "Fixez-vous un objectif pour cette année",
                 "where_goes": "Où ça va ?",
                 "planned_mo": "{amount} par mois prévu",
-                "empty_auto_title": "Pour l'instant, rien ne part automatiquement de Give.",
-                "empty_auto_body": "Ajoutez une dépense fixe dans le « pot des dons » pour planifier vos dons mensuels.",
+                "empty_auto_title": "Nothing leaves Giving automatically yet.",
+                "empty_auto_body": "Add a fixed cost on the Giving pot to plan monthly gifts.",
                 "empty_ledger_title": "Pas de dons triés cette année.",
-                "empty_ledger_body": "Les cadeaux qui quittent « Give » apparaissent ici une fois triés.",
+                "empty_ledger_body": "Gifts that leave Giving show up here once sorted.",
                 "no_org": "Aucune organisation n'a encore été désignée",
                 "received_year": "Reçu cette année",
                 "to_whom": "À qui",
@@ -3607,7 +3630,7 @@
             "offer": {
                 "eyebrow": "Présentation rapide",
                 "title": "Vous souhaitez découvrir Rumtelo ?",
-                "body": "Une brève visite guidée depuis la page d'accueil, qui vous présente les « pots », les coûts fixes et les revenus. Vous pouvez passer d'une section à l'autre à tout moment — ou ouvrir l'aide plus tard pour revoir la visite.",
+                "body": "A short guided tour from Home through pots, fixed costs, and income. You can skip anytime — or open Help later to replay.",
                 "accept": "Commencer la visite",
                 "dismiss": "Pas maintenant"
             },
@@ -3619,13 +3642,13 @@
                 "replay_tour_prompt": "Tu veux revoir le guide pas à pas pour cet écran ?",
                 "take_tour": "Faites une visite guidée",
                 "replay_tour": "Revivre la visite",
-                "take_full_tour_prompt": "Vous voulez un guide complet ? Commençons par le logement, puis les bocaux, les frais fixes et les revenus.",
+                "take_full_tour_prompt": "Want the full walkthrough? Home first, then pots, fixed costs, and income.",
                 "replay_full_tour_prompt": "Revoir la vidéo complète du guide pas à pas depuis la page d'accueil ?",
                 "take_full_tour": "Commencer la visite complète",
                 "replay_full_tour": "Revivre la visite dans son intégralité",
                 "no_tour": "Il n'y a pas encore de visite guidée sur cet écran — le document ci-dessus présente les éléments essentiels.",
                 "helpers_label": "Diffuser « The Coach » à l'écran",
-                "helpers_hint": "Lignes « Why » et cartes « jar » de The Coach (✦ The Coach). Identique à Paramètres → Préférences. Activé par défaut pour les débutants.",
+                "helpers_hint": "Why-lines and pot cards from The Coach (✦ The Coach). Same as Settings → Preferences. On by default for beginners.",
                 "helpers_on": "Le",
                 "helpers_off": "Désactivé",
                 "videos_eyebrow": "Vidéos explicatives",
@@ -3635,7 +3658,7 @@
                 "video_level_feature": "Cette fonctionnalité",
                 "settings": {
                     "eyebrow": "Visite guidée",
-                    "blurb": "Vous pouvez revenir à tout moment sur les rubriques « Accueil », « Tontines », « Coûts fixes » et « Revenus ».",
+                    "blurb": "Walk through Home, pots, fixed costs, and income again anytime.",
                     "row_title": "Présentation du produit",
                     "row_sub": "Même procédure que celle décrite après l'installation — commence sur l'écran d'accueil",
                     "restart": "Commencer la visite complète"
@@ -3654,7 +3677,7 @@
                     "url": ""
                 },
                 "money": {
-                    "title": "Argent — six bocaux",
+                    "title": "Money — Rumtelo Pots",
                     "url": ""
                 },
                 "growth": {
@@ -3670,7 +3693,7 @@
                     "url": ""
                 },
                 "jars": {
-                    "title": "Jars — comment fonctionne la répartition",
+                    "title": "Pots — how the split works",
                     "url": ""
                 },
                 "fixed": {
@@ -3688,7 +3711,7 @@
                     "sections": {
                         "looking_at": {
                             "heading": "Ce que vous voyez",
-                            "body": "Cette page fait partie de votre configuration « Budget familial et épargne ». Utilisez la rubrique « Période » (en haut à droite) pour changer de mois. Les chiffres correspondent à la répartition entre les « bocaux » que vous avez définie dans les « Paramètres »."
+                            "body": "This page is part of your household money and growth setup. Use Period (top right) to switch months. Numbers follow the pots split you set in Settings."
                         }
                     }
                 },
@@ -3697,11 +3720,11 @@
                     "sections": {
                         "what_for": {
                             "heading": "Ce que vous voyez",
-                            "body": "Votre aperçu financier du mois — Le Coach, la situation financière et les clés de la croissance, de l'énergie et de l'épanouissement spirituel. Commencez la visite complète depuis la rubrique « Aide » pour parcourir la section « Accueil », puis les « Tonneaux », les « Coûts fixes » et les « Revenus »."
+                            "body": "Your grip snapshot for this month — The Coach, the money picture, and doors into Growth, Energy, and Soul. Start the full tour from Help to walk through Home, then pots, fixed costs, and income."
                         },
                         "what_for_core": {
                             "heading": "What you’re looking at",
-                            "body": "Your grip snapshot for this month — The Coach, the money picture, and the door into Growth. Start the full tour from Help to walk through Home, then jars, fixed costs, and income."
+                            "body": "Your grip snapshot for this month — The Coach, the money picture, and the door into Growth. Start the full tour from Help to walk through Home, then pots, fixed costs, and income."
                         },
                         "how": {
                             "heading": "Mode d'emploi",
@@ -3719,7 +3742,7 @@
                         },
                         "hero": {
                             "title": "L'argent de ce mois-ci",
-                            "content": "Ce qui a été versé dans les bocaux, ce qu'il reste et le montant que vous pouvez dépenser sans risque pour la période considérée."
+                            "content": "What landed in the pots, what’s left, and safe-to-spend for the period you’re viewing."
                         },
                         "portals": {
                             "title": "Vos produits",
@@ -3739,7 +3762,7 @@
                         },
                         "period": {
                             "title": "Période",
-                            "content": "Changez le mois affiché. Les totaux et les dépenses indiqués correspondent à cette période."
+                            "content": "Switch the month you’re looking at. Pot totals and spends follow this period."
                         },
                         "help": {
                             "title": "Aide",
@@ -3760,7 +3783,7 @@
                         },
                         "simulator": {
                             "heading": "À quoi sert une augmentation ?",
-                            "body": "Faites glisser le montant net mensuel. La répartition entre les bocaux reste inchangée ; le montant de chaque bocal suit ce mouvement. Choisissez un objectif pour afficher sa date. Il s'agit d'une projection — l'argent n'a pas encore été transféré."
+                            "body": "Drag the monthly net. The pot split stays; each pot amount moves with it. Pick a goal to see its date. A projection — not money moved yet."
                         },
                         "sources": {
                             "heading": "Sources de revenus",
@@ -3778,7 +3801,7 @@
                         },
                         "simulator": {
                             "title": "À quoi sert une augmentation de salaire ?",
-                            "content": "Faites glisser les revenus vers le haut ou vers le bas. Même répartition, montants différents par pot — et ce que cela permet d'acheter pour atteindre un objectif."
+                            "content": "Drag income up or down. Same split, different amounts per pot — and what that buys for a goal."
                         },
                         "sources": {
                             "title": "Sources de revenus",
@@ -3791,15 +3814,15 @@
                     "sections": {
                         "what_for": {
                             "heading": "À quoi sert cette page ?",
-                            "body": "La colonne « OUT » correspond aux dépenses récurrentes liées aux « bocaux ». La colonne « IN » correspond aux mêmes sources de revenus qui alimentent la répartition. Il suffit de les configurer une seule fois : la couverture des « bocaux » et le solde restant sont mis à jour automatiquement."
+                            "body": "OUT is recurring bills linked to pots. IN is the same income sources that feed the split. Set them once; pot coverage and leftover update automatically."
                         },
                         "out_vs_in": {
                             "heading": "What goes out",
                             "body": "This list holds your active fixed costs (rent, insurance, subscriptions). Income has its own page: Money → Income. Leftover after costs is monthly net minus fixed costs."
                         },
                         "jars_use": {
-                            "heading": "Comment les « jars » utilisent cette fonctionnalité",
-                            "body": "Le montant « OUT » fixe réduit le solde disponible dans ce pot. Les revenus sont répartis proportionnellement entre les pots dès leur encaissement — cet écran présente le plan, et non le registre comptable."
+                            "heading": "How pots use this",
+                            "body": "Fixed OUT reduces available in that pot. Income is split by percentage into pots when money arrives — this screen is the plan, not the ledger."
                         },
                         "mark_paid": {
                             "heading": "Prévu → Payé",
@@ -3813,7 +3836,7 @@
                         },
                         "list": {
                             "title": "La liste",
-                            "content": "Your fixed costs by jar. Tap a row to open it."
+                            "content": "Your fixed costs by pot. Tap a row to open it."
                         },
                         "status": {
                             "title": "Mark a payé",
@@ -3822,25 +3845,25 @@
                     }
                 },
                 "jars": {
-                    "title": "Mes tirelires",
+                    "title": "My money pots",
                     "sections": {
                         "what_for": {
-                            "heading": "À quoi servent ces bocaux ?",
-                            "body": "Les six bocaux permettent d'affecter vos revenus à différentes fins. Chaque bocal correspond à une utilisation précise et à un pourcentage défini. Ensemble, ces pourcentages totalisent 100 % de vos revenus."
+                            "heading": "What the pots are for",
+                            "body": "Rumtelo Pots give your income a destination, in three groups: Basics, Future, Free. Each pot has a job and a percentage you set. Together they make 100% of your income."
                         },
                         "how": {
                             "heading": "Comment ça marche ?",
-                            "body": "C'est vous qui saisissez vous-même vos revenus. À partir de vos pourcentages fixes, vous voyez quelle part revient à chaque « pot » : ce que vous pouvez dépenser ou mettre de côté à cette fin. Ensuite, passez en revue les « pilules d'argent » de gauche à droite : Dépenses fixes → Transactions → Dettes → Patrimoine net. Rumtelo n'effectue jamais de mouvements d'argent sur votre compte bancaire."
+                            "body": "You enter income yourself. From the percentages you set you see how much belongs in each pot — what you can spend or set aside for that purpose. Then work the Money pills left to right: Fixed costs → Transactions → Debt → Net worth. Rumtelo never moves money at your bank."
                         }
                     },
                     "steps": {
                         "list": {
-                            "title": "Vos six bocaux",
-                            "content": "Chaque ligne correspond à une dépense. Appuyez sur un pot pour voir les coûts fixes, les dépenses et le solde restant ce mois-ci."
+                            "title": "Your pots",
+                            "content": "Each row is one job for money. Tap a pot for fixed costs, spends, and what’s left this month."
                         },
                         "toolbar": {
                             "title": "Ajouter · Déplacer",
-                            "content": "Enregistrez une entrée ou une sortie, ou transférez de l'argent d'un pot à l'autre lorsque le budget mensuel l'exige. Les virements bancaires restent au niveau de votre banque."
+                            "content": "Log a transaction in or out, or move money between pots when a month needs it. Bank transfers stay at your bank."
                         },
                         "bank": {
                             "title": "C'est toi qui gères l'argent",
@@ -3853,7 +3876,7 @@
                     "sections": {
                         "what_for": {
                             "heading": "À quoi cela sert-il ?",
-                            "body": "A snapshot of the current period: jars, transactions to sort, what you already own, and how the month is tracking."
+                            "body": "A snapshot of the current period: pots, transactions to sort, what you already own, and how the month is tracking."
                         },
                         "how": {
                             "heading": "Comment ça marche ?",
@@ -3866,7 +3889,7 @@
                     "sections": {
                         "save_vs_earn": {
                             "heading": "Épargner ou gagner",
-                            "body": "Les objectifs « Épargner » permettent de remplir un bocal pour se constituer une cagnotte. Les objectifs « Gagner » permettent de suivre le revenu net mensuel du foyer : lorsque ce dernier atteint l'objectif fixé, celui-ci est automatiquement considéré comme atteint."
+                            "body": "Save goals fill a pot toward a pile of money. Earn goals track household monthly net — when net hits the target, the goal marks itself reached."
                         },
                         "pace": {
                             "heading": "Rythme",
@@ -3888,11 +3911,11 @@
                     "sections": {
                         "what_for": {
                             "heading": "À quoi cela sert-il ?",
-                            "body": "Le registre des sommes déjà transférées : les sorties pour les dépenses, les entrées pour les cadeaux, les remboursements et les recharges des tirelires. Ce tri permet de s'assurer que chaque tirelire est bien équilibrée."
+                            "body": "The ledger for money that already moved — Out for spend, In for gifts, refunds, and pot top-ups. Sorting here keeps each pot honest."
                         },
                         "how": {
                             "heading": "Comment ça marche ?",
-                            "body": "Pick Out or In, say what it was, choose a jar, and save. Transactions to sort wait until you sort them. Edits update the same period’s available balance."
+                            "body": "Pick Out or In, say what it was, choose a pot, and save. Transactions to sort wait until you sort them. Edits update the same period’s available balance."
                         }
                     }
                 },
@@ -3901,11 +3924,11 @@
                     "sections": {
                         "what_for": {
                             "heading": "À quoi cela sert-il ?",
-                            "body": "Suivez le montant de ce que vous devez encore et le poids que cela représente dans votre budget mensuel. Les remboursements de dettes sont généralement une nécessité — cette page vous permet de garder un œil sur le solde."
+                            "body": "Track what you still owe and the monthly bite it takes. Debt instalments usually leave from Fixed costs and daily — this page keeps the balance in view."
                         },
                         "how": {
                             "heading": "Comment ça marche ?",
-                            "body": "Ajoutez chaque dette en précisant son solde et le montant des remboursements. Considérez-les comme des charges fixes : si un remboursement pèse trop sur votre budget, il faut revoir votre plan financier."
+                            "body": "Add each debt with balance and payment. Review them like fixed costs: if the payment hurts the pot, the pot plan needs a rethink."
                         }
                     }
                 }
@@ -3929,10 +3952,10 @@
                 "close_explain_soon": "The month ends soon — sort your transactions, then carry or skip unpaid bills so you can close.",
                 "close_explain_today": "Today is the last day. Sort your transactions, then carry or skip unpaid bills and close.",
                 "close_explain_overdue": "This month is overdue to close. Sort your transactions, then carry or skip unpaid bills and close it.",
-                "travel_past_one": "{stamp} · à propos de {money} via des bocaux sur une période de {horizon} mois",
-                "travel_past_other": "{stamp} · à propos de {money} dans des bocaux, sur une période de {horizon} mois",
-                "travel_ahead_one": "Par {stamp} · environ {money} bocaux en {horizon} mois",
-                "travel_ahead_other": "Par {stamp} · environ {money} en bocaux sur une période de {horizon} mois",
+                "travel_past_one": "{stamp} · about {money} through pots over {horizon} month",
+                "travel_past_other": "{stamp} · about {money} through pots over {horizon} months",
+                "travel_ahead_one": "By {stamp} · about {money} through pots over {horizon} month",
+                "travel_ahead_other": "By {stamp} · about {money} through pots over {horizon} months",
                 "travel_jar": "{name} {from} → {to}",
                 "level_sr": "Level: {level}"
             },
@@ -3982,7 +4005,7 @@
             },
             "recap": {
                 "surplus": "Il reste {amount} de cette période",
-                "overspent": "Un ou plusieurs postes de budget ont dépassé leur plafond."
+                "overspent": "One or more pots are overspent"
             },
             "household": {
                 "eyebrow": "Votre foyer",
@@ -4018,14 +4041,14 @@
                     "cta": "Close month"
                 },
                 "no_transactions": {
-                    "title": "Your jars are filled. Now see where it goes.",
+                    "title": "Your pots are filled. Now see where it goes.",
                     "body": "Add this week's spending — by hand or import a bank statement. Next week, your first week check takes ten minutes.",
                     "body_basic": "Add this week's spending as it happens. Next week, your first week check takes ten minutes.",
                     "cta": "Add a transaction",
                     "import": "Import a statement"
                 },
                 "zero_income": {
-                    "title": "No income yet? Add it when it lands — your jars split it the same second.",
+                    "title": "No income yet? Add it when it lands — your pots split it the same second.",
                     "cta": "Add income"
                 },
                 "inbox": {
@@ -4039,7 +4062,7 @@
                 "calm": {
                     "title": "Every euro has a job. Next week check: {weekday}.",
                     "title_other_currency": "Every amount has a job. Next week check: {weekday}.",
-                    "link": "See your jars"
+                    "link": "See your pots"
                 },
                 "viewer": {
                     "close_prior": "{month} is ready to close.",
@@ -4066,11 +4089,11 @@
             },
             "coach": {
                 "all_tips": "All tips ({count})",
-                "inbox_one": "{count} transaction en attente d'un jar.",
-                "inbox_many": "{count} transactions en attente d'un jar.",
+                "inbox_one": "{count} transaction waiting for a pot.",
+                "inbox_many": "{count} transactions waiting for a pot.",
                 "all_sorted": "Tout est réglé — place à l’intention.",
                 "week_check": "Bilan hebdomadaire",
-                "see_jars": "Voir les bocaux",
+                "see_jars": "See pots",
                 "practice_pending_one": "Une invitation à participer à un exercice vous attend — acceptez-la dans les paramètres si vous souhaitez l'ajouter à votre tableau.",
                 "practice_pending_many": "{count} Des invitations à s'entraîner vous attendent : acceptez-les dans les paramètres si vous souhaitez les voir apparaître sur votre tableau.",
                 "practice_pending_cta": "Invitation à donner un avis"
@@ -4081,14 +4104,14 @@
                 "money_put_through_one": "Argent · Versement sur une période de plus d'un mois",
                 "money_distributed": "Argent · Versements effectués ce mois-ci",
                 "money_allocated_month": "Argent · Alloué ce mois-ci",
-                "income_span": "Sur {months} mois · {jars} bocaux",
-                "income_span_one_jar": "Sur une période de {months} mois · 1 pot",
-                "income_month": "Répartis dans {jars} pots",
-                "income_month_one_jar": "Réparti dans 1 bocal",
+                "income_span": "Across {months} months · {jars} pots",
+                "income_span_one_jar": "Across {months} months · 1 pot",
+                "income_month": "Distributed across {jars} pots",
+                "income_month_one_jar": "Distributed across 1 pot",
                 "see_income": "Voir les revenus ▸",
                 "in_pots_label": "Dans les pots",
                 "in_pots_hint": "Accumulé au fil des mois",
-                "six_jars": "✦ Les six bocaux",
+                "six_jars": "✦ Your pots",
                 "see_all_jars": "Tout afficher ▸"
             },
             "travel": {
@@ -4101,7 +4124,7 @@
             "stats": {
                 "avg_left": "Moyenne restante par mois",
                 "safe_per_day": "Quantité journalière sans risque",
-                "play_left": "En jeu"
+                "play_left": "In Fun"
             },
             "open_portal": "Ouvrir ▸",
             "why": {
@@ -4129,13 +4152,13 @@
         "landing": {
             "meta": {
                 "title": "Rumtelo — Ne te demande plus où il est passé.",
-                "description": "Stop wondering where it went. Your income splits into six jars the second it lands. Ten minutes a week shows where it went and what to move. The Coach tips, you choose. Built in Amsterdam. Free to start.",
+                "description": "Stop wondering where it went. Income splits over Basics, Future and Free the second it lands. Ten minutes a week shows what to move. Free to start.",
                 "keywords": [
                     "aperçu financier",
-                    "six bocaux",
+                    "income split",
                     "prise sur la vie",
                     "coach en gestion des finances personnelles",
-                    "liberté financière",
+                    "money pots",
                     "bilan hebdomadaire",
                     "geld overzicht",
                     "potjes methode"
@@ -4172,7 +4195,7 @@
             "hero": {
                 "eyebrow": "RUMTELO — PRENDRE LA VIE À PLEINS COUPS DE POING",
                 "headline": "Arrête de te demander où ça a bien pu passer.",
-                "lead": "Your income splits into six jars the second it lands — bills, saving, freedom, fun. Ten minutes a week shows where it went and what to move.",
+                "lead": "Your income splits over three groups — Basics, Future, Free — the second it lands. Ten minutes a week shows where it went and what to move.",
                 "cta_primary": "Split my income — free",
                 "cta_microline": "No card. No bank link needed.",
                 "cta_secondary": "See it in 3 steps",
@@ -4180,24 +4203,25 @@
                 "manage_plan": "Gérer le forfait",
                 "manage_plan_named": "Gérer {plan}",
                 "demo_stage_landing": "ARRIVÉE DES REVENUS…",
-                "demo_stage_splitting": "RÉPARTITION DANS SIX BOÎTES…",
+                "demo_stage_splitting": "SPLITTING INTO YOUR POTS…",
                 "demo_stage_complete": "CE MOIS-CI · CHAQUE SOMME A SON UTILITÉ",
                 "demo_income_line": "Salaire : 3 450 € · En freelance : 850 €",
                 "demo_coach_eyebrow": "L'entraîneur · cette semaine",
-                "demo_coach_line": "Every amount has a job. Safe to spend today: €64."
+                "demo_coach_line": "Every amount has a job. Safe to spend today: €64.",
+                "demo_example_note": "Example split — you set your own."
             },
             "how_section": {
                 "eyebrow": "HOW IT WORKS",
-                "headline": "Six jars. Ten minutes a week.",
+                "headline": "Basics. Future. Free. Ten minutes a week.",
                 "steps_aria": "How Rumtelo works in three steps",
                 "steps": {
                     "split": {
                         "title": "Income lands, money splits.",
-                        "body": "Enter your net income once. Rumtelo splits it over six jars, so every amount has a job before you spend."
+                        "body": "Enter your net income once. Rumtelo splits it over Basics, Future and Free, so every amount has a job before you spend."
                     },
                     "spend": {
-                        "title": "Spending finds its jar.",
-                        "body": "Bills draw from the right jar. Purchases land in Transactions. Sort them by hand or let a rule do it."
+                        "title": "Spending finds its pot.",
+                        "body": "Bills draw from the right pot. Purchases land in Transactions. Sort them by hand or let a rule do it."
                     },
                     "week": {
                         "title": "Ten minutes a week.",
@@ -4209,29 +4233,29 @@
                 "f1": "+3 450 € · accélération en 0,4 s",
                 "f2": "7 h 20 de sommeil ↑",
                 "f3": "+850 € en tant qu’indépendant",
-                "f4": "NEC → 2 365 €",
+                "f4": "Basics → €2,365",
                 "f5": "Définition de l'intention",
-                "f6": "−38,65 € → Produit de première nécessité",
-                "f7": "1 livre · Éducation",
-                "f8": "FF → 430 € · investi",
+                "f6": "−€38.65 → Basics",
+                "f7": "1 book · Learning",
+                "f8": "Investing → €430",
                 "f9": "Le silence · 6e jour",
-                "f10": "55 / 10 / 10 / 10 / 10 / 5",
+                "f10": "Basics · Future · Free",
                 "f11": "Bilan hebdomadaire · 9 min",
                 "f12": "Score mensuel : 82"
             },
             "ticker": {
                 "t1": "Salaire net · répartition en 0,4 seconde",
-                "t2": "Courses − 38,65 € → Produits de première nécessité",
+                "t2": "Groceries −€38.65 → Basics",
                 "t3": "Sommeil : 7 h 20 · tendance ↑",
                 "t4": "430 € → fonds indiciel mondial",
                 "t5": "Objectif fixé : « une semaine en toute honnêteté »",
-                "t6": "Café − 5,20 € → Jouer",
-                "t7": "Livre terminé · Bocal de l'éducation",
+                "t6": "Coffee −€5.20 → Fun",
+                "t7": "Book finished · Learning pot",
                 "t8": "Sans dette : février 2035 · en bonne voie",
                 "t9": "Bilan hebdomadaire effectué · 9 min",
                 "t10": "Le silence · 6e jour",
                 "t11": "Montant disponible aujourd'hui : 64 €",
-                "t12": "Gym − 32 € → Jouer · signalé, un coup"
+                "t12": "Gym −€32 → Fun · flagged, one move"
             },
             "proof": {
                 "time": {
@@ -4239,7 +4263,7 @@
                     "label": "une fois par semaine — pas de devoirs quotidiens"
                 },
                 "jars": {
-                    "value": "6 bocaux",
+                    "value": "3 groups",
                     "label": "a exploité les terres à double revenu"
                 },
                 "free": {
@@ -4248,38 +4272,38 @@
                 }
             },
             "jars_section": {
-                "eyebrow": "LES SIX BOÎTES",
-                "headline": "Six emplois, donc aucun montant ne doit être déterminé séparément.",
-                "lead": "Chaque bocal est accompagné d’une règle que l’on peut lire en une seule ligne : ce qui doit y aller et ce qui n’y a pas sa place. À vous de modifier les pourcentages. L’important, c’est de prendre l’habitude."
+                "eyebrow": "RUMTELO POTS",
+                "headline": "Every amount gets a job, so none has to decide for itself.",
+                "lead": "Every pot has a rule you can read in one line — what belongs, what doesn’t. The percentages are yours to change. The habit is the point."
             },
             "jars": {
                 "nec": {
-                    "name": "Nécessité",
+                    "name": "Fixed costs and daily",
                     "line": "Loyer, énergie, assurances, courses, transports. Toutes ces dépenses qui s'imposent, qu'on le veuille ou non.",
-                    "not": "Ce n'est pas pour les sorties au restaurant ni pour les vêtements — ça, c'est « Play »."
+                    "not": "Not for eating out or clothes — that is Fun."
                 },
                 "ff": {
-                    "name": "Liberté financière",
-                    "line": "Les fonds indiciels, un dépôt immobilier, votre propre entreprise. Ce « pot » sert à acheter des actifs qui vous rapportent de l'argent.",
-                    "not": "Je n'ai jamais rien dépensé. Je n'ai fait que des investissements."
+                    "name": "Investing",
+                    "line": "Index funds, a property deposit, your own company. This pot buys things that pay you back.",
+                    "not": "Never spent. Set aside to invest."
                 },
                 "edu": {
-                    "name": "Éducation",
-                    "line": "Des livres, des formations, un mentor, un outil qui vous aide à vous améliorer. Le seul domaine où vos dépenses augmentent votre valeur.",
+                    "name": "Learning",
+                    "line": "Books, courses, a mentor, a tool that makes you better. The one pot where spending raises what you’re worth.",
                     "not": "Ce n'est pas ce genre de gadgets que l'on appelle de la recherche."
                 },
                 "lts": {
-                    "name": "Épargne à long terme",
+                    "name": "Buffer and goals",
                     "line": "D'abord le fonds d'urgence, puis la voiture, la caution, la facture d'impôts que tu sais inévitable.",
                     "not": "Ce n'est pas pour quelque chose que tu souhaites ce mois-ci."
                 },
                 "play": {
-                    "name": "Jouer",
+                    "name": "Fun",
                     "line": "Un dîner au restaurant, un concert, une sortie improvisée. Profitez-en sans demander la permission.",
                     "not": "Il faut que ce soit vide d'ici la fin du mois. C'est ça, le problème."
                 },
                 "give": {
-                    "name": "Donner",
+                    "name": "Giving",
                     "line": "Une cause, un ami qui en a besoin, votre propre fondation un jour. La générosité comme habitude, et non comme un simple caprice.",
                     "not": "Ce n'est pas un pourboire que vous avez déjà laissé."
                 }
@@ -4297,7 +4321,7 @@
                     "name": "Argent",
                     "alt_name": "Argent",
                     "question": "Où est donc passé ce mois-ci ?",
-                    "line": "Maîtrisez vos finances : six bocaux, une vision claire."
+                    "line": "Grip on your money — three groups, a clear picture."
                 },
                 "growth": {
                     "name": "Croissance",
@@ -4320,14 +4344,14 @@
             },
             "portal_features": {
                 "money": {
-                    "f1": "Six bocaux, vos pourcentages",
+                    "f1": "Basics, Future, Free — your percentages",
                     "f2": "Transactions — sorted by rule or by hand",
                     "f3": "Les coûts fixes que vous pouvez anticiper",
                     "f4": "Plan de désendettement assorti d'une date butoir",
                     "f5": "Le bilan de la semaine · le bilan du mois"
                 },
                 "growth": {
-                    "f1": "Des objectifs avec une date et un bocal",
+                    "f1": "Goals with a date and a pot",
                     "f2": "Revenu — la courbe et les quatre leviers",
                     "f3": "Apprendre — livres, cours, ce qu’ils ont changé",
                     "f4": "Votre patrimoine net et votre « indice de liberté »"
@@ -4356,7 +4380,7 @@
                 "watch_sub": "Courte vidéo · sans son",
                 "watch_aria": "Découvrez {portal} en action — courte vidéo, sans son",
                 "screen_aria": "{portal} dans l'application — {screen}",
-                "play": "Jouer →",
+                "play": "Fun →",
                 "coach": "L'entraîneur",
                 "money_over": "{jar} · {over} au-delà de sa ligne",
                 "signal": "un signal, pas un verdict",
@@ -4374,33 +4398,33 @@
                     "soul": "Le silence · 6e jour"
                 },
                 "coach_lines": {
-                    "money": "Le cours est de 38 € au-dessus de sa ligne de référence. Une seule option : le transférer vers l'épargne à long terme — ou le laisser tel quel.",
+                    "money": "Fun is €38 over its line. One move: shift it from Buffer and goals — or let it ride.",
                     "growth": "La réduction des coûts a une limite. L'augmentation des revenus, non. Les revenus complémentaires représentent 20 % du chemin à parcourir.",
-                    "energy": "Trois nuits de moins de 6 h 30… et Play a progressé ces jours-là. D’abord, dormir. Ensuite, on verra.",
+                    "energy": "Three nights under 6h30 — and Fun rose on those days. Sleep first. Then decide.",
                     "soul": "L'intention est fixée. Une seule phrase suffit : la semaine a désormais un cap."
                 },
                 "money_rows": {
                     "salary": {
                         "label": "Salaire",
-                        "jar": "Répartir → six bocaux"
+                        "jar": "Split → three groups"
                     },
                     "groceries": {
                         "label": "Albert Heijn",
-                        "jar": "Nécessité"
+                        "jar": "Basics"
                     },
                     "coffee": {
                         "label": "Café-bar",
-                        "jar": "Jouer"
+                        "jar": "Fun"
                     },
                     "debt": {
                         "label": "Remboursement de la dette",
-                        "jar": "Liberté"
+                        "jar": "Basics"
                     }
                 },
                 "growth_goals": {
                     "emergency": {
                         "name": "Fonds d'urgence",
-                        "meta": "Épargne à long terme · mars 2027"
+                        "meta": "Buffer and goals · Mar 2027"
                     },
                     "side_income": {
                         "name": "Revenu complémentaire de 500 € par mois",
@@ -4408,7 +4432,7 @@
                     },
                     "course": {
                         "name": "Cours · analyse de données",
-                        "meta": "Bocal pédagogique"
+                        "meta": "Learning pot"
                     }
                 },
                 "growth_income_label": "+14 % en six mois",
@@ -4459,7 +4483,7 @@
                     "millionaire_mind": {
                         "title": "Les secrets de l'esprit du millionnaire",
                         "author": "T. Harv Eker",
-                        "line": "La répartition en six pots : chaque somme est affectée à une tâche dès qu'elle est versée."
+                        "line": "Give every amount a job the second it lands."
                     },
                     "psychology": {
                         "title": "La psychologie de l'argent",
@@ -4488,7 +4512,7 @@
                 },
                 "information": {
                     "title": "De l'information, jamais de la honte.",
-                    "body": "Une « jar » qui dépasse les limites est un signal, pas un verdict. Chaque avertissement s'accompagne de la seule mesure à prendre pour y remédier."
+                    "body": "An over-the-line pot is a signal, not a verdict. Every warning carries the one move that fixes it."
                 }
             },
             "coach_section": {
@@ -4498,7 +4522,7 @@
                 "points": {
                     "one": "Un conseil, une prochaine étape — jamais une montagne de graphiques",
                     "quiet": "Restez silencieux jusqu’à ce que vous disposiez de suffisamment de données — le bruit n’est pas synonyme de connaissance",
-                    "shame": "De l'information, jamais de la honte — un « bocal des excès » est un signal, pas un verdict",
+                    "shame": "Information, never shame — an over-the-line pot is a signal, not a verdict",
                     "ten": "Dix minutes par semaine avec le coach — pas de devoirs quotidiens"
                 },
                 "demo_aria": "Exemple tiré de « The Coach » — un conseil par portail",
@@ -4508,8 +4532,8 @@
                 "demo": {
                     "money": {
                         "kind": "CETTE SEMAINE",
-                        "text": "La mise dépasse de 38 € la limite fixée. Retirez-la une fois de votre épargne à long terme — ou laissez-la telle quelle et faites votre dîner de la semaine prochaine à la maison.",
-                        "cta": "Ouvrir les bocaux"
+                        "text": "Fun is €38 over its line. Move it from Buffer and goals once — or let it ride and keep next week’s dinner in.",
+                        "cta": "Open pots"
                     },
                     "growth": {
                         "kind": "LE LEVIER",
@@ -4518,7 +4542,7 @@
                     },
                     "energy": {
                         "kind": "VOTRE SOL",
-                        "text": "Trois nuits de moins de 6 h 30… et les dépenses liées aux loisirs ont augmenté ces mêmes jours. Dormez d’abord. Ensuite, vous verrez.",
+                        "text": "Three nights under 6h30 — and Fun spending rose on the same days. Sleep first. Then decide.",
                         "cta": "Sommeil ouvert"
                     },
                     "soul": {
@@ -4549,7 +4573,7 @@
                     },
                     "yours": {
                         "head": "Bien à toi, comme toujours",
-                        "line": "En cas d'annulation, tous les jars, toutes les transactions et tous les objectifs restent consultables. Pas de dépendance, pas de données prises en otage."
+                        "line": "Cancel and every pot, transaction and goal stays readable. No lock-in, no hostage data."
                     },
                     "coach": {
                         "head": "Un coach, pas une banque",
@@ -4562,7 +4586,7 @@
                     "legal": "Mentions légales",
                     "contact": "Contact",
                     "portals": "Les portails",
-                    "jars": "Les bocaux",
+                    "jars": "The pots",
                     "coach": "L'entraîneur",
                     "pricing": "Tarifs",
                     "practices": "For practices",
@@ -4589,7 +4613,7 @@
                 "eyebrow": "TARIFS",
                 "headline": "Gratuit là où c'est important. Payant là où ça vous facilite la tâche.",
                 "headline_auth": "Votre projet et ce que vous pouvez changer",
-                "lead": "Start free with your jars. Pay when it saves you work: your bank statements in, your debt-free date, your Course.",
+                "lead": "Start free with your pots. Pay when it saves you work: your bank statements in, your debt-free date, your Course.",
                 "lead_on_plan": "Vous êtes sur {plan}. Passez à un forfait supérieur, changez de forfait ou gérez votre facturation depuis l'application : les modifications s'appliquent à l'ensemble de votre foyer.",
                 "lead_loading": "Chargement de votre forfait…",
                 "lead_manage": "Accédez à la rubrique « Formules et facturation » dans l'application pour passer à une formule supérieure ou modifier votre formule.",
@@ -4625,7 +4649,7 @@
             "practice_band": {
                 "eyebrow": "FOR COACHES & ADVISORS",
                 "headline": "Stop wondering where your clients stand.",
-                "lead": "One desk for every client’s jars and week check — only after they say yes. Rumtelo never moves money.",
+                "lead": "One desk for every client’s pots and week check — only after they say yes. Rumtelo never moves money.",
                 "cta": "See how it works for practices"
             },
             "practice_plan": {
@@ -4635,7 +4659,7 @@
                 "line": "Un bureau par client — les séances visent à prendre des décisions, et non à accumuler des chiffres.",
                 "f1": "Invitez vos clients par e-mail : aucune information n'est partagée tant qu'ils n'ont pas accepté l'invitation",
                 "f2": "L'espace client de chaque client, en lecture seule, accessible depuis un seul poste de travail",
-                "f3": "A snapshot per client: income, jars, spending, week check",
+                "f3": "A snapshot per client: income, pots, spending, week check",
                 "f4": "Entre deux séances, le coach vous donne des conseils — c'est vous qui prenez les décisions",
                 "extras_title": "En plus du prix de base",
                 "extra_staff": "Siège du personnel",
@@ -4656,14 +4680,14 @@
                     "tag": "Commencez par ici",
                     "best_for": "Pour commencer, par vous-même",
                     "line": "Vous voulez savoir où va votre argent et mettre en place une routine hebdomadaire de dix minutes — tout seul, sans rien dépenser. C'est suffisant pour commencer, et il n'y a aucune raison d'arrêter.",
-                    "f1": "ARGENT · six bocaux, transactions, coûts fixes",
+                    "f1": "MONEY · your pots, transactions, fixed costs",
                     "f2": "CROISSANCE · revenus et {maxGoals, plural, one {# objectif} other {# objectifs}} — goûter Growth",
                     "f3": "ÉNERGIE · sommeil",
                     "f4": "SOUL · calme, gratitude, une intention par semaine",
                     "f5": "Le coach, le bilan hebdomadaire, le score mensuel",
                     "f6": "1 place complète + 1 place pour un accompagnateur (partenaire, coach ou conseiller)",
                     "outcome": {
-                        "money": "Six jars, your transactions and fixed costs",
+                        "money": "Your pots, your transactions and fixed costs",
                         "growth": "{maxGoals, plural, one {# goal} other {# goals}} and your income curve",
                         "energy": "Sleep, the floor under every decision",
                         "soul": "Stillness, gratitude, one intention a week"
@@ -4729,11 +4753,11 @@
                 },
                 "partner": {
                     "question": "Puis-je l'utiliser avec mon partenaire ou ma famille ?",
-                    "answer": "Oui — La formule « Basic » comprend une place de spectateur (en tribune ou en mode « look-along »). Les formules « Plus » et « Max » offrent davantage de places « à part entière » et de places de spectateur. Les membres d'un même foyer partagent les pots. Les habitudes de consommation restent personnelles, car chaque partenaire a ses propres préférences. Vous avez besoin de plus de places ? Ajoutez-en pour 2,50 € chacune."
+                    "answer": "Yes — Basic includes one viewer seat (coach or look-along). Plus and Max add more full and viewer seats. A household shares the pots. Spending style stays personal, because partners differ. Need more people? Add seats for €2.50 each."
                 },
                 "data": {
                     "question": "Où se trouvent mes données ?",
-                    "answer": "Hébergées sur des serveurs de l'UE à Amsterdam, les données sont chiffrées au repos. Vous pouvez les exporter ou les supprimer à tout moment. Si vous résiliez un abonnement payant, tous les fichiers JAR, toutes les transactions et tous les objectifs restent accessibles."
+                    "answer": "On EU servers in Amsterdam, encrypted at rest. Export or delete it any time. Cancel a paid plan and every pot, transaction and goal stays readable."
                 },
                 "language": {
                     "question": "Néerlandais ou anglais ?",
@@ -4814,7 +4838,7 @@
                         "items": [
                             "Veuillez fournir des informations d'inscription exactes (notamment votre nom et votre adresse e-mail) et les tenir à jour. Si vous indiquez votre date de naissance, celle-ci doit être exacte.",
                             "Veillez à ne pas divulguer vos identifiants de connexion ni vos codes d'authentification à deux facteurs. Vous êtes responsable de toute activité effectuée sous votre compte, sauf si vous nous avez signalé sans délai un accès non autorisé.",
-                            "Un foyer est un espace de travail partagé. Les personnes que vous invitez peuvent consulter les tirelires, les transactions, les objectifs et les données associées de ce foyer. N’invitez que des personnes en qui vous avez confiance, et uniquement si vous êtes autorisé à partager ces données avec elles.",
+                            "A household is a shared workspace. People you invite can see that household’s pots, transactions, goals and related data. Invite only people you trust and only if you are allowed to share that data with them.",
                             "Si vous êtes invité, vous devez utiliser les données du foyer uniquement pour votre propre usage — vous ne devez pas copier, publier ou utiliser de manière abusive les informations d’un autre membre.",
                             "Nous nous réservons le droit de refuser, de suspendre ou de fermer tout compte qui comporte des informations inexactes, qui fait l'objet d'un usage abusif ou qui présente un risque sur le plan de la sécurité ou sur le plan juridique."
                         ]
@@ -4933,7 +4957,7 @@
                         "items": [
                             "Identité et coordonnées : nom, adresse e-mail, date de naissance (facultative), préférences linguistiques et de paramètres régionaux.",
                             "Sécurité du compte : hachage du mot de passe (nous ne stockons jamais votre mot de passe en clair), identifiants de session, statut de l’authentification à deux facteurs (facultative) et clés secrètes nécessaires au fonctionnement de l’authentification à deux facteurs, statut de la vérification par e-mail.",
-                            "Données relatives aux finances du foyer que vous saisissez ou importez : cagnottes, transactions, objectifs, dettes, répartition des revenus, bilans hebdomadaires et données associées aux produits.",
+                            "Household money data you enter or import: pots, transactions, goals, debts, income splits, week checks, and related product data.",
                             "Données facultatives relatives au développement personnel, à l'énergie et à l'esprit que vous choisissez d'enregistrer (par exemple : objectifs, sommeil, entraînement, alimentation, repos, intentions). Vous pouvez utiliser Rumtelo sans remplir ces rubriques.",
                             "Composition du foyer : les personnes que vous invitez, leur adresse e-mail et leur rôle au sein du foyer.",
                             "Facturation : forfait, dates de renouvellement, identifiants Stripe du client et de l'abonnement. Les numéros de carte bancaire sont collectés par Stripe, et non par nos soins.",
@@ -4960,7 +4984,7 @@
                         "title": "Finalités et bases juridiques (RGPD)",
                         "body": "Nous ne vendons pas de données à caractère personnel. Nous les utilisons aux fins suivantes. Chaque finalité repose sur une base juridique prévue par le RGPD (article 6 ; article 9 lorsqu’il s’agit de données relevant de catégories particulières) :",
                         "items": [
-                            "Contrat (art. 6, paragraphe 1, point b)) — créer et authentifier votre compte, gérer l'espace de travail du foyer, afficher les bocaux, les conseils du Coach et les portails que vous utilisez, proposer des fonctionnalités d'exportation et envoyer des e-mails transactionnels (vérification, réinitialisation, sécurité).",
+                            "Contract (Art. 6(1)(b)) — create and authenticate your account, run the household workspace, show pots, Coach tips and portals you use, provide export, and deliver transactional email (verify, reset, security).",
                             "Intérêts légitimes (art. 6, paragraphe 1, point f)) — assurer la sécurité du Service, prévenir les abus et la fraude, résoudre les pannes, analyser l’utilisation globale du produit sans créer de profils publicitaires, et faire valoir ou défendre des droits en justice. Vous pouvez vous y opposer ; nous cesserons alors ces activités, sauf si nous disposons de motifs impérieux.",
                             "Consentement (art. 6, paragraphe 1, point a), et, le cas échéant, art. 9, paragraphe 2, point a)) — journaux d'énergie/d'âme facultatifs ; connexion bancaire facultative ; tout futur e-mail marketing ou cookies non essentiels. Vous pouvez retirer votre consentement à tout moment sans que cela n'affecte le traitement effectué avant ce retrait.",
                             "Obligation légale (art. 6, paragraphe 1, point c)) — tenue des registres fiscaux, comptables et relatifs au droit de la consommation pour les formules payantes ; réponse aux demandes légitimes des autorités."
@@ -4968,7 +4992,7 @@
                     },
                     "automated": {
                         "title": "Profilage et décisions automatisées",
-                        "body": "Le Coach peut générer des suggestions à partir des données que vous avez déjà enregistrées (par exemple, un bocal qui dépasse la ligne). Il s'agit d'une assistance intégrée au produit, et non d'une décision produisant des effets juridiques ou d'une importance similaire à votre égard (article 22 du RGPD). Nous n’utilisons pas uniquement le traitement automatisé pour accorder un crédit, fixer un prix qui vous est propre ou refuser la création d’un compte sans examen humain lorsque la loi l’exige. Vous pouvez ignorer les conseils du Coach ; ils n’entraînent jamais de mouvements d’argent."
+                        "body": "The Coach may generate suggestions from data you already stored (for example a pot that is over the line). That is in-product assistance, not a decision that produces legal or similarly significant effects about you (GDPR Article 22). We do not use solely automated processing to grant credit, set a price uniquely for you, or refuse an account without human review where the law requires it. You can ignore Coach tips; they never move money."
                     },
                     "household": {
                         "title": "Colocation",
@@ -5101,7 +5125,7 @@
                     "purposes": {
                         "title": "Finalités et bases juridiques",
                         "items": [
-                            "Contrat — création et gestion de votre compte, de votre espace de travail familial, de vos bocaux, des conseils de votre coach, de l'exportation et des fonctionnalités du produit que vous utilisez.",
+                            "Contract — create and run your account, household workspace, pots, Coach tips, export, and the product features you use.",
                             "Intérêt légitime — sécurité, prévention de la fraude et des abus, fiabilité et amélioration des produits ne nécessitant pas de profils publicitaires ; cet intérêt est mis en balance avec vos droits, et vous disposez d'une option de désactivation pour les analyses d'amélioration si nous venions à mettre en place un système de mesure facultatif.",
                             "Consentement — connexion bancaire facultative ; journaux d'activité physique et mentale facultatifs (et consentement explicite au titre de l'article 9 lorsque ces journaux constituent des données relevant de catégories particulières) ; tout cookie futur à des fins de marketing ou non essentiel.",
                             "Obligation légale — documents fiscaux, comptables et relatifs aux consommateurs pour les formules payantes ; demandes légitimes."
@@ -5230,7 +5254,7 @@
             "settings_practice": "Coachs et conseillers — Paramètres",
             "settings_export": "Exporter — Paramètres",
             "settings_import": "Importation — Paramètres",
-            "settings_jars": "Jars — Paramètres",
+            "settings_jars": "Pots — Settings",
             "settings_debt": "Dette — Paramètres",
             "settings_parties": "Fêtes — Paramètres",
             "settings_bank": "Banque — Paramètres",
@@ -5247,7 +5271,7 @@
             "coming_soon_title": "À venir",
             "coming_soon_body": "Les nouveaux comptes seront ouverts d'ici peu. Si vous disposez déjà d'un accès, connectez-vous pour continuer.",
             "not_found_document": "Page introuvable · Rumtelo",
-            "app_description": "Maîtrisez les effets cumulatifs. Six bocaux, un rythme hebdomadaire serein, de la place pour se développer."
+            "app_description": "Basics, Future, Free. A calm weekly routine, room to grow."
         },
         "nav": {
             "groups": {
@@ -5321,7 +5345,7 @@
                 },
                 "row_aria": "Coming up: {next}",
                 "title": "Coming up",
-                "lead": "Rumtelo starts with your jars, transactions and week check. More joins as your board fills in.",
+                "lead": "Rumtelo starts with your pots, transactions and week check. More joins as your board fills in.",
                 "next_eyebrow": "Next",
                 "trigger": {
                     "week_check": "Do your first week check — ten minutes.",
@@ -5358,7 +5382,7 @@
         },
         "onboarding": {
             "income": "Vos revenus",
-            "income_lead": "Type what lands in your account each month. Next you'll see it split into six jars.",
+            "income_lead": "Type what lands in your account each month. Next you'll see it split over Basics, Future and Free.",
             "currency": "Devise",
             "net_income_label": "Net monthly income",
             "net_income_hint": "After tax — what lands in your account.",
@@ -5370,24 +5394,24 @@
             "income_error_decimals": "Use at most two decimals.",
             "income_error_large": "That's above what Rumtelo handles per month. Check the amount.",
             "split_title": "Here's where your {amount} goes.",
-            "split_lead": "Each jar has one job. Change the percentages any time — the habit matters more than the numbers.",
+            "split_lead": "Each pot has one job. Change the percentages any time — the habit matters more than the numbers.",
             "split_list_aria": "Your split",
             "split_row_aria": "{jar}, {percent} percent, {amount}",
             "split_jobs": {
                 "NECESSITIES": "rent, bills, groceries",
-                "FINANCIAL_FREEDOM": "money that works for you — never spent",
+                "FINANCIAL_FREEDOM": "money set aside to invest — never spent",
                 "EDUCATION": "courses, books, a new skill",
                 "LONG_TERM_SAVINGS": "big buys and a safety buffer",
                 "PLAY": "fun without guilt — spend it all",
                 "GIVE": "gifts and causes you care about"
             },
-            "split_main_account": "All six jars sit on one main account for now. Add your bank when it suits you.",
+            "split_main_account": "All your pots sit on one main account for now. Add your bank when it suits you.",
             "split_note": "Rumtelo never moves money. Savings pots at your bank? Move it there yourself — we show the split.",
-            "split_change_later": "Change the percentages any time in Money › Jars.",
-            "split_zero": "No income yet? Your jars wait — they split it the second it lands.",
+            "split_change_later": "Change the percentages any time in Money › Pots.",
+            "split_zero": "No income yet? Your pots wait — they split it the second it lands.",
             "split_cta": "Looks right — open my board",
             "split_cta_pending": "Opening your board…",
-            "split_error": "We couldn't load the jars — try again.",
+            "split_error": "We couldn't load the pots — try again.",
             "onboard_error": "Your board wasn't created yet. Try again.",
             "household_default_named": "{name}'s household",
             "household_default": "Ma famille",
@@ -5398,12 +5422,12 @@
             "continue": "Continuer",
             "banks_setup": {
                 "accounts_title": "Nommez vos comptes",
-                "accounts_body": "Nommez le compte principal où arrive l’argent (Necessity). Besoin de plus ? Ajoutez-les ici, puis liez les bocaux. Vous pourrez renommer plus tard dans Paramètres.",
-                "map_title": "Lier les pots aux comptes",
-                "map_body": "Nécessité reste sur votre compte principal. Placez les autres pots sur le bon compte d’épargne. Modifiable dans Paramètres → Pots.",
-                "map_body_one": "Vous avez un seul compte — chaque bocal y est déjà lié. Modifiez ceci plus tard dans Paramètres → Bocaux si vous ajoutez d’autres comptes.",
+                "accounts_body": "Name the main account where money lands (Fixed costs and daily). Need more? Add them here — then you link the pots. You can rename later in Settings.",
+                "map_title": "Link pots to accounts",
+                "map_body": "Fixed costs and daily stays on your main account. Put the other pots on the right savings account. Change this any time in Settings → Pots.",
+                "map_body_one": "You have one account — every pot is already linked to it. Change this later in Settings → Pots if you add more accounts.",
                 "read_only_link": "Open bank settings",
-                "map_required": "Choisissez un compte pour chaque bocal avant de terminer.",
+                "map_required": "Choose an account for every pot before you finish.",
                 "bank_label": "Banque",
                 "account_name_label": "Nom du compte",
                 "iban_label": "IBAN",
@@ -5422,19 +5446,19 @@
                 "suggested_names": {
                     "main_checking": "Compte principal",
                     "savings": "Économies",
-                    "freedom": "Épargne « Freedom »",
-                    "lts": "Économies à long terme",
-                    "education": "Épargne-études",
-                    "play": "Économies sur les jeux",
-                    "give": "Offrir des réductions"
+                    "freedom": "Investing",
+                    "lts": "Buffer and goals",
+                    "education": "Learning",
+                    "play": "Fun",
+                    "give": "Giving"
                 },
                 "preview": {
                     "main_account": "Compte principal",
                     "sub_savings": "Sous-épargne"
                 },
                 "tips": {
-                    "one_account": "Commencez avec un compte principal (Necessity). Ajoutez des spaarpotjes seulement si vous bancarisez déjà ainsi — puis liez chaque bocal à l’écran suivant.",
-                    "familiar": "Commencez avec votre compte principal. Ajoutez les autres comptes que vous utilisez déjà, puis liez chaque bocal.",
+                    "one_account": "Start with one main account (Fixed costs and daily). Add spaarpotjes as extra accounts only if you already bank that way — then link each pot on the next screen.",
+                    "familiar": "Start with your main account. Add any other accounts you already use, then link each pot.",
                     "already_set_up": "Notez simplement les comptes que vous avez déjà. Rumtelo ne touche pas à votre vraie banque."
                 }
             }
@@ -5702,12 +5726,12 @@
         "practices": {
             "meta": {
                 "title": "Rumtelo for practices",
-                "description": "One desk for every client’s jars and week check — only after they say yes. Rumtelo never moves money."
+                "description": "One desk for every client’s pots and week check — only after they say yes. Rumtelo never moves money."
             },
             "hero": {
                 "eyebrow": "FOR COACHES & ADVISORS",
                 "headline": "Stop wondering where your clients stand.",
-                "lead": "One desk for every client’s jars and week check — only after they say yes. Rumtelo never moves money.",
+                "lead": "One desk for every client’s pots and week check — only after they say yes. Rumtelo never moves money.",
                 "microline": "Looking along is free for your clients."
             },
             "how": {
@@ -5725,7 +5749,7 @@
                     },
                     "desk": {
                         "title": "One desk",
-                        "body": "See every accepted client’s board, read-only, with a snapshot per client: income, jars, spending, week check."
+                        "body": "See every accepted client’s board, read-only, with a snapshot per client: income, pots, spending, week check."
                     }
                 }
             },
@@ -5735,7 +5759,7 @@
                 "points": {
                     "picture": {
                         "title": "A current picture before every session",
-                        "body": "Your clients keep six jars, their fixed costs and a ten-minute week check. You open their board and start where they are."
+                        "body": "Your clients keep their pots, their fixed costs and a ten-minute week check. You open their board and start where they are."
                     },
                     "between": {
                         "title": "Progress continues between sessions",
@@ -5919,7 +5943,7 @@
                 }
             },
             "delete": {
-                "body": "Votre foyer, vos bocaux et l'historique complet de vos transactions seront supprimés. Cette action est irréversible : veillez à exporter vos données au préalable."
+                "body": "Your household, pots, and full transaction history will be deleted. This cannot be undone — export your data first."
             },
             "plan": {
                 "members_unlimited": "Nombre illimité de membres",
@@ -5988,7 +6012,7 @@
             "panels": {
                 "start": {
                     "eyebrow": "Your start",
-                    "blurb": "New boards start with jars, transactions and the week check. The rest joins your menu after your first week check and your first closed month."
+                    "blurb": "New boards start with pots, transactions and the week check. The rest joins your menu after your first week check and your first closed month."
                 },
                 "profile": {
                     "eyebrow": "Profil",
@@ -6004,7 +6028,7 @@
                 },
                 "money_style": {
                     "eyebrow": "Votre rapport à l'argent",
-                    "blurb": "Style personnel — les partenaires peuvent avoir des préférences différentes. Utilisez cette option pour les conseils sur la répartition des pots. L'ordre de remboursement des dettes se trouve dans les paramètres « Dettes » pour l'ensemble du tableau.",
+                    "blurb": "Personal style — partners can differ. Tips on the pot split use this. Debt payoff order lives under Debt settings for the whole board.",
                     "spender": "Dépensier",
                     "spender_sub": "La joie avant tout",
                     "saver": "Économiseur",
@@ -6027,7 +6051,7 @@
                 },
                 "household": {
                     "eyebrow": "Ménage",
-                    "blurb_suffix": "Les membres partagent leurs cagnottes, leurs règles et l'historique des transactions.",
+                    "blurb_suffix": "Members share pots, rules, and transaction history.",
                     "members_stub": "Les membres apparaissent ici dès que vous avez constitué un foyer.",
                     "last_seen": "Vu pour la dernière fois {when}",
                     "last_seen_never": "Pas encore connecté",
@@ -6119,15 +6143,15 @@
                 },
                 "coach": {
                     "eyebrow": "L'entraîneur",
-                    "blurb": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money, growth, energy, and soul.",
-                    "blurb_core": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money and growth.",
+                    "blurb": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, pot cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money, growth, energy, and soul.",
+                    "blurb_core": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, pot cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money and growth.",
                     "toggle": "Diffuser « The Coach » à la télévision",
                     "hint_on": "On — look for the ✦ The Coach mark. Your tips stay at Home → The Coach.",
                     "hint_off": "Off — on-screen tips hidden. Your tips are still at Home → The Coach anytime."
                 },
                 "jars_placement": {
-                    "eyebrow": "L'emplacement de chaque bocal",
-                    "blurb": "Combinez à votre guise : l'essentiel sur votre compte courant, le reste dans des fonds communs, et la liberté financière sur un véritable compte d'épargne.",
+                    "eyebrow": "Where each pot sits",
+                    "blurb": "Mix freely — Fixed costs and daily on your current account, the rest as savings pots at your bank, Investing on its own account.",
                     "accounts_one": "Compte {count}",
                     "accounts_other": "{count} comptes",
                     "no_accounts": "Aucun compte",
@@ -6241,7 +6265,7 @@
                     "import_eyebrow": "Importer un relevé",
                     "import_blurb": "Prefer CAMT.053 from your bank. MT940 or CSV work too. After import, sort what waits under To sort and link matching fixed costs.",
                     "account_label": "Intitulé du compte",
-                    "account_label_hint": "Affiché dans les fiches de stock et lors de l'importation CSV — par exemple, lors du contrôle des opérations.",
+                    "account_label_hint": "Shown in pots and CSV — e.g. Operating checking, or Creditcard · t.n.v. Avery Chen.",
                     "type": "Type",
                     "search_bank": "Rechercher une banque — par exemple : ING, Bunq",
                     "type_bank_name": "Saisissez le nom d'une banque…",
@@ -6317,7 +6341,7 @@
                     "lead_same_day": "Le dernier jour",
                     "lead_days": "{count} jours avant",
                     "lead_hint": "« Pas maintenant » le reporte au dernier jour. Après cela, il reste en attente jusqu'à la clôture du mois.",
-                    "last_fetched": "Dernière consultation {date, date, court} {heure, heure, court}",
+                    "last_fetched": "Dernière consultation {when, date, short} {when, time, short}",
                     "rotate": "Nouvelle adresse",
                     "disable": "Éteindre"
                 },
@@ -6380,7 +6404,7 @@
                 },
                 "stillness": {
                     "eyebrow": "Votre moment de calme quotidien",
-                    "blurb": "How long you sit. Short and daily beats long and occasional — this is the one routine that costs nothing and protects every jar.",
+                    "blurb": "How long you sit. Short and daily beats long and occasional — this is the one routine that costs nothing and protects every pot.",
                     "minutes_aria": "Quelques minutes de calme chaque jour",
                     "minutes": "{count} min",
                     "stub": "Modèles d'intentions et rappels — à venir."
@@ -6395,15 +6419,15 @@
                     "rules": {
                         "split": {
                             "name": "Répartition automatique des revenus",
-                            "desc": "Tout ce qui arrive est directement mis dans les bocaux : 55/10/10/10/10/5."
+                            "desc": "Everything that arrives goes straight into the pots, by the split you set."
                         },
                         "guard": {
-                            "name": "Protection pour bocal",
-                            "desc": "Envoyer une alerte dès qu'un bocal dépasse 90 % de sa capacité allouée."
+                            "name": "Pot guard",
+                            "desc": "Warn as soon as a pot passes 90% of its allocation."
                         },
                         "sweep": {
                             "name": "Reprendre l'excédent",
-                            "desc": "Tout ce qui reste dans la catégorie « Nécessité » le 1er est transféré dans la catégorie « Liberté financière »."
+                            "desc": "Whatever is left in Fixed costs and daily on the 1st moves to Investing."
                         }
                     }
                 },
@@ -6411,8 +6435,8 @@
                     "eyebrow": "Ce que vous utilisez et ce que vous payez",
                     "blurb": "Trois formules : Basic, Plus et Max. Commencez par la formule Basic : aucune des données que vous avez saisies ne sera jamais verrouillée.",
                     "card_basic_tag": "De {price}",
-                    "card_basic_line": "Solo board — the six jars and the routine underneath. No bank needed.",
-                    "card_basic_feats": "{members} · Solo uniquement · Tirelires · 1 objectif · Coach",
+                    "card_basic_line": "Solo board — your pots and the routine underneath. No bank needed.",
+                    "card_basic_feats": "{members} · Solo only · MONEY pots · 1 goal · Coach",
                     "card_plus_tag": "Les plus populaires",
                     "card_plus_line": "Partagez ce tableau avec votre famille ou vos amis : dettes, apprentissage, semaine de l'énergie et bien d'autres objectifs.",
                     "card_plus_feats": "{members} · Dette · En savoir plus · ÉNERGIE · Objectifs",
@@ -6475,15 +6499,15 @@
                     "sheet_income": "Revenus",
                     "sheet_income_cols": "étiquette · quantité · type",
                     "sheet_fixed": "Coûts fixes",
-                    "sheet_fixed_cols": "nom · quantité · bocal",
+                    "sheet_fixed_cols": "name · amount · pot",
                     "sheet_transactions": "Transactions",
                     "sheet_transactions_cols": "date · desc · montant · fichier .jar",
                     "sheet_debts": "Dettes",
                     "sheet_debts_cols": "nom · taux · solde",
                     "sheet_goals": "Objectifs",
-                    "sheet_goals_cols": "nom · cible · pot",
+                    "sheet_goals_cols": "name · target · pot",
                     "sheet_rules": "Règles",
-                    "sheet_rules_cols": "correspondance · pot · priorité",
+                    "sheet_rules_cols": "match · pot · priority",
                     "sheet_rows_one": "{count} ligne",
                     "sheet_rows_other": "{count} lignes",
                     "sheet_rows_loading": "…",
@@ -6491,12 +6515,12 @@
                     "download_csv_zip": "Télécharger le fichier CSV (.zip)",
                     "download_json": "Télécharger le fichier JSON",
                     "download_csv": "Télécharger le fichier CSV",
-                    "format_note": "Tout est téléchargé sous forme d'un fichier ZIP contenant un fichier CSV distinct pour chaque rubrique (paramètres, boîtes, revenus, transactions, etc.). Les transactions seules et celles du mois en cours sont regroupées dans un seul fichier CSV comportant des colonnes standard (date, montant, description, bénéficiaire, boîte, note). Le fichier JSON correspond à l'archive complète de Rumtelo : utilisez la fonction « Importer » pour la restaurer ultérieurement.",
+                    "format_note": "Everything downloads a zip with one real CSV file per subject (settings, pots, income, transactions, …). Transactions-only and this month are a single CSV with portable columns (date, amount, description, payee, pot, note). JSON is the full Rumtelo archive — use Import to restore it later.",
                     "sign_in_stub": "Connectez-vous pour exporter ou importer des données."
                 },
                 "import": {
                     "eyebrow": "Restaurer un fichier Rumtelo",
-                    "blurb": "Choisissez une archive JSON ou un fichier CSV compressé au format ZIP que vous avez exporté depuis Rumtelo. Les paramètres du foyer et du compte s'appliquent lorsqu'ils sont présents ; les jars sont remappés par clé ; les doublons sont ignorés. Les dettes et les objectifs suivent votre plan.",
+                    "blurb": "Choose a JSON archive, a CSV zip, or a single CSV sheet from Export. Board and account settings apply when present; pots remap by key; duplicates are skipped. Debts and goals follow your plan.",
                     "choose": "Choisissez un fichier ZIP au format JSON ou CSV",
                     "preview": "Aperçu de l'importation",
                     "confirm": "Importation dans ce foyer",
@@ -6511,8 +6535,8 @@
                     "found_parties_other": "{count} partis",
                     "found_accounts_one": "Compte bancaire {count}",
                     "found_accounts_other": "{count} comptes bancaires",
-                    "found_jars_one": "{count} jar",
-                    "found_jars_other": "{count} bocaux",
+                    "found_jars_one": "{count} pot",
+                    "found_jars_other": "{count} pots",
                     "found_income_one": "{count} revenu",
                     "found_income_other": "{count} revenu",
                     "found_fixed_one": "{count} coût fixe",
@@ -6531,9 +6555,9 @@
                     "will": "{count} sera importé",
                     "skipped": "{count} ignoré",
                     "skipped_plan": "{count} ignoré (plan)",
-                    "split_ok": "La répartition par jar sera appliquée",
-                    "split_skip": "Répartition des parts du fonds inchangée",
-                    "format_note": "Accepte les fichiers JSON Rumtelo ou les fichiers CSV compressés au format ZIP issus de la fonction « Exporter » (settings.csv, jars.csv, transactions.csv, …). Les fichiers CSV des relevés bancaires doivent toujours être placés dans la rubrique « Banque ».",
+                    "split_ok": "Pot split will be applied",
+                    "split_skip": "Pot split unchanged",
+                    "format_note": "Accepts Rumtelo JSON, the CSV zip from Export, or one sheet (settings.csv, pots.csv, transactions.csv, …). We detect the sheet from the file name or columns. Bank statement CSVs still go under Bank.",
                     "sign_in_stub": "Connectez-vous pour importer des données."
                 },
                 "sign_out_sub": "Vous resterez connecté pendant 30 jours sur cet appareil"
@@ -6672,8 +6696,8 @@
                 "chooser_title": "Lancez votre propre projet",
                 "chooser_lead": "Tu consultes le tableau de quelqu'un d'autre. Choisis ce dont tu as besoin : tu pourras toujours faire les deux plus tard.",
                 "chooser_household_title": "Tableau des ménages",
-                "chooser_household_body": "Vos propres bocaux et votre tableau de gestion financière pour gérer votre argent personnel ou celui de votre famille.",
-                "chooser_household_bullet_1": "Six bocaux et un planning mensuel clair",
+                "chooser_household_body": "Your own pots and money board for personal or family money.",
+                "chooser_household_bullet_1": "Basics, Future, Free and a clear month overview",
                 "chooser_household_bullet_2": "Invitez votre famille ou des personnes de confiance plus tard",
                 "chooser_household_bullet_3": "Vous devenez propriétaire de votre planche",
                 "chooser_household_cta": "Fonder mon foyer",
@@ -6724,7 +6748,7 @@
             "forms": {
                 "tx_create": {
                     "title": "Nouvelle transaction",
-                    "description": "Sorties pour les dépenses, rentrées pour les cadeaux, les remboursements et les recharges du pot."
+                    "description": "Out for spend, In for gifts, refunds, and pot top-ups."
                 },
                 "tx_import": {
                     "title": "Importer un relevé bancaire",
@@ -6732,11 +6756,11 @@
                 },
                 "tx_update": {
                     "title": "Modifier la transaction",
-                    "description": "Modifier la direction, le montant, le fichier .jar ou la note."
+                    "description": "Update direction, amount, pot, or note."
                 },
                 "fixed_create": {
                     "title": "Nouveau coût fixe",
-                    "description": "Qu'est-ce qui sort du bocal chaque mois ?"
+                    "description": "What leaves a pot every month?"
                 },
                 "fixed_income_create": {
                     "title": "Add other regular income",
@@ -6754,7 +6778,7 @@
                 },
                 "income_create": {
                     "title": "Nouveaux revenus",
-                    "description": "Ajoutez une source de revenus qui viendra remplir vos bocaux."
+                    "description": "Add an income source that feeds your pots."
                 },
                 "income_update": {
                     "title": "Modifier les revenus"
@@ -6780,7 +6804,7 @@
                 "move_create": {
                     "title": "Transférer de l'argent",
                     "description": "Choisissez une date de début et une date de fin. Horaires disponibles ce mois-ci ; votre répartition reste inchangée.",
-                    "description_from_jar": "Choisissez où il va : ce bocal en est déjà la source."
+                    "description_from_jar": "Pick where it goes — this pot is already the source."
                 }
             },
             "period_travel": {
@@ -6834,7 +6858,7 @@
                 "maintenance_title": "Brève interruption de connexion",
                 "maintenance_body": "Nous effectuons une brève mise à jour. Veuillez réessayer dans quelques minutes.",
                 "maintenance_api_down_title": "Rumtelo est temporairement indisponible",
-                "maintenance_api_down_body": "Nous ne parvenons pas à accéder à l'API pour le moment. Vos pots et vos données sont en sécurité — veuillez réessayer dans quelques instants.",
+                "maintenance_api_down_body": "We cannot reach the API right now. Your pots and data are safe — try again in a moment.",
                 "maintenance_update_title": "Rumtelo se prépare",
                 "maintenance_update_body": "Nous sommes en train de finaliser une petite mise à jour. Pour l'instant, seule l'équipe Rumtelo peut se connecter.",
                 "locked_title": "Passe à un plan supérieur pour ouvrir ceci",
@@ -6881,8 +6905,8 @@
                 "description": "Guides, documents juridiques et comment nous joindre. Rumtelo est exploité depuis Amsterdam — nous répondons par e-mail.",
                 "cards": {
                     "spaarpotjes": {
-                        "title": "Spaarpotjes et bocaux",
-                        "body": "Une banque, six bocaux : comment le compte principal et les sous-épargnes fonctionnent ensemble.",
+                        "title": "Spaarpotjes & Rumtelo Pots",
+                        "body": "One bank, your Rumtelo Pots: how main account and sub-savings work together.",
                         "cta": "Lire le guide"
                     },
                     "legal": {
@@ -6898,7 +6922,7 @@
                 }
             },
             "spaarpotjes": {
-                "title": "Spaarpotjes et les six bocaux",
+                "title": "Spaarpotjes and Rumtelo Pots",
                 "description": "Court guide pour les foyers qui gardent un compte principal et répartissent le reste en spaarpotjes (sous-épargnes).",
                 "sections": {
                     "what": {
@@ -6907,11 +6931,11 @@
                     },
                     "jars": {
                         "title": "Comment Rumtelo s’y rattache",
-                        "body": "Necessity est votre compte principal : salaire et factures y arrivent. Les cinq autres bocaux — Freedom, Long-term Savings, Education, Play, Give — sont des spaarpotjes. Rumtelo suit la répartition ; votre banque détient les euros."
+                        "body": "Fixed costs and daily lives on your hoofdrekening (main account): salary and bills land there. The other pots — Buffer and goals, Investing, Learning, Fun, Giving — can be spaarpotjes. Rumtelo tracks the split; your bank holds the euros."
                     },
                     "banks": {
                         "title": "Ce que propose en général votre banque",
-                        "body": "La plupart des banques néerlandaises et de nombreuses banques de l’UE permettent plusieurs pots d’épargne sous un même compte. Nommez-les d’après les bocaux (ou gardez les noms de la banque et liez-les dans Rumtelo). Vous n’avez pas besoin de six comptes bancaires séparés."
+                        "body": "Most Dutch and many EU banks let you open several savings pots under one account. Name them after your Rumtelo Pots (or keep the bank names and link them in Rumtelo). You do not need a separate bank account per pot."
                     },
                     "rumtelo": {
                         "title": "Ce que Rumtelo ne fait pas",
@@ -7018,10 +7042,10 @@
             "lead_core": "Wondering what? Where your money went. Rumtelo helps you see it, so nothing stays a mystery. From there you get grip again: control over what matters. Clear tools for that, and we’ll keep adding more. The Coach can give a tip. You choose what to do next.",
             "meaning_eyebrow": "✦ Comment Rumtelo peut vous aider",
             "meaning": {
-                "money_leaves_body": "Quand de l'argent sort, vous voyez immédiatement de quel pot il provient — et combien il reste pour cette tâche. Pas besoin de faire un tableau Excel après coup.",
+                "money_leaves_body": "When money leaves, you see which pot it came from — and how much is left for that job. Not a spreadsheet after the fact.",
                 "assign": {
                     "line": "Donnez une utilité à votre argent avant de le dépenser.",
-                    "body": "Les revenus sont versés et répartis dans six bocaux. D'abord, la répartition. Ensuite, les dépenses. Rumtelo n'effectue jamais de mouvements d'argent sur votre compte bancaire : c'est vous qui vous en chargez. Nous vous proposons une vue d'ensemble."
+                    "body": "Income comes in and splits over Basics, Future and Free. Split first. Spend second. Rumtelo never moves money at your bank — you do. We show the overview."
                 },
                 "direction": {
                     "body": "Regarder en arrière, ce n'est qu'une partie de l'histoire. C'est en évoluant que l'on va de l'avant : compétences, objectifs, apprentissage et, si vous le souhaitez, revenus."
@@ -7033,7 +7057,7 @@
             "portals": {
                 "money": {
                     "line": "Gardez le contrôle de votre argent.",
-                    "body": "Six bocaux : revenus, factures, solde. Vous saisissez vos entrées et vos sorties. Rumtelo vous présente votre plan — ce n’est pas une application de gestion budgétaire qui se contente de faire les comptes a posteriori."
+                    "body": "Basics, Future, Free. Income, bills, what’s left. You enter what comes in and goes out. Rumtelo shows the split — not a budget app that only counts afterwards."
                 },
                 "growth": {
                     "line": "Maîtrisez votre croissance.",
@@ -7050,7 +7074,7 @@
             },
             "closing_title": "C'est vous qui gardez le contrôle.",
             "closing_body": "Voyez où ça vous a mené. Reprenez le contrôle. Que vous soyez nouveau ici ou déjà sur la bonne voie : des outils clairs, des conseils que vous pouvez mettre en pratique. Des informations, jamais de reproches — avoir dépensé plus que prévu est un signal qui vous invite à ajuster votre comportement, pas un jugement à votre égard.",
-            "cta_jars": "Voir mes bocaux",
+            "cta_jars": "View my pots",
             "cta_week_check": "Bilan hebdomadaire"
         }
     }

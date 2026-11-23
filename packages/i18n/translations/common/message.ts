@@ -25,12 +25,12 @@ const message = {
         send_failed: 'Could not send',
         /** Known Nest/oRPC keys — must match `API_ERROR_MESSAGES` in @rumtelo/contracts. */
         api: {
-            goal_save_only_jar_focus: 'Only SAVE goals have jar focus',
-            goal_save_needs_jar_focus: 'SAVE goal needs a jar before it can be focus',
+            goal_save_only_jar_focus: 'Only SAVE goals have pot focus',
+            goal_save_needs_jar_focus: 'SAVE goal needs a pot before it can be focus',
             goal_only_active_focus: 'Only active goals can be focus',
             goal_save_only_achieved: 'Only SAVE goals can be marked achieved this way',
             goal_not_active: 'Goal is not active',
-            goal_no_jar_spend: 'Goal has no jar to spend from',
+            goal_no_jar_spend: 'Goal has no pot to spend from',
             payment_amount_positive: 'Payment amount must be positive',
             bill_paused_no_settlement: 'Paused or ended bills cannot take new settlements.',
             due_month_required: 'Pick which month you are charged for quarterly or yearly bills.',
@@ -82,8 +82,8 @@ const message = {
             member_not_found: 'That household member is no longer here',
             cannot_remove_owner: 'The household owner cannot be removed',
             member_remove_failed: 'Could not remove that member. Try again.',
-            jar_split_total: 'Jar split must total 100%, received {total}%',
-            jar_split_keys: 'Jar split must list each of the six jars exactly once',
+            jar_split_total: 'Pot split must total 100%, received {total}%',
+            jar_split_keys: 'The split must list every pot exactly once',
             jar_placement_account_invalid: 'That bank account is not in this household.',
             book_catalog_unavailable: 'The book catalog did not answer.',
             contact_send_failed:

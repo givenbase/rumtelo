@@ -24,10 +24,10 @@ const dashboard = {
         close_explain_overdue:
             'This month is overdue to close. Sort your transactions, then carry or skip unpaid bills and close it.',
         /** Compact period-travel note (lives here instead of a Coach slide). */
-        travel_past_one: '{stamp} · about {money} through jars over {horizon} month',
-        travel_past_other: '{stamp} · about {money} through jars over {horizon} months',
-        travel_ahead_one: 'By {stamp} · about {money} through jars over {horizon} month',
-        travel_ahead_other: 'By {stamp} · about {money} through jars over {horizon} months',
+        travel_past_one: '{stamp} · about {money} through pots over {horizon} month',
+        travel_past_other: '{stamp} · about {money} through pots over {horizon} months',
+        travel_ahead_one: 'By {stamp} · about {money} through pots over {horizon} month',
+        travel_ahead_other: 'By {stamp} · about {money} through pots over {horizon} months',
         travel_jar: '{name} {from} → {to}',
         /** Screen-reader prefix for the level name next to the score. */
         level_sr: 'Level: {level}',
@@ -87,7 +87,7 @@ const dashboard = {
     },
     recap: {
         surplus: '{amount} left this period',
-        overspent: 'One or more jars are overspent',
+        overspent: 'One or more pots are overspent',
     },
     household: {
         eyebrow: 'Your household',
@@ -127,7 +127,7 @@ const dashboard = {
             cta: 'Close month',
         },
         no_transactions: {
-            title: 'Your jars are filled. Now see where it goes.',
+            title: 'Your pots are filled. Now see where it goes.',
             body: "Add this week's spending — by hand or import a bank statement. Next week, your first week check takes ten minutes.",
             body_basic:
                 "Add this week's spending as it happens. Next week, your first week check takes ten minutes.",
@@ -135,7 +135,7 @@ const dashboard = {
             import: 'Import a statement',
         },
         zero_income: {
-            title: 'No income yet? Add it when it lands — your jars split it the same second.',
+            title: 'No income yet? Add it when it lands — your pots split it the same second.',
             cta: 'Add income',
         },
         inbox: {
@@ -149,7 +149,7 @@ const dashboard = {
         calm: {
             title: 'Every euro has a job. Next week check: {weekday}.',
             title_other_currency: 'Every amount has a job. Next week check: {weekday}.',
-            link: 'See your jars',
+            link: 'See your pots',
         },
         viewer: {
             close_prior: '{month} is ready to close.',
@@ -177,11 +177,11 @@ const dashboard = {
     },
     coach: {
         all_tips: 'All tips ({count})',
-        inbox_one: '{count} transaction waiting for a jar.',
-        inbox_many: '{count} transactions waiting for a jar.',
+        inbox_one: '{count} transaction waiting for a pot.',
+        inbox_many: '{count} transactions waiting for a pot.',
         all_sorted: 'All sorted — time for intention.',
         week_check: 'Week check',
-        see_jars: 'See jars',
+        see_jars: 'See pots',
         practice_pending_one:
             'A Practice invitation is waiting — accept in settings if you want them on your board.',
         practice_pending_many:
@@ -194,14 +194,14 @@ const dashboard = {
         money_put_through_one: 'Money · Put through over 1 month',
         money_distributed: 'Money · Distributed this month',
         money_allocated_month: 'Money · Allocated this month',
-        income_span: 'Across {months} months · {jars} jars',
-        income_span_one_jar: 'Across {months} months · 1 jar',
-        income_month: 'Distributed across {jars} jars',
-        income_month_one_jar: 'Distributed across 1 jar',
+        income_span: 'Across {months} months · {jars} pots',
+        income_span_one_jar: 'Across {months} months · 1 pot',
+        income_month: 'Distributed across {jars} pots',
+        income_month_one_jar: 'Distributed across 1 pot',
         see_income: 'See income ▸',
         in_pots_label: 'In the pots',
         in_pots_hint: 'Built up over the months',
-        six_jars: '✦ The six jars',
+        six_jars: '✦ Your pots',
         see_all_jars: 'See all ▸',
     },
     travel: {
@@ -215,7 +215,7 @@ const dashboard = {
     stats: {
         avg_left: 'Avg left',
         safe_per_day: 'Safe / day',
-        play_left: 'In Play',
+        play_left: 'In Fun',
     },
     open_portal: 'Open ▸',
     why: {

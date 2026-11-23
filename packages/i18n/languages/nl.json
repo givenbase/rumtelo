@@ -98,7 +98,7 @@
                     "cannot_remove_owner": "De eigenaar van het huishouden kun je niet verwijderen",
                     "member_remove_failed": "Dit lid kon niet worden verwijderd. Probeer het opnieuw.",
                     "jar_split_total": "De potjesverdeling moet samen 100% zijn; ontvangen: {total}%",
-                    "jar_split_keys": "De verdeling moet elk van de zes potjes precies één keer bevatten",
+                    "jar_split_keys": "De verdeling moet elk potje precies één keer bevatten",
                     "jar_placement_account_invalid": "Die bankrekening hoort niet bij dit huishouden.",
                     "book_catalog_unavailable": "De boekencatalogus gaf geen antwoord.",
                     "contact_send_failed": "Je bericht kon niet worden verzonden. Probeer het nog eens of stuur ons rechtstreeks een e-mail.",
@@ -398,7 +398,7 @@
             },
             "sign_up": {
                 "title": "Maak je account aan",
-                "subtitle": "Zes potjes. Eén overzichtelijk geheel.",
+                "subtitle": "Drie groepen. Eén rustig overzicht.",
                 "subtitle_practice": "Eén bureau voor elke cliënt.",
                 "submit": "Account aanmaken",
                 "have_account": "Heb je al een account?",
@@ -514,7 +514,7 @@
                 "portals_eyebrow": "Houding ten opzichte van het leven",
                 "portals_line": "Geld. Groei. Energie. Ziel — hulpmiddelen om grip op het leven te krijgen.",
                 "portals_line_core": "Geld. Groei — hulpmiddelen om grip op het leven te krijgen, en er komt nog meer aan.",
-                "jars_eyebrow": "Zes potjes",
+                "jars_eyebrow": "Rumtelo-potjes",
                 "jars_line": "Salaris gestort. Reeds toegewezen.",
                 "portals": {
                     "money": {
@@ -536,28 +536,28 @@
                 },
                 "jars": {
                     "necessity": {
-                        "name": "Noodzakelijk",
-                        "short": "NEC"
+                        "name": "Vaste kosten en dagelijks",
+                        "short": "KOSTEN"
                     },
                     "freedom": {
-                        "name": "Vrijheid",
-                        "short": "FF"
+                        "name": "Beleggen",
+                        "short": "BELEGGEN"
                     },
                     "education": {
-                        "name": "Opleiding",
-                        "short": "EDU"
+                        "name": "Leren",
+                        "short": "LEREN"
                     },
                     "savings": {
-                        "name": "Sparen",
-                        "short": "LTS"
+                        "name": "Buffer en doelen",
+                        "short": "BUFFER"
                     },
                     "play": {
                         "name": "Plezier",
-                        "short": "PLAY"
+                        "short": "PLEZIER"
                     },
                     "give": {
                         "name": "Geven",
-                        "short": "GIVE"
+                        "short": "GEVEN"
                     }
                 }
             },
@@ -565,12 +565,12 @@
                 "money_picture": {
                     "eyebrow": "Je geld",
                     "headline": "Weet waar het gebleven is. Weet waar het naartoe gaat.",
-                    "support": "Kijk waar het heen is gegaan. Krijg weer grip. Zes potjes beslissen."
+                    "support": "Zie waar het bleef. Krijg weer grip. Eerst verdelen, dan uitgeven."
                 },
                 "how_it_works": {
                     "eyebrow": "Vandaag",
                     "headline": "Salaris gestort. Beeld helder.",
-                    "support": "Wijs het toe. En geef het vervolgens uit. Zes potjes bepalen het."
+                    "support": "Wijs het toe. Geef het daarna uit. Basis, Toekomst, Vrij."
                 },
                 "energy": {
                     "eyebrow": "Je capaciteit",
@@ -603,7 +603,7 @@
             },
             "money-jars": {
                 "name": "Potjes",
-                "description": "De zes potjes — het kernmodel voor geld."
+                "description": "Rumtelo-potjes — het kernmodel voor geld."
             },
             "money-spending": {
                 "name": "Transacties",
@@ -683,7 +683,7 @@
             },
             "soul-giving": {
                 "name": "Geven",
-                "description": "Waarom het ‘Give’-potje bestaat, waar de opbrengst naartoe gaat en hoe je een goede keuze maakt."
+                "description": "Waarom het potje Geven bestaat, waar het naartoe gaat en hoe je goed kiest."
             },
             "soul-intent": {
                 "name": "Doel",
@@ -804,17 +804,17 @@
             "got_it": "Oké, begrepen",
             "split_more": "{count, plural, =1 {Nog 1 tip} other {Nog # tips}}",
             "split_tips": {
-                "play-above-default": "Het deel dat je aan ‘plezier’ uitgeeft en boven de 10% ligt, komt meestal uit ‘financiële vrijheid’ of ‘langetermijnspaargeld’. Die twee zorgen voor je toekomst; ‘plezier’ is wat je deze maand uitgeeft.",
-                "play-above-default-saver": "Een uitgavenpercentage van meer dan 10% kan gezond zijn als je niet te veel uitgeeft aan plezier — zorg er alleen voor dat je dit niet financiert door in te boeten aan financiële vrijheid.",
-                "give-above-default": "Meer dan 5% doneren is gul — houd je ‘financiële vrijheid’ op minimaal 10%, zodat doneren niet ten koste gaat van het eerst geld opzij zetten voor jezelf.",
-                "edu-above-soft": "Onderwijs verhoogt je verdiencapaciteit — zorg er echter voor dat je 10% reserveert voor financiële vrijheid, zodat leren niet ten koste gaat van beleggen.",
-                "ff-below-default": "Financiële vrijheid onder de 10% betekent dat je eerst alle anderen betaalt. Neem jezelf weer op in de verdeling voordat je ‘Play’ of ‘Give’ verhoogt.",
-                "lts-below-default": "Als je op lange termijn minder dan 10% spaart, heb je geen buffer voor geplande grote uitgaven. Verhoog dit percentage voordat je Play uitbreidt.",
-                "future-vs-fun": "Je besteedt vandaag geld (Plezier / Geven), terwijl je je toekomst (Vrijheid + Lange termijn) beperkt. Ik geef er de voorkeur aan om die twee op de eerste plaats te zetten, vóór plezier.",
-                "nec-high": "Een Noodzakelijk-aandeel van meer dan 60% zet alle andere potjes onder druk. Het verlagen van vaste kosten helpt meestal meer dan het inperken van vrijheid.",
-                "nec-low": "Een budget van minder dan 45% is voor de meeste huishoudens krap — controleer of de huur, verzekeringen en aflossingen van schulden nog binnen het budget passen.",
-                "spender-ff": "Je patroon neigt naar meer uitgaven — probeer 1–2% extra aan ‘Financiële vrijheid’ toe te wijzen voordat je meer aan ‘Vrije tijd’ toevoegt.",
-                "saver-play": "Je patroon neigt naar veilig — een beetje meer speelsheid kan het plan duurzaam maken. Geplande vreugde is geen verspilling."
+                "play-above-default": "Plezier boven 10% komt meestal uit Beleggen of Buffer en doelen. Die twee bouwen je toekomst; Plezier geef je deze maand uit.",
+                "play-above-default-saver": "Plezier boven 10% kan gezond zijn als je zelden iets voor plezier uitgeeft — haal het alleen niet uit Beleggen.",
+                "give-above-default": "Geven boven 5% is gul — houd Beleggen op minstens 10%, zodat geven niet in de plaats komt van eerst jezelf betalen.",
+                "edu-above-soft": "Leren verhoogt je verdienvermogen — houd Beleggen toch op 10%, zodat leren beleggen niet verdringt.",
+                "ff-below-default": "Beleggen onder 10% betekent dat je eerst iedereen anders betaalt. Zet jezelf terug in de verdeling voordat je Plezier of Geven verhoogt.",
+                "lts-below-default": "Buffer en doelen onder 10% laat weinig ruimte voor tegenvallers en geplande grote dingen. Verhoog dit voordat je Plezier verhoogt.",
+                "future-vs-fun": "Je geeft meer aan vandaag (Plezier, Geven) en minder aan morgen (Beleggen, Buffer en doelen). Verhoog eerst die twee.",
+                "nec-high": "Vaste kosten en dagelijks boven 60% knijpt elk ander potje af. Vaste kosten verlagen helpt meestal meer dan minder beleggen.",
+                "nec-low": "Vaste kosten en dagelijks onder 45% is krap voor de meeste huishoudens — check of huur, verzekeringen en aflossingen er nog in passen.",
+                "spender-ff": "Je patroon neigt naar uitgeven — probeer 1–2% extra naar Beleggen voordat je Plezier verhoogt.",
+                "saver-play": "Je patroon neigt naar sparen — met iets meer Plezier houd je de verdeling vol. Geplande vreugde is geen verspilling."
             },
             "helpers": {
                 "mark_title": "Van De Coach — schakel tips op het scherm in of uit via Instellingen → Voorkeuren",
@@ -859,7 +859,7 @@
                     }
                 },
                 "necessities_share": {
-                    "text": "Noodzakelijk staat op {pct}% — het doel is 55%. Prima voor nu; om het gat te dichten, schrap je vaste kosten of verhoog je je inkomen, en laat je Vrijheid met rust.",
+                    "text": "Vaste kosten en dagelijks staat op {pct}%, boven de 55% waarmee de standaardverdeling begint. Prima voor nu — wil je het omlaag, verlaag dan vaste kosten of verhoog je inkomen, en laat Beleggen staan.",
                     "cta": "Bekijk potjes"
                 },
                 "over_necessities": {
@@ -1330,11 +1330,11 @@
                     "give_mode_org": "Help me kiezen",
                     "give_mode_open": "Laat het open staan",
                     "pledge_tip_link": "Waarom ‘geven’ in een geld-app staat → Soul",
-                    "pledge_tip_body": "Elk gesorteerd bedrag dat dit jaar uit je ‘Give’-potje komt, telt mee — je hoeft niets met de hand te verplaatsen.",
+                    "pledge_tip_body": "Elk gesorteerd bedrag dat dit jaar uit je potje Geven gaat, telt mee — je hoeft niets met de hand te verplaatsen.",
                     "cause_label": "Reden (doel)",
                     "cause_aria": "Aanleiding geven",
                     "cause_any": "Om welke reden dan ook",
-                    "cause_open_hint": "Open toezegging — elke bijdrage uit het ‘Give’-potje telt mee.",
+                    "cause_open_hint": "Open toezegging — alles wat uit het potje Geven gaat, telt mee.",
                     "organization": "Organisatie",
                     "give_mode_aria": "Hoe concreet is deze toezegging?",
                     "give_mode_hint": "Ik weet wie — vul de naam in van degene aan wie je al doneert. Help me kiezen — een shortlist van De Coach met onafhankelijke beoordelingen. Houd het open — noem alleen het goede doel, nog geen organisatie.",
@@ -1453,9 +1453,9 @@
                     "advice_earn_short_body": "Bekijk je inkomen en controleer de bronnen. Een loonsverhoging of een verlaging van de vaste kosten op het juiste moment dicht de kloof vaak sneller dan je zou hopen.",
                     "advice_give_planned_title": "Geven is een geplande uitgave",
                     "advice_give_planned_body_jar": "Geld dat {jar} verlaat, telt mee voor deze toezegging. Stel een automatische maandelijkse donatie in als je moeite hebt om je aan je voornemen te houden.",
-                    "advice_give_planned_body": "Automatiseer een maandelijkse donatie als je wilskracht het knelpunt is — het toegezegde bedrag wordt aangevuld met wat er daadwerkelijk uit de donatiepot is gegaan.",
+                    "advice_give_planned_body": "Automatiseer een maandelijkse gift als wilskracht het knelpunt is — de toezegging vult zich met wat echt uit het potje Geven ging.",
                     "advice_give_gap_title": "De maandelijkse kloof dichten",
-                    "advice_give_gap_body": "Als er ongeveer {amount} meer per maand wordt gedoneerd, wordt de toezegging op tijd nagekomen. Een vast bedrag bij Noodzakelijk of ‘Give’ maakt het saai — op een positieve manier.",
+                    "advice_give_gap_body": "Met ongeveer {amount} meer per maand haal je de toezegging op tijd. Een vaste maandelijkse gift uit Geven maakt het saai — op een goede manier.",
                     "advice_save_amount_title": "Stel een maandelijks bedrag in",
                     "advice_save_amount_body": "Een doel zonder tempo is slechts een wens. Bepaal hoeveel je elke maand van dit potje kunt missen — dan verschijnt de einddatum.",
                     "advice_save_pace_title": "Op koers — houd het ritme vast",
@@ -1477,15 +1477,15 @@
             "net_worth": {
                 "page_eyebrow": "✦ MIJN VERMOGEN",
                 "page_title": "Wat je al bezit — en wat het oplevert of kost.",
-                "page_lead": "Bezit plus langetermijnspaargeld en financiële vrijheid, minus open schulden. Gekoppelde inkomsten en rekeningen zijn geld in beweging, geen verlanglijst.",
+                "page_lead": "Bezit plus wat in Beleggen en in Buffer en doelen staat, minus open schulden. Gekoppelde inkomsten en rekeningen zijn geld in beweging, geen verlanglijst.",
                 "add_asset": "+ Bezit toevoegen",
                 "horizon_eyebrow": "✦ Hoe ver kom je hiermee?",
                 "stat_holdings": "Bezit",
-                "stat_jars": "LTS + Vrijheid",
+                "stat_jars": "Buffer + Beleggen",
                 "stat_monthly_income": "Maandelijks inkomen",
                 "stat_debt": "Totale schuld",
                 "none_yet": "Nog geen",
-                "summary": "Je nettovermogen bedraagt {net} — {owned} aan bezittingen minus {owed} aan schulden. Zet je spaargeld in LTS/Freedom of als contant vermogen — niet beide.",
+                "summary": "Je nettovermogen is {net} — {owned} bezit min {owed} schuld. Tel spaargeld in je potjes of als contant bezit — niet allebei.",
                 "show": "Weergeven",
                 "filter_all": "Alles",
                 "search_placeholder": "Zoeken bezig…",
@@ -1508,7 +1508,7 @@
                 "not_available_yet": "nog niet beschikbaar",
                 "per_month_short": "p/m",
                 "empty_title": "Nog geen bezittingen",
-                "empty_body": "Voeg je eerste bezit toe (bijvoorbeeld een belegging). LTS- en Freedom-potjes en schulden tellen al mee. Tel spaargeld niet dubbel: niet als contant bezit en ook niet in die potjes.",
+                "empty_body": "Voeg je eerste bezit toe (bijvoorbeeld een belegging). Buffer en doelen, Beleggen en je schulden tellen al mee. Tel spaargeld niet dubbel: niet als contant bezit én in die potjes.",
                 "debt_empty_title": "Er zijn geen schulden geregistreerd",
                 "debt_empty_body": "Schulden die je toevoegt onder ‘Geld’ → ‘Schulden’ verschijnen hier automatisch.",
                 "month_score_eyebrow": "Maandscore",
@@ -1935,7 +1935,7 @@
                     },
                     "emergency_buffer": {
                         "name": "Een noodbuffer opbouwen",
-                        "doneWhen": "De buffer staat in mijn potje Lange termijn",
+                        "doneWhen": "De buffer staat in mijn potje Buffer en doelen",
                         "firstStep": "Bepaal het bedrag en stel de maandelijkse overboeking in"
                     },
                     "pay_off_debt": {
@@ -2080,7 +2080,7 @@
                     "amount_earn_hint": "Je netto inkomen per maand. Het komt niet uit een potje.",
                     "per_month": "≈ {amount} per maand tot december",
                     "jar": "Welk potje?",
-                    "jar_hint": "Geplande uitgaven horen bij Lange termijn.",
+                    "jar_hint": "Geplande uitgaven horen bij Buffer en doelen.",
                     "jar_placeholder": "Kies een potje",
                     "shared_note": "Een doel met een bedrag deel je met je huishouden bij Geld.",
                     "amount_locked": "Bedragen bij doelen horen bij een abonnement met Geld-doelen. Het doel zelf wordt wel opgeslagen.",
@@ -2278,7 +2278,7 @@
             "hub": {
                 "eyebrow": "Geld · deze maand",
                 "title": "Hoe je geld wordt verplaatst.",
-                "line": "Grip op je geld — zes potjes, wat binnenkomt, wat eruit gaat.",
+                "line": "Grip op je geld — je potjes, wat binnenkomt, wat eruit gaat.",
                 "cards": {
                     "jars": {
                         "name": "Potjes",
@@ -2309,14 +2309,37 @@
                     }
                 }
             },
+            "groups": {
+                "method_name": "Rumtelo-potjes",
+                "BASIS": {
+                    "title": "Basis",
+                    "line": "Wat moet, elke maand."
+                },
+                "FUTURE": {
+                    "title": "Toekomst",
+                    "line": "Wat je opbouwt."
+                },
+                "FREE": {
+                    "title": "Vrij",
+                    "line": "Wat je kiest."
+                },
+                "order_hint": "Je geld stroomt in deze volgorde.",
+                "all_placed": "Alles heeft een plek",
+                "left_to_place": "Nog {amount} te verdelen",
+                "share_of_income": "{percent}% van je inkomen",
+                "all": "Alles",
+                "open_group": "Open {group}",
+                "view_label": "Toon",
+                "bar_label": "Aandeel van je inkomen per groep: {shares}"
+            },
             "jars": {
                 "coach_line": {
                     "necessities_over": "{jar} heeft deze maand {amount} meer nodig dan het krijgt.",
                     "open_fixed": "Open vaste kosten"
                 },
-                "eyebrow": "DE ZES POTJES",
+                "eyebrow": "RUMTELO-POTJES",
                 "title": "Elke munt krijgt een taak vóór hij binnenkomt.",
-                "lead": "Zodra je inkomsten binnenkomen, wordt het bedrag direct verdeeld. Financiële vrijheid wordt nooit uitgegeven — alleen geïnvesteerd.",
+                "lead": "Inkomen komt binnen en wordt meteen verdeeld. Geld in Beleggen staat apart om te beleggen. Dat doe je zelf.",
                 "on_track": "{on} / {total} liggen op schema",
                 "move_between": "Van potje naar potje gaan",
                 "add_transaction": "+ Transactie toevoegen",
@@ -2333,19 +2356,19 @@
                 "left_label": "Over deze maand",
                 "left_label_stacked": "Over in de periode",
                 "names": {
-                    "NECESSITIES": "Noodzakelijk",
-                    "FINANCIAL_FREEDOM": "Financiële vrijheid",
-                    "LONG_TERM_SAVINGS": "Lange termijn",
-                    "EDUCATION": "Opleiding",
+                    "NECESSITIES": "Vaste kosten en dagelijks",
+                    "FINANCIAL_FREEDOM": "Beleggen",
+                    "LONG_TERM_SAVINGS": "Buffer en doelen",
+                    "EDUCATION": "Leren",
                     "PLAY": "Plezier",
                     "GIVE": "Geven"
                 },
                 "purpose": {
                     "NECESSITIES": "Huur, eten, rekeningen",
                     "FINANCIAL_FREEDOM": "Beleggen, nooit uitgeven",
-                    "LONG_TERM_SAVINGS": "Grote plannen, buffer",
+                    "LONG_TERM_SAVINGS": "Voor nood en tegenvallers, en je grote plannen.",
                     "EDUCATION": "Cursussen, boeken, groei",
-                    "PLAY": "Plezier, vrij te besteden",
+                    "PLAY": "Uitgaan, hobby’s, vrij te besteden",
                     "GIVE": "Doneren, anderen helpen"
                 },
                 "this_month": "Deze maand",
@@ -2361,8 +2384,8 @@
                 "guides": {
                     "NECESSITIES": {
                         "subtitle": "Verplichte betalingen",
-                        "note": "Huur, energie, verzekeringen, boodschappen, vervoer. Het gaat erom dat je onder de 55% blijft.",
-                        "not_allowed": "Niet om uit eten te gaan, kleding te kopen of plezier te maken — dat is Play.",
+                        "note": "Huur, energie, verzekeringen, boodschappen, vervoer. Wat moet, elke maand.",
+                        "not_allowed": "Niet voor uit eten, kleding of uitjes — dat is Plezier.",
                         "allowed": {
                             "rent": "Huur",
                             "energy_water": "Energie en water",
@@ -2380,7 +2403,7 @@
                     },
                     "FINANCIAL_FREEDOM": {
                         "subtitle": "Geef nooit geld uit",
-                        "note": "Met dit potje koop je activa. Geld gaat erin en komt er nooit meer uit — alleen het rendement komt eruit.",
+                        "note": "Dit potje staat apart voor bezit dat je zelf koopt. Geld gaat erin en hoort er te blijven — alleen wat het oplevert komt eruit.",
                         "not_allowed": "Ga nooit geld opnemen om iets te kopen. Je mag alleen geld terugstorten — en dat kun je beter ook maar laten staan.",
                         "allowed": {
                             "index_funds": "Indexfondsen en ETF’s",
@@ -2398,7 +2421,7 @@
                             "crypto": "Crypto",
                             "trading": "Handel en experimenten"
                         },
-                        "sub_note": "Handelen is toegestaan, maar alleen vanuit dit 10%-gedeelte — nooit vanuit de rest. Als je dit verliest, verlies je een maand, niet je toekomst."
+                        "sub_note": "Handelen mag, maar alleen vanuit dit kleine hoekje — nooit vanuit de rest. Verlies je het, dan verlies je een maand, niet je toekomst."
                     },
                     "LONG_TERM_SAVINGS": {
                         "subtitle": "Grote dingen",
@@ -2419,7 +2442,7 @@
                     "EDUCATION": {
                         "subtitle": "Ontwikkel jezelf",
                         "note": "Boeken, cursussen, mentoren, hulpmiddelen. De enige uitgaven die je verdiencapaciteit vergroten. Gebruik Leren voor wat je doorwerkt, blader door de bibliotheek voor inspiratie, en zet een doel op dit potje als je klaar bent om het te claimen.",
-                        "not_allowed": "Alleen als het je verdiencapaciteit vergroot. Een cursus die je nooit afmaakt, hoort thuis in Play.",
+                        "not_allowed": "Alleen als het je verdienvermogen vergroot. Een cursus die je nooit afmaakt, hoort bij Plezier.",
                         "allowed": {
                             "books": "Boeken",
                             "courses": "Cursussen en opleidingen",
@@ -2875,7 +2898,7 @@
                 "note_placeholder_out": "Optioneel — bijv. kinderlunch",
                 "no_jars": "Geen potjes — eerst de installatie voltooien",
                 "default_description": "Transactie",
-                "give_one_time_hint": "Eenmalige donatie — wordt weergegeven bij transacties onder ‘Geven’ en ‘Uitgaand’. Voeg voor een periodieke donatie in plaats daarvan vaste kosten toe."
+                "give_one_time_hint": "Eenmalige gift — staat bij Geven en bij Uitgaand. Voor een terugkerende gift voeg je vaste kosten toe."
             },
             "income_form": {
                 "save": "Inkomsten opslaan",
@@ -2940,7 +2963,7 @@
                 "moving_preview": "Verplaatsing van {amount} van {from} naar {to}",
                 "balance_after": "{jar} {before} → {after}",
                 "to_arrow": "↓ Naar",
-                "sidebar_hint": "Alleen potjes waarin nog geld zit, kunnen geld overmaken. Het geld in ‘Financiële vrijheid’ blijft belegd.",
+                "sidebar_hint": "Alleen potjes met geld erin kunnen sturen. Beleggen staat apart en geef je niet uit.",
                 "left": "{amount} links",
                 "cannot_send": "Ik kan vanaf hier niet verzenden",
                 "sending_from": "Vanaf hier verzenden",
@@ -3244,7 +3267,7 @@
                     "term_count": "Aantal betalingen",
                     "term_placeholder": "bijv. 24",
                     "pay_off_by": "Afbetalen via",
-                    "link_fixed_title": "Voeg dit ook toe als vaste kosten in Noodzakelijk",
+                    "link_fixed_title": "Voeg ook toe als vaste kosten in Basis",
                     "link_fixed_body": "Hiermee houd je de geplande aflossing in je potjesbudget volgens dit ritme aan.",
                     "kind_credit_card": "Creditcard",
                     "kind_loan": "Lening",
@@ -3255,7 +3278,7 @@
                 },
                 "toast_payment_recorded": "Betaling geregistreerd",
                 "toast_payment_failed": "Betaling is mislukt",
-                "toast_monthly_added": "Maandelijkse betaling toegevoegd aan Noodzakelijk",
+                "toast_monthly_added": "Maandbedrag toegevoegd aan vaste kosten",
                 "toast_fixed_failed": "De vaste kosten konden niet worden toegevoegd",
                 "show_payments_aria": "{name}-betalingen weergeven",
                 "hide_payments_aria": "{name}-betalingen verbergen",
@@ -3300,9 +3323,9 @@
                     "no_payments_short": "Er zijn nog geen betalingen geregistreerd.",
                     "open_debt": "Openstaande schuld ›",
                     "planned_payment": "Geplande betaling",
-                    "necessities": "Eerste levensbehoeften",
-                    "no_fixed_linked": "Er is nog geen doorlopende betaling gekoppeld. Voeg er een toe, zodat Noodzakelijk deze betaling kan zien.",
-                    "add_to_necessities": "Toevoegen aan benodigdheden",
+                    "necessities": "Vaste kosten en dagelijks",
+                    "no_fixed_linked": "Nog geen terugkerende rekening gekoppeld. Voeg er een toe, zodat Vaste kosten en dagelijks deze betaling meetelt.",
+                    "add_to_necessities": "Toevoegen aan vaste kosten",
                     "apr": "{rate}% rente",
                     "validation_amount_required": "Het bedrag moet worden ingevuld",
                     "validation_amount_valid": "Voer een geldig bedrag in",
@@ -3523,11 +3546,11 @@
             "giving": {
                 "eyebrow": "Geven",
                 "headline": "Door te geven blijft geld een hulpmiddel en geen meester.",
-                "lead": "Het ‘Give’-potje is de kleinste van de zes en heeft de grootste invloed op je relatie met geld. Wanneer een vast deel al weg is voordat je het kunt uitgeven, is geld niet langer iets om aan vast te houden.",
+                "lead": "Het potje Geven is vaak het kleinste, en doet het meest voor je relatie met geld. Gaat een vast deel weg voordat je het kunt uitgeven, dan is geld niet langer iets om aan vast te houden.",
                 "add_recurring": "+ Een periodieke donatie toevoegen",
-                "open_jar": "Open het ‘Give’-potje",
+                "open_jar": "Open het potje Geven",
                 "this_year": "Dit jaar",
-                "jar_pct": "Geef een potje · {pct}%",
+                "jar_pct": "Potje Geven · {pct}%",
                 "pledged_of": "van {amount} toegezegd",
                 "reached_by": "{when} bereikt. Het potje blijft stromen — daar ging het om.",
                 "reached_by_fallback": "tegen die tijd",
@@ -3538,14 +3561,14 @@
                 "pledge_no_date": "Er staat nog geen datum op deze toezegging.",
                 "open_pledge": "Open belofte ›",
                 "given_so_far": "tot nu toe gegeven",
-                "pledge_pitch": "Een toezegging geeft het potje een einddoel voor het jaar. Elk gesorteerd bedrag dat Give verlaat, telt mee voor dat doel — je hoeft niets handmatig te verplaatsen.",
+                "pledge_pitch": "Een toezegging geeft het potje een eindstreep voor het jaar. Elk gesorteerd bedrag dat uit Geven gaat, telt mee — je hoeft niets met de hand te verplaatsen.",
                 "set_pledge": "Stel een doel voor dit jaar vast",
                 "where_goes": "Waar het naartoe gaat",
                 "planned_mo": "{amount}/maand gepland",
-                "empty_auto_title": "Er wordt op dit moment nog niets automatisch weggegeven.",
-                "empty_auto_body": "Voeg vaste kosten toe aan het ‘Give’-potje om maandelijkse donaties te plannen.",
+                "empty_auto_title": "Er gaat nog niets automatisch uit Geven.",
+                "empty_auto_body": "Voeg vaste kosten toe aan het potje Geven om maandelijkse giften te plannen.",
                 "empty_ledger_title": "Dit jaar wordt er niet gesorteerd bij het uitdelen.",
-                "empty_ledger_body": "Cadeaus die ‘Give’ achterlaten, verschijnen hier zodra ze zijn gesorteerd.",
+                "empty_ledger_body": "Giften uit Geven verschijnen hier zodra ze gesorteerd zijn.",
                 "no_org": "Er is nog geen naam van de organisatie bekend",
                 "received_year": "Dit jaar ontvangen",
                 "to_whom": "Aan wie",
@@ -3654,7 +3677,7 @@
                     "url": ""
                 },
                 "money": {
-                    "title": "Geld — zes potjes",
+                    "title": "Geld — Rumtelo-potjes",
                     "url": ""
                 },
                 "growth": {
@@ -3826,16 +3849,16 @@
                     "sections": {
                         "what_for": {
                             "heading": "Waar de potjes voor dienen",
-                            "body": "Met zes potjes geef je je inkomen een bestemming. Elk potje heeft een functie en een vast percentage. Samen bedragen de percentages 100% van je inkomen."
+                            "body": "Met de Rumtelo-potjes geef je je inkomen een bestemming, in drie groepen: Basis, Toekomst, Vrij. Elk potje heeft een taak en een percentage dat jij kiest. Samen is dat 100% van je inkomen."
                         },
                         "how": {
                             "heading": "Hoe het werkt",
-                            "body": "Je voert je inkomsten zelf in. Aan de hand van je vaste percentages zie je hoeveel er in elk potje hoort — wat je kunt uitgeven of voor dat doel opzij kunt zetten. Werk vervolgens de ‘Money pills’ van links naar rechts af: Vaste kosten → Transacties → Schulden → Nettovermogen. Rumtelo verplaatst nooit geld op je bankrekening."
+                            "body": "Je voert je inkomen zelf in. Aan de hand van de percentages die je instelt zie je hoeveel er in elk potje hoort — wat je kunt uitgeven of voor dat doel opzij kunt zetten. Werk daarna de tabs van Geld van links naar rechts af: Vaste kosten → Transacties → Schulden → Nettovermogen. Rumtelo verplaatst nooit geld op je bankrekening."
                         }
                     },
                     "steps": {
                         "list": {
-                            "title": "Je zes potjes",
+                            "title": "Je potjes",
                             "content": "Elke rij staat voor één klus waar je geld mee verdient. Tik op een potje om de vaste kosten, uitgaven en het resterende bedrag van deze maand te bekijken."
                         },
                         "toolbar": {
@@ -3901,7 +3924,7 @@
                     "sections": {
                         "what_for": {
                             "heading": "Waar dit voor dient",
-                            "body": "Houd bij wat je nog verschuldigd bent en hoeveel dat maandelijks van je inkomen opslokt. Aflossingen van schulden horen meestal bij Noodzakelijk — op deze pagina houd je het saldo in de gaten."
+                            "body": "Houd bij wat je nog schuldig bent en wat het elke maand kost. Aflossingen gaan meestal uit Vaste kosten en dagelijks — deze pagina houdt het saldo in beeld."
                         },
                         "how": {
                             "heading": "Hoe het werkt",
@@ -4088,7 +4111,7 @@
                 "see_income": "Zie inkomsten ▸",
                 "in_pots_label": "In de potjes",
                 "in_pots_hint": "Opgebouwd over de maanden",
-                "six_jars": "✦ De zes potjes",
+                "six_jars": "✦ Je potjes",
                 "see_all_jars": "Alles bekijken ▸"
             },
             "travel": {
@@ -4129,13 +4152,13 @@
         "landing": {
             "meta": {
                 "title": "Rumtelo — Niet meer gissen waar het bleef.",
-                "description": "Niet meer gissen waar het bleef. Je inkomen gaat zodra het binnenkomt over zes potjes. Tien minuten per week laat zien waar het bleef en wat je verschuift. De Coach tipt, jij kiest. Gemaakt in Amsterdam. Gratis om te beginnen.",
+                "description": "Niet meer gissen waar het bleef. Je inkomen gaat meteen naar Basis, Toekomst en Vrij. Tien minuten per week laat zien wat je verschuift. Gratis starten.",
                 "keywords": [
                     "geldoverzicht",
-                    "zes potjes",
+                    "inkomen verdelen",
                     "grip op je leven",
                     "coach voor persoonlijke financiën",
-                    "financiële vrijheid",
+                    "geldpotjes",
                     "weekcheck",
                     "overzicht van je geld",
                     "potjesmethode"
@@ -4172,7 +4195,7 @@
             "hero": {
                 "eyebrow": "RUMTELO — GRIP OP JE LEVEN",
                 "headline": "Niet meer gissen waar het bleef.",
-                "lead": "Je inkomen gaat zodra het binnenkomt over zes potjes — vaste kosten, sparen, vrijheid, plezier. Tien minuten per week laat zien waar het bleef en wat je verschuift.",
+                "lead": "Je inkomen gaat zodra het binnenkomt naar drie groepen — Basis, Toekomst, Vrij. Tien minuten per week laat zien waar het bleef en wat je verschuift.",
                 "cta_primary": "Verdeel mijn inkomen — gratis",
                 "cta_microline": "Geen kaart. Geen bankkoppeling nodig.",
                 "cta_secondary": "Bekijk het in 3 stappen",
@@ -4180,20 +4203,21 @@
                 "manage_plan": "Abonnement beheren",
                 "manage_plan_named": "{plan} beheren",
                 "demo_stage_landing": "INKOMEN KOMT BINNEN…",
-                "demo_stage_splitting": "VERDEELD OVER ZES POTJES…",
+                "demo_stage_splitting": "VERDELEN OVER JE POTJES…",
                 "demo_stage_complete": "DEZE MAAND · ELK BEDRAG HEEFT EEN TAAK",
                 "demo_income_line": "Salaris € 3.450 · Freelance € 850",
                 "demo_coach_eyebrow": "De Coach · deze week",
-                "demo_coach_line": "Elk bedrag heeft een taak. Vandaag veilig uit te geven: €64."
+                "demo_coach_line": "Elk bedrag heeft een taak. Vandaag veilig uit te geven: €64.",
+                "demo_example_note": "Voorbeeld — jij bepaalt zelf de verdeling."
             },
             "how_section": {
                 "eyebrow": "HOE HET WERKT",
-                "headline": "Zes potjes. Tien minuten per week.",
+                "headline": "Basis. Toekomst. Vrij. Tien minuten per week.",
                 "steps_aria": "Zo werkt Rumtelo in drie stappen",
                 "steps": {
                     "split": {
                         "title": "Inkomen binnen, geld verdeeld.",
-                        "body": "Vul één keer je netto-inkomen in. Rumtelo verdeelt het over zes potjes, zodat elk bedrag een taak heeft vóór je uitgeeft."
+                        "body": "Vul één keer je netto-inkomen in. Rumtelo verdeelt het over Basis, Toekomst en Vrij, zodat elk bedrag een taak heeft vóór je uitgeeft."
                     },
                     "spend": {
                         "title": "Uitgaven vinden hun potje.",
@@ -4209,24 +4233,24 @@
                 "f1": "+€ 3.450 · in 0,4 s verdeeld",
                 "f2": "Slaap 7 uur en 20 minuten ↑",
                 "f3": "+€ 850 freelance",
-                "f4": "Noodzakelijk → € 2.365",
+                "f4": "Basis → € 2.365",
                 "f5": "Intentie gezet",
-                "f6": "−€38,65 → Noodzakelijk",
-                "f7": "1 boek · Opleiding",
-                "f8": "FF → € 430 · geïnvesteerd",
+                "f6": "−€38,65 → Basis",
+                "f7": "1 boek · Leren",
+                "f8": "Beleggen → € 430",
                 "f9": "Stilte · dag 6",
-                "f10": "55 / 10 / 10 / 10 / 10 / 5",
+                "f10": "Basis · Toekomst · Vrij",
                 "f11": "Weekcheck · 9 min",
                 "f12": "Maandscore 82"
             },
             "ticker": {
                 "t1": "Salaris ontvangen · verdeeld in 0,4 seconden",
-                "t2": "Boodschappen −38,65 € → Noodzakelijk",
+                "t2": "Boodschappen −€38,65 → Basis",
                 "t3": "Slaap 7 uur en 20 minuten · trend ↑",
                 "t4": "€ 430 → wereldwijd indexfonds",
                 "t5": "Intentie gezet: “één eerlijke week”",
                 "t6": "Koffie −€5,20 → Plezier",
-                "t7": "Boek uitgelezen · potje Opleiding",
+                "t7": "Boek uitgelezen · potje Leren",
                 "t8": "Schuldenvrij: februari 2035 · ligt op schema",
                 "t9": "Weekcheck klaar · 9 min",
                 "t10": "Stilte · dag 6",
@@ -4239,7 +4263,7 @@
                     "label": "per week — geen dagelijks huiswerk"
                 },
                 "jars": {
-                    "value": "6 potjes",
+                    "value": "3 groepen",
                     "label": "gevuld zodra je inkomen binnenkomt"
                 },
                 "free": {
@@ -4248,28 +4272,28 @@
                 }
             },
             "jars_section": {
-                "eyebrow": "DE ZES POTJES",
-                "headline": "Zes taken, zodat geen enkel bedrag zelf hoeft te beslissen.",
+                "eyebrow": "RUMTELO-POTJES",
+                "headline": "Elk bedrag krijgt een taak, zodat geen enkel bedrag zelf hoeft te beslissen.",
                 "lead": "Elk potje heeft een regel die je in één zin leest: wat erin hoort en wat niet. De percentages kun je zelf aanpassen. Het gaat om de gewoonte."
             },
             "jars": {
                 "nec": {
-                    "name": "Noodzakelijk",
+                    "name": "Vaste kosten en dagelijks",
                     "line": "Huur, energie, verzekeringen, boodschappen, vervoer. De dingen die komen, of je het nu leuk vindt of niet.",
                     "not": "Niet voor uit eten of kleding — dat is Plezier."
                 },
                 "ff": {
-                    "name": "Financiële vrijheid",
+                    "name": "Beleggen",
                     "line": "Indexfondsen, een aanbetaling voor een huis, je eigen bedrijf. Met dit potje koop je dingen die je iets opleveren.",
-                    "not": "Nooit uitgegeven. Alleen geïnvesteerd."
+                    "not": "Nooit uitgegeven. Staat apart om te beleggen."
                 },
                 "edu": {
-                    "name": "Opleiding",
+                    "name": "Leren",
                     "line": "Boeken, cursussen, een mentor, een hulpmiddel waar je beter van wordt. Het enige potje waar uitgeven je meer waard maakt.",
                     "not": "Niet voor gadgets die je onderzoek noemt."
                 },
                 "lts": {
-                    "name": "Langetermijn sparen",
+                    "name": "Buffer en doelen",
                     "line": "Eerst een noodfonds, dan de auto, de borg en de belastingaanslag waarvan je weet dat die eraan komt.",
                     "not": "Niet voor iets wat je deze maand wilt."
                 },
@@ -4297,7 +4321,7 @@
                     "name": "Geld",
                     "alt_name": "Geld",
                     "question": "Waar blijft deze maand toch?",
-                    "line": "Houd grip op je geld — zes potjes, een duidelijk overzicht."
+                    "line": "Grip op je geld — drie groepen, een duidelijk overzicht."
                 },
                 "growth": {
                     "name": "Groei",
@@ -4320,7 +4344,7 @@
             },
             "portal_features": {
                 "money": {
-                    "f1": "Zes potjes, je percentages",
+                    "f1": "Basis, Toekomst, Vrij — jouw percentages",
                     "f2": "Transacties — gesorteerd door een regel of met de hand",
                     "f3": "Vaste kosten die je van tevoren kunt inschatten",
                     "f4": "Aflossingsplan met een einddatum",
@@ -4374,7 +4398,7 @@
                     "soul": "Stilte · dag 6"
                 },
                 "coach_lines": {
-                    "money": "Plezier zit €38 boven de lijn. Eén stap: haal het uit Langetermijn sparen — of laat het staan.",
+                    "money": "Plezier zit €38 boven de lijn. Eén zet: haal het uit Buffer en doelen — of laat het staan.",
                     "growth": "Kosten besparen heeft een bodem. Meer verdienen niet. Je bijverdienste is al 20% op weg.",
                     "energy": "Drie nachten onder de 6,5 uur — en Plezier ging omhoog op die dagen. Eerst slapen. Dan beslissen.",
                     "soul": "Intentie gezet. Eén zin is genoeg — de week heeft nu een richting."
@@ -4382,11 +4406,11 @@
                 "money_rows": {
                     "salary": {
                         "label": "Salaris",
-                        "jar": "Verdelen → zes potjes"
+                        "jar": "Verdelen → drie groepen"
                     },
                     "groceries": {
                         "label": "Albert Heijn",
-                        "jar": "Noodzakelijk"
+                        "jar": "Basis"
                     },
                     "coffee": {
                         "label": "Koffiebar",
@@ -4394,13 +4418,13 @@
                     },
                     "debt": {
                         "label": "Aflossing van schulden",
-                        "jar": "Vrijheid"
+                        "jar": "Basis"
                     }
                 },
                 "growth_goals": {
                     "emergency": {
                         "name": "Noodfonds",
-                        "meta": "Sparen op lange termijn · maart 2027"
+                        "meta": "Buffer en doelen · maart 2027"
                     },
                     "side_income": {
                         "name": "Bijverdienste € 500 per maand",
@@ -4408,7 +4432,7 @@
                     },
                     "course": {
                         "name": "Cursus · gegevensanalyse",
-                        "meta": "Potje Opleiding"
+                        "meta": "Potje Leren"
                     }
                 },
                 "growth_income_label": "+14% in zes maanden",
@@ -4459,7 +4483,7 @@
                     "millionaire_mind": {
                         "title": "De geheimen van de miljonairsmentaliteit",
                         "author": "T. Harv Eker",
-                        "line": "De verdeling over zes potjes — elk bedrag krijgt een taak zodra het binnenkomt."
+                        "line": "Geef elk bedrag een taak zodra het binnenkomt."
                     },
                     "psychology": {
                         "title": "De psychologie van geld",
@@ -4508,7 +4532,7 @@
                 "demo": {
                     "money": {
                         "kind": "DEZE WEEK",
-                        "text": "Plezier zit €38 boven de lijn. Haal het één keer uit Langetermijn sparen — of laat het staan en houd het diner van volgende week erin.",
+                        "text": "Plezier zit €38 boven de lijn. Haal het één keer uit Buffer en doelen — of laat het staan en houd het diner van volgende week erin.",
                         "cta": "Open potjes"
                     },
                     "growth": {
@@ -4656,14 +4680,14 @@
                     "tag": "Begin hier",
                     "best_for": "Aan de slag, op eigen houtje",
                     "line": "Wil je zien waar je geld naartoe gaat en een wekelijkse routine van tien minuten opbouwen — helemaal in je eentje en helemaal gratis? Dat is genoeg om mee te beginnen, en er is geen enkele reden om ermee te stoppen.",
-                    "f1": "GELD · zes potjes, transacties, vaste kosten",
+                    "f1": "GELD · je potjes, transacties, vaste kosten",
                     "f2": "GROEI · inkomen en {maxGoals, plural, one {# doel} other {# doelen}} — proef van Groei",
                     "f3": "ENERGIE · slaap",
                     "f4": "ZIEL · stilte, dankbaarheid, één intentie per week",
                     "f5": "De Coach, de weekcheck, de maandscore",
                     "f6": "1 volledige plek + 1 kijkplek (partner, coach of adviseur)",
                     "outcome": {
-                        "money": "Zes potjes, je transacties en vaste kosten",
+                        "money": "Je potjes, je transacties en vaste kosten",
                         "growth": "{maxGoals, plural, one {# doel} other {# doelen}} en je inkomenscurve",
                         "energy": "Slaap, de basis onder elke beslissing",
                         "soul": "Stilte, dankbaarheid, één intentie per week"
@@ -5247,7 +5271,7 @@
             "coming_soon_title": "Binnenkort beschikbaar",
             "coming_soon_body": "Binnenkort worden er nieuwe accounts geopend. Als je al toegang hebt, log dan in om verder te gaan.",
             "not_found_document": "Pagina niet gevonden · Rumtelo",
-            "app_description": "Houd de samenstelling in de gaten. Zes potjes, een rustig wekelijks ritme, ruimte om te groeien."
+            "app_description": "Basis, Toekomst, Vrij. Een rustige wekelijkse routine, ruimte om te groeien."
         },
         "nav": {
             "groups": {
@@ -5358,7 +5382,7 @@
         },
         "onboarding": {
             "income": "Jouw inkomen",
-            "income_lead": "Vul in wat je elke maand op je rekening krijgt. Daarna zie je het verdeeld over zes potjes.",
+            "income_lead": "Vul in wat je elke maand op je rekening krijgt. Daarna zie je het verdeeld over Basis, Toekomst en Vrij.",
             "currency": "Valuta",
             "net_income_label": "Netto maandinkomen",
             "net_income_hint": "Na belasting — wat er op je rekening binnenkomt.",
@@ -5375,13 +5399,13 @@
             "split_row_aria": "{jar}, {percent} procent, {amount}",
             "split_jobs": {
                 "NECESSITIES": "huur, vaste kosten, boodschappen",
-                "FINANCIAL_FREEDOM": "geld dat voor je werkt — nooit uitgeven",
+                "FINANCIAL_FREEDOM": "geld dat apart staat om te beleggen — nooit uitgeven",
                 "EDUCATION": "lessen, boeken, een nieuwe vaardigheid",
                 "LONG_TERM_SAVINGS": "grote aankopen en een veiligheidsbuffer",
                 "PLAY": "plezier zonder schuldgevoel — geef het helemaal uit",
                 "GIVE": "cadeaus en goede doelen waar je om geeft"
             },
-            "split_main_account": "Alle zes potjes staan voor nu op één hoofdrekening. Voeg je bank toe wanneer het jou uitkomt.",
+            "split_main_account": "Al je potjes staan voor nu op één hoofdrekening. Voeg je bank toe wanneer het jou uitkomt.",
             "split_note": "Rumtelo verplaatst nooit geld. Spaarpotjes bij je bank? Zet het daar zelf over — wij laten de verdeling zien.",
             "split_change_later": "Je past de percentages altijd aan via Geld › Potjes.",
             "split_zero": "Nog geen inkomen? Je potjes wachten — ze verdelen het zodra het binnenkomt.",
@@ -5398,9 +5422,9 @@
             "continue": "Doorgaan",
             "banks_setup": {
                 "accounts_title": "Geef je rekeningen een naam",
-                "accounts_body": "Geef de hoofdrekening een naam waar geld binnenkomt (Noodzakelijk). Heb je meer rekeningen? Voeg ze hier toe — daarna koppel je de potjes. Hernoemen kan later in Instellingen.",
+                "accounts_body": "Geef de hoofdrekening een naam waar geld binnenkomt (Vaste kosten en dagelijks). Heb je meer rekeningen? Voeg ze hier toe — daarna koppel je de potjes. Hernoemen kan later in Instellingen.",
                 "map_title": "Koppel potjes aan rekeningen",
-                "map_body": "Noodzakelijk blijft op je hoofdrekening. Zet de andere potjes op de juiste spaarrekening. Aanpassen kan altijd via Instellingen → Potjes.",
+                "map_body": "Vaste kosten en dagelijks blijft op je hoofdrekening. Zet de andere potjes op de juiste spaarrekening. Aanpassen kan altijd via Instellingen → Potjes.",
                 "map_body_one": "Je hebt één rekening — alle potjes staan er al op. Later kun je dit aanpassen via Instellingen → Potjes als je meer rekeningen toevoegt.",
                 "read_only_link": "Bankinstellingen openen",
                 "map_required": "Kies voor elk potje een rekening voordat je afrondt.",
@@ -5422,18 +5446,18 @@
                 "suggested_names": {
                     "main_checking": "Hoofdrekening",
                     "savings": "Spaarrekening",
-                    "freedom": "Vrijheidssparen",
-                    "lts": "Lange-termijnsparen",
-                    "education": "Educatiesparen",
-                    "play": "Plezierrekening",
-                    "give": "Geefrekening"
+                    "freedom": "Beleggen",
+                    "lts": "Buffer en doelen",
+                    "education": "Leren",
+                    "play": "Plezier",
+                    "give": "Geven"
                 },
                 "preview": {
                     "main_account": "Hoofdrekening",
                     "sub_savings": "Spaarpotje"
                 },
                 "tips": {
-                    "one_account": "Begin met één hoofdrekening (Noodzakelijk). Voeg spaarpotjes alleen toe als je zo al bankiert — koppel daarna elk potje op het volgende scherm.",
+                    "one_account": "Begin met één hoofdrekening (Vaste kosten en dagelijks). Voeg spaarpotjes alleen toe als je zo al bankiert — koppel daarna elk potje op het volgende scherm.",
                     "familiar": "Begin met je hoofdrekening. Voeg andere rekeningen toe die je al gebruikt, en koppel daarna elk potje.",
                     "already_set_up": "Noteer gewoon de rekeningen die je al hebt. Rumtelo raakt je echte bank niet aan."
                 }
@@ -5735,7 +5759,7 @@
                 "points": {
                     "picture": {
                         "title": "Een actueel beeld vóór elke sessie",
-                        "body": "Je cliënten houden zes potjes, hun vaste kosten en een weekcheck van tien minuten bij. Jij opent hun bord en begint waar zij staan."
+                        "body": "Je cliënten houden hun potjes, vaste kosten en een weekcheck van tien minuten bij. Jij opent hun bord en begint waar zij staan."
                     },
                     "between": {
                         "title": "De voortgang gaat door tussen sessies",
@@ -6127,7 +6151,7 @@
                 },
                 "jars_placement": {
                     "eyebrow": "Waar elk potje staat",
-                    "blurb": "Mix het naar eigen inzicht — het noodzakelijke op je betaalrekening, de rest in verschillende potjes, en financiële vrijheid op een echte spaarrekening.",
+                    "blurb": "Combineer vrij — Vaste kosten en dagelijks op je betaalrekening, de rest als spaarpotjes bij je bank, Beleggen op een eigen rekening.",
                     "accounts_one": "{count}-account",
                     "accounts_other": "{count}-rekeningen",
                     "no_accounts": "Geen accounts",
@@ -6317,7 +6341,7 @@
                     "lead_same_day": "Op de laatste dag",
                     "lead_days": "{count} dagen ervoor",
                     "lead_hint": "\"Niet nu\" verplaatst hem naar de laatste dag. Daarna blijft hij staan tot de maand is afgesloten.",
-                    "last_fetched": "Laatst opgehaald {wanneer, datum, kort} {wanneer, tijd, kort}",
+                    "last_fetched": "Laatst opgehaald {when, date, short} {when, time, short}",
                     "rotate": "Nieuw adres",
                     "disable": "Uitzetten"
                 },
@@ -6395,7 +6419,7 @@
                     "rules": {
                         "split": {
                             "name": "Automatische verdeling van inkomsten",
-                            "desc": "Alles wat binnenkomt, gaat meteen in de potjes: 55/10/10/10/10/5."
+                            "desc": "Alles wat binnenkomt gaat meteen naar de potjes, volgens de verdeling die je instelt."
                         },
                         "guard": {
                             "name": "Potjesbeschermer",
@@ -6403,7 +6427,7 @@
                         },
                         "sweep": {
                             "name": "Overschot afschrijven",
-                            "desc": "Wat er op de 1e nog overblijft in de categorie ‘Noodzakelijk’, wordt overgeheveld naar ‘Financiële vrijheid’."
+                            "desc": "Wat op de 1e nog in Vaste kosten en dagelijks staat, gaat naar Beleggen."
                         }
                     }
                 },
@@ -6411,7 +6435,7 @@
                     "eyebrow": "Wat je gebruikt en betaalt",
                     "blurb": "Drie abonnementen: Basic, Plus en Max. Begin met Basic — niets wat je hebt ingevoerd, wordt ooit vergrendeld.",
                     "card_basic_tag": "Van {price}",
-                    "card_basic_line": "Solo-bord — de zes potjes en de routine eronder. Geen bank nodig.",
+                    "card_basic_line": "Solo-bord — je potjes en de routine eronder. Geen bank nodig.",
                     "card_basic_feats": "{members} · Alleen solo · Spaarpotjes · 1 doel · Coach",
                     "card_plus_tag": "Meest gekozen",
                     "card_plus_line": "Deel het bord met familie of vrienden — schulden, Leren, energieweken en nog meer doelen.",
@@ -6673,7 +6697,7 @@
                 "chooser_lead": "Je kijkt mee op het bord van iemand anders. Kies wat je nodig hebt — je kunt later allebei doen.",
                 "chooser_household_title": "Huishoudbord",
                 "chooser_household_body": "Je eigen potjes en geldbord voor persoonlijk of familiemoney.",
-                "chooser_household_bullet_1": "Zes potjes en een duidelijk maandplan",
+                "chooser_household_bullet_1": "Basis, Toekomst, Vrij en een helder maandoverzicht",
                 "chooser_household_bullet_2": "Nodig later familie of vertrouwde mensen uit",
                 "chooser_household_bullet_3": "Jij wordt eigenaar van je bord",
                 "chooser_household_cta": "Start mijn huishouden",
@@ -6881,8 +6905,8 @@
                 "description": "Gidsen, juridische documenten en hoe je ons bereikt. Rumtelo wordt vanuit Amsterdam geëxploiteerd — we antwoorden per e-mail.",
                 "cards": {
                     "spaarpotjes": {
-                        "title": "Spaarpotjes & potjes",
-                        "body": "Eén bank, zes potjes: zo werken hoofdrekening en spaarpotjes samen.",
+                        "title": "Spaarpotjes & Rumtelo-potjes",
+                        "body": "Eén bank, je Rumtelo-potjes: zo werken hoofdrekening en spaarpotjes samen.",
                         "cta": "Lees de gids"
                     },
                     "legal": {
@@ -6898,7 +6922,7 @@
                 }
             },
             "spaarpotjes": {
-                "title": "Spaarpotjes en de zes potjes",
+                "title": "Spaarpotjes en Rumtelo-potjes",
                 "description": "Korte gids voor huishoudens met één hoofdrekening die de rest splitsen in spaarpotjes.",
                 "sections": {
                     "what": {
@@ -6907,11 +6931,11 @@
                     },
                     "jars": {
                         "title": "Hoe Rumtelo dat koppelt",
-                        "body": "Necessity is je hoofdrekening: salaris en vaste kosten landen daar. De andere vijf potjes — Freedom, Long-term Savings, Education, Play, Give — zijn spaarpotjes. Rumtelo houdt de verdeling bij; je bank houdt de euro’s."
+                        "body": "Vaste kosten en dagelijks staat op je hoofdrekening: salaris en rekeningen komen daar binnen. De andere potjes — Buffer en doelen, Beleggen, Leren, Plezier, Geven — kunnen spaarpotjes zijn. Rumtelo houdt de verdeling bij; je bank bewaart de euro’s."
                     },
                     "banks": {
                         "title": "Wat je bank meestal biedt",
-                        "body": "De meeste Nederlandse en veel EU-banken laten je meerdere spaarpotjes onder één rekening openen. Noem ze naar de potjes (of houd banknamen en koppel ze in Rumtelo). Je hebt geen zes aparte bankrekeningen nodig."
+                        "body": "De meeste Nederlandse en veel EU-banken laten je meerdere spaarpotjes onder één rekening openen. Noem ze naar je Rumtelo-potjes (of houd de banknamen en koppel ze in Rumtelo). Je hebt geen aparte bankrekening per potje nodig."
                     },
                     "rumtelo": {
                         "title": "Wat Rumtelo niet doet",
@@ -7021,7 +7045,7 @@
                 "money_leaves_body": "Als er geld wordt opgenomen, zie je meteen uit welk potje het komt — en hoeveel er nog over is voor die klus. Geen spreadsheet achteraf.",
                 "assign": {
                     "line": "Geef je geld een bestemming voordat je het uitgeeft.",
-                    "body": "Inkomsten komen binnen en worden over zes potjes verdeeld. Eerst verdelen. Pas daarna uitgeven. Rumtelo verplaatst nooit geld op je bankrekening — dat doe je zelf. Wij geven je het overzicht."
+                    "body": "Inkomsten komen binnen en worden verdeeld over Basis, Toekomst en Vrij. Eerst verdelen. Pas daarna uitgeven. Rumtelo verplaatst nooit geld op je bankrekening — dat doe je zelf. Wij geven je het overzicht."
                 },
                 "direction": {
                     "body": "Terugkijken is maar de helft van het verhaal. Groei helpt je vooruit te komen — vaardigheden, doelen, kennis en inkomen, als je dat wilt."
@@ -7033,7 +7057,7 @@
             "portals": {
                 "money": {
                     "line": "Houd grip op je geld.",
-                    "body": "Zes potjes. Inkomsten, rekeningen, wat er overblijft. Je voert in wat er binnenkomt en wat eruit gaat. Rumtelo laat het plan zien — het is geen budget-app die alleen achteraf de balans opmaakt."
+                    "body": "Basis, Toekomst, Vrij. Inkomsten, rekeningen, wat er overblijft. Je voert in wat er binnenkomt en wat eruit gaat. Rumtelo laat de verdeling zien — geen budget-app die alleen achteraf telt."
                 },
                 "growth": {
                     "line": "Houd je groei onder controle.",

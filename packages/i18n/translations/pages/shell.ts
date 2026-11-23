@@ -48,8 +48,8 @@ const shell = {
         chooser_lead:
             'You’re looking along on someone else’s board. Pick what you need — you can always do both later.',
         chooser_household_title: 'Household board',
-        chooser_household_body: 'Your own jars and money board for personal or family money.',
-        chooser_household_bullet_1: 'Six jars and a clear month plan',
+        chooser_household_body: 'Your own pots and money board for personal or family money.',
+        chooser_household_bullet_1: 'Basics, Future, Free and a clear month overview',
         chooser_household_bullet_2: 'Invite family or trusted people later',
         chooser_household_bullet_3: 'You become the owner of your board',
         chooser_household_cta: 'Start my household',
@@ -101,7 +101,7 @@ const shell = {
     forms: {
         tx_create: {
             title: 'New transaction',
-            description: 'Out for spend, In for gifts, refunds, and jar top-ups.',
+            description: 'Out for spend, In for gifts, refunds, and pot top-ups.',
         },
         tx_import: {
             title: 'Import bank statement',
@@ -110,11 +110,11 @@ const shell = {
         },
         tx_update: {
             title: 'Edit transaction',
-            description: 'Update direction, amount, jar, or note.',
+            description: 'Update direction, amount, pot, or note.',
         },
         fixed_create: {
             title: 'New fixed cost',
-            description: 'What leaves a jar every month?',
+            description: 'What leaves a pot every month?',
         },
         fixed_income_create: {
             title: 'Add other regular income',
@@ -132,7 +132,7 @@ const shell = {
         },
         income_create: {
             title: 'New income',
-            description: 'Add an income source that feeds your jars.',
+            description: 'Add an income source that feeds your pots.',
         },
         income_update: {
             title: 'Edit income',
@@ -159,7 +159,7 @@ const shell = {
             title: 'Move money',
             description:
                 'Pick from and to. Available this month shifts; your split stays the same.',
-            description_from_jar: 'Pick where it goes — this jar is already the source.',
+            description_from_jar: 'Pick where it goes — this pot is already the source.',
         },
     },
     period_travel: {
@@ -214,7 +214,7 @@ const shell = {
         maintenance_body: 'We are doing a short update. Try again in a few minutes.',
         maintenance_api_down_title: 'Rumtelo is briefly offline',
         maintenance_api_down_body:
-            'We cannot reach the API right now. Your jars and data are safe — try again in a moment.',
+            'We cannot reach the API right now. Your pots and data are safe — try again in a moment.',
         maintenance_update_title: 'Rumtelo is getting ready',
         maintenance_update_body:
             'We are finishing a short update. Only the Rumtelo team can sign in for now.',

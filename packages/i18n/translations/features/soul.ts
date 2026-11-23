@@ -46,7 +46,7 @@ const soul = {
         mind_tie:
             'A restless mind does not steer money — it spends it and calls that a decision. Stillness ' +
             'is not meditative, it is strategic: the only routine here that costs nothing and protects ' +
-            'everything else. Every coin you do not spend impulsively is a coin that chooses a jar.',
+            'everything else. Every coin you do not spend impulsively is a coin that chooses a pot.',
         practices: {
             breathing: {
                 meta: '2–5 min',
@@ -91,7 +91,7 @@ const soul = {
         example: 'Ten minutes of stillness before I open my inbox.',
         my_intention: 'My intention',
         set_for_week: '✦ Set for this week',
-        tip: 'A good intention is small, concrete, and about behavior — not an outcome. "I check my jars every Sunday" works better than "I am more financially aware."',
+        tip: 'A good intention is small, concrete, and about behavior — not an outcome. "I check my pots every Sunday" works better than "I am more financially aware."',
         stillness_link: 'Go to stillness →',
     },
     centers: {
@@ -140,15 +140,15 @@ const soul = {
     giving: {
         eyebrow: 'Giving',
         headline: 'Giving keeps money a tool and not a master.',
-        lead: 'The Give jar is the smallest of the six and the one that does the most to your relationship with money. When a fixed share leaves before you can spend it, money stops being something to hold on to.',
+        lead: 'The Giving pot is often the smallest, and the one that does the most for your relationship with money. When a fixed share leaves before you can spend it, money stops being something to hold on to.',
         add_recurring: '+ Add a recurring gift',
-        open_jar: 'Open the Give jar',
+        open_jar: 'Open the Giving pot',
         this_year: 'This year',
-        jar_pct: 'Give jar · {pct}%',
+        jar_pct: 'Giving pot · {pct}%',
         pledged_of: 'of {amount} pledged',
-        reached_by: 'Reached {when}. The jar keeps flowing — that was the point.',
+        reached_by: 'Reached {when}. The pot keeps flowing — that was the point.',
         reached_by_fallback: 'by then',
-        pledge_met: 'Pledge met. The jar keeps flowing — that was the point.',
+        pledge_met: 'Pledge met. The pot keeps flowing — that was the point.',
         pledge_on_track:
             '{planned} leaves every month — enough to land the pledge with {months} month to go.',
         pledge_on_track_plural:
@@ -159,14 +159,14 @@ const soul = {
         open_pledge: 'Open pledge ›',
         given_so_far: 'given so far',
         pledge_pitch:
-            'A pledge gives the jar a finish line for the year. Every sorted amount that leaves Give counts toward it — nothing to move by hand.',
+            'A pledge gives the pot a finish line for the year. Every sorted amount that leaves Giving counts toward it — nothing to move by hand.',
         set_pledge: 'Set a pledge for this year',
         where_goes: 'Where it goes',
         planned_mo: '{amount}/mo planned',
-        empty_auto_title: 'Nothing leaves Give automatically yet.',
-        empty_auto_body: 'Add a fixed cost on the Give jar to plan monthly gifts.',
+        empty_auto_title: 'Nothing leaves Giving automatically yet.',
+        empty_auto_body: 'Add a fixed cost on the Giving pot to plan monthly gifts.',
         empty_ledger_title: 'No sorted giving this year.',
-        empty_ledger_body: 'Gifts that leave Give show up here once sorted.',
+        empty_ledger_body: 'Gifts that leave Giving show up here once sorted.',
         no_org: 'No organization named yet',
         received_year: 'Received this year',
         to_whom: 'To whom',
