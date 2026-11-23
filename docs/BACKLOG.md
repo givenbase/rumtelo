@@ -69,4 +69,14 @@ Source and copy: [`docs/product/clarity-audit.md`](/docs/product/clarity-audit.m
 | 12 | **Growth levers and milestones** beyond list/CRUD. | Low | M | `modules/public/product/growth/{lever,milestone}`, [`docs/engineering/growth-cascade-plan.md`](/docs/engineering/growth-cascade-plan.md) |
 | 13 | **Design** — finish porting Money screens against artboards; design surfaces the Kluis export never covered (Growth, Energy, Soul, Practice, billing). | Low | XL | [`docs/design/README.md`](/docs/design/README.md), HANDOFF §8 |
 
-- **S0 · `updateSplit` validation (High, S)** — `jar.service.ts` only checks that the submitted entries total 100; a partial payload can leave the household split off 100%, and the plain `Error` returns a 500. Found by reading on 2026-11-23, not reproduced. See `docs/product/split-system-proposal.md` §8.
+## Rumtelo Pots — follow-ups after step 1 (2026-11-23)
+
+Step 1 (three groups, new pot names, split validation) is on `dev`. See `docs/product/split-system-proposal.md`.
+
+- **Not yet seen running.** The UI was verified by type checks, unit tests and code review only. Check on staging: the pots board at 360/430/768 px, `?group=` links, onboarding and settings grouping, one pot name on every screen for an NL-seeded, an EN-seeded and a renamed household, Save in settings only at exactly 100%.
+- **`pnpm i18n:gen` (Given).** es/fr show the changed strings in English until it runs with the DeepL key.
+- **Coach lines composed in the backend still use the stored pot name (Medium, S).** `money-coach.service.ts:175` and `fixed-cost-coach.util.ts:77` — e.g. "Noodzakelijk bills come to …". Needs the name resolved by key server-side or the text composed in the application.
+- **Archive restore is not transactional (Medium, M).** A service-level failure in a later section (income, debts, fixed costs, goals) leaves a half-applied import; the dry run can promise rows the real run rejects. Wrap the real run in one transaction or pre-validate each section.
+- **Application unit tests are not part of `pnpm test` (Low, S).** `apps/application` has no `test` script; its 16 node:test files only run by hand. Needs `tsx` as a devDependency — Given's approval.
+- **Decisions for Given:** remove the "Secrets of the Millionaire Mind / T. Harv Eker" book card (`apps/website/app/_components/landing/landing-why.tsx:9`) and footer attribution (`pages/landing.ts:387`); the brand line replacing "Six jars. Ten minutes a week." (`docs/brand/quotes.md`); the Coach tip that names 55% as the default starting point (changes with the default split in step 2); the pot name "Beleggen / Investing".
+- **Step 2 (needs a migration):** separate Buffer pot that fills first, Giving off by default, subscriptions under Fun with "Moet dit, of kies je dit?", category tags (ECOICOP, Nibud group, must/choose), default split 55/20/25 and Basis derived from real fixed costs.
