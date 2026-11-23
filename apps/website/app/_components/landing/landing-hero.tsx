@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useMarketingSession } from '@/app/_components/marketing-session-provider';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 
-import { DEMO_INCOME_DEFAULT, HERO_VIDEO, JARS } from '@/lib/landing-content';
+import { DEMO_INCOME_DEFAULT, HERO_EXAMPLE_GROUPS, HERO_VIDEO } from '@/lib/landing-content';
 import { LIVE_FLOATERS, LIVE_TICKER } from '@/lib/launch-products';
 import { planSlug } from '@/lib/landing-plans';
 import { appHomeUrl, appPlanSettingsUrl, appSignInUrl, webSignUpPath } from '@/lib/portal-urls';
@@ -26,6 +26,7 @@ const PROOF_KEYS = ['time', 'jars', 'free'] as const;
 export function LandingHero() {
     const t = useTranslations('pages.landing');
     const tPlans = useTranslations('pages.landing.plans');
+    const tGroups = useTranslations('features.money.groups');
     const appLocale = useLocale();
     const income = DEMO_INCOME_DEFAULT;
     const [landP, setLandP] = useState(1);
@@ -262,42 +263,46 @@ export function LandingHero() {
                             {t('hero.demo_income_line')}
                         </div>
 
-                        {/* Bar */}
+                        {/* Bar — one segment per group; sized from an example split, never labelled as a share */}
                         <div className="mb-5 flex h-2.5 gap-0.5 overflow-hidden rounded-full bg-sunken">
-                            {JARS.map(j => (
+                            {HERO_EXAMPLE_GROUPS.map(group => (
                                 <span
-                                    key={j.key}
+                                    key={group.key}
                                     className="transition-[width] duration-75"
-                                    style={{ width: `${j.pct * splitP}%`, background: j.colorVar }}
+                                    style={{
+                                        width: `${group.share * splitP}%`,
+                                        background: group.colorVar,
+                                    }}
                                 />
                             ))}
                         </div>
 
-                        {/* Jar rows */}
-                        <div className="grid gap-2.5">
-                            {JARS.map(j => (
-                                <span
-                                    key={j.key}
-                                    className="grid grid-cols-[10px_minmax(0,1fr)_auto_auto] items-center gap-2.5">
+                        {/* Group rows — numbered in flow order, Basics → Future → Free */}
+                        <ol className="grid gap-2.5">
+                            {HERO_EXAMPLE_GROUPS.map((group, index) => (
+                                <li
+                                    key={group.key}
+                                    className="grid grid-cols-[10px_minmax(0,1fr)_auto] items-center gap-2.5">
                                     <span
                                         className="size-2 rounded-sm"
-                                        style={{ background: j.colorVar }}
+                                        style={{ background: group.colorVar }}
                                     />
-                                    <span className="min-w-0 text-sm text-fg-strong">
-                                        {t(`jars.${j.key}.name`)}
-                                    </span>
-                                    <span className="font-mono text-xs font-medium text-fg-faint">
-                                        {j.pct}%
+                                    <span className="min-w-0 text-sm wrap-break-word text-fg-strong">
+                                        <span className="mr-1.5 font-mono text-xs text-fg-faint">
+                                            {index + 1}
+                                        </span>
+                                        {tGroups(`${group.key}.title`)}
                                     </span>
                                     <span className="font-mono text-sm font-medium text-fg">
                                         {formatCatalogMajor(
-                                            Math.round(((income * j.pct) / 100) * splitP),
+                                            Math.round(((income * group.share) / 100) * splitP),
                                             appLocale
                                         )}
                                     </span>
-                                </span>
+                                </li>
                             ))}
-                        </div>
+                        </ol>
+                        <p className="mt-3 text-xs text-fg-muted">{t('hero.demo_example_note')}</p>
 
                         {/* Coach one-liner — the hero already hints that the app talks back */}
                         <div className="mt-5 flex items-start gap-2.5 rounded-xl border border-line bg-raised px-3.5 py-3">

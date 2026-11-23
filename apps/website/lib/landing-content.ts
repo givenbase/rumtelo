@@ -1,10 +1,19 @@
 /**
- * Landing structure — keys, percentages, icons, media paths, demo numbers.
+ * Landing structure — keys, icons, media paths, demo numbers.
  *
  * Marketing copy lives in `@rumtelo/i18n` under `pages.landing.*`.
  * Feature claims and plan limits come from `@rumtelo/contracts`.
  */
-import { DEFAULT_JAR_SPLIT, JarKey, PLAN_RETAIL_CENTS, PlanKey } from '@rumtelo/contracts';
+import {
+    DEFAULT_JAR_SPLIT,
+    JAR_GROUP_ORDER,
+    JAR_ORDER_IN_GROUP,
+    JarGroup,
+    JarKey,
+    PLAN_RETAIL_CENTS,
+    PlanKey,
+    sumPercentageByGroup,
+} from '@rumtelo/contracts';
 import type { IconName } from '@rumtelo/ui';
 
 export type { IconName };
@@ -23,54 +32,58 @@ export const HERO_VIDEO = {
 
 export const DEMO_INCOME_DEFAULT = 4300;
 
-/* ─────────────────────────── jars ─────────────────────────── */
+/* ─────────────────────────── pots ─────────────────────────── */
 
-export interface Jar {
-    key: string;
-    pct: number;
-    /** Theme token — `--color-jar-*` in packages/config/tailwind/theme.css. */
+/** Pot visuals — copy comes from `features.money.jars.names` / `.purpose` (keyed by `JarKey`). */
+const POT_VISUAL: Record<JarKey, { colorVar: string; icon: IconName }> = {
+    // `--color-jar-*` in packages/config/tailwind/theme.css.
+    [JarKey.NECESSITIES]: { colorVar: 'var(--color-jar-nec)', icon: 'home' },
+    [JarKey.LONG_TERM_SAVINGS]: { colorVar: 'var(--color-jar-lts)', icon: 'lock' },
+    [JarKey.FINANCIAL_FREEDOM]: { colorVar: 'var(--color-jar-ff)', icon: 'trending-up' },
+    [JarKey.EDUCATION]: { colorVar: 'var(--color-jar-edu)', icon: 'book-open' },
+    [JarKey.PLAY]: { colorVar: 'var(--color-jar-play)', icon: 'sparkles' },
+    [JarKey.GIVE]: { colorVar: 'var(--color-jar-give)', icon: 'heart' },
+};
+
+/** A group takes the tint of its anchor pot — groups have no token of their own. */
+const GROUP_COLOR_VAR: Record<JarGroup, string> = {
+    [JarGroup.BASIS]: 'var(--color-jar-nec)',
+    [JarGroup.FUTURE]: 'var(--color-jar-lts)',
+    [JarGroup.FREE]: 'var(--color-jar-play)',
+};
+
+export interface LandingPot {
+    key: JarKey;
     colorVar: string;
     icon: IconName;
 }
 
-export const JARS: Jar[] = [
-    {
-        key: 'nec',
-        pct: DEFAULT_JAR_SPLIT[JarKey.NECESSITIES],
-        colorVar: 'var(--color-jar-nec)',
-        icon: 'home',
-    },
-    {
-        key: 'ff',
-        pct: DEFAULT_JAR_SPLIT[JarKey.FINANCIAL_FREEDOM],
-        colorVar: 'var(--color-jar-ff)',
-        icon: 'trending-up',
-    },
-    {
-        key: 'edu',
-        pct: DEFAULT_JAR_SPLIT[JarKey.EDUCATION],
-        colorVar: 'var(--color-jar-edu)',
-        icon: 'book-open',
-    },
-    {
-        key: 'lts',
-        pct: DEFAULT_JAR_SPLIT[JarKey.LONG_TERM_SAVINGS],
-        colorVar: 'var(--color-jar-lts)',
-        icon: 'lock',
-    },
-    {
-        key: 'play',
-        pct: DEFAULT_JAR_SPLIT[JarKey.PLAY],
-        colorVar: 'var(--color-jar-play)',
-        icon: 'sparkles',
-    },
-    {
-        key: 'give',
-        pct: DEFAULT_JAR_SPLIT[JarKey.GIVE],
-        colorVar: 'var(--color-jar-give)',
-        icon: 'heart',
-    },
-];
+export interface LandingGroup {
+    key: JarGroup;
+    colorVar: string;
+    pots: LandingPot[];
+}
+
+/** Rumtelo Pots — three groups in flow order (Basics → Future → Free), pots inside. No shares: the household sets its own. */
+export const POT_GROUPS: LandingGroup[] = JAR_GROUP_ORDER.map(group => ({
+    key: group,
+    colorVar: GROUP_COLOR_VAR[group],
+    pots: JAR_ORDER_IN_GROUP[group].map(key => ({ key, ...POT_VISUAL[key] })),
+}));
+
+/**
+ * Hero demo only: an example split per group, summed from the onboarding default.
+ * Never shown as a percentage or a promise — it just sizes the animated bar.
+ */
+const EXAMPLE_GROUP_SHARE = sumPercentageByGroup(
+    Object.values(JarKey).map(key => ({ key, percentage: DEFAULT_JAR_SPLIT[key] }))
+);
+
+export const HERO_EXAMPLE_GROUPS = POT_GROUPS.map(group => ({
+    key: group.key,
+    colorVar: group.colorVar,
+    share: EXAMPLE_GROUP_SHARE[group.key],
+}));
 
 /* ─────────────────────────── portals ─────────────────────────── */
 

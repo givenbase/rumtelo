@@ -3,11 +3,11 @@
  *
  * The original `design/Kluis Landing.dc.html` was a money-only landing. The current
  * page follows a promise → mechanism → price → wider picture arc:
- * hero → how it works → jars → the Coach → pricing → portals → principles → why we exist → FAQ → sign-up.
+ * hero → how it works → pots → the Coach → pricing → portals → principles → why we exist → FAQ → sign-up.
  * Copy lives in `@rumtelo/i18n` (`pages.landing.*`); structure in `lib/landing-content.ts`.
  *
  * Cut on purpose to keep the page light: Problem (hero already names it), Loop (covered by
- * jars + Coach + principles), Proof (Why already carries the founders).
+ * pots + Coach + principles), Proof (Why already carries the founders).
  */
 
 export type LandingSectionStatus = 'shell' | 'partial' | 'missing';
@@ -52,7 +52,7 @@ export const LANDING_SECTIONS: LandingSection[] = [
     {
         id: 'jars',
         anchor: '#jars',
-        label: 'Six jars + split bar (tinted band)',
+        label: 'Rumtelo Pots — three groups with their pots (tinted band)',
         status: 'shell',
         gap: 'Static copy',
     },

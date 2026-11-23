@@ -3,81 +3,83 @@
 import { Icon, Typography } from '@rumtelo/ui';
 import { useTranslations } from '@rumtelo/i18n';
 
-import { JARS } from '@/lib/landing-content';
+import { POT_GROUPS } from '@/lib/landing-content';
 import { cn } from '@rumtelo/utils';
 
 import { CARD, SectionHeading } from './landing-primitives';
 
-/** Tinted band — sits between the plain Portals and Coach sections. */
+/**
+ * Rumtelo Pots — three numbered groups in flow order, each with its pots inside.
+ * No shares on purpose: the household sets its own split. Tinted band between Portals and Coach.
+ * Anchor stays `#jars` (header/footer links).
+ */
 export function LandingJars() {
-    const t = useTranslations('pages.landing');
+    const t = useTranslations();
 
     return (
         <section id="jars" className="border-t border-line bg-bg-app">
             <div className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-20">
                 <SectionHeading
-                    eyebrow={t('jars_section.eyebrow')}
-                    headline={t('jars_section.headline')}
-                    lead={t('jars_section.lead')}
-                    className="mb-8"
+                    eyebrow={t('pages.landing.jars_section.eyebrow')}
+                    headline={t('pages.landing.jars_section.headline')}
+                    lead={t('pages.landing.jars_section.lead')}
+                    className="mb-6"
                 />
 
-                <div className="mb-6 grid gap-2">
-                    <div className="flex h-3 gap-0.5 overflow-hidden rounded-full bg-sunken">
-                        {JARS.map(jar => (
-                            <span
-                                key={jar.key}
-                                className="h-full"
-                                style={{ width: `${jar.pct}%`, background: jar.colorVar }}
-                                title={`${t(`jars.${jar.key}.name`)} ${jar.pct}%`}
-                            />
-                        ))}
-                    </div>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1">
-                        {JARS.map(jar => (
-                            <span
-                                key={jar.key}
-                                className="inline-flex items-center gap-1.5 font-mono text-xs text-fg-muted">
-                                <span
-                                    className="size-1.5 rounded-full"
-                                    style={{ background: jar.colorVar }}
-                                />
-                                {t(`jars.${jar.key}.name`)}{' '}
-                                <span className="text-fg-faint">{jar.pct}%</span>
-                            </span>
-                        ))}
-                    </div>
-                </div>
+                <p className="mb-5 font-mono text-xs font-medium tracking-wide text-fg-muted uppercase">
+                    {t('features.money.groups.order_hint')}
+                </p>
 
-                <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
-                    {JARS.map(jar => (
-                        <div
-                            key={jar.key}
-                            className={cn(CARD, 'grid min-w-0 content-start gap-2.5 p-5')}>
-                            <span className="flex flex-wrap items-center gap-3">
-                                <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-line bg-raised">
-                                    <Icon
-                                        name={jar.icon}
-                                        size="lg"
-                                        style={{ color: jar.colorVar }}
-                                    />
+                <ol className="grid grid-cols-1 gap-3.5 lg:grid-cols-3">
+                    {POT_GROUPS.map((group, index) => (
+                        <li
+                            key={group.key}
+                            className={cn(CARD, 'grid min-w-0 content-start gap-4 p-5')}>
+                            <div className="grid min-w-0 gap-2">
+                                <span className="flex min-w-0 items-center gap-3">
+                                    <span
+                                        aria-hidden
+                                        className="grid size-8 shrink-0 place-items-center rounded-full border border-line bg-raised font-mono text-sm font-semibold"
+                                        style={{ color: group.colorVar }}>
+                                        {index + 1}
+                                    </span>
+                                    <Typography as="h3" size="lg" className="min-w-0 text-balance">
+                                        {t(`features.money.groups.${group.key}.title`)}
+                                    </Typography>
                                 </span>
-                                <Typography as="h3" size="lg">
-                                    {t(`jars.${jar.key}.name`)}
+                                <Typography
+                                    as="span"
+                                    size="sm"
+                                    color="muted"
+                                    className="text-pretty">
+                                    {t(`features.money.groups.${group.key}.line`)}
                                 </Typography>
-                                <span className="ml-auto font-mono text-xs font-semibold text-accent">
-                                    {jar.pct}%
-                                </span>
-                            </span>
-                            <Typography as="span" size="sm" color="muted" className="text-pretty">
-                                {t(`jars.${jar.key}.line`)}
-                            </Typography>
-                            <span className="border-t border-line pt-2.5 font-mono text-xs leading-relaxed font-medium tracking-normal text-fg-faint">
-                                {t(`jars.${jar.key}.not`)}
-                            </span>
-                        </div>
+                            </div>
+
+                            <ul className="grid gap-3 border-t border-line pt-4">
+                                {group.pots.map(pot => (
+                                    <li key={pot.key} className="flex min-w-0 items-start gap-3">
+                                        <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-line bg-raised">
+                                            <Icon
+                                                name={pot.icon}
+                                                size="md"
+                                                style={{ color: pot.colorVar }}
+                                            />
+                                        </span>
+                                        <span className="grid min-w-0 gap-0.5">
+                                            <span className="text-sm font-medium wrap-break-word text-fg-strong">
+                                                {t(`features.money.jars.names.${pot.key}`)}
+                                            </span>
+                                            <span className="text-sm text-pretty wrap-break-word text-fg-muted">
+                                                {t(`features.money.jars.purpose.${pot.key}`)}
+                                            </span>
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </li>
                     ))}
-                </div>
+                </ol>
             </div>
         </section>
     );

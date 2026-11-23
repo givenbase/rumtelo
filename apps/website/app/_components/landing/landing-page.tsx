@@ -18,11 +18,11 @@ import { LandingWhy } from './landing-why';
 
 /**
  * Narrative order — promise → mechanism → proof → price → the wider picture:
- *   hook (hero) → how it works (3 steps) → the six jars → how it feels daily (coach) → pricing
+ *   hook (hero) → how it works (3 steps) → the Rumtelo Pots (three groups) → how it feels daily (coach) → pricing
  *   → for practices (short band, links to /practices) → "grip on life" band (portals, principles, why we exist) → FAQ → sign-up.
  *
  * Background rhythm alternates plain / tinted, with Principles as the single dark pivot:
- *   hero gradient · how plain · jars tinted · coach plain · pricing tinted · practices band plain · portals plain
+ *   hero gradient · how plain · pots tinted · coach plain · pricing tinted · practices band plain · portals plain
  *   · PRINCIPLES DARK · why tinted · faq plain · signup plain · footer tinted
  *
  * Cut on purpose: Problem, Loop — the hero names the problem, How it works is the loop.
