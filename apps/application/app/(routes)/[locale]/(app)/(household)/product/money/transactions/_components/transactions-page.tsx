@@ -2,6 +2,7 @@
 
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
+import { jarForKey } from '@/app/_lib/jar-for-key';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'next/navigation';
 import { useDeferredValue, useMemo, useState } from 'react';
@@ -380,8 +381,8 @@ export function TransactionsPageClient() {
     });
 
     function resolveJarId(fallbackKey: JarKey): string {
-        const match = jars.find(jar => jar.key === fallbackKey);
-        return match?.id ?? jars[0]?.id ?? fallbackKey;
+        // A key the household has not turned on resolves to its group's main pot.
+        return jarForKey(jars, fallbackKey)?.id ?? '';
     }
 
     const payeeMemory = buildPayeeJarMemory(all);

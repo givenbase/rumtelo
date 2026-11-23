@@ -4,7 +4,7 @@ Guide for any AI agent working here (Claude Code loads it through `CLAUDE.md` in
 
 ## 1. What this app is and who uses it
 
-The authenticated Rumtelo product: Money (six jars, inbox, fixed costs, goals, debts, week check, month score), Growth (Course), Energy, Soul, the Coach, household settings and the Practice portal. Used by household members (full or viewer), on Basic / Plus / Max plans, and by practices (coaches, advisors) looking along with clients. Every screen shows one household's data, filtered by role, plan and visibility.
+The authenticated Rumtelo product: Money (pots in three groups — Basics, Future, Free — three by default, up to eight; inbox, fixed costs, goals, debts, week check, month score), Growth (Course), Energy, Soul, the Coach, household settings and the Practice portal. Used by household members (full or viewer), on Basic / Plus / Max plans, and by practices (coaches, advisors) looking along with clients. Every screen shows one household's data, filtered by role, plan and visibility.
 
 ## 2. Stack and how to run/check it
 

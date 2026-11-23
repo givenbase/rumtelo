@@ -18,6 +18,7 @@ import {
 } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
+import { jarForKey } from '@/app/_lib/jar-for-key';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -51,8 +52,8 @@ function resolveInitialJarId(
     amount: number
 ): string {
     if (suggestedJarId && jars.some(j => j.id === suggestedJarId)) return suggestedJarId;
-    const byKey = jars.find(j => j.key === suggestJarKey(amount));
-    return byKey?.id ?? jars[0]?.id ?? '';
+    // The soft guess may name a pot the household has not turned on: its group's main pot takes it.
+    return jarForKey(jars, suggestJarKey(amount))?.id ?? '';
 }
 
 export function InboxSortCard({
@@ -113,7 +114,7 @@ export function InboxSortCard({
     const [done, setDone] = useState(false);
     const [pending, setPending] = useState<'sort' | 'rule' | null>(null);
 
-    const selected = jars.find(j => j.id === jarId) ?? jars[0];
+    const selected = jars.find(j => j.id === jarId);
     const suggestedKey = selected?.key ?? suggestJarKey(transaction.amount);
     const catalog = catalogByKey.get(suggestedKey);
     const title = transaction.counterparty?.trim() || transaction.description;

@@ -10,7 +10,7 @@ export async function generateMetadata() {
     return { title: t('money') };
 }
 
-/** Overview = Money hub + the six jars, then the one Coach line (one screen, no extra Jars pill). */
+/** Overview = Money hub + the pots (Basics, Future, Free), then the one Coach line (one screen, no extra Jars pill). */
 export default function MoneyPage() {
     return (
         <div className="grid gap-8">

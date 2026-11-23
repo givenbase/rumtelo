@@ -191,8 +191,9 @@ export function blankDraft(input: { id: string; area: PlanArea }): PlanGoalDraft
 
 /**
  * A draft from a preset: its copy, scope, amount default, jar and routine, all editable.
- * `jarIdOf` resolves the preset's suggested jar key to this household's jar id; a jar
- * that does not exist (or is not allowed) leaves the choice open (`'none'`).
+ * `jarIdOf` resolves the preset's suggested jar key to this household's jar id (the caller
+ * falls back to the main pot of the key's group when that pot is off, `jarForKey`); a key
+ * that resolves to nothing (or is not allowed) leaves the choice open (`'none'`).
  */
 export function draftFromPreset(input: {
     id: string;

@@ -3,38 +3,50 @@
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
-import {
-    DEFAULT_JAR_SPLIT,
-    JAR_GROUP_ORDER,
-    SpendingStyle,
-    sumPercentageByGroup,
-} from '@rumtelo/contracts';
+import { JAR_GROUP_ORDER, mainJarKeyFor, sumPercentageByGroup, type Jar } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
-import { Badge, Button, Input, Meter, StubNotice, VendorMark } from '@rumtelo/ui';
+import {
+    Badge,
+    Button,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    Input,
+    Meter,
+    StubNotice,
+    VendorMark,
+} from '@rumtelo/ui';
 import { cn, formatIban, formatPercent, sumMonthly } from '@rumtelo/utils';
 
 import { useApiError } from '@/app/_lib/api-error-messages';
-import { resolveJarName } from '@/app/_lib/jar-copy';
 import {
     GROUP_CHROME,
+    defaultSharesById,
     formatShare,
     groupSlug,
     jarsInGroup,
     orderJarsByGroup,
+    splitGroupAnchor,
 } from '@/app/_lib/jar-group';
 import { isLiveData } from '@/app/_lib/preview';
 import { evaluateSplitCoach, orderSplitTips, pctByJarKey } from '@/app/_lib/split-coach';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { useJarName } from '@/app/_lib/use-jar-name';
+import { usePotActivation } from '@/app/_lib/use-pot-activation';
 import { HelperGate } from '@/components/features/helpers';
 import { BankAccountRow } from '@/components/features/money/bank-account-row';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { accountBankMark, countryFromCurrency } from '../_utils/resolve-account-bank';
 import { JAR_COLOR, accountKindLabel } from '../_utils/settings-shared';
+import { JarsRefineGroup } from './jars-refine-group';
 import { SettingsInkCard, SettingsPanel, SettingsPill, SettingsRow } from './settings-chrome';
 
 type JarsSettingsValues = {
@@ -42,9 +54,19 @@ type JarsSettingsValues = {
     jarSeats: Record<string, string>;
 };
 
+/** Two share maps are the same when every pot has the same value to the basis point. */
+function sameShares(left: Record<string, number>, right: Record<string, number>): boolean {
+    const ids = new Set([...Object.keys(left), ...Object.keys(right)]);
+    return [...ids].every(
+        id => Math.round((left[id] ?? NaN) * 100) === Math.round((right[id] ?? NaN) * 100)
+    );
+}
+
 export function JarsSettings() {
     const t = useTranslations();
-    const tJars = useTranslations('features.money.jars');
+    const tGroups = useTranslations('features.money.groups');
+    const tAction = useTranslations('ui.button.actions');
+    const jarName = useJarName();
     const locale = useLocale();
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
@@ -52,8 +74,8 @@ export function JarsSettings() {
     const apiError = useApiError();
     const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
-
-    const accountSettingsQuery = useLiveQuery(apiQuery.account.settings.queryOptions(), null, live);
+    const { canRefine, activate, deactivate } = usePotActivation();
+    const [turnOffJar, setTurnOffJar] = useState<Jar | null>(null);
 
     const jarsQuery = useLiveQuery(
         apiQuery.money.jars.list.queryOptions({ input: { householdId: householdId! } }),
@@ -117,21 +139,49 @@ export function JarsSettings() {
         form.reset({ pct: serverPct, jarSeats: serverJarSeats });
     }, [form, jars.length, serverPct, serverJarSeats]);
 
+    // Pots turned on or off change the server's shares (the main pot gives or takes back). When
+    // the person had no unsaved edits, follow the server; otherwise keep their edits. The buttons
+    // are blocked while edits exist, so this only matters for a refetch from elsewhere.
+    const savedSharesRef = useRef<Record<string, number> | null>(null);
+    useEffect(() => {
+        const previous = savedSharesRef.current;
+        savedSharesRef.current = serverPct;
+        if (!previous || jars.length === 0) return;
+        if (sameShares(previous, form.getValues('pct'))) form.setValue('pct', serverPct);
+    }, [form, jars.length, serverPct]);
+
+    // Links from the pots board (`#split-basis`) land on a block that only exists after the pot
+    // list has loaded, so the browser's own hash scroll misses it: scroll once the blocks exist.
+    const scrolledToHash = useRef(false);
+    useEffect(() => {
+        if (scrolledToHash.current || jars.length === 0) return;
+        scrolledToHash.current = true;
+        const id = window.location.hash.slice(1);
+        if (id) document.getElementById(id)?.scrollIntoView({ block: 'start' });
+    }, [jars.length]);
+
     const [dismissedTips, setDismissedTips] = useState<Record<string, true>>({});
     const [showAllTips, setShowAllTips] = useState(false);
     const [editingJarId, setEditingJarId] = useState<string | null>(null);
 
-    const total = Object.values(pct).reduce((running, value) => running + value, 0);
+    // Every pot counted once, from the pots the household has now (a turned-off pot's id may
+    // still sit in the form state until the refetch lands).
+    const shareOf = (jar: Jar) => pct[jar.id] ?? jar.percentage;
+    const total = jars.reduce((running, jar) => running + shareOf(jar), 0);
     // The server accepts a split only when it adds up to exactly 10 000 basis points, so compare
     // the same rounded integers here — Save is enabled only when the server will take it.
-    const totalBasisPoints = Object.values(pct).reduce(
-        (running, value) => running + Math.round(value * 100),
+    const totalBasisPoints = jars.reduce(
+        (running, jar) => running + Math.round(shareOf(jar) * 100),
         0
+    );
+    // Unsaved percentage edits (seat changes save themselves and are not edits).
+    const hasUnsavedShares = jars.some(
+        jar => Math.round(shareOf(jar) * 100) !== Math.round(jar.percentage * 100)
     );
     const balanced = totalBasisPoints === 10_000;
     // Live group subtotals follow the inputs, in basis points so they add up without drift.
     const groupShares = sumPercentageByGroup(
-        jars.map(jar => ({ key: jar.key, percentage: pct[jar.id] ?? jar.percentage }))
+        jars.map(jar => ({ key: jar.key, percentage: shareOf(jar) }))
     );
 
     // A household with no pot in a group gets no empty section for it.
@@ -148,8 +198,7 @@ export function JarsSettings() {
     }, [jarSeats, accounts]);
 
     const coachTips = (() => {
-        const spendingStyle = accountSettingsQuery.data?.spendingStyle ?? SpendingStyle.UNKNOWN;
-        const tips = orderSplitTips(evaluateSplitCoach(pctByJarKey(jars, pct), spendingStyle));
+        const tips = orderSplitTips(evaluateSplitCoach(pctByJarKey(jars, pct)));
         return tips.filter(tip => !dismissedTips[tip.id]);
     })();
 
@@ -165,7 +214,8 @@ export function JarsSettings() {
             if (!householdId) throw new Error('No household');
             return api.money.jars.updateSplit({
                 householdId,
-                split: Object.entries(pct).map(([jarId, percentage]) => ({ jarId, percentage })),
+                // Every pot the household has, once: the server rejects a missing or extra pot.
+                split: jars.map(jar => ({ jarId: jar.id, percentage: shareOf(jar) })),
             });
         },
         onSuccess: () => {
@@ -178,10 +228,8 @@ export function JarsSettings() {
     });
 
     function resetDefaults() {
-        const next: Record<string, number> = {};
-        for (const jar of jars) {
-            next[jar.id] = DEFAULT_JAR_SPLIT[jar.key] ?? jar.percentage;
-        }
+        // The default for the pots this household has: always adds up to 100.
+        const next = defaultSharesById(jars);
         form.setValue('pct', next, { shouldDirty: true });
         setDismissedTips({});
     }
@@ -227,9 +275,7 @@ export function JarsSettings() {
                                         )}
                                     />
                                     <span className="grid min-w-0 gap-0.5">
-                                        <span className="text-sm text-fg">
-                                            {resolveJarName(tJars, jar.key, jar.name)}
-                                        </span>
+                                        <span className="text-sm text-fg">{jarName(jar)}</span>
                                         {account ? (
                                             <span className="flex min-w-0 items-center gap-1.5">
                                                 {mark ? (
@@ -317,11 +363,7 @@ export function JarsSettings() {
                                                     t(
                                                         'pages.settings.panels.jars_placement.seat_saved',
                                                         {
-                                                            jar: resolveJarName(
-                                                                tJars,
-                                                                jar.key,
-                                                                jar.name
-                                                            ),
+                                                            jar: jarName(jar),
                                                             account: option.name,
                                                         }
                                                     ),
@@ -350,8 +392,12 @@ export function JarsSettings() {
                         return (
                             <section
                                 key={group}
+                                id={splitGroupAnchor(group)}
                                 aria-labelledby={headingId}
-                                className={cn(groupIndex > 0 && 'mt-2 border-t border-line pt-2')}>
+                                className={cn(
+                                    'scroll-mt-24',
+                                    groupIndex > 0 && 'mt-2 border-t border-line pt-2'
+                                )}>
                                 <header className="flex min-w-0 items-center justify-between gap-3 py-1.5">
                                     <span className="flex min-w-0 items-center gap-2">
                                         <span
@@ -380,7 +426,7 @@ export function JarsSettings() {
                                 {groupJars.map((jar, i) => {
                                     const value = pct[jar.id] ?? jar.percentage;
                                     const allocated = Math.round((monthlyNet * value) / 100);
-                                    const name = resolveJarName(tJars, jar.key, jar.name);
+                                    const name = jarName(jar);
                                     return (
                                         <div
                                             key={jar.id}
@@ -435,6 +481,23 @@ export function JarsSettings() {
                                         </div>
                                     );
                                 })}
+                                <JarsRefineGroup
+                                    group={group}
+                                    groupTitle={tGroups(`${group}.title`)}
+                                    groupShare={groupShares[group]}
+                                    jars={jars}
+                                    canRefine={canRefine}
+                                    blockedByEdits={hasUnsavedShares}
+                                    pendingKey={
+                                        activate.isPending
+                                            ? (activate.variables ?? null)
+                                            : deactivate.isPending
+                                              ? (deactivate.variables?.key ?? null)
+                                              : null
+                                    }
+                                    onTurnOn={key => activate.mutate(key)}
+                                    onTurnOff={setTurnOffJar}
+                                />
                             </section>
                         );
                     })}
@@ -507,6 +570,54 @@ export function JarsSettings() {
                     ) : null}
                 </div>
             </SettingsInkCard>
+
+            {/* Turning a pot off moves its share back; ask once, in the same dialog style as the rest of the app. */}
+            <Dialog
+                open={turnOffJar !== null}
+                onOpenChange={open => {
+                    if (!open && !deactivate.isPending) setTurnOffJar(null);
+                }}>
+                <DialogContent className="sm:max-w-md" closeLabel={tAction('close')}>
+                    {turnOffJar ? (
+                        <>
+                            <DialogHeader>
+                                <DialogTitle>{jarName(turnOffJar)}</DialogTitle>
+                                <DialogDescription>
+                                    {tGroups('refine.turn_off_effect', {
+                                        share: formatShare(turnOffJar.percentage, locale),
+                                        main: jarName(
+                                            jars.find(
+                                                jar => jar.key === mainJarKeyFor(turnOffJar.key)
+                                            ) ?? turnOffJar
+                                        ),
+                                    })}
+                                </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    disabled={deactivate.isPending}
+                                    onClick={() => setTurnOffJar(null)}>
+                                    {tAction('cancel')}
+                                </Button>
+                                <Button
+                                    type="button"
+                                    disabled={deactivate.isPending}
+                                    onClick={() =>
+                                        deactivate.mutate(turnOffJar, {
+                                            onSettled: () => setTurnOffJar(null),
+                                        })
+                                    }>
+                                    {deactivate.isPending
+                                        ? t('pages.settings.working')
+                                        : tGroups('refine.turn_off')}
+                                </Button>
+                            </DialogFooter>
+                        </>
+                    ) : null}
+                </DialogContent>
+            </Dialog>
         </SettingsPanel>
     );
 }

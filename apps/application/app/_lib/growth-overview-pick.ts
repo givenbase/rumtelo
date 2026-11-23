@@ -71,12 +71,16 @@ function firstOf(
     return best;
 }
 
+// Every pot a save goal can sit in, so an unlisted pot (GOALS, DAILY) never ranks first by accident.
+// EDUCATION is left out on purpose: its goals have their own lane above.
 const NEXT_JAR_ORDER: JarKey[] = [
     JarKey.FINANCIAL_FREEDOM,
     JarKey.LONG_TERM_SAVINGS,
+    JarKey.GOALS,
     JarKey.PLAY,
     JarKey.GIVE,
     JarKey.NECESSITIES,
+    JarKey.DAILY,
 ];
 
 /**

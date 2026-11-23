@@ -37,6 +37,7 @@ import {
 } from '@rumtelo/contracts';
 
 import { audienceKeysFromFixedCostPreset } from '@/app/_lib/household-audience-from-money';
+import { jarForKey } from '@/app/_lib/jar-for-key';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { viewedPeriodDefaultIso } from '@/app/_lib/viewed-period-date';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
@@ -555,7 +556,8 @@ export function FixedCostForm({
         if (billJars.length === 0) return;
         const current = form.getValues('jarId');
         if (current && billJars.some(jar => jar.id === current)) return;
-        const necessities = billJars.find(jar => jar.key === JarKey.NECESSITIES);
+        // Basics' main pot is the default home for a bill; `billJars[0]` only when it is not offered.
+        const necessities = jarForKey(billJars, JarKey.NECESSITIES);
         const fallback = necessities?.id ?? billJars[0]?.id;
         if (fallback) form.setValue('jarId', fallback);
     }, [billJars, form]);
@@ -907,9 +909,10 @@ export function FixedCostForm({
         form.setValue('categoryId', null);
     }
 
-    /** Jar by catalog key → household category; falls back to a pending template when unknown. */
+    /** Jar by catalog key (main pot of its group when off) → household category; falls back to a pending template when unknown. */
     function applyJarAndCategory(jarKey: JarKey, categoryTemplateKey: string) {
-        const jar = jars.find(row => row.key === jarKey);
+        // A preset for a pot the household has not turned on lands in the group's main pot.
+        const jar = jarForKey(jars, jarKey);
         if (jar) {
             form.setValue('jarId', jar.id);
             applyCategoryFromTemplate(jar.id, categoryTemplateKey);
@@ -921,7 +924,8 @@ export function FixedCostForm({
 
     /** Give jar owns a "to whom" chooser; any other jar clears it. */
     function syncGiveMode(jarKey: JarKey) {
-        const give = jarKey === JarKey.GIVE;
+        // Judge the pot the bill actually lands in: a Give preset without a Give pot is a Free bill.
+        const give = jarForKey(jars, jarKey)?.key === JarKey.GIVE;
         setGivePayeeMode(give ? 'known' : null);
         setGiveModeHydrated(give);
     }

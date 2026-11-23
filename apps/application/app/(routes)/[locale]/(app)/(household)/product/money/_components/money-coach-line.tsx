@@ -8,7 +8,7 @@ import { toPeriodKey } from '@rumtelo/utils';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import type { CoachLineCandidate } from '@/app/_lib/coach-line';
 import { useCoachFeedCandidates } from '@/app/_lib/coach-line-feed';
-import { necessitiesPressureFromJar } from '@/app/_lib/necessities-pressure';
+import { necessitiesPressureFromJars } from '@/app/_lib/necessities-pressure';
 import { isLiveData } from '@/app/_lib/preview';
 import { productPath } from '@/app/_lib/routes';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -44,7 +44,10 @@ export function MoneyCoachLine() {
     );
 
     const necessitiesJar = dashboardQuery.data?.jars.find(jar => jar.key === JarKey.NECESSITIES);
-    const pressure = necessitiesJar ? necessitiesPressureFromJar(necessitiesJar) : null;
+    // Measured over the Basics group (Necessities + Daily when on); the line names the Necessities pot.
+    const pressure = dashboardQuery.data
+        ? necessitiesPressureFromJars(dashboardQuery.data.jars)
+        : null;
     const local: CoachLineCandidate[] =
         necessitiesJar && pressure?.active && pressure.shortfallCents > 0
             ? [

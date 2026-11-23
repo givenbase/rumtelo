@@ -58,6 +58,11 @@ type ExpenseIntentFieldProps = {
     categoryIconByKey: Map<string, string | null>;
     /** When set, only show types/vendors that belong to this jar. */
     jarKey?: JarKey | null;
+    /**
+     * Every catalog key the selected pot stands in for (`jarKeysCoveredBy`): a main pot with its
+     * optional siblings off also carries their types and vendors. Defaults to `[jarKey]`.
+     */
+    coveredJarKeys?: readonly JarKey[];
     disabled?: boolean;
     id?: string;
 };
@@ -95,6 +100,7 @@ export function ExpenseIntentField({
     parties = [],
     categoryIconByKey,
     jarKey = null,
+    coveredJarKeys,
     disabled,
     id,
 }: ExpenseIntentFieldProps) {
@@ -132,19 +138,30 @@ export function ExpenseIntentField({
             categoryTemplates: categories,
         });
 
+    // The selected pot plus the keys it covers (its group's optional pots that are off).
+    const scopeKeys = useMemo(
+        () => (jarKey ? [...new Set([jarKey, ...(coveredJarKeys ?? [])])] : null),
+        [jarKey, coveredJarKeys]
+    );
+
     const scopedCategories = useMemo(
         () =>
-            jarKey
+            scopeKeys
                 ? categories.filter(
-                      category => category.jarKeys?.includes(jarKey) || category.jarKey === jarKey
+                      category =>
+                          scopeKeys.includes(category.jarKey) ||
+                          scopeKeys.some(key => category.jarKeys?.includes(key))
                   )
                 : categories,
-        [categories, jarKey]
+        [categories, scopeKeys]
     );
 
     const scopedMerchants = useMemo(
-        () => (jarKey ? merchants.filter(merchant => merchant.jarKey === jarKey) : merchants),
-        [merchants, jarKey]
+        () =>
+            scopeKeys
+                ? merchants.filter(merchant => scopeKeys.includes(merchant.jarKey))
+                : merchants,
+        [merchants, scopeKeys]
     );
 
     const needle = query.trim().toLowerCase();
@@ -256,7 +273,9 @@ export function ExpenseIntentField({
     function selectCategory(category: CategoryTemplate) {
         const keys =
             category.jarKeys && category.jarKeys.length > 0 ? category.jarKeys : [category.jarKey];
-        const resolvedJar = jarKey && keys.includes(jarKey) ? jarKey : category.jarKey;
+        // A category of a pot that is off lands in the selected pot that covers it.
+        const resolvedJar =
+            jarKey && keys.some(key => scopeKeys?.includes(key)) ? jarKey : category.jarKey;
         onChange({
             vendor: '',
             merchantKey: null,

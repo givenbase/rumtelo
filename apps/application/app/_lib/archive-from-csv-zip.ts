@@ -16,6 +16,7 @@ import {
     IncomeStability,
     JarKey,
     Locale,
+    mainJarKeyFor,
     PayoffStrategy,
     RuleField,
     RuleMatcher,
@@ -197,6 +198,11 @@ function resolveJarId(
         const byName = maps.byName.get(jarName.toLowerCase());
         if (byName) return byName;
         if (maps.byKey.has(jarName)) return maps.byKey.get(jarName)!;
+    }
+    // A row naming an optional pot the archive's household did not have rides with the main pot of its group.
+    if (jarKey && (Object.values(JarKey) as string[]).includes(jarKey)) {
+        const mainId = maps.byKey.get(mainJarKeyFor(jarKey as JarKey));
+        if (mainId) return mainId;
     }
     return null;
 }

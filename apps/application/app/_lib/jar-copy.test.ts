@@ -3,7 +3,13 @@ import { test } from 'node:test';
 
 import type { TranslateFn } from '@rumtelo/i18n';
 
-import { isDefaultJarName, resolveJarName } from './jar-copy';
+import {
+    isDefaultJarName,
+    jarGuideAllowedLabel,
+    resolveJarName,
+    resolvePotName,
+    resolvePotPurpose,
+} from './jar-copy';
 
 const dutch = Object.assign((key: string) => `nl:${key}`, {
     has: (key: string) => key.startsWith('names.'),
@@ -66,6 +72,8 @@ const SEEDED_NAMES: Record<string, string[]> = {
     EDUCATION: ['Education', 'Opleiding', 'Educación', 'Éducation'],
     PLAY: ['Play', 'Plezier', 'Ocio', 'Plaisir'],
     GIVE: ['Give / foundation', 'Geven / stichting', 'Dar / fundación', 'Donner / fondation'],
+    DAILY: ['Daily', 'Dagelijks', 'Diario', 'Quotidien'],
+    GOALS: ['Goals', 'Doelen', 'Metas', 'Objectifs'],
 };
 
 test('every seeded name, in every language, is a default for its own jar only', () => {
@@ -92,4 +100,115 @@ test('case, padding and an empty name are handled', () => {
 
 test('the old English short label for Give still counts as a default', () => {
     assert.equal(resolveJarName(dutch, 'GIVE', 'Give'), 'nl:names.GIVE');
+});
+
+// Pot copy for a household with 3 to 8 pots: a main pot alone in its group stands for the group.
+const translators = {
+    jars: Object.assign((key: string) => `jars:${key}`, {
+        has: (key: string) => key.startsWith('names.'),
+    }) as unknown as TranslateFn,
+    groups: Object.assign((key: string) => `groups:${key}`, {
+        has: () => true,
+    }) as unknown as TranslateFn,
+};
+const threePots = ['NECESSITIES', 'LONG_TERM_SAVINGS', 'PLAY'];
+const sixPots = [
+    'NECESSITIES',
+    'FINANCIAL_FREEDOM',
+    'LONG_TERM_SAVINGS',
+    'EDUCATION',
+    'PLAY',
+    'GIVE',
+];
+
+test('a main pot alone in its group is named after the group', () => {
+    assert.equal(
+        resolvePotName(translators, 'NECESSITIES', 'Necessity', threePots),
+        'groups:BASIS.title'
+    );
+    assert.equal(
+        resolvePotName(translators, 'LONG_TERM_SAVINGS', 'Long Term Savings', threePots),
+        'groups:FUTURE.title'
+    );
+    assert.equal(resolvePotName(translators, 'PLAY', 'Plezier', threePots), 'groups:FREE.title');
+});
+
+test('a refined group names its main pot after the pot, not the group', () => {
+    // Six pots: Future and Free hold more than the main pot; Basics is still alone.
+    assert.equal(
+        resolvePotName(translators, 'LONG_TERM_SAVINGS', 'Long Term Savings', sixPots),
+        'jars:names.LONG_TERM_SAVINGS'
+    );
+    assert.equal(resolvePotName(translators, 'PLAY', 'Play', sixPots), 'jars:names.PLAY');
+    assert.equal(
+        resolvePotName(translators, 'NECESSITIES', 'Necessity', sixPots),
+        'groups:BASIS.title'
+    );
+    assert.equal(
+        resolvePotName(translators, 'NECESSITIES', 'Necessity', [...threePots, 'DAILY']),
+        'jars:names.NECESSITIES'
+    );
+    // An optional pot always has its own name.
+    assert.equal(
+        resolvePotName(translators, 'DAILY', 'Dagelijks', [...threePots, 'DAILY']),
+        'jars:names.DAILY'
+    );
+});
+
+test('a name the household typed is never replaced, alone or refined', () => {
+    assert.equal(
+        resolvePotName(translators, 'NECESSITIES', 'Home & bills', threePots),
+        'Home & bills'
+    );
+    assert.equal(resolvePotName(translators, 'PLAY', 'Fun money', sixPots), 'Fun money');
+});
+
+test('while the pot list is empty (loading) the per-pot name is used', () => {
+    assert.equal(
+        resolvePotName(translators, 'NECESSITIES', 'Necessity', []),
+        'jars:names.NECESSITIES'
+    );
+});
+
+test('purpose follows the same rule as the name', () => {
+    assert.equal(resolvePotPurpose(translators, 'NECESSITIES', threePots), 'groups:BASIS.purpose');
+    assert.equal(
+        resolvePotPurpose(translators, 'NECESSITIES', [...threePots, 'DAILY']),
+        'jars:purpose.NECESSITIES'
+    );
+    assert.equal(resolvePotPurpose(translators, 'GIVE', sixPots), 'jars:purpose.GIVE');
+    assert.equal(resolvePotPurpose(translators, 'PLAY', []), 'jars:purpose.PLAY');
+});
+
+test('the Daily and Goals template names, in every language, follow the locale', () => {
+    assert.equal(resolveJarName(dutch, 'DAILY', 'Dagelijks'), 'nl:names.DAILY');
+    assert.equal(resolveJarName(dutch, 'GOALS', 'Objectifs'), 'nl:names.GOALS');
+    assert.equal(resolveJarName(dutch, 'GOALS', 'Doelen voor ons'), 'Doelen voor ons');
+});
+
+test('the Daily and Goals guide chips follow the locale, an unknown label stays as stored', () => {
+    const guides = Object.assign((key: string) => `nl:${key}`, {
+        has: (key: string) => key.startsWith('guides.'),
+    }) as unknown as TranslateFn;
+    assert.equal(
+        jarGuideAllowedLabel(guides, 'DAILY', 'Groceries'),
+        'nl:guides.DAILY.allowed.groceries'
+    );
+    assert.equal(
+        jarGuideAllowedLabel(guides, 'DAILY', 'Drugstore & pharmacy'),
+        'nl:guides.DAILY.allowed.pharmacy'
+    );
+    assert.equal(
+        jarGuideAllowedLabel(guides, 'DAILY', 'Household supplies'),
+        'nl:guides.DAILY.allowed.household'
+    );
+    assert.equal(
+        jarGuideAllowedLabel(guides, 'GOALS', 'A planned trip'),
+        'nl:guides.GOALS.allowed.trip'
+    );
+    assert.equal(
+        jarGuideAllowedLabel(guides, 'GOALS', 'Down payment'),
+        'nl:guides.GOALS.allowed.home_deposit'
+    );
+    assert.equal(jarGuideAllowedLabel(guides, 'GOALS', 'Something new'), 'Something new');
 });

@@ -6,9 +6,8 @@ import { useSearchParams } from 'next/navigation';
 import { useDeferredValue, useState } from 'react';
 
 import {
-    DEFAULT_JAR_SPLIT,
     jarCapabilitiesFor,
-    JarKey,
+    type JarKey,
     FlowDirection,
     type Cadence,
     FixedCostPeriodStatus,
@@ -46,10 +45,10 @@ import {
     settlementsByFixedCostId,
 } from '@/app/_lib/fixed-cost-match';
 import { useCoachFeedCandidates } from '@/app/_lib/coach-line-feed';
-import { jarChrome } from '@/app/_lib/jar-meta';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isScheduledLater, listFixedCostsForPeriodView } from '@/app/_lib/period-plan-list';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
+import { assignFixedCostsToPots, fixedCostPots } from '../_utils/fixed-cost-pots';
 import { isLiveData } from '@/app/_lib/preview';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { findPartyVendor, partyMark } from '@/app/_lib/vendor-brands';
@@ -180,20 +179,16 @@ export function FixedCostsPageClient() {
     const merchants = merchantsQuery.data ?? [];
     const givingOrgs = givingOrgsQuery.data ?? [];
     const categoryTemplates = categoryTemplatesQuery.data ?? [];
-    const { jars: catalogJars, byKey: jarByKey } = useJarCatalog();
-    const splitJars =
-        catalogJars.length > 0
-            ? catalogJars
-            : Object.values(JarKey).map(key => ({
-                  key,
-                  name: key,
-                  icon: null as string | null,
-                  color: jarChrome(key).color,
-                  pct: DEFAULT_JAR_SPLIT[key],
-              }));
+    const { byKey: jarByKey } = useJarCatalog();
+    // The household's own pots (three to eight): groups follow them, not the company catalog.
+    const jarsQuery = useLiveQuery(
+        apiQuery.money.jars.list.queryOptions({ input: { householdId: householdId! } }),
+        [] as never,
+        live
+    );
 
     // Flatten byJar groups — keep cadence so OUT totals match jar committedOut.
-    const allFixedOut =
+    const rawFixedOut =
         live && byJarQuery.data?.length
             ? byJarQuery.data.flatMap(group =>
                   group.items
@@ -206,6 +201,12 @@ export function FixedCostsPageClient() {
                       }))
               )
             : [];
+    const splitJars = fixedCostPots(
+        jarsQuery.data ?? [],
+        rawFixedOut.map(item => item.jarKey)
+    );
+    // A bill in a pot the household has not turned on is listed under the group's main pot.
+    const allFixedOut = assignFixedCostsToPots(splitJars, rawFixedOut);
     const asOf = endOfPeriodIso(periodKey);
     const { applying: applyingFixedCosts, list: fixedCosts } = listFixedCostsForPeriodView(
         allFixedOut,

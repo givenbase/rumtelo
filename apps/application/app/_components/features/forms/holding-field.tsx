@@ -16,7 +16,7 @@ type HoldingFieldProps = {
 /**
  * Optional “Part of a holding” picker for bills, income and one-offs.
  * Hidden when the plan has no net worth (unless the row already carries a link).
- * Attribution only — the jar field stays the source of truth for the six jars.
+ * Attribution only — the jar field stays the source of truth for the pots.
  */
 export function HoldingField({
     value,

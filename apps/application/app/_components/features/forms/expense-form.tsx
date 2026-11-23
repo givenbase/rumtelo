@@ -29,6 +29,7 @@ import { JarKey, defaultGiveCategoryTemplate, jarCapabilitiesFor } from '@rumtel
 import { useTranslations } from '@rumtelo/i18n';
 import { findByNameOrAlias } from '@rumtelo/utils';
 
+import { jarForKey, jarKeysCoveredBy } from '@/app/_lib/jar-for-key';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { viewedPeriodDefaultIso } from '@/app/_lib/viewed-period-date';
 import { isLiveData } from '@/app/_lib/preview';
@@ -420,12 +421,18 @@ export function ExpenseForm({
     );
     const selectedJarKey = useMemo(() => selectedJar?.key ?? null, [selectedJar]);
     const isGive = selectedJarKey === JarKey.GIVE;
+    // The pot the intent's catalog key lands in: itself, or its group's main pot when that pot is off.
+    const intentJarKey = intent.jarKey ? (jarForKey(jars, intent.jarKey)?.key ?? null) : null;
+    const coveredJarKeys = useMemo(
+        () => (selectedJarKey ? jarKeysCoveredBy(jars, selectedJarKey) : undefined),
+        [jars, selectedJarKey]
+    );
 
     // Drop intent when it belongs to another jar (adjust during render).
     const [seenJarKey, setSeenJarKey] = useState<JarKey | null>(selectedJarKey);
     if (selectedJarKey !== seenJarKey) {
         setSeenJarKey(selectedJarKey);
-        if (intent.jarKey && selectedJarKey && intent.jarKey !== selectedJarKey && intentOverride) {
+        if (intentJarKey && selectedJarKey && intentJarKey !== selectedJarKey && intentOverride) {
             setIntentOverride(null);
         }
     }
@@ -455,10 +462,10 @@ export function ExpenseForm({
     }
 
     // Leaving Give clears the special payee path (adjust during render).
-    if (!isGive && (giveOrgKey || givePayeeMode !== 'known' || intent.jarKey === JarKey.GIVE)) {
+    if (!isGive && (giveOrgKey || givePayeeMode !== 'known' || intentJarKey === JarKey.GIVE)) {
         if (giveOrgKey) setGiveOrgKey(null);
         if (givePayeeMode !== 'known') setGivePayeeMode('known');
-        if (intent.jarKey === JarKey.GIVE && intentOverride) {
+        if (intentJarKey === JarKey.GIVE && intentOverride) {
             setIntentOverride(null);
         }
     }
@@ -510,7 +517,8 @@ export function ExpenseForm({
         // Locked jar context wins — don't let merchant intent switch jars.
         if (lockJar) return;
         if (!intent.jarKey) return;
-        const jar = jarChoices.find(candidate => candidate.key === intent.jarKey);
+        // A merchant or type whose pot is off lands in that group's main pot.
+        const jar = jarForKey(jarChoices, intent.jarKey);
         if (jar) form.setValue('jarId', jar.id);
     }, [intent.jarKey, jarChoices, form, lockJar]);
 
@@ -857,9 +865,7 @@ export function ExpenseForm({
                                             candidate => candidate.key === preset.key
                                         );
                                         if (!full?.jarKey) return;
-                                        const jar = jars.find(
-                                            candidate => candidate.key === full.jarKey
-                                        );
+                                        const jar = jarForKey(jars, full.jarKey);
                                         if (jar) form.setValue('jarId', jar.id);
                                     }}
                                 />
@@ -955,6 +961,7 @@ export function ExpenseForm({
                         parties={parties}
                         categoryIconByKey={categoryIconByKey}
                         jarKey={selectedJarKey}
+                        coveredJarKeys={coveredJarKeys}
                         disabled={busy}
                     />
                 </div>

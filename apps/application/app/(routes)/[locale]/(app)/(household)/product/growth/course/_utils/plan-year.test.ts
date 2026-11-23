@@ -12,6 +12,8 @@ import {
     coursePresetByKey,
 } from '@rumtelo/contracts';
 
+import { jarForKey } from '@/app/_lib/jar-for-key';
+
 import { createPlanFormSchema, type PlanGoalDraft } from './plan-form';
 import {
     PLAN_AREAS,
@@ -309,4 +311,37 @@ test('schema: name, amount, jar and routine target are checked', () => {
         issues({ ...run, routineOn: false, routineTarget: '99', routineName: '' }),
         []
     );
+});
+
+test('a suggested pot the household has not turned on resolves to the main pot of its group', () => {
+    const preset = { ...coursePresetByKey('emergency_buffer')!, suggestedJarKey: JarKey.EDUCATION };
+    const area = PLAN_AREAS.find(candidate => candidate.scope === preset.scope)!;
+    const draftFor = (jars: { id: string; key: JarKey }[]) =>
+        draftFromPreset({
+            id: 'draft',
+            area,
+            preset,
+            copy: COPY,
+            jarIdOf: key => jarForKey(jars, key)?.id ?? null,
+            canHaveAmount: true,
+        });
+
+    // Education is off: the goal sits in Long-term savings (Future's main pot).
+    assert.equal(
+        draftFor([
+            { id: 'jar-nec', key: JarKey.NECESSITIES },
+            { id: 'jar-lts', key: JarKey.LONG_TERM_SAVINGS },
+        ]).jarId,
+        'jar-lts'
+    );
+    // Education is on: it keeps its own pot.
+    assert.equal(
+        draftFor([
+            { id: 'jar-lts', key: JarKey.LONG_TERM_SAVINGS },
+            { id: 'jar-edu', key: JarKey.EDUCATION },
+        ]).jarId,
+        'jar-edu'
+    );
+    // Nothing in the group to land in: the choice stays open instead of guessing.
+    assert.equal(draftFor([{ id: 'jar-play', key: JarKey.PLAY }]).jarId, PLAN_NO_JAR);
 });

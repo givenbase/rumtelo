@@ -40,6 +40,7 @@ import { MonthScoreLog } from '@/components/features/home/month-score-log';
 import { NextMoveCardError, NextMoveCardSkeleton } from '@/components/features/home/next-move-card';
 import { TodoCard } from '@/components/features/home/todo-card';
 import { Week1Checklist } from '@/components/features/home/week1-checklist';
+import { orderJarsByGroup } from '@/app/_lib/jar-group';
 import { JarTileGrid } from '@/components/features/money/jar-tile-grid';
 import { useCoachLine } from '@/components/features/helpers';
 import { HouseholdPermissionSection, roleCanSee } from '@/app/_lib/role-permissions';
@@ -169,11 +170,14 @@ export function HomeDashboardClient() {
               monthsHorizon: travelMeta.monthsHorizon,
               stackedTotal: dashboard.allocatedTotal ?? 0,
               formatMoney,
-              jarHighlights: jars.slice(0, 2).map(jar => ({
-                  name: jarName(jar),
-                  from: baselineById.get(jar.id) ?? jar.allocated,
-                  to: jar.allocated,
-              })),
+              // Group order (Basics, Future, Free), never the API's sortOrder: old households keep 0–5.
+              jarHighlights: orderJarsByGroup(jars)
+                  .slice(0, 2)
+                  .map(jar => ({
+                      name: jarName(jar),
+                      from: baselineById.get(jar.id) ?? jar.allocated,
+                      to: jar.allocated,
+                  })),
               tDashboard,
           })
         : null;

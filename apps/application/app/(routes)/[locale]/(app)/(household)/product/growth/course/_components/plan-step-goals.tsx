@@ -6,6 +6,8 @@ import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import { coursePresetCopyKey, type Jar, type JarKey } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
 
+import { jarForKey } from '@/app/_lib/jar-for-key';
+
 import type { PlanFormValues } from '../_utils/plan-form';
 import {
     blankDraft,
@@ -43,7 +45,8 @@ export function PlanStepGoals({
     // UI-only: the editor that was just added takes focus once.
     const [justAdded, setJustAdded] = useState<string | null>(null);
 
-    const jarIdOf = (key: JarKey) => jars.find(jar => jar.key === key)?.id ?? null;
+    // A suggested pot the household has not turned on resolves to its group's main pot.
+    const jarIdOf = (key: JarKey) => jarForKey(jars, key)?.id ?? null;
     const chosen: PlanArea[] = PLAN_AREAS.filter(area => areas.includes(area.key));
 
     const add = (draft: PlanFormValues['goals'][number]) => {

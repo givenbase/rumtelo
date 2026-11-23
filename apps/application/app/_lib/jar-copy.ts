@@ -1,5 +1,7 @@
-import { JarKey } from '@rumtelo/contracts';
+import { JarKey, jarGroupFor } from '@rumtelo/contracts';
 import type { TranslateFn } from '@rumtelo/i18n';
+
+import { isAloneInGroup } from '@/app/_lib/jar-group';
 
 const JAR_KEYS = new Set<string>(Object.values(JarKey));
 
@@ -47,6 +49,24 @@ const ALLOWED_LABEL_SUFFIX: Record<string, Record<string, string>> = {
         Clothes: 'allowed.clothes',
         'Spontaneous buys': 'allowed.spontaneous',
         'Gifts to yourself': 'allowed.gifts_self',
+    },
+    // Optional pots: the seed labels (`jar.seed-data.ts`) plus the wording of the guide copy, so a
+    // label tweak on either side still finds its translation.
+    [JarKey.DAILY]: {
+        Groceries: 'allowed.groceries',
+        'Drugstore & pharmacy': 'allowed.pharmacy',
+        'Pharmacy & drugstore': 'allowed.pharmacy',
+        'Household supplies': 'allowed.household',
+        'Household things': 'allowed.household',
+        'Transport & fuel': 'allowed.transport_fuel',
+    },
+    [JarKey.GOALS]: {
+        'Car or big purchase': 'allowed.big_purchase',
+        'Down payment': 'allowed.home_deposit',
+        'Home deposit': 'allowed.home_deposit',
+        'A planned trip': 'allowed.trip',
+        'A trip': 'allowed.trip',
+        Renovation: 'allowed.renovation',
     },
     [JarKey.GIVE]: {
         'Your foundation': 'allowed.foundation',
@@ -171,6 +191,9 @@ const LEGACY_DEFAULT_JAR_NAMES: Record<JarKey, readonly string[]> = {
         'Dar / fundación',
         'Donner / fondation',
     ],
+    // The two newest optional pots: English template plus nl, es, fr (`jar-translations.ts`).
+    [JarKey.DAILY]: ['Daily', 'Dagelijks', 'Diario', 'Quotidien'],
+    [JarKey.GOALS]: ['Goals', 'Doelen', 'Metas', 'Objectifs'],
 };
 
 function normalizeJarName(name: string): string {
@@ -191,4 +214,38 @@ export function resolveJarName(t: TranslateFn, jarKey: string, storedName: strin
     if (!isDefaultJarName(jarKey, storedName)) return storedName;
     const key = `names.${jarKey}`;
     return t.has(key) ? t(key) : storedName;
+}
+
+/** The two translators the pot copy needs: `features.money.jars` and `features.money.groups`. */
+export type PotCopyTranslators = { jars: TranslateFn; groups: TranslateFn };
+
+/**
+ * Pot name for display, given the pots the household has. A name the household typed wins.
+ * Otherwise the main pot of a group that is not refined (no other pot of its group present)
+ * is named after the GROUP ("Basics"); in every other case it is the per-pot name
+ * ("Fixed costs", "Daily"). `presentKeys` empty (list still loading) gives the per-pot name.
+ */
+export function resolvePotName(
+    translators: PotCopyTranslators,
+    jarKey: string,
+    storedName: string,
+    presentKeys: readonly string[]
+): string {
+    if (!isDefaultJarName(jarKey, storedName)) return storedName;
+    if (presentKeys.length > 0 && isAloneInGroup(jarKey, presentKeys)) {
+        return translators.groups(`${jarGroupFor(jarKey as JarKey)}.title`);
+    }
+    return resolveJarName(translators.jars, jarKey, storedName);
+}
+
+/** The one literal line under a pot name: the group's purpose while the pot stands for its group. */
+export function resolvePotPurpose(
+    translators: PotCopyTranslators,
+    jarKey: string,
+    presentKeys: readonly string[]
+): string {
+    if (presentKeys.length > 0 && isAloneInGroup(jarKey, presentKeys)) {
+        return translators.groups(`${jarGroupFor(jarKey as JarKey)}.purpose`);
+    }
+    return translators.jars(`purpose.${jarKey}`);
 }

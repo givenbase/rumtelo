@@ -512,9 +512,10 @@ export function GoalsPageClient() {
                                 {saveJarKeys.map(key => {
                                     const on = jarFilter === key;
                                     const catalog = jarByKey.get(key);
+                                    // The household's own pot first (its name is already resolved), then the catalog.
                                     const name =
-                                        (catalog ? jarName(catalog) : undefined) ??
                                         [...jarById.values()].find(jar => jar.key === key)?.name ??
+                                        (catalog ? jarName(catalog) : undefined) ??
                                         key;
                                     return (
                                         <button

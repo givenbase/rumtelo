@@ -8,6 +8,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
     HouseholdRole,
+    JAR_GROUP_ORDER,
     WeekCheckStage,
     weekCheckWeekFor,
     type WeekCheck,
@@ -162,9 +163,13 @@ function WeekCheckFlow() {
                 aria-busy="true"
                 className="grid gap-3 rounded-2xl border border-line bg-surface p-4">
                 <div className="h-14 rounded-xl bg-sunken" />
-                {Array.from({ length: 6 }, (_unused, index) => (
-                    <div key={index} className="h-14 rounded-xl bg-sunken" />
-                ))}
+                {/* One tile per pot once known; a new household has three (one main pot per group). */}
+                {Array.from(
+                    { length: jars.length > 0 ? jars.length : JAR_GROUP_ORDER.length },
+                    (_unused, index) => (
+                        <div key={index} className="h-14 rounded-xl bg-sunken" />
+                    )
+                )}
             </div>
         );
     } else if (jars.length === 0) {

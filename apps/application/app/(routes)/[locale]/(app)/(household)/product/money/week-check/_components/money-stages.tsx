@@ -4,7 +4,7 @@ import Link from 'next/link';
 import type { Ref } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { JarKey, type JarBalance } from '@rumtelo/contracts';
+import { JarGroup, jarGroupFor, type JarBalance } from '@rumtelo/contracts';
 import { useTranslations } from '@rumtelo/i18n';
 import {
     EmptyState,
@@ -177,7 +177,8 @@ export function RedirectStage({
     const t = useTranslations('features.money.week_check');
     const tForm = useTranslations('ui.form');
     const jarName = useJarName();
-    const options = jars.filter(jar => jar.key !== JarKey.NECESSITIES);
+    // The surplus goes to Future or Free; the whole Basics group (Necessities, Daily) is where the bills are.
+    const options = jars.filter(jar => jarGroupFor(jar.key) !== JarGroup.BASIS);
 
     return (
         <div className="grid gap-5">

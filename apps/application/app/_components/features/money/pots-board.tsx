@@ -3,12 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 
-import {
-    JAR_GROUP_ORDER,
-    JAR_ORDER_IN_GROUP,
-    sumPercentageByGroup,
-    type JarGroup,
-} from '@rumtelo/contracts';
+import { JAR_GROUP_ORDER, sumPercentageByGroup, type JarGroup } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { allocateByPercentage, cn } from '@rumtelo/utils';
 
@@ -16,24 +11,55 @@ import {
     GROUP_CHROME,
     GROUP_PARAM,
     formatShare,
+    groupBlocks,
     groupSlug,
-    jarsInGroup,
+    groupViews,
     parseGroupParam,
+    splitGroupAnchor,
     sumGroupAmount,
 } from '@/app/_lib/jar-group';
 import { jarsMonthSummary } from '@/app/_lib/jar-tile';
+import { settingsHref } from '@/app/_lib/settings-tabs';
+import { useCanRefinePots } from '@/app/_lib/use-pot-activation';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
-import { JarTile, JarTileSkeleton, useOpenBillsByJar, type JarTileJar } from './jar-tile-grid';
+import {
+    GROUP_TILE_GRID,
+    JarTile,
+    JarTileSkeletonRow,
+    SingleGroupTiles,
+    useOpenBillsByJar,
+    type JarTileJar,
+} from './jar-tile-grid';
 
 const focusRing =
     'outline-none focus-visible:ring-2 focus-visible:ring-accent/25 focus-visible:ring-offset-2 focus-visible:ring-offset-surface';
 
-const TILE_GRID = 'grid grid-cols-1 gap-2.5 @md:grid-cols-2 @xl:gap-3 @3xl:grid-cols-3';
+/**
+ * One quiet link per group to the split settings, anchored at that group, where its optional
+ * pots are turned on and off. Only for people who may change pots (the settings screen is
+ * closed to read-only roles). 44 px tall so it is easy to hit on a phone.
+ */
+function RefineGroupLink({ group, title }: { group: JarGroup; title: string }) {
+    const t = useTranslations('features.money.groups');
+    const label = t('refine.title', { group: title });
+    return (
+        <Link
+            href={`${settingsHref('jars')}#${splitGroupAnchor(group)}`}
+            aria-label={label}
+            className={cn(
+                'inline-flex min-h-11 min-w-0 items-center justify-self-start rounded-md px-1 text-xs font-semibold text-accent underline-offset-2 hover:underline',
+                focusRing
+            )}>
+            <span className="min-w-0 break-words">{label}</span>
+        </Link>
+    );
+}
 
 /**
  * Money › Pots: one summary (what is left, whether everything has a place, one bar over the
- * three groups) and then the six pots under Basics → Future → Free. `?group=basis|future|free`
+ * three groups) and then the pots under Basics → Future → Free: a group that is not refined is one
+ * tile, a refined group shows its pots under a heading. `?group=basis|future|free`
  * narrows the board to one group; no param shows all three. Amounts come from the API — the
  * only sums here are per-group totals of the integer minor units the API already returned.
  */
@@ -60,10 +86,9 @@ export function PotsBoard({
     const searchParams = useSearchParams();
     const { formatMoney } = useHouseholdCurrency();
     const openByJar = useOpenBillsByJar(period);
+    const canRefine = useCanRefinePots();
 
     const selected = parseGroupParam(searchParams.get(GROUP_PARAM));
-    const visibleGroups = selected ? [selected] : JAR_GROUP_ORDER;
-
     /** Link to a group (or to all), keeping any other query param the page carries. */
     function viewHref(group: JarGroup | null): string {
         const next = new URLSearchParams(searchParams.toString());
@@ -80,15 +105,7 @@ export function PotsBoard({
                     aria-hidden
                     className="mb-4 h-28 animate-pulse rounded-2xl border border-line bg-surface"
                 />
-                <div className="grid gap-6">
-                    {JAR_GROUP_ORDER.map(group => (
-                        <div key={group} className={TILE_GRID}>
-                            {JAR_ORDER_IN_GROUP[group].map(jarKey => (
-                                <JarTileSkeleton key={jarKey} />
-                            ))}
-                        </div>
-                    ))}
-                </div>
+                <JarTileSkeletonRow />
             </div>
         );
     }
@@ -111,7 +128,9 @@ export function PotsBoard({
                   { id: 'unplaced', percentage: unplacedBasisPoints / 100 },
               ]).find(part => part.id === 'unplaced')?.amount ?? 0);
     const isAllPlaced = !stacked && incomeTotal > 0 && placedBasisPoints === 10_000;
-    const shownGroups = visibleGroups.filter(group => jarsInGroup(jars, group).length > 0);
+    const presentKeys = jars.map(jar => jar.key);
+    const shownViews = groupViews(jars).filter(view => !selected || view.group === selected);
+    const blocks = groupBlocks(shownViews);
 
     const shareText = (group: JarGroup) =>
         `${t(`groups.${group}.title`)} ${formatShare(shares[group], locale)}%`;
@@ -217,9 +236,27 @@ export function PotsBoard({
             )}
 
             <div className="grid min-w-0 gap-6">
-                {shownGroups.map(group => {
-                    const groupJars = jarsInGroup(jars, group);
-                    const position = JAR_GROUP_ORDER.indexOf(group) + 1;
+                {blocks.map(block => {
+                    if (block.kind === 'tiles') {
+                        return (
+                            <SingleGroupTiles
+                                key={block.views.map(view => view.group).join('-')}
+                                views={block.views}
+                                presentKeys={presentKeys}
+                                openByJar={openByJar}
+                                stacked={stacked}
+                                footer={view =>
+                                    canRefine ? (
+                                        <RefineGroupLink
+                                            group={view.group}
+                                            title={t(`groups.${view.group}.title`)}
+                                        />
+                                    ) : null
+                                }
+                            />
+                        );
+                    }
+                    const { group, position, jars: groupJars } = block.view;
                     const title = t(`groups.${group}.title`);
                     const headingId = `pots-group-${groupSlug(group)}`;
                     return (
@@ -238,31 +275,37 @@ export function PotsBoard({
                                         {position}
                                     </span>
                                     <div className="grid min-w-0 gap-0.5">
-                                        <h3
-                                            id={headingId}
-                                            className="min-w-0 text-base leading-tight font-semibold text-fg">
-                                            {selected ? (
-                                                title
-                                            ) : (
-                                                <Link
-                                                    href={viewHref(group)}
-                                                    scroll={false}
-                                                    aria-label={t('groups.open_group', {
-                                                        group: title,
-                                                    })}
-                                                    className={cn(
-                                                        'inline-flex min-h-6 items-center rounded-md underline-offset-2 hover:underline',
-                                                        focusRing
-                                                    )}>
-                                                    {title}
-                                                    <span
-                                                        aria-hidden
-                                                        className="ml-1 text-fg-muted">
-                                                        ›
-                                                    </span>
-                                                </Link>
-                                            )}
-                                        </h3>
+                                        <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                                            <h3
+                                                id={headingId}
+                                                className="min-w-0 text-base leading-tight font-semibold text-fg">
+                                                {selected ? (
+                                                    title
+                                                ) : (
+                                                    <Link
+                                                        href={viewHref(group)}
+                                                        scroll={false}
+                                                        aria-label={t('groups.open_group', {
+                                                            group: title,
+                                                        })}
+                                                        className={cn(
+                                                            // The link stays 24 px tall; the pseudo-element stretches its tap area to 44 px.
+                                                            'relative inline-flex min-h-6 items-center rounded-md underline-offset-2 before:absolute before:inset-x-0 before:-inset-y-2.5 hover:underline',
+                                                            focusRing
+                                                        )}>
+                                                        {title}
+                                                        <span
+                                                            aria-hidden
+                                                            className="ml-1 text-fg-muted">
+                                                            ›
+                                                        </span>
+                                                    </Link>
+                                                )}
+                                            </h3>
+                                            <span className="rounded-full border border-line bg-raised px-2 py-0.5 font-mono text-[11px] leading-snug whitespace-nowrap text-fg-muted">
+                                                {t('groups.refine.refined_badge')}
+                                            </span>
+                                        </div>
                                         <p className="text-xs leading-snug text-fg-muted">
                                             {t(`groups.${group}.line`)}
                                         </p>
@@ -281,17 +324,19 @@ export function PotsBoard({
                                     </span>
                                 </div>
                             </header>
-                            <ul className={TILE_GRID}>
+                            <ul className={GROUP_TILE_GRID}>
                                 {groupJars.map(jar => (
                                     <li key={jar.id} className="min-w-0">
                                         <JarTile
                                             jar={jar}
                                             openBills={openByJar.get(jar.id) ?? 0}
                                             stacked={stacked}
+                                            presentKeys={presentKeys}
                                         />
                                     </li>
                                 ))}
                             </ul>
+                            {canRefine ? <RefineGroupLink group={group} title={title} /> : null}
                         </section>
                     );
                 })}
