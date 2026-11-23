@@ -43,6 +43,7 @@ import { useApiError } from '@/app/_lib/api-error-messages';
 import { jarPlacementForAccounts, planJarBankSetup } from '@/app/_lib/jar-bank-plan';
 import { countryFromCurrency } from '@/app/_lib/resolve-account-bank';
 import { vendorMarkSrc, type PartyMark } from '@/app/_lib/vendor-brands';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import { JarMark } from '@/components/features/money/jar-badge';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -349,6 +350,7 @@ function MapStep({
     onPlace: (jarId: string, accountId: string) => void;
 }) {
     const t = useTranslations('pages.onboarding');
+    const jarName = useJarName();
 
     if (accountOptions.length === 0) {
         return <p className="text-sm text-fg-muted">{t('banks_setup.no_accounts_yet')}</p>;
@@ -363,14 +365,16 @@ function MapStep({
                     <span className="grid size-9 shrink-0 place-items-center rounded-xl border border-line bg-card text-base">
                         <JarMark jarKey={jar.key} icon={jar.icon} />
                     </span>
-                    <span className="min-w-0 flex-1 text-sm font-medium text-fg">{jar.name}</span>
+                    <span className="min-w-0 flex-1 text-sm font-medium text-fg">
+                        {jarName(jar)}
+                    </span>
                     <Select
                         value={effectivePlacement[jar.id] ?? 'none'}
                         disabled={!mapNeedsChoices}
                         onValueChange={value => onPlace(jar.id, value === 'none' ? '' : value)}>
                         <SelectTrigger
                             className="w-44 shrink-0"
-                            aria-label={`${jar.name} — ${t('banks_setup.map_title')}`}>
+                            aria-label={`${jarName(jar)} — ${t('banks_setup.map_title')}`}>
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent position="popper">

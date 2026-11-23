@@ -31,6 +31,7 @@ import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { isLiveData } from '@/app/_lib/preview';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import { findPartyVendor, partyMark } from '@/app/_lib/vendor-brands';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import { JarGuideCard } from '@/components/features/helpers';
@@ -57,6 +58,7 @@ import {
 export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
     const t = useTranslations('features.money.jars.detail');
     const tJars = useTranslations('features.money.jars');
+    const jarName = useJarName();
     const { householdId } = useAuth();
     const { period } = useHouseholdShell();
     const { showCreateFlows } = useBoardWriteAccess();
@@ -234,7 +236,7 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                             {jar.icon ?? catalog?.icon ?? '◇'}
                         </span>
                         <div className="grid min-w-0 gap-1">
-                            <Typography as="h1">{jar.name}</Typography>
+                            <Typography as="h1">{jarName(jar)}</Typography>
                             <p className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase">
                                 {resolveJarSubtitle(tJars, jarKey, jar.subtitle, catalog?.subtitle)}{' '}
                                 · {t('pct_of_net', { pct: jar.percentage })}
@@ -430,7 +432,7 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                 jarKey={jarKey}
                 jarId={jar.id}
                 allocatedCents={jar.allocated}
-                jarName={jar.name}
+                jarName={jarName(jar)}
             />
         </div>
     );

@@ -41,6 +41,7 @@ import { useHoldings } from '@/app/_lib/use-holdings';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { findCatalogMerchantFromFeed, findPartyVendor, partyMark } from '@/app/_lib/vendor-brands';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import {
     JarBadge,
@@ -137,6 +138,7 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
     const tChips = useTranslations('features.money.chips');
     const tLeak = useTranslations('features.money.business_household_leak');
     const tAction = useTranslations('common.action');
+    const jarName = useJarName();
     const appLocale = useLocale();
     const searchParams = useSearchParams();
     const setupParam = searchParams.get('setup');
@@ -511,7 +513,7 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
                                             {jar ? (
                                                 <JarBadge
                                                     jarKey={jar.key}
-                                                    name={jar.name}
+                                                    name={jarName(jar)}
                                                     icon={jar.icon}
                                                 />
                                             ) : null}
@@ -573,7 +575,7 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
                                             {jar ? (
                                                 <JarBadge
                                                     jarKey={jar.key}
-                                                    name={jar.name}
+                                                    name={jarName(jar)}
                                                     icon={jar.icon}
                                                 />
                                             ) : null}

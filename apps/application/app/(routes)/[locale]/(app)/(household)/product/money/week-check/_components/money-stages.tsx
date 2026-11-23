@@ -21,6 +21,7 @@ import { cn } from '@rumtelo/utils';
 import { CREATE_HREF } from '@/app/_lib/create-routes';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { moneyPath } from '@/app/_lib/routes';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import type { WeekCheckIntendSchemaValues } from '@/components/features/forms/form-zod';
 import { JarProgressBar } from '@/components/features/money/jar-progress-bar';
 
@@ -82,6 +83,7 @@ export function LookStage({
     headingRef?: Ref<HTMLHeadingElement>;
 }) {
     const t = useTranslations('features.money.week_check');
+    const jarName = useJarName();
     const noIncome = jars.length > 0 && jars.every(jar => jar.allocated === 0);
 
     return (
@@ -117,7 +119,7 @@ export function LookStage({
                                     <span aria-hidden className="text-base">
                                         {jar.icon ?? '✦'}
                                     </span>
-                                    <span className="min-w-0 text-pretty">{jar.name}</span>
+                                    <span className="min-w-0 text-pretty">{jarName(jar)}</span>
                                 </span>
                                 <span className="shrink-0 font-mono text-sm text-fg tabular-nums">
                                     {formatMoney(jar.available)}
@@ -174,6 +176,7 @@ export function RedirectStage({
 }) {
     const t = useTranslations('features.money.week_check');
     const tForm = useTranslations('ui.form');
+    const jarName = useJarName();
     const options = jars.filter(jar => jar.key !== JarKey.NECESSITIES);
 
     return (
@@ -195,7 +198,7 @@ export function RedirectStage({
                                 <span aria-hidden className="text-base">
                                     {jar.icon ?? '✦'}
                                 </span>
-                                <span className="min-w-0 text-pretty">{jar.name}</span>
+                                <span className="min-w-0 text-pretty">{jarName(jar)}</span>
                             </span>
                             <button
                                 type="button"

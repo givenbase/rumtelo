@@ -11,13 +11,14 @@ import { apiQuery } from '@/app/_lib/api-hooks';
 import { resolveJarName } from '@/app/_lib/jar-copy';
 import { jarIcon } from '@/app/_lib/jar-meta';
 import { openBillCountsByJar } from '@/app/_lib/jar-open-bills';
+import { orderJarsByGroup } from '@/app/_lib/jar-group';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { jarsMonthSummary, jarTileFigures } from '@/app/_lib/jar-tile';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useAuth } from '@/components/features/shell/auth-provider';
 
-type JarTileJar = Pick<
+export type JarTileJar = Pick<
     JarBalance,
     | 'id'
     | 'key'
@@ -28,6 +29,7 @@ type JarTileJar = Pick<
     | 'spent'
     | 'committedOut'
     | 'potBalance'
+    | 'percentage'
 >;
 
 const focusRing =
@@ -37,7 +39,7 @@ const focusRing =
  * One jar: what is left this month as the big number, one meter, the pot and open bills.
  * The whole tile is the link to the jar. Amounts come from the API; only sums happen here.
  */
-function JarTile({
+export function JarTile({
     jar,
     openBills,
     stacked,
@@ -65,13 +67,16 @@ function JarTile({
                     {jarIcon(jar.key, jar.icon)}
                 </span>
                 <span className="grid min-w-0 gap-0.5 pt-0.5">
-                    <span className="text-sm leading-tight font-semibold text-balance break-words text-fg">
+                    <span
+                        title={name}
+                        className="text-sm leading-tight font-semibold text-balance break-words text-fg">
                         {name}
                     </span>
-                    {/* One literal line so a beginner knows what the jar is for. */}
-                    {/* Every purpose line follows the same short "x, y" pattern so it fits one
-                        line; no forced height needed. */}
-                    <span className="truncate text-xs leading-snug text-fg-muted">
+                    {/* One literal line so a beginner knows what the pot is for. It may take two
+                        lines now that some purposes are longer; `title` carries the full text. */}
+                    <span
+                        title={t(`purpose.${jar.key}`)}
+                        className="line-clamp-2 text-xs leading-snug text-fg-muted">
                         {t(`purpose.${jar.key}`)}
                     </span>
                 </span>
@@ -135,7 +140,7 @@ function JarTile({
     );
 }
 
-function JarTileSkeleton() {
+export function JarTileSkeleton() {
     return (
         <div
             aria-hidden
@@ -145,9 +150,26 @@ function JarTileSkeleton() {
 }
 
 /**
- * Six jars as a compact grid (2 columns, 3 when the container is wide) under one summary
- * line. Used on Home (inside the money hero) and on Money › Jars. Owns the one fixed-costs
- * query the "open bills" chips need, so both surfaces behave the same.
+ * Open-bills count per jar for the period. The one fixed-costs query the tile chips need;
+ * the flat grid (Home) and the grouped board (Money) share it so both behave the same.
+ */
+export function useOpenBillsByJar(period: { year: number; month: number }): Map<string, number> {
+    const { householdId } = useAuth();
+    const live = isLiveData(householdId);
+
+    const byJarQuery = useLiveQuery(
+        apiQuery.money.fixedCosts.byJar.queryOptions({ input: { householdId: householdId! } }),
+        [] as never,
+        live
+    );
+    const fixedCosts: FixedCost[] = (byJarQuery.data ?? []).flatMap(group => group.items);
+    return openBillCountsByJar(fixedCosts, period);
+}
+
+/**
+ * Six pots as a compact flat grid (2 columns, 3 when the container is wide) under one summary
+ * line, in group order (Basics, Future, Free). Used on Home (inside the money hero); Money
+ * uses the grouped `PotsBoard`. Both read open bills through `useOpenBillsByJar`.
  */
 export function JarTileGrid({
     jars,
@@ -164,18 +186,10 @@ export function JarTileGrid({
     className?: string;
 }) {
     const t = useTranslations('features.money.jars');
-    const { householdId } = useAuth();
     const { formatMoney } = useHouseholdCurrency();
-    const live = isLiveData(householdId);
-
-    const byJarQuery = useLiveQuery(
-        apiQuery.money.fixedCosts.byJar.queryOptions({ input: { householdId: householdId! } }),
-        [] as never,
-        live
-    );
-    const fixedCosts: FixedCost[] = (byJarQuery.data ?? []).flatMap(group => group.items);
-    const openByJar = openBillCountsByJar(fixedCosts, period);
+    const openByJar = useOpenBillsByJar(period);
     const summary = jarsMonthSummary(jars);
+    const orderedJars = orderJarsByGroup(jars);
 
     return (
         <div className={cn('@container min-w-0', className)}>
@@ -201,7 +215,7 @@ export function JarTileGrid({
                         </p>
                     ) : null}
                     <ul className="grid grid-cols-1 gap-2.5 @md:grid-cols-2 @xl:gap-3 @3xl:grid-cols-3">
-                        {jars.map(jar => (
+                        {orderedJars.map(jar => (
                             <li key={jar.id} className="min-w-0">
                                 <JarTile
                                     jar={jar}

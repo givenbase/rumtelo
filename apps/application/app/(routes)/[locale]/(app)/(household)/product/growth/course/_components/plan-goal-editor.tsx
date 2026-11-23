@@ -23,6 +23,7 @@ import {
 } from '@rumtelo/ui';
 
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { useJarName } from '@/app/_lib/use-jar-name';
 
 import { PLAN_AMOUNT_KINDS, type PlanFormValues } from '../_utils/plan-form';
 import { monthlyShareFor, parseMinorUnits } from '../_utils/plan-year';
@@ -56,6 +57,7 @@ export function PlanGoalEditor({
 }) {
     const t = useTranslations('features.growth.course.plan');
     const tScope = useTranslations('features.growth.course.goal');
+    const jarName = useJarName();
     const { control, setValue } = useFormContext<PlanFormValues>();
     const { symbol, formatMoney } = useHouseholdCurrency();
     const root = useRef<HTMLElement>(null);
@@ -226,7 +228,7 @@ export function PlanGoalEditor({
                                                     <SelectContent position="popper">
                                                         {jars.map(jar => (
                                                             <SelectItem key={jar.id} value={jar.id}>
-                                                                {jar.name}
+                                                                {jarName(jar)}
                                                             </SelectItem>
                                                         ))}
                                                     </SelectContent>

@@ -41,6 +41,7 @@ import { useHouseholdShell } from '@/components/features/shell/household-shell-c
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 import { CREATE_HREF } from '@/app/_lib/create-routes';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import Link from 'next/link';
 import { ConfirmActionButton } from './confirm-action-button';
 import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
@@ -264,6 +265,7 @@ export function ExpenseForm({
     const tExpense = useTranslations('features.money.expense_form');
     const tForm = useTranslations('ui.form');
     const tBtn = useTranslations('ui.button.actions');
+    const jarName = useJarName();
     const coachGuidesEnabled = useHelpersEnabled();
     const givePayeeModes: ReadonlyArray<{ id: GivePayeeMode; label: string }> = [
         { id: 'known', label: tFixed('give_known') },
@@ -772,7 +774,7 @@ export function ExpenseForm({
                             {selectedJar.icon ?? '◇'}
                         </span>
                         <div className="min-w-0 flex-1">
-                            <p className="text-sm font-semibold text-fg">{selectedJar.name}</p>
+                            <p className="text-sm font-semibold text-fg">{jarName(selectedJar)}</p>
                             <p className="font-mono text-[10px] tracking-wide text-fg-muted uppercase">
                                 {tExpense('this_jar')}
                             </p>
@@ -797,7 +799,7 @@ export function ExpenseForm({
                                     jarChoices.map(jar => (
                                         <FormSelectItem key={jar.id} value={jar.id}>
                                             {jar.icon ? `${jar.icon} ` : ''}
-                                            {jar.name}
+                                            {jarName(jar)}
                                         </FormSelectItem>
                                     ))
                                 )}
@@ -1020,7 +1022,9 @@ export function ExpenseForm({
                                 {selectedJar.icon ?? '◇'}
                             </span>
                             <div className="min-w-0 flex-1">
-                                <p className="text-sm font-semibold text-fg">{selectedJar.name}</p>
+                                <p className="text-sm font-semibold text-fg">
+                                    {jarName(selectedJar)}
+                                </p>
                                 <p className="font-mono text-[10px] tracking-wide text-fg-muted uppercase">
                                     {tExpense('this_jar')}
                                 </p>
@@ -1045,7 +1049,7 @@ export function ExpenseForm({
                                         jarChoices.map(jar => (
                                             <FormSelectItem key={jar.id} value={jar.id}>
                                                 {jar.icon ? `${jar.icon} ` : ''}
-                                                {jar.name}
+                                                {jarName(jar)}
                                             </FormSelectItem>
                                         ))
                                     )}

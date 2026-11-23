@@ -29,6 +29,7 @@ import { isLiveData } from '@/app/_lib/preview';
 import { productPath } from '@/app/_lib/routes';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import { GoalKindMark } from '@/components/features/growth/goal-kind-mark';
 import { SaveGoalManifestActions } from '@/components/features/growth/save-goal-manifest-actions';
 import { CoachFeatureGate } from '@/components/features/helpers';
@@ -192,6 +193,7 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
     const td = useTranslations('features.growth.goals.detail');
     const tGoals = useTranslations('features.growth.goals');
     const tJars = useTranslations('features.money.jars');
+    const jarName = useJarName();
     const tAction = useTranslations('common.action');
     const locale = useLocale();
     const live = isLiveData(householdId);
@@ -374,7 +376,7 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
         verdict: pace?.verdict ?? null,
         projection,
         formatMoney,
-        jarName: jar?.name ?? null,
+        jarName: jar ? jarName(jar) : null,
         headroom: pace?.jarHeadroomCents ?? null,
         siblingCount: siblings.length,
         locale,
@@ -384,7 +386,7 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
     const related: Array<{ title: string; subtitle: string; href: string }> = [];
     if (jarHref && jar) {
         related.push({
-            title: jar.name,
+            title: jarName(jar),
             subtitle: td('open_jar'),
             href: jarHref,
         });
@@ -406,7 +408,7 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
     if (jar && goal.kind === GoalKind.SAVE) {
         related.push({
             title: td('move_money'),
-            subtitle: td('feed_jar', { name: jar.name }),
+            subtitle: td('feed_jar', { name: jarName(jar) }),
             href: createMoveHref({
                 returnTo: goalDetailHref(goal.id),
             }),
@@ -584,14 +586,14 @@ export function GoalDetailPageClient({ goalId }: { goalId: string }) {
                                 </span>
                                 <JarBadge
                                     jarKey={jar.key}
-                                    name={jar.name}
+                                    name={jarName(jar)}
                                     icon={jar.icon}
                                     showIcon={false}
                                     className="border-0 bg-transparent p-0"
                                 />
                             </Link>
                         ) : (
-                            <JarBadge jarKey={jar.key} name={jar.name} icon={jar.icon} />
+                            <JarBadge jarKey={jar.key} name={jarName(jar)} icon={jar.icon} />
                         )}
                     </div>
                     {jarBalance ? (

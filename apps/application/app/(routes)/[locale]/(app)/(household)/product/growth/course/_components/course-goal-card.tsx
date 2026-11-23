@@ -19,6 +19,7 @@ import {
 import { cn } from '@rumtelo/utils';
 
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { useJarName } from '@/app/_lib/use-jar-name';
 
 import { monthName, type GoalNode } from '../_utils/course-goals';
 import type { CourseItemActions } from '../_utils/use-course-actions';
@@ -69,6 +70,7 @@ export function CourseGoalCard({
 }) {
     const t = useTranslations('features.growth.course.goal');
     const tCourse = useTranslations('features.growth.course');
+    const jarName = useJarName();
     const locale = useLocale();
     const { formatMoney } = useHouseholdCurrency();
     const { item, moneyGoal } = node;
@@ -121,7 +123,15 @@ export function CourseGoalCard({
                                     <span className={CHIP}>
                                         <Icon name="piggy-bank" size="sm" className="size-3.5" />
                                         <span className="truncate">
-                                            {[formatMoney(moneyGoal.target), moneyGoal.jarName]
+                                            {[
+                                                formatMoney(moneyGoal.target),
+                                                moneyGoal.jarKey && moneyGoal.jarName
+                                                    ? jarName({
+                                                          key: moneyGoal.jarKey,
+                                                          name: moneyGoal.jarName,
+                                                      })
+                                                    : moneyGoal.jarName,
+                                            ]
                                                 .filter(Boolean)
                                                 .join(' · ')}
                                         </span>

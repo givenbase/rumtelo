@@ -32,6 +32,7 @@ import { isFocusSaveGoal, saveGoalRank } from '@/app/_lib/goal-focus';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import { GoalKindMark } from '@/components/features/growth/goal-kind-mark';
 import { JarBadge, JarMark } from '@/components/features/money/jar-badge';
 import { PlanCapacityCreate } from '@/components/features/shell/plan-capacity-create';
@@ -207,6 +208,7 @@ export function GoalsPageClient() {
     const t = useTranslations('features.growth.goals');
     const tDetail = useTranslations('features.growth.goals.detail');
     const tShell = useTranslations('pages.shell');
+    const jarName = useJarName();
     const locale = useLocale();
     const { householdId } = useAuth();
     const { period } = useHouseholdShell();
@@ -254,10 +256,11 @@ export function GoalsPageClient() {
     const jarById = useMemo(() => {
         const map = new Map<string, { id: string; key: JarKey; name: string }>();
         for (const jar of jarsQuery.data ?? []) {
-            map.set(jar.id, { id: jar.id, key: jar.key, name: jar.name });
+            // Resolved once here so every badge and label below shows the pot's current name.
+            map.set(jar.id, { id: jar.id, key: jar.key, name: jarName(jar) });
         }
         return map;
-    }, [jarsQuery.data]);
+    }, [jarName, jarsQuery.data]);
 
     const goals = useMemo((): ReadonlyArray<Goal> => goalsQuery.data ?? [], [goalsQuery.data]);
     /** Backend `assertWithinLimit('maxGoals')` counts ACTIVE status only. */
@@ -510,7 +513,7 @@ export function GoalsPageClient() {
                                     const on = jarFilter === key;
                                     const catalog = jarByKey.get(key);
                                     const name =
-                                        catalog?.name ??
+                                        (catalog ? jarName(catalog) : undefined) ??
                                         [...jarById.values()].find(jar => jar.key === key)?.name ??
                                         key;
                                     return (

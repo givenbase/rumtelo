@@ -6,13 +6,26 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
-import { DEFAULT_JAR_SPLIT, SpendingStyle } from '@rumtelo/contracts';
+import {
+    DEFAULT_JAR_SPLIT,
+    JAR_GROUP_ORDER,
+    SpendingStyle,
+    sumPercentageByGroup,
+} from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { useTranslations } from '@rumtelo/i18n';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Badge, Button, Input, Meter, StubNotice, VendorMark } from '@rumtelo/ui';
 import { cn, formatIban, formatPercent, sumMonthly } from '@rumtelo/utils';
 
 import { useApiError } from '@/app/_lib/api-error-messages';
+import { resolveJarName } from '@/app/_lib/jar-copy';
+import {
+    GROUP_CHROME,
+    formatShare,
+    groupSlug,
+    jarsInGroup,
+    orderJarsByGroup,
+} from '@/app/_lib/jar-group';
 import { isLiveData } from '@/app/_lib/preview';
 import { evaluateSplitCoach, orderSplitTips, pctByJarKey } from '@/app/_lib/split-coach';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -31,6 +44,8 @@ type JarsSettingsValues = {
 
 export function JarsSettings() {
     const t = useTranslations();
+    const tJars = useTranslations('features.money.jars');
+    const locale = useLocale();
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { showToast } = useHouseholdShell();
@@ -69,7 +84,8 @@ export function JarsSettings() {
     );
     const banks = useMemo(() => banksQuery.data ?? [], [banksQuery.data]);
 
-    const jars = useMemo(() => jarsQuery.data ?? [], [jarsQuery.data]);
+    // Pots always list in group order (Basics, Future, Free), whatever order the API sent.
+    const jars = useMemo(() => orderJarsByGroup(jarsQuery.data ?? []), [jarsQuery.data]);
     const accounts = useMemo(() => accountsQuery.data ?? [], [accountsQuery.data]);
     const serverPct = useMemo(
         () => Object.fromEntries(jars.map(j => [j.id, j.percentage])),
@@ -106,7 +122,20 @@ export function JarsSettings() {
     const [editingJarId, setEditingJarId] = useState<string | null>(null);
 
     const total = Object.values(pct).reduce((running, value) => running + value, 0);
-    const balanced = Math.abs(total - 100) < 0.01;
+    // The server accepts a split only when it adds up to exactly 10 000 basis points, so compare
+    // the same rounded integers here — Save is enabled only when the server will take it.
+    const totalBasisPoints = Object.values(pct).reduce(
+        (running, value) => running + Math.round(value * 100),
+        0
+    );
+    const balanced = totalBasisPoints === 10_000;
+    // Live group subtotals follow the inputs, in basis points so they add up without drift.
+    const groupShares = sumPercentageByGroup(
+        jars.map(jar => ({ key: jar.key, percentage: pct[jar.id] ?? jar.percentage }))
+    );
+
+    // A household with no pot in a group gets no empty section for it.
+    const visibleGroups = JAR_GROUP_ORDER.filter(group => jarsInGroup(jars, group).length > 0);
 
     // Only show seats that still exist in the current accounts list — stale IDs are dropped.
     const effectiveJarSeats = useMemo(() => {
@@ -198,7 +227,9 @@ export function JarsSettings() {
                                         )}
                                     />
                                     <span className="grid min-w-0 gap-0.5">
-                                        <span className="text-sm text-fg">{jar.name}</span>
+                                        <span className="text-sm text-fg">
+                                            {resolveJarName(tJars, jar.key, jar.name)}
+                                        </span>
                                         {account ? (
                                             <span className="flex min-w-0 items-center gap-1.5">
                                                 {mark ? (
@@ -286,7 +317,11 @@ export function JarsSettings() {
                                                     t(
                                                         'pages.settings.panels.jars_placement.seat_saved',
                                                         {
-                                                            jar: jar.name,
+                                                            jar: resolveJarName(
+                                                                tJars,
+                                                                jar.key,
+                                                                jar.name
+                                                            ),
                                                             account: option.name,
                                                         }
                                                     ),
@@ -309,54 +344,98 @@ export function JarsSettings() {
                     <Badge tone={balanced ? 'success' : 'danger'}>{formatPercent(total)}</Badge>
                 }>
                 <div className="grid gap-0">
-                    {jars.map((jar, i) => {
-                        const value = pct[jar.id] ?? jar.percentage;
-                        const allocated = Math.round((monthlyNet * value) / 100);
+                    {visibleGroups.map((group, groupIndex) => {
+                        const groupJars = jarsInGroup(jars, group);
+                        const headingId = `split-group-${groupSlug(group)}`;
                         return (
-                            <div
-                                key={jar.id}
-                                className={cn(
-                                    'grid gap-1.5 py-2',
-                                    i < jars.length - 1 && 'border-b border-line'
-                                )}>
-                                <div className="flex items-center gap-2">
-                                    <span
-                                        className={cn(
-                                            'size-1.5 shrink-0 rounded-sm',
-                                            JAR_COLOR[jar.key] ?? 'bg-accent'
-                                        )}
-                                    />
-                                    <label
-                                        htmlFor={`pct-${jar.id}`}
-                                        className="min-w-0 flex-1 truncate text-sm text-fg">
-                                        {jar.name}
-                                    </label>
-                                    <Input
-                                        id={`pct-${jar.id}`}
-                                        type="number"
-                                        min={0}
-                                        max={100}
-                                        step={0.5}
-                                        value={value}
-                                        onChange={event =>
-                                            form.setValue(
-                                                'pct',
-                                                {
-                                                    ...pct,
-                                                    [jar.id]: Number(event.target.value) || 0,
-                                                },
-                                                { shouldDirty: true }
-                                            )
-                                        }
-                                        className="h-8 w-16 text-sm"
-                                    />
-                                    <span className="w-3 text-xs text-fg-muted">%</span>
-                                    <span className="w-20 shrink-0 text-right text-xs text-fg-muted tabular-nums">
-                                        {formatMoney(allocated)}
+                            <section
+                                key={group}
+                                aria-labelledby={headingId}
+                                className={cn(groupIndex > 0 && 'mt-2 border-t border-line pt-2')}>
+                                <header className="flex min-w-0 items-center justify-between gap-3 py-1.5">
+                                    <span className="flex min-w-0 items-center gap-2">
+                                        <span
+                                            aria-hidden
+                                            className={cn(
+                                                'grid size-5 shrink-0 place-items-center rounded-full border border-line bg-raised font-mono text-[11px] font-semibold',
+                                                GROUP_CHROME[group].text
+                                            )}>
+                                            {groupIndex + 1}
+                                        </span>
+                                        <span className="min-w-0">
+                                            <span
+                                                id={headingId}
+                                                className="block text-sm font-semibold text-fg">
+                                                {t(`features.money.groups.${group}.title`)}
+                                            </span>
+                                            <span className="block text-xs leading-snug text-fg-muted">
+                                                {t(`features.money.groups.${group}.line`)}
+                                            </span>
+                                        </span>
                                     </span>
-                                </div>
-                                <Meter value={value / 100} tone={JAR_COLOR[jar.key] ?? 'accent'} />
-                            </div>
+                                    <span className="shrink-0 font-mono text-sm font-medium whitespace-nowrap text-fg tabular-nums">
+                                        {formatShare(groupShares[group], locale)}%
+                                    </span>
+                                </header>
+                                {groupJars.map((jar, i) => {
+                                    const value = pct[jar.id] ?? jar.percentage;
+                                    const allocated = Math.round((monthlyNet * value) / 100);
+                                    const name = resolveJarName(tJars, jar.key, jar.name);
+                                    return (
+                                        <div
+                                            key={jar.id}
+                                            className={cn(
+                                                'grid gap-1.5 py-2',
+                                                i < groupJars.length - 1 && 'border-b border-line'
+                                            )}>
+                                            {/* Below sm the label gets its own line and wraps, so a long Dutch pot name is never clipped; the controls sit under it. */}
+                                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
+                                                <span className="flex min-w-0 basis-full items-center gap-2 sm:flex-1 sm:basis-0">
+                                                    <span
+                                                        className={cn(
+                                                            'size-1.5 shrink-0 rounded-sm',
+                                                            JAR_COLOR[jar.key] ?? 'bg-accent'
+                                                        )}
+                                                    />
+                                                    <label
+                                                        htmlFor={`pct-${jar.id}`}
+                                                        className="min-w-0 text-sm break-words text-fg">
+                                                        {name}
+                                                    </label>
+                                                </span>
+                                                <Input
+                                                    id={`pct-${jar.id}`}
+                                                    type="number"
+                                                    min={0}
+                                                    max={100}
+                                                    step={0.5}
+                                                    value={value}
+                                                    onChange={event =>
+                                                        form.setValue(
+                                                            'pct',
+                                                            {
+                                                                ...pct,
+                                                                [jar.id]:
+                                                                    Number(event.target.value) || 0,
+                                                            },
+                                                            { shouldDirty: true }
+                                                        )
+                                                    }
+                                                    className="h-8 w-16 text-sm"
+                                                />
+                                                <span className="w-3 text-xs text-fg-muted">%</span>
+                                                <span className="ml-auto w-20 shrink-0 text-right text-xs whitespace-nowrap text-fg-muted tabular-nums sm:ml-0">
+                                                    {formatMoney(allocated)}
+                                                </span>
+                                            </div>
+                                            <Meter
+                                                value={value / 100}
+                                                tone={JAR_COLOR[jar.key] ?? 'accent'}
+                                            />
+                                        </div>
+                                    );
+                                })}
+                            </section>
                         );
                     })}
 

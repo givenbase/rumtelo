@@ -11,14 +11,15 @@ import { toPeriodKey } from '@rumtelo/utils';
 import { CREATE_HREF, createTxHref } from '@/app/_lib/create-routes';
 import { isLiveData } from '@/app/_lib/preview';
 import { productPath } from '@/app/_lib/routes';
-import { JarTileGrid } from '@/components/features/money/jar-tile-grid';
+import { PotsBoard } from '@/components/features/money/pots-board';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListToolbar } from '@/components/layout/list-toolbar';
 
 /**
- * Jars screen — design Kluis Finance App.dc.html :689-839.
- * ListToolbar: + Add transaction (Out/In) · Move between jars secondary.
+ * Pots screen — design Kluis Finance App.dc.html :689-839, now grouped (Basics, Future, Free).
+ * ListToolbar: + Add transaction (Out/In) · Move between pots secondary. The "on track" count
+ * lives once, in the footer; the board owns the totals and the group bar.
  * An overspent Necessities is a full red meter in its row; the one Coach line that says what
  * to do lives on the Money overview (`MoneyCoachLine`), after these rows.
  * Income what-ifs live on Growth → Income (`IncomeSimulator`) — the lever there is income.
@@ -40,7 +41,6 @@ export function JarsPageClient({ embed = false }: { embed?: boolean }) {
 
     const jars = dashboardQuery.data?.jars ?? [];
     const stacked = dashboardQuery.data?.travel?.mode === 'stacked';
-    const totalPct = jars.reduce((total, j) => total + j.percentage, 0);
     const onTarget = jars.filter(j => !j.overspent).length;
 
     return (
@@ -65,11 +65,6 @@ export function JarsPageClient({ embed = false }: { embed?: boolean }) {
 
             <div data-tour="jars-toolbar">
                 <ListToolbar
-                    secondary={
-                        <span className="font-mono text-xs font-medium text-fg-faint">
-                            {t('on_track', { on: onTarget, total: jars.length })}
-                        </span>
-                    }
                     createSlot={
                         embed ? undefined : (
                             <div className="flex flex-wrap items-center gap-2">
@@ -86,24 +81,17 @@ export function JarsPageClient({ embed = false }: { embed?: boolean }) {
                             </div>
                         )
                     }>
-                    <span className="rounded-full border border-accent bg-accent-soft px-4 py-2 font-mono text-xs font-medium tracking-wide text-accent uppercase">
-                        {t('allocated', {
-                            count: jars.length,
-                            pct: Math.round(totalPct * 10) / 10,
-                        })}
+                    <span className="font-mono text-xs font-medium text-fg-faint">
+                        {t('tap_hint')}
                     </span>
-                    {embed ? null : (
-                        <span className="font-mono text-xs font-medium text-fg-faint">
-                            {t('tap_hint')}
-                        </span>
-                    )}
                 </ListToolbar>
             </div>
 
             <div id="jars-list" data-tour="jars-list">
-                <JarTileGrid
+                <PotsBoard
                     jars={jars}
                     period={period}
+                    incomeTotal={dashboardQuery.data?.incomeTotal ?? 0}
                     stacked={stacked}
                     loading={live && dashboardQuery.isPending}
                 />

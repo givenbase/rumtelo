@@ -19,6 +19,7 @@ import {
 } from '@/app/_lib/jar-copy';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import { GivingFinder } from '@/components/features/money/giving-finder';
 
 type JarGuideCardProps = {
@@ -45,6 +46,7 @@ export function JarGuideCard({
 }: JarGuideCardProps) {
     const t = useTranslations('features.coach.jar_guide');
     const tJars = useTranslations('features.money.jars');
+    const displayJarName = useJarName();
     const router = useRouter();
     const { formatMoney } = useHouseholdCurrency();
     const { guideFor, byKey } = useJarCatalog();
@@ -66,7 +68,7 @@ export function JarGuideCard({
                     {catalog?.icon ?? '◇'}
                 </span>
                 <span className="min-w-0 flex-1 text-pretty wrap-anywhere">
-                    {t('summary', { jar: jarName ?? catalog?.name ?? jarKey })}
+                    {t('summary', { jar: jarName ?? (catalog ? displayJarName(catalog) : jarKey) })}
                 </span>
                 <Icon
                     name="chevron-down"

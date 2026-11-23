@@ -31,6 +31,7 @@ import { viewedPeriodDefaultIso } from '@/app/_lib/viewed-period-date';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
@@ -286,6 +287,7 @@ export function MoveMoneyForm({
     const t = useTranslations('features.money.move');
     const tTx = useTranslations('features.money.transactions');
     const tForm = useTranslations('ui.form');
+    const jarName = useJarName();
     const apiError = useApiError();
     const leftLabel = (amount: string) => t('left', { amount });
     const queryClient = useQueryClient();
@@ -320,14 +322,15 @@ export function MoveMoneyForm({
             return {
                 id: jar.id,
                 key: jar.key,
-                name: jar.name,
+                // Resolved here so the picker, the summary and the toast all show the same pot name.
+                name: jarName(jar),
                 icon: jar.icon || catalog?.icon || '◇',
                 available: availableById.has(jar.id) ? (availableById.get(jar.id) ?? 0) : null,
                 canSpend: caps.canSpend,
                 canInvest: caps.canInvest,
             };
         });
-    }, [jarsQuery.data, balancesQuery.data, catalogByKey]);
+    }, [jarsQuery.data, balancesQuery.data, catalogByKey, jarName]);
 
     const moveSchema = useMemo(() => createMoveMoneyFormSchema(tForm), [tForm]);
 

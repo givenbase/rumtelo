@@ -12,6 +12,7 @@ import { necessitiesPressureFromJar } from '@/app/_lib/necessities-pressure';
 import { isLiveData } from '@/app/_lib/preview';
 import { productPath } from '@/app/_lib/routes';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import { CoachLine } from '@/components/features/helpers';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
@@ -25,6 +26,7 @@ const FEED_KEYS = [`${MONEY_COACH_KEY_PREFIX}necessities_share`];
  */
 export function MoneyCoachLine() {
     const t = useTranslations('features.money.jars.coach_line');
+    const jarName = useJarName();
     const { householdId } = useAuth();
     const { period } = useHouseholdShell();
     const { formatMoney } = useHouseholdCurrency();
@@ -49,7 +51,7 @@ export function MoneyCoachLine() {
                   {
                       id: 'jars.necessities_over',
                       text: t('necessities_over', {
-                          jar: necessitiesJar.name,
+                          jar: jarName(necessitiesJar),
                           amount: formatMoney(pressure.shortfallCents),
                       }),
                       cta: { label: t('open_fixed'), href: productPath('money/fixed-costs') },

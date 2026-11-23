@@ -47,6 +47,7 @@ import { formRoute } from '@/app/_lib/form-route-meta';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { useMergeHouseholdAudiences } from '@/app/_lib/use-merge-household-audiences';
 import { partyMark } from '@/app/_lib/vendor-brands';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import { GivingFinder } from '@/components/features/money/giving-finder';
 import { useHelpersEnabled } from '@/components/features/helpers';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
@@ -138,6 +139,7 @@ export function FixedCostForm({
     const tProfile = useTranslations('features.money.household_profile');
     const tForm = useTranslations('ui.form');
     const tBtn = useTranslations('ui.button.actions');
+    const jarName = useJarName();
     const coachGuidesEnabled = useHelpersEnabled();
     const givePayeeModes: ReadonlyArray<{ id: GivePayeeMode; label: string }> = [
         { id: 'known', label: tFixed('give_known') },
@@ -1194,7 +1196,7 @@ export function FixedCostForm({
                                 billJars.map(jar => (
                                     <FormSelectItem key={jar.id} value={jar.id}>
                                         {jar.icon ? `${jar.icon} ` : ''}
-                                        {jar.name}
+                                        {jarName(jar)}
                                     </FormSelectItem>
                                 ))
                             )}

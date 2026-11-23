@@ -75,6 +75,7 @@ import { useAuth } from '@/components/features/shell/auth-provider';
 import { ListSearchField } from '@/components/layout/list-controls';
 import { ListToolbar } from '@/components/layout/list-toolbar';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { useJarName } from '@/app/_lib/use-jar-name';
 
 function compareByHoldingLast(
     leftAssetId: string | null | undefined,
@@ -106,6 +107,7 @@ export function FixedCostsPageClient() {
     const t = useTranslations('features.money.fixed');
     const tChips = useTranslations('features.money.chips');
     const tHolding = useTranslations('features.money.holding_link');
+    const jarName = useJarName();
     const { householdId } = useAuth();
     const { period, showToast } = useHouseholdShell();
     const { canMutate } = useBoardWriteAccess();
@@ -251,6 +253,7 @@ export function FixedCostsPageClient() {
                   .includes(deferredSearch)
           )
         : jarScopedFixedCosts;
+    const jarNameByKey = new Map(splitJars.map(jar => [jar.key, jarName(jar)]));
     const groupedFixedCosts = splitJars
         .filter(jar => visibleFixedCosts.some(item => item.jarKey === jar.key))
         .map(jar => {
@@ -595,7 +598,7 @@ export function FixedCostsPageClient() {
                                                         : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
                                                 )}>
                                                 <JarMark jarKey={j.key} icon={j.icon} />
-                                                {j.name}
+                                                {jarName(j)}
                                             </button>
                                         );
                                     })}
@@ -705,7 +708,7 @@ export function FixedCostsPageClient() {
                                                     )}>
                                                     <JarBadge
                                                         jarKey={group.jar.key}
-                                                        name={group.jar.name}
+                                                        name={jarName(group.jar)}
                                                         icon={group.jar.icon}
                                                     />
                                                     <span className="flex items-center gap-2">
@@ -1010,9 +1013,8 @@ export function FixedCostsPageClient() {
                                                     <JarBadge
                                                         jarKey={fixedCost.jarKey}
                                                         name={
-                                                            splitJars.find(
-                                                                jar => jar.key === fixedCost.jarKey
-                                                            )?.name ?? fixedCost.jarKey
+                                                            jarNameByKey.get(fixedCost.jarKey) ??
+                                                            fixedCost.jarKey
                                                         }
                                                         icon={jarByKey.get(fixedCost.jarKey)?.icon}
                                                     />

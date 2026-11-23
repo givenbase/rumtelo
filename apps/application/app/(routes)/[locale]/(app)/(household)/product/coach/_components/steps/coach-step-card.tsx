@@ -14,6 +14,7 @@ import { useApiError } from '@/app/_lib/api-error-messages';
 import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 
 import { localizeCoachStepHrefLabel, localizeCoachStepPrompt } from '../../_utils/step-prompt';
@@ -59,6 +60,7 @@ function CoachStepCardInner({
     onAdvanced,
 }: Props) {
     const t = useTranslations('features.coach.session');
+    const jarName = useJarName();
     const apiError = useApiError();
     const queryClient = useQueryClient();
     const { showToast } = useHouseholdShell();
@@ -234,7 +236,9 @@ function CoachStepCardInner({
         if (step.input === 'jar_pick' && step.payload.type === 'inbox_sort') {
             const match = step.payload.jars.find(
                 jar =>
-                    lower.includes(jar.name.toLowerCase()) || lower.includes(jar.key.toLowerCase())
+                    lower.includes(jarName(jar).toLowerCase()) ||
+                    lower.includes(jar.name.toLowerCase()) ||
+                    lower.includes(jar.key.toLowerCase())
             );
             if (match) setPendingConfirm(match.id);
             return;
@@ -333,7 +337,7 @@ function CoachStepCardInner({
                                     'rounded-xl border border-line px-4 py-2.5 text-sm font-medium transition-colors hover:border-accent hover:bg-accent-soft',
                                     pendingConfirm === jar.id && 'border-accent bg-accent-soft'
                                 )}>
-                                {jar.name}
+                                {jarName(jar)}
                             </button>
                         ))}
                     </div>
@@ -457,7 +461,7 @@ function CoachStepCardInner({
                                             })
                                         }
                                         className="rounded-xl border border-line px-4 py-2.5 text-sm font-medium transition-colors hover:border-accent hover:bg-accent-soft">
-                                        {jar.name}
+                                        {jarName(jar)}
                                     </button>
                                 ))}
                             </div>

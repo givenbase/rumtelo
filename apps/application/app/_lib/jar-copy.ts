@@ -140,24 +140,55 @@ export function resolveJarSubtitle(
 }
 
 /**
- * English seed names the backend copies onto a household's jars at onboarding
- * (`jar.seed-data.ts`). A jar still carrying its seed name is shown in the active locale;
- * a name the household typed is theirs and is never replaced.
+ * Every default name the backend has ever copied onto a household's jars at onboarding:
+ * the English template (`jar.seed-data.ts`) and the localised templates
+ * (`jar-translations.ts`: nl, es, fr), plus the short English labels the UI used before.
+ * Households are seeded once, in the language of the day, so a Dutch household still holds
+ * "Noodzakelijk" and not "Necessity". A jar carrying any of these was never renamed by hand,
+ * so it follows the app's current pot names; any other stored name is the household's own.
+ * Keep in sync with the two backend seed files when a default name is added.
  */
-const SEED_JAR_NAMES: Record<JarKey, string> = {
-    [JarKey.NECESSITIES]: 'Necessity',
-    [JarKey.FINANCIAL_FREEDOM]: 'Financial Freedom',
-    [JarKey.LONG_TERM_SAVINGS]: 'Long Term Savings',
-    [JarKey.EDUCATION]: 'Education',
-    [JarKey.PLAY]: 'Play',
-    [JarKey.GIVE]: 'Give / foundation',
+const LEGACY_DEFAULT_JAR_NAMES: Record<JarKey, readonly string[]> = {
+    [JarKey.NECESSITIES]: ['Necessity', 'Noodzakelijk', 'Necesidades', 'Nécessités'],
+    [JarKey.FINANCIAL_FREEDOM]: [
+        'Financial Freedom',
+        'Financiële vrijheid',
+        'Libertad financiera',
+        'Liberté financière',
+    ],
+    [JarKey.LONG_TERM_SAVINGS]: [
+        'Long Term Savings',
+        'Langetermijn sparen',
+        'Ahorro a largo plazo',
+        'Épargne long terme',
+    ],
+    [JarKey.EDUCATION]: ['Education', 'Opleiding', 'Educación', 'Éducation'],
+    [JarKey.PLAY]: ['Play', 'Plezier', 'Ocio', 'Plaisir'],
+    [JarKey.GIVE]: [
+        'Give / foundation',
+        'Give',
+        'Geven / stichting',
+        'Dar / fundación',
+        'Donner / fondation',
+    ],
 };
 
-/** Jar name for display: i18n over the stored name only while the stored name is the seed default. */
+function normalizeJarName(name: string): string {
+    return name.trim().toLowerCase();
+}
+
+/** True when the stored name is one of the defaults a jar is seeded with, in any language. */
+export function isDefaultJarName(jarKey: string, storedName: string): boolean {
+    if (!JAR_KEYS.has(jarKey)) return false;
+    const stored = normalizeJarName(storedName);
+    return LEGACY_DEFAULT_JAR_NAMES[jarKey as JarKey].some(
+        defaultName => normalizeJarName(defaultName) === stored
+    );
+}
+
+/** Jar name for display: i18n over the stored name only while the stored name is a seed default. */
 export function resolveJarName(t: TranslateFn, jarKey: string, storedName: string): string {
-    if (!JAR_KEYS.has(jarKey)) return storedName;
-    const seedName = SEED_JAR_NAMES[jarKey as JarKey];
-    if (storedName.trim().toLowerCase() !== seedName.toLowerCase()) return storedName;
+    if (!isDefaultJarName(jarKey, storedName)) return storedName;
     const key = `names.${jarKey}`;
     return t.has(key) ? t(key) : storedName;
 }

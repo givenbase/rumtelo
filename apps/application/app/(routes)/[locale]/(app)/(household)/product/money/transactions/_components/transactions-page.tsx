@@ -54,6 +54,7 @@ import { ListToolbar } from '@/components/layout/list-toolbar';
 import { ConfirmActionButton } from '@/components/features/forms/confirm-action-button';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useBankSyncOnVisit } from '@/app/_lib/use-bank-sync-on-visit';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import Link from 'next/link';
 
 type Tab = 'INBOX' | 'OUT' | 'IN' | 'RULES';
@@ -118,6 +119,7 @@ const EXPLICIT_RULE_PRIORITY_MAX = 500;
 export function TransactionsPageClient() {
     const t = useTranslations('features.money.transactions');
     const tHolding = useTranslations('features.money.holding_link');
+    const jarName = useJarName();
     const searchParams = useSearchParams();
     // `?assetId=` from a holding's detail page: only its one-offs.
     const assetFilter = assetIdFromParams(searchParams) ?? null;
@@ -254,11 +256,11 @@ export function TransactionsPageClient() {
             { key: 'all', label: t('filter_all') },
             ...jars.map(jar => ({
                 key: jar.id,
-                label: jar.name,
+                label: jarName(jar),
                 leading: <JarMark jarKey={jar.key} icon={jar.icon} />,
             })),
         ],
-        [jars, t]
+        [jars, jarName, t]
     );
 
     const amountFilterActive =
@@ -761,7 +763,7 @@ export function TransactionsPageClient() {
                                                 ) : (
                                                     <JarBadge
                                                         jarKey={jar?.key}
-                                                        name={jar?.name}
+                                                        name={jar ? jarName(jar) : undefined}
                                                         icon={jar?.icon}
                                                     />
                                                 )}
@@ -792,8 +794,12 @@ export function TransactionsPageClient() {
                                     });
                             }
                             const ordered = [...groups.entries()].sort((left, right) => {
-                                const leftName = left[1].jar?.name ?? t('unassigned');
-                                const rightName = right[1].jar?.name ?? t('unassigned');
+                                const leftName = left[1].jar
+                                    ? jarName(left[1].jar)
+                                    : t('unassigned');
+                                const rightName = right[1].jar
+                                    ? jarName(right[1].jar)
+                                    : t('unassigned');
                                 return leftName.localeCompare(rightName);
                             });
 
@@ -802,7 +808,9 @@ export function TransactionsPageClient() {
                                     {ordered.map(([jarId, group]) => {
                                         const open =
                                             openJarIds.size === 0 ? true : openJarIds.has(jarId);
-                                        const label = group.jar?.name ?? t('unassigned');
+                                        const label = group.jar
+                                            ? jarName(group.jar)
+                                            : t('unassigned');
                                         return (
                                             <div key={jarId}>
                                                 <button
@@ -896,7 +904,7 @@ export function TransactionsPageClient() {
                                                 </p>
                                                 <p className="mt-1 font-mono text-xs tracking-normal text-fg-faint uppercase">
                                                     {t('rule_meta', {
-                                                        jar: jar?.name ?? t('jar_fallback'),
+                                                        jar: jar ? jarName(jar) : t('jar_fallback'),
                                                         priority: String(rule.priority),
                                                         hits: t(
                                                             rule.hitCount === 1

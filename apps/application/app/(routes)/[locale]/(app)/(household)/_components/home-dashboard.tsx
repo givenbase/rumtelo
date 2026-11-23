@@ -44,6 +44,7 @@ import { JarTileGrid } from '@/components/features/money/jar-tile-grid';
 import { useCoachLine } from '@/components/features/helpers';
 import { HouseholdPermissionSection, roleCanSee } from '@/app/_lib/role-permissions';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
@@ -53,6 +54,7 @@ export function HomeDashboardClient() {
     const tDashboard = useTranslations('pages.dashboard');
     const tShell = useTranslations('pages.shell');
     const tCoach = useTranslations('features.coach');
+    const jarName = useJarName();
     const copyContext = useCoachCopyContext();
     const locale = useLocale();
     const { householdId, session } = useAuth();
@@ -168,7 +170,7 @@ export function HomeDashboardClient() {
               stackedTotal: dashboard.allocatedTotal ?? 0,
               formatMoney,
               jarHighlights: jars.slice(0, 2).map(jar => ({
-                  name: jar.name,
+                  name: jarName(jar),
                   from: baselineById.get(jar.id) ?? jar.allocated,
                   to: jar.allocated,
               })),

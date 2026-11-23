@@ -16,6 +16,7 @@ import { bgClassToCssVar } from '@/app/_lib/jar-chrome';
 import { jarChrome } from '@/app/_lib/jar-meta';
 import { JarMark } from '@/components/features/money/jar-badge';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { useJarName } from '@/app/_lib/use-jar-name';
 
 type SimulatorJar = Pick<JarBalance, 'id' | 'key' | 'name' | 'percentage' | 'committedOut'>;
 
@@ -102,6 +103,7 @@ export function IncomeSimulator({
     className,
 }: IncomeSimulatorProps) {
     const t = useTranslations('features.growth.income_simulator');
+    const displayJarName = useJarName();
     const locale = useLocale();
     const { formatMoney } = useHouseholdCurrency();
 
@@ -145,7 +147,7 @@ export function IncomeSimulator({
               goal,
               jar: goalJar
                   ? {
-                        name: goalJar.name,
+                        name: displayJarName(goalJar),
                         percentage: goalJar.percentage,
                         committedOut: goalJar.committedOut,
                     }
@@ -164,7 +166,7 @@ export function IncomeSimulator({
     const pace = paceInput ? evaluateGoalPace({ ...paceInput, wantMonths }) : null;
 
     const goalReached = pace?.verdict === 'reached';
-    const jarName = goalJar?.name ?? t('no_jar');
+    const jarName = goalJar ? displayJarName(goalJar) : t('no_jar');
     const doneLabel = pace?.doneOn ? formatMonthYear(pace.doneOn, locale) : t('date_unknown');
     const yourDateLabel = goal?.targetOn ? formatMonthYear(new Date(goal.targetOn), locale) : null;
     const followsYourDate = wantOverrideMonths === null && pace?.planMonths !== null;
@@ -353,7 +355,7 @@ export function IncomeSimulator({
                                     className="flex min-w-0 items-center gap-1.5 font-mono text-xs font-medium tracking-wide uppercase"
                                     style={{ color: bgClassToCssVar(color) }}>
                                     <JarMark jarKey={j.key} />
-                                    <span className="min-w-0 truncate">{j.name}</span>
+                                    <span className="min-w-0 truncate">{displayJarName(j)}</span>
                                 </span>
                                 <span className="flex shrink-0 items-baseline gap-2 text-right">
                                     {now !== null && now !== then ? (

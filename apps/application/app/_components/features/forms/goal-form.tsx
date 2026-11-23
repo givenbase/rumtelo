@@ -40,6 +40,7 @@ import { CAR_BRAND_PREVIEW, carBrandMark, filterCarBrands } from '@/app/_lib/car
 import { soulPath } from '@/app/_lib/routes';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { formRoute } from '@/app/_lib/form-route-meta';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import { GivingFinder } from '@/components/features/money/giving-finder';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -124,6 +125,7 @@ export function GoalForm({
     const tGoals = useTranslations('features.growth.goals');
     const tForm = useTranslations('features.growth.goals.form');
     const tUiForm = useTranslations('ui.form');
+    const jarName = useJarName();
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { symbol } = useHouseholdCurrency();
@@ -822,7 +824,7 @@ export function GoalForm({
                                         {jars.map(jar => (
                                             <FormSelectItem key={jar.id} value={jar.id}>
                                                 {jar.icon ? `${jar.icon} ` : ''}
-                                                {jar.name}
+                                                {jarName(jar)}
                                             </FormSelectItem>
                                         ))}
                                     </FormSelect>

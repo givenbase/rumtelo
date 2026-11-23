@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Button, Icon, Meter } from '@rumtelo/ui';
 
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
+import { useJarName } from '@/app/_lib/use-jar-name';
 
 import {
     monthName,
@@ -198,6 +199,7 @@ export function CourseGoalDetail({
 function MoneyBlock({ goal, locale }: { goal: GoalSummary; locale: string }) {
     const t = useTranslations('features.growth.course.goal');
     const tCourse = useTranslations('features.growth.course');
+    const jarName = useJarName();
     const { formatMoney } = useHouseholdCurrency();
     const projected = monthYearOf(goal.projectedDate, locale);
     return (
@@ -211,7 +213,13 @@ function MoneyBlock({ goal, locale }: { goal: GoalSummary; locale: string }) {
                         target: formatMoney(goal.target),
                     })}
                 </span>
-                {goal.jarName ? <span className="text-fg-muted">{goal.jarName}</span> : null}
+                {goal.jarName ? (
+                    <span className="text-fg-muted">
+                        {goal.jarKey
+                            ? jarName({ key: goal.jarKey, name: goal.jarName })
+                            : goal.jarName}
+                    </span>
+                ) : null}
             </p>
             <Meter value={goal.target > 0 ? goal.saved / goal.target : 0} />
             {projected ? (

@@ -25,6 +25,7 @@ import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { shiftWeek, todayIso, weekKeyOf, weekRangeOf } from '@/app/_lib/week-key';
 import { resolveMoneyWeek, weekCheckFactsOf } from '@/app/_lib/week-check-week';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import {
     createWeekCheckIntendSchema,
     type WeekCheckIntendSchemaValues,
@@ -233,6 +234,7 @@ function WeekCheckRun({
     const t = useTranslations('features.money.week_check');
     const tForm = useTranslations('ui.form');
     const tUi = useTranslations();
+    const jarName = useJarName();
     const queryClient = useQueryClient();
     const apiError = useApiError();
     const { showToast } = useHouseholdShell();
@@ -382,11 +384,14 @@ function WeekCheckRun({
         return (
             <WeekCheckDone
                 weekNumber={weekNumberOf(moneyWeek)}
-                allocations={check.allocations.map(allocation => ({
-                    jarId: allocation.jarId,
-                    name: jars.find(jar => jar.id === allocation.jarId)?.name ?? '',
-                    amount: allocation.amount,
-                }))}
+                allocations={check.allocations.map(allocation => {
+                    const allocatedJar = jars.find(jar => jar.id === allocation.jarId);
+                    return {
+                        jarId: allocation.jarId,
+                        name: allocatedJar ? jarName(allocatedJar) : '',
+                        amount: allocation.amount,
+                    };
+                })}
                 intention={intention}
                 nextThree={nextThree}
                 offerCourse={hasCourse && courseDone === false}

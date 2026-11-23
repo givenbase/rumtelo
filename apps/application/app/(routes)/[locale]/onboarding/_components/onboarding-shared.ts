@@ -1,4 +1,4 @@
-import { Currency, JarKey } from '@rumtelo/contracts';
+import { Currency } from '@rumtelo/contracts';
 import { z } from 'zod';
 
 import { parseLocaleAmount, type LocaleAmountError } from '@/app/_lib/money-input';
@@ -13,23 +13,6 @@ export type OnboardingScreen = 'income' | 'split';
 
 /** Value of the `step` search param on the second screen (a history entry, so Back works). */
 export const SPLIT_STEP_PARAM = 'split';
-
-export const JAR_NAME_KEYS: Record<
-    JarKey,
-    | 'features.brand.auth_manifesto.jars.necessity.name'
-    | 'features.brand.auth_manifesto.jars.freedom.name'
-    | 'features.brand.auth_manifesto.jars.savings.name'
-    | 'features.brand.auth_manifesto.jars.education.name'
-    | 'features.brand.auth_manifesto.jars.play.name'
-    | 'features.brand.auth_manifesto.jars.give.name'
-> = {
-    [JarKey.NECESSITIES]: 'features.brand.auth_manifesto.jars.necessity.name',
-    [JarKey.FINANCIAL_FREEDOM]: 'features.brand.auth_manifesto.jars.freedom.name',
-    [JarKey.LONG_TERM_SAVINGS]: 'features.brand.auth_manifesto.jars.savings.name',
-    [JarKey.EDUCATION]: 'features.brand.auth_manifesto.jars.education.name',
-    [JarKey.PLAY]: 'features.brand.auth_manifesto.jars.play.name',
-    [JarKey.GIVE]: 'features.brand.auth_manifesto.jars.give.name',
-};
 
 /** Message key (under `pages.onboarding`) for each way an income string can be wrong. */
 export const INCOME_ERROR_KEYS: Record<LocaleAmountError, string> = {
