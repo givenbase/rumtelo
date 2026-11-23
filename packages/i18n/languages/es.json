@@ -57,7 +57,7 @@
                     "goal_save_only_achieved": "Solo los objetivos de «SAVE» pueden marcarse como alcanzados de esta manera",
                     "goal_not_active": "El objetivo no está activo",
                     "goal_no_jar_spend": "Goal has no pot to spend from",
-                    "goal_give_needs_give_jar": "A giving pledge needs the Giving pot. Turn on Giving in your split, then make the pledge.",
+                    "goal_give_needs_give_jar": "Para realizar una promesa de donación es necesario disponer del fondo de donaciones. Activa la opción «Donaciones» en tu grupo y, a continuación, realiza la promesa.",
                     "payment_amount_positive": "El importe del pago debe ser positivo",
                     "bill_paused_no_settlement": "Las facturas en suspenso o cerradas no pueden aceptar nuevas liquidaciones.",
                     "due_month_required": "Elige en qué mes se te cobra en el caso de las facturas trimestrales o anuales.",
@@ -99,11 +99,11 @@
                     "cannot_remove_owner": "No se puede desalojar al titular del hogar.",
                     "member_remove_failed": "No se ha podido eliminar a ese miembro. Inténtalo de nuevo.",
                     "jar_split_total": "Pot split must total 100%, received {total}%",
-                    "jar_split_keys": "The split must list each of your pots exactly once",
-                    "jar_not_optional": "This is one of your three main pots, so it stays on. Change its share in your split instead.",
-                    "jar_already_active": "This pot is already on.",
-                    "jar_not_empty": "This pot still holds transactions, fixed costs or goals. Move them to another pot first, then turn it off.",
-                    "jar_share_too_small": "The main pot has too little share left for this. Raise the group’s share in your split first.",
+                    "jar_split_keys": "La lista debe incluir cada uno de tus botes exactamente una vez.",
+                    "jar_not_optional": "Este es uno de tus tres botes principales, así que se mantiene. En su lugar, modifica su porcentaje en el reparto.",
+                    "jar_already_active": "Esta olla ya está encendida.",
+                    "jar_not_empty": "Esta olla todavía contiene transacciones, costes fijos u objetivos. Pásalos primero a otra olla y, después, apágalo.",
+                    "jar_share_too_small": "Al bote principal le queda muy poca parte para esto. Aumenta primero la parte del grupo en tu reparto.",
                     "jar_placement_account_invalid": "Esa cuenta bancaria no pertenece a este hogar.",
                     "book_catalog_unavailable": "El catálogo de libros no me dio respuesta.",
                     "contact_send_failed": "No se ha podido enviar tu mensaje. Inténtalo de nuevo o envíanos un correo electrónico directamente.",
@@ -541,7 +541,7 @@
                 },
                 "jars": {
                     "necessity": {
-                        "name": "Fixed costs",
+                        "name": "Costes fijos",
                         "short": "FIXED"
                     },
                     "freedom": {
@@ -553,7 +553,7 @@
                         "short": "LEARN"
                     },
                     "savings": {
-                        "name": "Buffer",
+                        "name": "Búfer",
                         "short": "BUFFER"
                     },
                     "play": {
@@ -820,8 +820,8 @@
                 "nec-low": "Fixed costs and daily under 45% is tight for most households — check that rent, insurance and debt instalments still fit.",
                 "spender-ff": "Your pattern leans spender — try 1–2% more into Investing before adding to Fun.",
                 "saver-play": "Your pattern leans saver — a little more Fun helps you keep the split up. Joy that is planned is not waste.",
-                "basics-high": "Basics is above 60% of your income — what must be paid takes most of it. Look at your biggest fixed cost first; the split is not the thing to squeeze.",
-                "future-low": "Future is under 10% of your income, so little is left to build with. Move 1–2% from Free to Future."
+                "basics-high": "Los gastos básicos superan el 60 % de tus ingresos: lo que hay que pagar se lleva la mayor parte. Fíjate primero en tu mayor gasto fijo; no es en la cuota donde hay que recortar.",
+                "future-low": "La partida «Futuro» representa menos del 10 % de tus ingresos, por lo que te queda muy poco para ahorrar. Transfiere entre un 1 % y un 2 % de la partida «Libre» a la partida «Futuro»."
             },
             "helpers": {
                 "mark_title": "De «The Coach»: activa o desactiva los consejos en pantalla en Ajustes → Preferencias",
@@ -866,7 +866,7 @@
                     }
                 },
                 "necessities_share": {
-                    "text": "Basics is at {pct}%, above the 55% the default split starts from. Fine for now — to bring it down, trim fixed costs or raise income.",
+                    "text": "El porcentaje de «Basics» es del {pct} %, por encima del 55 % a partir del cual se aplica la distribución predeterminada. Por ahora está bien; para reducirlo, recorta los costes fijos o aumenta los ingresos.",
                     "cta": "Review pots"
                 },
                 "over_necessities": {
@@ -1484,7 +1484,7 @@
             "net_worth": {
                 "page_eyebrow": "✦ MI PATRIMONIO NETO",
                 "page_title": "Dónde está tu dinero, no cómo se mueve.",
-                "page_lead": "Holdings plus your savings in Future (Buffer and Investing), minus open debts. Linked income and bills are money in motion, not a wish list.",
+                "page_lead": "Activos más tus ahorros en «Future» (reserva e inversiones), menos las deudas pendientes. Los ingresos y los gastos vinculados son dinero en movimiento, no una lista de deseos.",
                 "add_asset": "+ Añadir recurso",
                 "horizon_eyebrow": "✦ Hasta dónde te lleva esto",
                 "stat_holdings": "Participaciones",
@@ -1515,7 +1515,7 @@
                 "not_available_yet": "Aún no está disponible",
                 "per_month_short": "p/m",
                 "empty_title": "Aún no hay participaciones",
-                "empty_body": "Add your first asset (for example an investment). Your savings in Future and your debts already count. Do not double-count savings as a Cash asset and in those pots.",
+                "empty_body": "Añade tu primer activo (por ejemplo, una inversión). Tus ahorros en «Future» y tus deudas ya se tienen en cuenta. No contabilices dos veces los ahorros, ni como activo en efectivo ni en esas categorías.",
                 "debt_empty_title": "No se han registrado deudas",
                 "debt_empty_body": "Las deudas que añadas en «Dinero → Deuda» aparecen aquí automáticamente.",
                 "month_score_eyebrow": "Puntuación mensual",
@@ -1942,7 +1942,7 @@
                     },
                     "emergency_buffer": {
                         "name": "Build an emergency buffer",
-                        "doneWhen": "The buffer is set aside in Future",
+                        "doneWhen": "El margen se reserva para el futuro",
                         "firstStep": "Decide the amount and set up the monthly transfer"
                     },
                     "pay_off_debt": {
@@ -2087,7 +2087,7 @@
                     "amount_earn_hint": "Your net income per month. It does not come out of a pot.",
                     "per_month": "≈ {amount} per month until December",
                     "jar": "Which pot?",
-                    "jar_hint": "Planned spends live in Future.",
+                    "jar_hint": "Los gastos previstos se registran en «Futuro».",
                     "jar_placeholder": "Choose a pot",
                     "shared_note": "A goal with an amount is shared with your household in Money.",
                     "amount_locked": "Amounts on goals come with a plan that includes money goals. The goal itself is saved.",
@@ -2321,36 +2321,36 @@
                 "BASIS": {
                     "title": "Básico",
                     "line": "What has to be paid, every month.",
-                    "purpose": "Rent, bills, groceries, transport"
+                    "purpose": "Alquiler, facturas, compra, transporte"
                 },
                 "FUTURE": {
                     "title": "Futuro",
                     "line": "What you build.",
-                    "purpose": "Buffer, goals, investing, learning"
+                    "purpose": "Reserva, objetivos, inversión, aprendizaje"
                 },
                 "FREE": {
                     "title": "Libre",
                     "line": "What you choose.",
-                    "purpose": "Fun, hobbies, giving"
+                    "purpose": "Diversión, aficiones, generosidad"
                 },
                 "refine": {
-                    "title": "Refine {group}",
-                    "intro": "Split {group} into more pots if you want. {group} stays {percent}% of your income.",
-                    "optional_label": "Optional",
-                    "turn_on": "Turn on",
-                    "turn_off": "Turn off",
-                    "turned_on": "On",
-                    "turned_off": "Off",
-                    "refined_badge": "Refined",
-                    "not_refined_hint": "{group} is one pot. Turn on a pot below to split it.",
-                    "turn_on_effect": "{share}% moves from {main} to {pot}. {group} stays {percent}%.",
-                    "turn_off_effect": "{share}% goes back to {main}.",
-                    "turn_off_blocked": "{pot} still holds transactions, fixed costs or goals. Move them to {main} first, then turn it off.",
-                    "share_too_small": "{main} has too little share left to turn this on. Raise {group} in your split first.",
-                    "main_renamed_hint": "{group} now shows as {main} and {pot}.",
-                    "save_first": "Save your split first, then turn pots on or off.",
-                    "toast_turned_on": "{pot} is on",
-                    "toast_turned_off": "{pot} is off — its share is back in {main}"
+                    "title": "Filtrar {group}",
+                    "intro": "Divide {group} en más partidas si lo deseas. {group} sigue siendo el {percent} % de tus ingresos.",
+                    "optional_label": "Opcional",
+                    "turn_on": "Activar",
+                    "turn_off": "Apagar",
+                    "turned_on": "El",
+                    "turned_off": "Apagado",
+                    "refined_badge": "Refinado",
+                    "not_refined_hint": "{group} es un bote. Selecciona un bote de los de abajo para dividirlo.",
+                    "turn_on_effect": "El {share} % pasa de {main} a {pot}. El {group} se mantiene en el {percent} %.",
+                    "turn_off_effect": "El {share} % se destina a {main}.",
+                    "turn_off_blocked": "{pot} todavía contiene transacciones, costes fijos u objetivos. Múdalos primero a {main} y, a continuación, desactívalo.",
+                    "share_too_small": "{main} tiene muy poca participación restante para activar esta opción. Aumenta primero {group} en tu división.",
+                    "main_renamed_hint": "{group} ahora aparece como {main} y {pot}.",
+                    "save_first": "Guarda primero tu división y, a continuación, activa o desactiva las ollas.",
+                    "toast_turned_on": "{pot} está activado",
+                    "toast_turned_off": "{pot} está desactivado; su participación vuelve a ser {main}"
                 },
                 "order_hint": "Money flows in this order.",
                 "all_placed": "Everything has a place",
@@ -2368,7 +2368,7 @@
                 },
                 "eyebrow": "RUMTELO POTS",
                 "title": "Cada moneda tiene una función asignada antes de llegar.",
-                "lead": "Income lands and splits the same second. Rumtelo shows the split; moving and investing the money is yours to do.",
+                "lead": "Los ingresos se ingresan y se reparten en el mismo instante. Rumtelo muestra el reparto; mover e invertir el dinero es cosa tuya.",
                 "on_track": "{on} / {total} según lo previsto",
                 "move_between": "Move between pots",
                 "add_transaction": "+ Añadir transacción",
@@ -2385,29 +2385,29 @@
                 "left_label": "Left this month",
                 "left_label_stacked": "Left over the span",
                 "names": {
-                    "NECESSITIES": "Fixed costs",
-                    "DAILY": "Daily",
-                    "LONG_TERM_SAVINGS": "Buffer",
-                    "GOALS": "Goals",
+                    "NECESSITIES": "Costes fijos",
+                    "DAILY": "Diario",
+                    "LONG_TERM_SAVINGS": "Búfer",
+                    "GOALS": "Objetivos",
                     "FINANCIAL_FREEDOM": "Investing",
                     "EDUCATION": "Learning",
                     "PLAY": "Fun",
                     "GIVE": "Giving"
                 },
                 "purpose": {
-                    "NECESSITIES": "Rent, bills, insurance",
-                    "DAILY": "Groceries, transport, everyday spends",
-                    "LONG_TERM_SAVINGS": "For emergencies and setbacks.",
-                    "GOALS": "Saving for the big things you plan",
-                    "FINANCIAL_FREEDOM": "Set aside for you to invest",
+                    "NECESSITIES": "Alquiler, facturas, seguros",
+                    "DAILY": "Comestibles, transporte, gastos diarios",
+                    "LONG_TERM_SAVINGS": "Para emergencias y contratiempos.",
+                    "GOALS": "Ahorrar para los grandes proyectos que tienes en mente",
+                    "FINANCIAL_FREEDOM": "Dinero que te has reservado para invertir",
                     "EDUCATION": "Courses, books, skills",
                     "PLAY": "Going out, hobbies, spent freely",
                     "GIVE": "Donate, help others"
                 },
                 "inactive": {
-                    "title": "{pot} is off",
-                    "body": "{pot} is an optional pot inside {group}. Turn it on and it gets its own share of {group} — your three main numbers stay the same.",
-                    "cta": "Turn on {pot}"
+                    "title": "{pot} está desactivado",
+                    "body": "{pot} es un bote opcional dentro de {group}. Si lo activas, recibirá su propia parte de {group}; tus tres números principales seguirán siendo los mismos.",
+                    "cta": "Activa {pot}"
                 },
                 "this_month": "Este mes",
                 "this_month_of": "{available} de {allocated} este mes",
@@ -2422,13 +2422,13 @@
                 "guides": {
                     "NECESSITIES": {
                         "subtitle": "Pagos obligatorios",
-                        "note": "Rent, energy, insurance, phone, debt instalments — and everyday spending like groceries and transport, unless you turned on Daily. What has to be paid, every month.",
+                        "note": "Alquiler, energía, seguros, teléfono, cuotas de deudas… y los gastos diarios, como la compra y el transporte, a menos que hayas activado la función «Daily». Lo que hay que pagar cada mes.",
                         "not_allowed": "Not for eating out, clothes or outings — that is Fun.",
                         "allowed": {
                             "rent": "Alquiler",
                             "energy_water": "Energía y agua",
-                            "groceries": "Groceries — unless Daily is on",
-                            "transport_fuel": "Transport & fuel — unless Daily is on",
+                            "groceries": "Compras de alimentación — a menos que haya «Daily» en el programa",
+                            "transport_fuel": "Transporte y combustible — a menos que esté activada la opción «Diario» —",
                             "insurance": "Seguros",
                             "debt_instalments": "Pagos de la deuda",
                             "phone_internet": "Teléfono e Internet"
@@ -2440,18 +2440,18 @@
                         }
                     },
                     "DAILY": {
-                        "subtitle": "Everyday spending",
-                        "note": "Groceries, transport, pharmacy and drugstore, household things. What you spend week to week — bills stay in Fixed costs.",
-                        "not_allowed": "Not for bills or subscriptions — those stay in Fixed costs. Not for eating out — that is Fun.",
+                        "subtitle": "Gastos diarios",
+                        "note": "Comida, transporte, farmacia y droguería, artículos para el hogar. Lo que gastas semana tras semana; las facturas se incluyen en los gastos fijos.",
+                        "not_allowed": "No es para facturas ni suscripciones: esas se incluyen en «Gastos fijos». Tampoco es para comer fuera: eso es «Ocio».",
                         "allowed": {
-                            "groceries": "Groceries",
-                            "transport_fuel": "Transport & fuel",
-                            "pharmacy": "Pharmacy & drugstore",
-                            "household": "Household things"
+                            "groceries": "Productos alimenticios",
+                            "transport_fuel": "Transporte y combustible",
+                            "pharmacy": "Farmacia y droguería",
+                            "household": "Artículos para el hogar"
                         },
                         "links": {
-                            "fixed_costs": "Fixed costs",
-                            "transactions": "Transactions"
+                            "fixed_costs": "Costes fijos",
+                            "transactions": "Transacciones"
                         }
                     },
                     "FINANCIAL_FREEDOM": {
@@ -2477,14 +2477,14 @@
                         "sub_note": "Trading is allowed, but only from this small corner — never from the rest. Lose it and you lose a month, not your future."
                     },
                     "LONG_TERM_SAVINGS": {
-                        "subtitle": "Buffer first",
-                        "note": "An emergency fund first. Then the big things you plan — car, deposit, renovation — unless you turned on Goals.",
-                        "not_allowed": "Not for anything you want this month. Urgent and unexpected? That is exactly what this pot is for.",
+                        "subtitle": "Primero, el búfer",
+                        "note": "Primero, un fondo de emergencia. Después, los grandes gastos que tengas previstos —coche, fianza, reformas—, a menos que hayas activado la función «Objetivos».",
+                        "not_allowed": "No es para nada de lo que quieras este mes. ¿Algo urgente e inesperado? Pues para eso es precisamente este bote.",
                         "allowed": {
                             "emergency_fund": "Fondo de emergencia",
-                            "car_purchase": "Car or big purchase — unless Goals is on",
-                            "down_payment": "Down payment — unless Goals is on",
-                            "renovation": "Renovation — unless Goals is on",
+                            "car_purchase": "Un coche o una compra importante… a menos que tengas «Goals» activado",
+                            "down_payment": "Pago inicial — a menos que la opción «Goals» esté activada",
+                            "renovation": "Renovación — a menos que se emita «Goals»",
                             "tax_bill": "Declaración de impuestos"
                         },
                         "links": {
@@ -2493,18 +2493,18 @@
                         }
                     },
                     "GOALS": {
-                        "subtitle": "Named plans",
-                        "note": "The things you save for by name — a big purchase, a home deposit, a trip. Not the buffer: that stays for setbacks.",
-                        "not_allowed": "Not for emergencies — that is Buffer. Not for what you want this month — that is Fun.",
+                        "subtitle": "Planes con nombre",
+                        "note": "Las cosas para las que ahorras con un objetivo concreto: una compra importante, la entrada para una vivienda, un viaje. No el colchón: ese se reserva para los imprevistos.",
+                        "not_allowed": "No es para emergencias: para eso está Buffer. No es para lo que te apetezca este mes: para eso está Fun.",
                         "allowed": {
-                            "big_purchase": "Car or big purchase",
-                            "home_deposit": "Home deposit",
-                            "trip": "A trip",
-                            "renovation": "Renovation"
+                            "big_purchase": "Un coche o una compra importante",
+                            "home_deposit": "Depósito para la vivienda",
+                            "trip": "Un viaje",
+                            "renovation": "Reforma"
                         },
                         "links": {
-                            "goals": "Goals",
-                            "transactions": "Transactions"
+                            "goals": "Objetivos",
+                            "transactions": "Transacciones"
                         }
                     },
                     "EDUCATION": {
@@ -3391,8 +3391,8 @@
                     "no_payments_short": "Aún no se ha registrado ningún pago.",
                     "open_debt": "Deuda pendiente ›",
                     "planned_payment": "Pago programado",
-                    "necessities": "Basics",
-                    "no_fixed_linked": "No recurring bill linked yet. Add one so Basics counts this payment.",
+                    "necessities": "Conceptos básicos",
+                    "no_fixed_linked": "Aún no hay ninguna factura periódica vinculada. Añade una para que Basics tenga en cuenta este pago.",
                     "add_to_necessities": "Add to fixed costs",
                     "apr": "{rate} % TAE",
                     "validation_amount_required": "Es necesario indicar el importe",
@@ -3637,9 +3637,9 @@
                 "empty_auto_body": "Add a fixed cost on the Giving pot to plan monthly gifts.",
                 "empty_ledger_title": "Este año no habrá reparto de donaciones.",
                 "empty_ledger_body": "Gifts that leave Giving show up here once sorted.",
-                "pot_off_title": "Giving is off",
-                "pot_off_body": "Giving is an optional pot inside Free. Turn it on and a share of Free goes to gifts and causes before you spend it — Free itself stays the same.",
-                "pot_off_cta": "Turn on Giving",
+                "pot_off_title": "La función «Compartir» está desactivada",
+                "pot_off_body": "«Giving» es un fondo opcional integrado en Free. Si lo activas, una parte de tu saldo de Free se destinará a regalos y causas benéficas antes de que lo gastes; el saldo de Free en sí no se ve afectado.",
+                "pot_off_cta": "Activa la función «Donar»",
                 "no_org": "Aún no se ha nombrado ninguna organización",
                 "received_year": "Recibido este año",
                 "to_whom": "A quién",
@@ -3658,7 +3658,7 @@
                 "check_3_body": "Noticias que describan qué ha cambiado para las personas o los animales, no una tarjeta de agradecimiento.",
                 "check_4_title": "Aún hay sitio para más",
                 "check_4_body": "Una respuesta clara a la pregunta «¿para qué serviría esa cantidad extra?». Si no saben responder, el dinero se queda ahí sin utilizarse.",
-                "coach_tip_1": "It does not have to be much. A small share, transferred automatically, to a place you chose on purpose. The amount is not the point — the habit is.",
+                "coach_tip_1": "No tiene por qué ser mucho. Una pequeña cantidad, que se transfiera automáticamente a un lugar que hayas elegido expresamente. Lo importante no es la cantidad, sino el hábito.",
                 "coach_tip_2": "Elige a dónde va el dinero igual que eliges todo lo demás aquí: basándote en datos, no en un logotipo. Una organización que publica en qué gasta y qué ha cambiado es una a la que puedes seguir apoyando durante años.",
                 "causes": {
                     "GLOBAL_HEALTH": {
@@ -3920,7 +3920,7 @@
                     "sections": {
                         "what_for": {
                             "heading": "What the pots are for",
-                            "body": "Rumtelo Pots give your income a destination: three pots — Basics, Future, Free. Each has a job and a percentage you set; together they make 100% of your income. Want more detail? Refine a pot into smaller ones — its percentage stays the same."
+                            "body": "Las «cajas» de Rumtelo te permiten asignar un destino a tus ingresos: tres cajas — «Básico», «Futuro» y «Libre». Cada una tiene una finalidad y un porcentaje que tú mismo estableces; juntas suman el 100 % de tus ingresos. ¿Quieres más detalles? Divide una caja en otras más pequeñas: su porcentaje seguirá siendo el mismo."
                         },
                         "how": {
                             "heading": "Cómo funciona",
@@ -3995,7 +3995,7 @@
                     "sections": {
                         "what_for": {
                             "heading": "Para qué sirve esto",
-                            "body": "Track what you still owe and the monthly bite it takes. Debt instalments usually leave from Basics — this page keeps the balance in view."
+                            "body": "Lleva un control de lo que aún debes y de la cantidad que te supone cada mes. Las cuotas de la deuda suelen deducirse de «Basics»; esta página te permite tener siempre a la vista el saldo."
                         },
                         "how": {
                             "heading": "Cómo funciona",
@@ -4345,11 +4345,11 @@
             "jars_section": {
                 "eyebrow": "RUMTELO POTS",
                 "headline": "Every amount gets a job, so none has to decide for itself.",
-                "lead": "Start with three pots, each with a rule you can read in one line. Refine one into smaller pots when you want. The percentages are yours to change. The habit is the point."
+                "lead": "Empieza con tres categorías, cada una con una regla que puedas leer en una sola línea. Si lo deseas, puedes dividir una de ellas en categorías más pequeñas. Los porcentajes los puedes modificar a tu gusto. Lo importante es el hábito."
             },
             "jars": {
                 "nec": {
-                    "name": "Fixed costs",
+                    "name": "Costes fijos",
                     "line": "El alquiler, la factura de la luz, el seguro, la compra, el transporte. Esas cosas que hay que pagar, te guste o no.",
                     "not": "Not for eating out or clothes — that is Fun."
                 },
@@ -4364,7 +4364,7 @@
                     "not": "Lo que tú llamas «investigación» no tiene nada que ver con los artilugios."
                 },
                 "lts": {
-                    "name": "Buffer",
+                    "name": "Búfer",
                     "line": "Primero, el fondo de emergencia; después, el coche, la fianza y la factura de impuestos que sabes que va a llegar.",
                     "not": "No es para nada de lo que quieras este mes."
                 },
@@ -4469,7 +4469,7 @@
                     "soul": "Silencio · día 6"
                 },
                 "coach_lines": {
-                    "money": "Fun is €38 over its line. One move: shift it from Buffer — or let it ride.",
+                    "money": "Fun está 38 € por encima de su línea. Una opción: sacarlo de Buffer… o dejarlo ahí.",
                     "growth": "La reducción de gastos tiene un límite mínimo. El aumento de los ingresos, no. Los ingresos complementarios suponen el 20 % del camino.",
                     "energy": "Three nights under 6h30 — and Fun rose on those days. Sleep first. Then decide.",
                     "soul": "Objetivo fijado. Basta con una sola frase: ahora la semana tiene un rumbo."
@@ -4495,7 +4495,7 @@
                 "growth_goals": {
                     "emergency": {
                         "name": "Fondo de emergencia",
-                        "meta": "Buffer · Mar 2027"
+                        "meta": "Buffer · Marzo de 2027"
                     },
                     "side_income": {
                         "name": "Ingresos adicionales: 500 € al mes",
@@ -4603,7 +4603,7 @@
                 "demo": {
                     "money": {
                         "kind": "ESTA SEMANA",
-                        "text": "Fun is €38 over its line. Move it from Buffer once — or let it ride and keep next week’s dinner in.",
+                        "text": "Fun está 38 € por encima de su límite. Trasládalo una vez desde Buffer, o déjalo así y mantén la cena de la semana que viene.",
                         "cta": "Open pots"
                     },
                     "growth": {
@@ -5465,20 +5465,20 @@
             "income_error_decimals": "Use at most two decimals.",
             "income_error_large": "That's above what Rumtelo handles per month. Check the amount.",
             "split_title": "Here's where your {amount} goes.",
-            "split_lead": "Three pots to start: Basics, Future, Free. Each has one job. Change the percentages any time — the habit matters more than the numbers.",
+            "split_lead": "Tres fondos para empezar: Básico, Futuro y Libre. Cada uno tiene una finalidad concreta. Puedes modificar los porcentajes cuando quieras: lo importante es el hábito, más que las cifras.",
             "split_list_aria": "Your split",
             "split_row_aria": "{jar}, {percent} percent, {amount}",
             "split_jobs": {
-                "NECESSITIES": "rent, bills, groceries, transport",
-                "LONG_TERM_SAVINGS": "a buffer first, then goals, investing, learning",
-                "PLAY": "fun, hobbies, giving — spent freely",
-                "DAILY": "groceries, transport, everyday spends",
-                "GOALS": "the big things you plan",
-                "FINANCIAL_FREEDOM": "money set aside for you to invest — never spent",
+                "NECESSITIES": "alquiler, facturas, compra, transporte",
+                "LONG_TERM_SAVINGS": "Primero, un colchón de seguridad; después, los objetivos, la inversión y el aprendizaje",
+                "PLAY": "diversión, aficiones, generosidad — gastado sin reparos",
+                "DAILY": "comida, transporte, gastos diarios",
+                "GOALS": "los grandes proyectos que tienes pensados",
+                "FINANCIAL_FREEDOM": "dinero que has ahorrado para invertir — que nunca te has gastado",
                 "EDUCATION": "courses, books, a new skill",
                 "GIVE": "gifts and causes you care about"
             },
-            "split_refine_later": "Want more pots — Daily, Goals, Giving? Refine a pot later in Settings; the three percentages stay as they are.",
+            "split_refine_later": "¿Quieres más categorías — Diario, Objetivos, Donaciones? Puedes ajustar una categoría más adelante en «Configuración»; los tres porcentajes se mantienen tal y como están.",
             "split_main_account": "All your pots sit on one main account for now. Add your bank when it suits you.",
             "split_note": "Rumtelo never moves money. Savings pots at your bank? Move it there yourself — we show the split.",
             "split_change_later": "Change the percentages any time in Money › Pots.",
@@ -5496,9 +5496,9 @@
             "continue": "Continuar",
             "banks_setup": {
                 "accounts_title": "Pon nombre a tus cuentas",
-                "accounts_body": "Name the main account where money lands (Basics). Need more? Add them here — then you link the pots. You can rename later in Settings.",
+                "accounts_body": "Asigna un nombre a la cuenta principal en la que se ingresa el dinero (Conceptos básicos). ¿Necesitas más? Añádelas aquí y, a continuación, vincula los fondos. Puedes cambiar el nombre más adelante en «Configuración».",
                 "map_title": "Link pots to accounts",
-                "map_body": "Basics stays on your main account. Put the other pots on the right savings account. Change this any time in Settings → Pots.",
+                "map_body": "El importe básico se queda en tu cuenta principal. Deposita el resto de los fondos en la cuenta de ahorro adecuada. Puedes cambiar esto en cualquier momento en Ajustes → Fondos.",
                 "map_body_one": "You have one account — every pot is already linked to it. Change this later in Settings → Pots if you add more accounts.",
                 "read_only_link": "Open bank settings",
                 "map_required": "Choose an account for every pot before you finish.",
@@ -5521,7 +5521,7 @@
                     "main_checking": "Cuenta principal",
                     "savings": "Ahorros",
                     "freedom": "Investing",
-                    "lts": "Buffer",
+                    "lts": "Búfer",
                     "education": "Learning",
                     "play": "Fun",
                     "give": "Giving"
@@ -5531,7 +5531,7 @@
                     "sub_savings": "Subahorro"
                 },
                 "tips": {
-                    "one_account": "Start with one main account (Basics). Add spaarpotjes as extra accounts only if you already bank that way — then link each pot on the next screen.",
+                    "one_account": "Empieza con una cuenta principal (Básica). Añade «spaarpotjes» como cuentas adicionales solo si ya gestionas tus finanzas de esa manera; a continuación, vincula cada «spaarpotje» en la siguiente pantalla.",
                     "familiar": "Start with your main account. Add any other accounts you already use, then link each pot.",
                     "already_set_up": "Solo anota las cuentas que ya tienes. Rumtelo no toca tu banco real."
                 }
@@ -6225,7 +6225,7 @@
                 },
                 "jars_placement": {
                     "eyebrow": "Where each pot sits",
-                    "blurb": "Mix freely — Basics on your current account, the rest as savings pots at your bank. Investing can sit on its own account.",
+                    "blurb": "Combínalo como quieras: el dinero básico en tu cuenta corriente y el resto en cuentas de ahorro en tu banco. Las inversiones pueden ir en una cuenta aparte.",
                     "accounts_one": "Cuenta {count}",
                     "accounts_other": "{count} cuentas",
                     "no_accounts": "No hay cuentas",
@@ -6501,7 +6501,7 @@
                         },
                         "sweep": {
                             "name": "Excedente de barrido",
-                            "desc": "Whatever is left in Basics on the 1st moves to Investing."
+                            "desc": "Todo lo que quede en «Conceptos básicos» el día 1 se traslada a «Inversiones»."
                         }
                     }
                 },
@@ -7005,7 +7005,7 @@
                     },
                     "jars": {
                         "title": "Cómo lo mapea Rumtelo",
-                        "body": "Basics lives on your hoofdrekening (main account): salary and bills land there. Future and Free — and any pots you refine them into — can be spaarpotjes. Rumtelo tracks the split; your bank holds the euros."
+                        "body": "«Basics» se encuentra en tu cuenta principal: ahí es donde se ingresan el sueldo y se pagan las facturas. «Future» y «Free» —y cualquier fondo en el que los distribuyas— pueden ser huchas. Rumtelo lleva un control de la distribución; tu banco gestiona los euros."
                     },
                     "banks": {
                         "title": "Qué suele ofrecer tu banco",
