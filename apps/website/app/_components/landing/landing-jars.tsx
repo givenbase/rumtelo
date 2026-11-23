@@ -10,7 +10,8 @@ import { CARD, SectionHeading } from './landing-primitives';
 
 /**
  * Rumtelo Pots — three numbered groups in flow order, each with its pots inside.
- * No shares on purpose: the household sets its own split. Tinted band between Portals and Coach.
+ * Each group shows its main pot and its optional pots (marked Optional). No shares on purpose:
+ * the household sets its own split. Tinted band between Portals and Coach.
  * Anchor stays `#jars` (header/footer links).
  */
 export function LandingJars() {
@@ -67,8 +68,15 @@ export function LandingJars() {
                                             />
                                         </span>
                                         <span className="grid min-w-0 gap-0.5">
-                                            <span className="text-sm font-medium wrap-break-word text-fg-strong">
+                                            <span className="flex min-w-0 flex-wrap items-baseline gap-x-2 text-sm font-medium wrap-break-word text-fg-strong">
                                                 {t(`features.money.jars.names.${pot.key}`)}
+                                                {pot.optional ? (
+                                                    <span className="rounded-full border border-line px-2 py-0.5 font-mono text-[10px] font-medium tracking-wide text-fg-muted uppercase">
+                                                        {t(
+                                                            'features.money.groups.refine.optional_label'
+                                                        )}
+                                                    </span>
+                                                ) : null}
                                             </span>
                                             <span className="text-sm text-pretty wrap-break-word text-fg-muted">
                                                 {t(`features.money.jars.purpose.${pot.key}`)}

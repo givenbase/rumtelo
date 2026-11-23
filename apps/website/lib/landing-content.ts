@@ -5,14 +5,14 @@
  * Feature claims and plan limits come from `@rumtelo/contracts`.
  */
 import {
-    DEFAULT_JAR_SPLIT,
+    DEFAULT_GROUP_SPLIT,
+    isMainJarKey,
     JAR_GROUP_ORDER,
     JAR_ORDER_IN_GROUP,
     JarGroup,
     JarKey,
     PLAN_RETAIL_CENTS,
     PlanKey,
-    sumPercentageByGroup,
 } from '@rumtelo/contracts';
 import type { IconName } from '@rumtelo/ui';
 
@@ -43,6 +43,8 @@ const POT_VISUAL: Record<JarKey, { colorVar: string; icon: IconName }> = {
     [JarKey.EDUCATION]: { colorVar: 'var(--color-jar-edu)', icon: 'book-open' },
     [JarKey.PLAY]: { colorVar: 'var(--color-jar-play)', icon: 'sparkles' },
     [JarKey.GIVE]: { colorVar: 'var(--color-jar-give)', icon: 'heart' },
+    [JarKey.DAILY]: { colorVar: 'var(--color-jar-daily)', icon: 'shopping-cart' },
+    [JarKey.GOALS]: { colorVar: 'var(--color-jar-goals)', icon: 'target' },
 };
 
 /** A group takes the tint of its anchor pot — groups have no token of their own. */
@@ -56,6 +58,8 @@ export interface LandingPot {
     key: JarKey;
     colorVar: string;
     icon: IconName;
+    /** True for pots a household turns on inside the group; false for the group's main pot. */
+    optional: boolean;
 }
 
 export interface LandingGroup {
@@ -64,25 +68,28 @@ export interface LandingGroup {
     pots: LandingPot[];
 }
 
-/** Rumtelo Pots — three groups in flow order (Basics → Future → Free), pots inside. No shares: the household sets its own. */
+/**
+ * Rumtelo Pots — three groups in flow order (Basics → Future → Free), each with its main pot
+ * and the optional pots a household can turn on. No shares: the household sets its own.
+ */
 export const POT_GROUPS: LandingGroup[] = JAR_GROUP_ORDER.map(group => ({
     key: group,
     colorVar: GROUP_COLOR_VAR[group],
-    pots: JAR_ORDER_IN_GROUP[group].map(key => ({ key, ...POT_VISUAL[key] })),
+    pots: JAR_ORDER_IN_GROUP[group].map(key => ({
+        key,
+        ...POT_VISUAL[key],
+        optional: !isMainJarKey(key),
+    })),
 }));
 
 /**
- * Hero demo only: an example split per group, summed from the onboarding default.
- * Never shown as a percentage or a promise — it just sizes the animated bar.
+ * Hero demo only: an example split per group — a new household starts with three pots,
+ * Basics 55 / Future 20 / Free 25. It sizes the animated bar and the example amounts.
  */
-const EXAMPLE_GROUP_SHARE = sumPercentageByGroup(
-    Object.values(JarKey).map(key => ({ key, percentage: DEFAULT_JAR_SPLIT[key] }))
-);
-
 export const HERO_EXAMPLE_GROUPS = POT_GROUPS.map(group => ({
     key: group.key,
     colorVar: group.colorVar,
-    share: EXAMPLE_GROUP_SHARE[group.key],
+    share: DEFAULT_GROUP_SPLIT[group.key],
 }));
 
 /* ─────────────────────────── portals ─────────────────────────── */
