@@ -1,4 +1,5 @@
 import type { JarKey } from '@rumtelo/contracts';
+import { BadRequestException } from '@nestjs/common';
 
 import { apiBadRequest } from '../errors/api-user-error';
 import { splitByPercentage } from './money.util';
@@ -70,9 +71,10 @@ export function checkJarSplit(
 }
 
 /**
- * Shares for the six jars, in template `sortOrder`: the custom split when given, else
- * each template's default. Shared by `previewSplit`, `onboard`, `JarService.updateSplit`
- * and the archive restore so the preview and the board always agree.
+ * Shares for the given templates (a household's pots: three by default, up to eight), in
+ * template `sortOrder`: the custom split when given, else each template's default, which
+ * must total exactly 100.00 or the catalog is rejected. Shared by `previewSplit`, `onboard`,
+ * `JarService.updateSplit` and the archive restore so the preview and the board always agree.
  *
  * A custom split is validated by `checkJarSplit` and throws its failure as
  * `jar_split_keys` / `jar_split_total`.
@@ -82,6 +84,18 @@ export function resolveJarSplit(
     custom?: readonly JarShare[]
 ): JarShare[] {
     if (!custom) {
+        // The defaults are what a new household is seeded with: a catalog that does not add up
+        // to exactly 100.00 must fail closed, never create pots that do not total 100.
+        const totalBasisPoints = templates.reduce(
+            (sum, template) => sum + Math.round(Number(template.percentage) * 100),
+            0
+        );
+        const finite = templates.every(template => Number.isFinite(Number(template.percentage)));
+        if (!finite || totalBasisPoints !== 10_000) {
+            throw new BadRequestException(
+                `Jar catalog defaults total ${totalBasisPoints / 100}%, not 100% — fix the seed`
+            );
+        }
         return [...templates]
             .sort((left, right) => left.sortOrder - right.sortOrder)
             .map(template => ({

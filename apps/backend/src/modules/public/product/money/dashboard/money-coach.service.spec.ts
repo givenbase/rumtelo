@@ -53,6 +53,8 @@ type SetupInput = {
     bills?: Bill[];
     inbox?: number;
     necessitiesPct?: number;
+    /** DAILY carved out of Basics: the group stays at `necessitiesPct`, split in two pots. */
+    dailyPct?: number;
     netMonthlyCents?: number;
     planKey?: PlanKey;
     assets?: { id: string; kindKey: string; name: string }[];
@@ -90,8 +92,18 @@ function setup(input: SetupInput) {
                     id: 'jar-nec',
                     key: JarKey.NECESSITIES,
                     name: 'Necessities',
-                    percentage: necessitiesPct,
+                    percentage: necessitiesPct - (input.dailyPct ?? 0),
                 },
+                ...(input.dailyPct
+                    ? [
+                          {
+                              id: 'jar-daily',
+                              key: JarKey.DAILY,
+                              name: 'Daily',
+                              percentage: input.dailyPct,
+                          },
+                      ]
+                    : []),
                 {
                     id: 'jar-play',
                     key: JarKey.PLAY,
@@ -149,7 +161,7 @@ describe('MoneyCoachService', () => {
         expect(drafts.every(draft => draft.kind === CoachKind.NUDGE && draft.ctaHref)).toBe(true);
     });
 
-    it('stays quiet while Necessities bridges between the 55% goal and the soft ceiling', async () => {
+    it('stays quiet while Basics bridges between the 55% goal and the soft ceiling', async () => {
         const { service, sync } = setup({ inbox: 2, necessitiesPct: 58 });
 
         await service.refresh();
@@ -157,7 +169,7 @@ describe('MoneyCoachService', () => {
         expect(sync.mock.calls[0]![2]).toEqual([]);
     });
 
-    it('flags Necessities above the soft ceiling as an insight', async () => {
+    it('flags Basics above the soft ceiling as an insight', async () => {
         const { service, sync } = setup({ necessitiesPct: 64 });
 
         await service.refresh();
@@ -166,6 +178,34 @@ describe('MoneyCoachService', () => {
         expect(draft?.key).toBe('money.necessities_share:2026-10:64');
         expect(draft?.kind).toBe(CoachKind.INSIGHT);
         expect(draft?.text).toContain('the goal is 55%');
+    });
+
+    it('compares the Basics group sum, not the NECESSITIES row alone', async () => {
+        // Necessities 44% + Daily 20% = 64% of the household: over the 60% ceiling even
+        // though the Necessities row alone (44) is far below it.
+        const { service, sync } = setup({ necessitiesPct: 64, dailyPct: 20 });
+
+        await service.refresh();
+
+        const [draft] = sync.mock.calls[0]![2];
+        expect(draft?.key).toBe('money.necessities_share:2026-10:64');
+        expect(draft?.text).toContain('Basics is at 64%');
+    });
+
+    it('stays quiet when a refined Basics group sums to the goal', async () => {
+        const { service, sync } = setup({ necessitiesPct: 55, dailyPct: 20 });
+
+        await service.refresh();
+
+        expect(sync.mock.calls[0]![2]).toEqual([]);
+    });
+
+    it('never bakes a stored pot name into the tip text', async () => {
+        const { service, sync } = setup({ necessitiesPct: 64 });
+
+        await service.refresh();
+
+        expect(sync.mock.calls[0]![2][0]?.text).not.toContain('Necessities');
     });
 
     describe('household-wide fixed-cost tips', () => {
@@ -194,11 +234,27 @@ describe('MoneyCoachService', () => {
             expect(draft?.key).toBe('money.fixed_costs.over_necessities:2026-10:10000');
             expect(draft?.identity).toBe('money.fixed_costs.over_necessities:2026-10');
             expect(draft?.text).toBe(
-                'Necessities bills come to €100 a month more than the jar gets.'
+                'Your bills come to €100 a month more than the pot that pays them gets.'
             );
             expect(draft?.ctaLabel).toBe('Add income');
             expect(draft?.ctaHref).toBe('/product/money/income/create');
             expect(draft?.ctaSecondaryLabel).toBe('Open the biggest fixed cost');
+            expect(draft?.ctaSecondaryHref).toBe('/product/money/fixed-costs/rent');
+        });
+
+        it('fires on a Fixed costs overshoot even when Daily has slack in the Basics group', async () => {
+            // Necessities 35% + Daily 20%: envelope for bills is 700.00, bills 800.00.
+            const { service, sync } = setup({
+                necessitiesPct: 55,
+                dailyPct: 20,
+                netMonthlyCents: 2000_00,
+                bills: [{ ...bill('rent', 1), amount: 800_00 }],
+            });
+
+            await service.refresh();
+
+            const [draft] = householdDrafts(sync);
+            expect(draft?.key).toBe('money.fixed_costs.over_necessities:2026-10:10000');
             expect(draft?.ctaSecondaryHref).toBe('/product/money/fixed-costs/rent');
         });
 

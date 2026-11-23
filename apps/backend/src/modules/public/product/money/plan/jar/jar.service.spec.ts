@@ -1,4 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
+import { LockMode } from '@mikro-orm/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import { JarKey } from '@rumtelo/contracts';
@@ -41,17 +42,25 @@ function buildService(householdBoard: Array<[JarKey, string]> = DEFAULT_BOARD) {
     const rows = [...buildJars(HOUSEHOLD, householdBoard), ...buildJars(OTHER_HOUSEHOLD)];
     const flush = vi.fn<() => Promise<void>>(async () => undefined);
     const em = {
-        find: vi.fn<(entity: unknown, where: { household: string }) => Promise<Jar[]>>(
-            async (_entity, where) =>
-                rows.filter(
-                    row => (row as unknown as { household: string }).household === where.household
-                )
+        find: vi.fn<
+            (
+                entity: unknown,
+                where: { household: string },
+                options?: { lockMode?: LockMode; orderBy?: unknown }
+            ) => Promise<Jar[]>
+        >(async (_entity, where) =>
+            rows.filter(
+                row => (row as unknown as { household: string }).household === where.household
+            )
         ),
         flush,
+        transactional: undefined as unknown as <T>(cb: (tx: unknown) => Promise<T>) => Promise<T>,
     };
-    const service = new JarService(em as never, {} as never, {} as never);
+    // `updateSplit` runs inside a transaction; the fake runs the callback on the same em.
+    em.transactional = cb => cb(em);
+    const service = new JarService(em as never, {} as never, {} as never, {} as never);
     vi.spyOn(service, 'list').mockResolvedValue([]);
-    return { service, rows, flush };
+    return { service, rows, flush, em };
 }
 
 function inHousehold<T>(run: () => Promise<T>): Promise<T> {
@@ -295,5 +304,48 @@ describe('JarService.updateSplit edge cases', () => {
         );
 
         expect(percentagesOf(rows, HOUSEHOLD)).toEqual(DEFAULT_BOARD.map(([, value]) => value));
+    });
+});
+
+describe('JarService.updateSplit lock', () => {
+    it('locks every jar of the household in id order before validating, like activate and deactivate', async () => {
+        const { service, em } = buildService();
+
+        await inHousehold(() => service.updateSplit(fullSplit([50, 15, 10, 10, 10, 5])));
+
+        expect(em.find).toHaveBeenCalledTimes(1);
+        const [, where, options] = em.find.mock.calls[0]!;
+        expect(where).toEqual({ household: HOUSEHOLD });
+        expect(options).toMatchObject({
+            orderBy: { id: 'ASC' },
+            lockMode: LockMode.PESSIMISTIC_WRITE,
+        });
+    });
+
+    it('rejects a split built from a stale board (a jar id that is no longer there) with jar_split_keys', async () => {
+        // The client saw six jars; a concurrent turn-off removed one before this write got the lock.
+        const { service, rows, flush } = buildService([
+            [JarKey.NECESSITIES, '60.00'],
+            [JarKey.LONG_TERM_SAVINGS, '20.00'],
+            [JarKey.PLAY, '20.00'],
+        ]);
+        const stale = fullSplit([55, 10, 10, 10, 10, 5]);
+
+        await expect(inHousehold(() => service.updateSplit(stale))).rejects.toMatchObject({
+            response: expect.objectContaining({ message: 'jar_split_keys' }),
+        });
+        expect(percentagesOf(rows, HOUSEHOLD)).toEqual(['60.00', '20.00', '20.00']);
+        expect(flush).not.toHaveBeenCalled();
+    });
+
+    it('rejects a split that is missing a jar that appeared meanwhile with jar_split_keys', async () => {
+        const { service, flush } = buildService();
+        // Client board has five of the six jars the locked set holds.
+        const missingOne = fullSplit([55, 10, 10, 10, 10, 5]).slice(0, 5);
+
+        await expect(inHousehold(() => service.updateSplit(missingOne))).rejects.toMatchObject({
+            response: expect.objectContaining({ message: 'jar_split_keys' }),
+        });
+        expect(flush).not.toHaveBeenCalled();
     });
 });

@@ -1,7 +1,20 @@
+import { LockMode } from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/postgresql';
-import { Inject, Injectable } from '@nestjs/common';
+import {
+    Inject,
+    Injectable,
+    InternalServerErrorException,
+    NotFoundException,
+} from '@nestjs/common';
 
-import { type Jar as ContractJar, type Cadence, jarCapabilitiesFor } from '@rumtelo/contracts';
+import {
+    type Jar as ContractJar,
+    type Cadence,
+    type JarKey,
+    isMainJarKey,
+    jarCapabilitiesFor,
+    mainJarKeyFor,
+} from '@rumtelo/contracts';
 import {
     allocateByPercentage,
     categoryEnvelope,
@@ -21,6 +34,7 @@ import {
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
 import { apiBadRequest } from '../../../../../../common/errors/api-user-error';
+import { parseUniqueConstraint } from '../../../../../../common/utils/database-constraint-error.util';
 import { resolveJarSplit, type JarShare } from '../../../../../../common/utils/jar-split.util';
 import { AuthHousehold } from '../../../../../auth/household/managed/household/auth-household.entity';
 import { AccountSettingsService } from '../../../../../auth/user/account/account-settings';
@@ -32,8 +46,14 @@ import {
     TranslationService,
 } from '../../../../../backoffice/admin/translation';
 import { CATEGORY_TEMPLATE_SEED } from '../../../../../backoffice/product/money/template/category/seed/category.seed-data';
+import { JarTemplateService } from '../../../../../backoffice/product/money/template/jar/jar.service';
 import { JAR_TEMPLATE_SEED } from '../../../../../backoffice/product/money/template/jar/seed/jar.seed-data';
 import { BankAccount } from '../../ledger/bank-account/bank-account.entity';
+import { SortRule } from '../../ledger/sort-rule/sort-rule.entity';
+import { Transaction } from '../../ledger/transaction/transaction.entity';
+import { Goal } from '../../targets/goal/goal.entity';
+import { WeekCheckAllocation } from '../../week-check/week-check-allocation.entity';
+import { FixedCost } from '../fixed-cost/fixed-cost.entity';
 import { Category } from './category.entity';
 import { Jar } from './jar.entity';
 
@@ -51,7 +71,8 @@ export class JarService {
     constructor(
         @Inject(EntityManager) private readonly em: EntityManager,
         @Inject(TranslationService) private readonly translations: TranslationService,
-        @Inject(AccountSettingsService) private readonly accountSettings: AccountSettingsService
+        @Inject(AccountSettingsService) private readonly accountSettings: AccountSettingsService,
+        @Inject(JarTemplateService) private readonly jarTemplates: JarTemplateService
     ) {
         this.jars = new HouseholdScopedRepository(em, Jar);
         this.categories = new HouseholdScopedRepository(em, Category);
@@ -60,6 +81,79 @@ export class JarService {
     // ====================================================================
     // ? CREATE Operations
     // ====================================================================
+
+    /**
+     * Turn on an optional pot (DAILY, GOALS, FINANCIAL_FREEDOM, EDUCATION, GIVE). Its share
+     * (the template percentage) comes OUT OF the group's main pot, so the group total and the
+     * household total (exactly 100.00) do not change. The new pot sits on the same bank seat
+     * as the main pot.
+     *
+     * One transaction that first locks every jar of the household (`lockHouseholdJars`, the
+     * same lock `deactivate` and `updateSplit` take): two writers would otherwise both read old
+     * percentages and the second write would silently undo the first (the total would drift
+     * from 100). A double activation of the
+     * same key ends as `jar_already_active`, never a 500 (the unique household + key index is
+     * the last line of defence). Maths is in basis points (0.01 %).
+     *
+     * Errors: `jar_not_optional` (a main key), `jar_already_active`, `jar_share_too_small`
+     * (the main pot would be left with nothing).
+     */
+    async activate(key: JarKey): Promise<JarDto> {
+        if (isMainJarKey(key)) throw apiBadRequest('jar_not_optional');
+        const template = await this.jarTemplates.findActive(key);
+        const shareBasisPoints = template ? toBasisPoints(template.percentage) : 0;
+        // A missing template or a share of 0 is a catalog setup error, not the household's
+        // doing: one exception type, carrying only the key.
+        if (!template || shareBasisPoints <= 0) {
+            throw new InternalServerErrorException(`Jar template for ${key} is not set up`);
+        }
+        const mainKey = mainJarKeyFor(key);
+
+        try {
+            const created = await this.em.transactional(async tx => {
+                const scoped = new HouseholdScopedRepository(tx, Jar);
+                const jars = await this.lockHouseholdJars(tx);
+                const main = jars.find(jar => jar.key === mainKey);
+                if (!main) throw new NotFoundException(`Household has no ${mainKey} pot`);
+                if (jars.some(jar => jar.key === key)) throw apiBadRequest('jar_already_active');
+
+                const mainBasisPoints = toBasisPoints(main.percentage);
+                if (mainBasisPoints - shareBasisPoints <= 0) {
+                    throw apiBadRequest('jar_share_too_small');
+                }
+                main.percentage = fromBasisPoints(mainBasisPoints - shareBasisPoints);
+
+                const jar = scoped.create({
+                    key,
+                    name: template.name,
+                    subtitle: template.subtitle,
+                    icon: template.icon,
+                    percentage: fromBasisPoints(shareBasisPoints),
+                    capabilities: { ...template.capabilities },
+                    sortOrder: template.sortOrder,
+                    defaultAccount: main.defaultAccount,
+                } as never);
+                tx.persist(jar);
+
+                // The household still totals exactly 100.00 (same rule as `updateSplit`).
+                const after = [...jars, jar].map(row => ({
+                    key: row.key,
+                    sortOrder: row.sortOrder,
+                    percentage: row.percentage,
+                }));
+                resolveJarSplit(
+                    after,
+                    after.map(row => ({ key: row.key, percentage: Number(row.percentage) }))
+                );
+                return jar;
+            });
+            const [dto] = await this.applyJarTranslations([toJarDto(created)]);
+            return dto!;
+        } catch (error) {
+            if (parseUniqueConstraint(error)) throw apiBadRequest('jar_already_active');
+            throw error;
+        }
+    }
 
     /**
      * UNIQUE(household, jar, name) — re-creating a name that exists (usually
@@ -399,31 +493,36 @@ export class JarService {
      * outside the household is simply not in the scoped list and counts as a bad key.
      */
     async updateSplit(split: { jarId: string; percentage: number }[]): Promise<JarDto[]> {
-        const jars = await this.jars.find({});
-        const jarById = new Map(jars.map(jar => [jar.id, jar]));
+        // Same lock as `activate` / `deactivate`: validated against the rows as they are once
+        // any concurrent turn-on / turn-off has committed, so a stale board can never be
+        // written over it and leave the household away from 100.
+        await this.em.transactional(async tx => {
+            const jars = await this.lockHouseholdJars(tx);
+            const jarById = new Map(jars.map(jar => [jar.id, jar]));
 
-        const shares: JarShare[] = split.map(entry => {
-            const jar = jarById.get(entry.jarId);
-            if (!jar) throw apiBadRequest('jar_split_keys');
-            return { key: jar.key, percentage: entry.percentage };
+            const shares: JarShare[] = split.map(entry => {
+                const jar = jarById.get(entry.jarId);
+                if (!jar) throw apiBadRequest('jar_split_keys');
+                return { key: jar.key, percentage: entry.percentage };
+            });
+            const validated = resolveJarSplit(
+                jars.map(jar => ({
+                    key: jar.key,
+                    sortOrder: jar.sortOrder,
+                    percentage: jar.percentage,
+                })),
+                shares
+            );
+
+            const jarByKey = new Map(jars.map(jar => [jar.key, jar]));
+            for (const share of validated) {
+                // Round to basis points first so the stored value is exactly what was totalled.
+                jarByKey.get(share.key)!.percentage = (
+                    Math.round(share.percentage * 100) / 100
+                ).toFixed(2);
+            }
+            await tx.flush();
         });
-        const validated = resolveJarSplit(
-            jars.map(jar => ({
-                key: jar.key,
-                sortOrder: jar.sortOrder,
-                percentage: jar.percentage,
-            })),
-            shares
-        );
-
-        const jarByKey = new Map(jars.map(jar => [jar.key, jar]));
-        for (const share of validated) {
-            // Round to basis points first so the stored value is exactly what was totalled.
-            jarByKey.get(share.key)!.percentage = (
-                Math.round(share.percentage * 100) / 100
-            ).toFixed(2);
-        }
-        await this.em.flush();
         return this.list();
     }
 
@@ -465,7 +564,7 @@ export class JarService {
 
     /**
      * Put every jar that has no seat yet on `accountId`. Called when the household's
-     * first bank account is created, so one main account carries all six jars. Jars the
+     * first bank account is created, so one main account carries every pot. Jars the
      * household already placed are never moved. Caller guarantees the account is this
      * household's; the caller flushes nothing else, this flushes its own change.
      */
@@ -507,12 +606,75 @@ export class JarService {
     // ? DELETE Operations
     // ====================================================================
 
+    /**
+     * Turn off an optional pot: its share goes back to the group's main pot and the pot is
+     * deleted. Main pots cannot be turned off (`jar_not_optional`).
+     *
+     * A pot that anything points at stays on (`jar_not_empty`): the foreign keys of
+     * transactions and goals are SET NULL, so deleting would silently drop that money out of
+     * every sum, and fixed costs, sort rules and week-check allocations would be deleted with
+     * it. The same goes for a transaction, fixed cost or sort rule in another pot that uses a
+     * category of this pot (the category would be nulled). Unused categories alone do not
+     * block; they go with the pot. Moving the contents to the
+     * main pot is a deliberate separate step, not done here.
+     *
+     * The same lock as `activate` and `updateSplit` (every jar of the household): it
+     * serialises with a concurrent activation or split save and makes a transaction being
+     * sorted into this pot at the same moment wait (then fail its foreign key) instead of
+     * being nulled.
+     */
+    async deactivate(jarId: string): Promise<void> {
+        const target = await this.jars.findOne({ id: jarId });
+        if (!target) throw new NotFoundException('Jar not found in this household');
+        if (isMainJarKey(target.key)) throw apiBadRequest('jar_not_optional');
+        const mainKey = mainJarKeyFor(target.key);
+
+        await this.em.transactional(async tx => {
+            const scoped = new HouseholdScopedRepository(tx, Jar);
+            const locked = await this.lockHouseholdJars(tx);
+            const jar = locked.find(row => row.id === jarId);
+            const main = locked.find(row => row.key === mainKey);
+            if (!jar) throw new NotFoundException('Jar not found in this household');
+            if (!main) throw new NotFoundException(`Household has no ${mainKey} pot`);
+
+            // Rows in this pot, and rows elsewhere that use one of its categories: deleting the
+            // pot cascades its categories, which would null that category on those rows.
+            const inPot = { $or: [{ jar: jarId }, { category: { jar: jarId } }] };
+            const references = await Promise.all([
+                new HouseholdScopedRepository(tx, Transaction).count(inPot),
+                new HouseholdScopedRepository(tx, FixedCost).count(inPot),
+                new HouseholdScopedRepository(tx, Goal).count({ jar: jarId }),
+                new HouseholdScopedRepository(tx, SortRule).count(inPot),
+                new HouseholdScopedRepository(tx, WeekCheckAllocation).count({ jar: jarId }),
+            ]);
+            if (references.some(count => count > 0)) throw apiBadRequest('jar_not_empty');
+
+            main.percentage = fromBasisPoints(
+                toBasisPoints(main.percentage) + toBasisPoints(jar.percentage)
+            );
+            scoped.remove(jar);
+        });
+    }
+
     async deleteCategory(id: string) {
         const cat = await this.categories.findOneOrFail({ id });
         await this.em.remove(cat).flush();
     }
 
     // Private
+
+    /**
+     * Lock every jar of the household for the rest of the transaction, in a fixed order (by
+     * id) so two writers can never wait on each other. `activate`, `deactivate` and
+     * `updateSplit` all start here, which makes the household's percentages a single
+     * serialised resource, and they validate against these rows, not an earlier read.
+     */
+    private lockHouseholdJars(tx: EntityManager): Promise<Jar[]> {
+        return new HouseholdScopedRepository(tx, Jar).find(
+            {},
+            { orderBy: { id: 'ASC' }, lockMode: LockMode.PESSIMISTIC_WRITE }
+        );
+    }
 
     /**
      * Sum sorted OUT / IN across an inclusive YYYY-MM range (Looking Back stack).
@@ -700,6 +862,16 @@ export class JarService {
         }
         return map;
     }
+}
+
+/** A stored percentage (decimal string or number) as integer basis points (0.01 %). */
+function toBasisPoints(percentage: string | number): number {
+    return Math.round(Number(percentage) * 100);
+}
+
+/** Basis points back to the stored decimal string with two decimals. */
+function fromBasisPoints(basisPoints: number): string {
+    return (basisPoints / 100).toFixed(2);
 }
 
 function toJarDto(jar: Jar): JarDto {

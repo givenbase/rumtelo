@@ -4,15 +4,17 @@ import {
     CAPABILITIES,
     CoachFeatureId,
     CoachKind,
-    DEFAULT_JAR_SPLIT,
+    DEFAULT_GROUP_SPLIT,
     FIXED_COSTS_COACH_KEY_PREFIX,
     FlowDirection,
     FixedCostPeriodStatus,
-    JarKey,
+    GROUP_SOFT_CEILING,
+    JarGroup,
     MONEY_COACH_KEY_PREFIX,
-    SPLIT_SOFT_CEILING,
     hasCapability,
     isCoachFeatureEnabledAtLaunch,
+    jarGroupFor,
+    sumPercentageByGroup,
 } from '@rumtelo/contracts';
 import { evaluateBusinessHouseholdLeak, fixedCostPeriodStatus, formatMoney } from '@rumtelo/utils';
 
@@ -39,13 +41,16 @@ const INCOME_CREATE_HREF = '/product/money/income/create';
 const INBOX_HREF = '/product/money/transactions';
 const JARS_HREF = '/product/money';
 const INBOX_TIP_MIN = 3;
-/** Same ceiling as the in-app split coach — 55% is the goal, bridging up to here stays quiet. */
-const NECESSITIES_SOFT_CEILING = SPLIT_SOFT_CEILING[JarKey.NECESSITIES];
-const NECESSITIES_GOAL = DEFAULT_JAR_SPLIT[JarKey.NECESSITIES];
+/**
+ * The Basics group (NECESSITIES plus DAILY when on) is measured as a whole: 55% is the goal,
+ * bridging up to the soft ceiling stays quiet. `?? Infinity`: a group without a ceiling never fires.
+ */
+const BASICS_SOFT_CEILING = GROUP_SOFT_CEILING[JarGroup.BASIS] ?? Number.POSITIVE_INFINITY;
+const BASICS_GOAL = DEFAULT_GROUP_SPLIT[JarGroup.BASIS];
 
 /**
- * Money inbox tip producers — due bills, unsorted inbox, soft Necessities share, and the
- * household-wide fixed-cost tips (over the Necessities split, business costs paid from the
+ * Money inbox tip producers — due bills, unsorted inbox, soft Basics share, and the
+ * household-wide fixed-cost tips (over the Basics split, business costs paid from the
  * household, a quarterly subscription review).
  * Rule-based; pairs with on-screen jar helpers (informatie, nooit schaamte).
  */
@@ -119,13 +124,17 @@ export class MoneyCoachService implements OnModuleInit {
             });
         }
 
-        const necessities = jars.find(jar => jar.key === JarKey.NECESSITIES);
-        const necPct = necessities ? necessities.percentage : null;
-        if (necPct !== null && Number.isFinite(necPct) && necPct > NECESSITIES_SOFT_CEILING) {
+        // Group sum in basis points (`sumPercentageByGroup`), so a refined Basics (NECESSITIES +
+        // DAILY) reads the same as an unrefined one. The key keeps its `necessities_share` name
+        // so earlier dismissals stay hidden and the client copy keeps matching.
+        const hasBasics = jars.some(jar => jarGroupFor(jar.key) === JarGroup.BASIS);
+        const basicsPct = sumPercentageByGroup(jars)[JarGroup.BASIS];
+        if (hasBasics && Number.isFinite(basicsPct) && basicsPct > BASICS_SOFT_CEILING) {
             drafts.push({
-                key: `${MONEY_COACH_KEY_PREFIX}necessities_share:${period}:${Math.round(necPct)}`,
+                key: `${MONEY_COACH_KEY_PREFIX}necessities_share:${period}:${Math.round(basicsPct)}`,
                 kind: CoachKind.INSIGHT,
-                text: `Necessities is at ${Math.round(necPct)}% — the goal is ${NECESSITIES_GOAL}%. Fine for now; to close the gap, trim fixed costs or raise income and leave Freedom untouched.`,
+                // No stored pot name here: the name depends on whether Basics is refined.
+                text: `Basics is at ${Math.round(basicsPct)}% — the goal is ${BASICS_GOAL}%. Fine for now; to close the gap, trim fixed costs or raise income and leave Future untouched.`,
                 ctaLabel: 'Review jars',
                 ctaHref: JARS_HREF,
             });
@@ -160,7 +169,6 @@ export class MoneyCoachService implements OnModuleInit {
             jars: jars.map(jar => ({
                 id: jar.id,
                 key: jar.key,
-                name: jar.name,
                 percentage: jar.percentage,
             })),
             bills,
@@ -172,7 +180,7 @@ export class MoneyCoachService implements OnModuleInit {
                 key: `${identity}:${over.shortfallCents}`,
                 identity,
                 kind: CoachKind.NUDGE,
-                text: `${over.jarName} bills come to ${money(over.shortfallCents)} a month more than the jar gets.`,
+                text: `Your bills come to ${money(over.shortfallCents)} a month more than the pot that pays them gets.`,
                 ctaLabel: 'Add income',
                 ctaHref: INCOME_CREATE_HREF,
                 ctaSecondaryLabel: 'Open the biggest fixed cost',

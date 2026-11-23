@@ -19,13 +19,11 @@ import { HouseholdService } from './household.service';
 
 type Row = Record<string, unknown>;
 
+/** What `JarTemplateService.listDefault` returns: only the three main pots, 55 / 20 / 25. */
 const TEMPLATES = [
     [JarKey.NECESSITIES, 55],
-    [JarKey.FINANCIAL_FREEDOM, 10],
-    [JarKey.EDUCATION, 10],
-    [JarKey.LONG_TERM_SAVINGS, 10],
-    [JarKey.PLAY, 10],
-    [JarKey.GIVE, 5],
+    [JarKey.LONG_TERM_SAVINGS, 20],
+    [JarKey.PLAY, 25],
 ].map(([key, percentage], sortOrder) => ({
     key,
     name: String(key),
@@ -104,7 +102,7 @@ function setup(
         accountSettings as never,
         householdSettings as never,
         {} as never,
-        { listActive: async () => options.templates ?? TEMPLATES } as never,
+        { listDefault: async () => options.templates ?? TEMPLATES } as never,
         {} as never
     );
     const onboard = (body: OnboardingInput) =>
@@ -144,12 +142,10 @@ function setup(
 }
 
 describe('HouseholdService.previewSplit', () => {
-    it('splits 2,500.00 EUR into the six jars and sums to the income', async () => {
+    it('splits 2,500.00 EUR into the three default pots and sums to the income', async () => {
         const { preview } = setup();
         const result = await preview({ currency: Currency.EUR, monthlyNetIncome: 250_000 });
-        expect(result.jars.map(jar => jar.amount)).toEqual([
-            137_500, 25_000, 25_000, 25_000, 25_000, 12_500,
-        ]);
+        expect(result.jars.map(jar => jar.amount)).toEqual([137_500, 50_000, 62_500]);
         expect(result.jars.map(jar => jar.key)).toEqual(TEMPLATES.map(template => template.key));
         expect(result.currency).toBe(Currency.EUR);
     });
@@ -162,16 +158,68 @@ describe('HouseholdService.previewSplit', () => {
         expect(authApi.createOrganization).not.toHaveBeenCalled();
     });
 
-    it('fails like onboard when the jar catalog is empty', async () => {
+    it('fails like onboard when no template is flagged default (seed has not run)', async () => {
         const { preview } = setup({ templates: [] });
         await expect(preview({ currency: Currency.EUR, monthlyNetIncome: 100 })).rejects.toThrow(
-            'Jar catalog is empty'
+            'Jar catalog has no default pots'
         );
+    });
+
+    it('fails when a main pot is missing from the defaults instead of making two jars', async () => {
+        const { preview } = setup({ templates: TEMPLATES.slice(0, 2) });
+        await expect(preview({ currency: Currency.EUR, monthlyNetIncome: 100 })).rejects.toThrow(
+            'Jar catalog has no default pots'
+        );
+    });
+
+    it('fails closed when the default templates do not total 100 (nothing is created)', async () => {
+        const skewed = TEMPLATES.map(template => ({ ...template, percentage: '47.00' }));
+        const { preview, onboard, authApi } = setup({ templates: skewed });
+
+        await expect(preview({ currency: Currency.EUR, monthlyNetIncome: 100 })).rejects.toThrow(
+            'total 141%'
+        );
+        await expect(onboard(input())).rejects.toThrow('total 141%');
+        expect(authApi.createOrganization).not.toHaveBeenCalled();
+    });
+
+    it('accepts a three-entry custom split', async () => {
+        const { preview } = setup();
+        const result = await preview({
+            currency: Currency.EUR,
+            monthlyNetIncome: 100_00,
+            split: [
+                { key: JarKey.PLAY, percentage: 30 },
+                { key: JarKey.NECESSITIES, percentage: 50 },
+                { key: JarKey.LONG_TERM_SAVINGS, percentage: 20 },
+            ],
+        });
+        expect(result.jars.map(jar => [jar.key, jar.amount])).toEqual([
+            [JarKey.NECESSITIES, 50_00],
+            [JarKey.LONG_TERM_SAVINGS, 20_00],
+            [JarKey.PLAY, 30_00],
+        ]);
+    });
+
+    it('rejects a split that names an optional pot with jar_split_keys', async () => {
+        const { preview } = setup();
+        await expect(
+            preview({
+                currency: Currency.EUR,
+                monthlyNetIncome: 100_00,
+                split: [
+                    { key: JarKey.NECESSITIES, percentage: 35 },
+                    { key: JarKey.DAILY, percentage: 20 },
+                    { key: JarKey.LONG_TERM_SAVINGS, percentage: 20 },
+                    { key: JarKey.PLAY, percentage: 25 },
+                ],
+            })
+        ).rejects.toThrow('jar_split_keys');
     });
 });
 
 describe('HouseholdService.onboard', () => {
-    it('creates six jars, one Main account without bank or IBAN, and puts every jar on it', async () => {
+    it('creates exactly the three default pots, one Main account without bank or IBAN, and puts every jar on it', async () => {
         const { onboard, rowsOf } = setup();
         await onboard(input());
         const accounts = rowsOf(BankAccount);
@@ -184,7 +232,12 @@ describe('HouseholdService.onboard', () => {
             isPrimary: true,
         });
         const jars = rowsOf(Jar);
-        expect(jars).toHaveLength(6);
+        expect(jars).toHaveLength(3);
+        expect(jars.map(jar => jar.key)).toEqual([
+            JarKey.NECESSITIES,
+            JarKey.LONG_TERM_SAVINGS,
+            JarKey.PLAY,
+        ]);
         expect(new Set(jars.map(jar => jar.defaultAccount))).toEqual(new Set([accounts[0]!.id]));
     });
 
@@ -201,21 +254,14 @@ describe('HouseholdService.onboard', () => {
             amount: 250_000,
             account: rowsOf(BankAccount)[0]!.id,
         });
-        expect(rowsOf(Jar).map(jar => jar.percentage)).toEqual([
-            '55.00',
-            '10.00',
-            '10.00',
-            '10.00',
-            '10.00',
-            '5.00',
-        ]);
+        expect(rowsOf(Jar).map(jar => jar.percentage)).toEqual(['55.00', '20.00', '25.00']);
     });
 
     it('makes no income source for zero income', async () => {
         const { onboard, rowsOf } = setup();
         await onboard(input({ monthlyNetIncome: 0 }));
         expect(rowsOf(IncomeSource)).toHaveLength(0);
-        expect(rowsOf(Jar)).toHaveLength(6);
+        expect(rowsOf(Jar)).toHaveLength(3);
     });
 
     it('writes jar_experience NEW and jar_bank_setup_done true in the same call', async () => {
@@ -244,28 +290,36 @@ describe('HouseholdService.onboard', () => {
         );
     });
 
-    it('applies a valid custom split to the jars', async () => {
+    it('applies a valid three-entry custom split to the pots', async () => {
         const { onboard, rowsOf } = setup();
         await onboard(
             input({
                 split: [
                     { key: JarKey.NECESSITIES, percentage: 50 },
-                    { key: JarKey.FINANCIAL_FREEDOM, percentage: 15 },
-                    { key: JarKey.EDUCATION, percentage: 10 },
-                    { key: JarKey.LONG_TERM_SAVINGS, percentage: 10 },
-                    { key: JarKey.PLAY, percentage: 10 },
-                    { key: JarKey.GIVE, percentage: 5 },
+                    { key: JarKey.LONG_TERM_SAVINGS, percentage: 25 },
+                    { key: JarKey.PLAY, percentage: 25 },
                 ],
             })
         );
-        expect(rowsOf(Jar).map(jar => jar.percentage)).toEqual([
-            '50.00',
-            '15.00',
-            '10.00',
-            '10.00',
-            '10.00',
-            '5.00',
-        ]);
+        expect(rowsOf(Jar).map(jar => jar.percentage)).toEqual(['50.00', '25.00', '25.00']);
+    });
+
+    it('rejects a split that names an optional pot before anything is created', async () => {
+        const { onboard, authApi, em } = setup();
+        await expect(
+            onboard(
+                input({
+                    split: [
+                        { key: JarKey.NECESSITIES, percentage: 35 },
+                        { key: JarKey.DAILY, percentage: 20 },
+                        { key: JarKey.LONG_TERM_SAVINGS, percentage: 20 },
+                        { key: JarKey.PLAY, percentage: 25 },
+                    ],
+                })
+            )
+        ).rejects.toThrow('jar_split_keys');
+        expect(authApi.createOrganization).not.toHaveBeenCalled();
+        expect(em.create).not.toHaveBeenCalled();
     });
 
     it('rejects a bad split before any organization is created', async () => {
@@ -275,11 +329,8 @@ describe('HouseholdService.onboard', () => {
                 input({
                     split: [
                         { key: JarKey.NECESSITIES, percentage: 60 },
-                        { key: JarKey.FINANCIAL_FREEDOM, percentage: 15 },
-                        { key: JarKey.EDUCATION, percentage: 10 },
-                        { key: JarKey.LONG_TERM_SAVINGS, percentage: 10 },
-                        { key: JarKey.PLAY, percentage: 10 },
-                        { key: JarKey.GIVE, percentage: 5 },
+                        { key: JarKey.LONG_TERM_SAVINGS, percentage: 20 },
+                        { key: JarKey.PLAY, percentage: 25 },
                     ],
                 })
             )

@@ -12,6 +12,7 @@ import {
     type HouseholdSeatUsage,
     HouseholdPermissionAction,
     HouseholdPermissionSection,
+    JAR_MAIN_KEY_BY_GROUP,
     type JarKey,
     type Locale,
     PlanKey,
@@ -215,7 +216,7 @@ export class HouseholdService {
     // ====================================================================
 
     /**
-     * Onboarding split preview: income into the six jars in minor units, nothing written.
+     * Onboarding split preview: income into the default pots (three) in minor units, nothing written.
      * Needs a signed-in session only (no household), and never reads one.
      */
     async previewSplit(
@@ -400,12 +401,17 @@ export class HouseholdService {
         return `${base.slice(0, 72)}-${crypto.randomUUID().slice(0, 8)}`;
     }
 
-    /** Active jar templates in display order; an empty catalog is a setup error, not a split. */
+    /**
+     * The default jar templates (`isDefault`: one main pot per group) in display order. A
+     * catalog without all three main pots is a setup error (the seed has not run), never a
+     * split: it must not quietly create zero jars, or every optional pot as well.
+     */
     private async requireJarTemplates() {
-        const templates = await this.jarTemplates.listActive();
-        if (templates.length === 0) {
+        const templates = await this.jarTemplates.listDefault();
+        const present = new Set(templates.map(template => template.key));
+        if (!Object.values(JAR_MAIN_KEY_BY_GROUP).every(mainKey => present.has(mainKey))) {
             throw new BadRequestException(
-                'Jar catalog is empty — seed backoffice.reference_money_jar_template'
+                'Jar catalog has no default pots — seed backoffice.reference_money_jar_template with isDefault on the three main pots'
             );
         }
         return templates;

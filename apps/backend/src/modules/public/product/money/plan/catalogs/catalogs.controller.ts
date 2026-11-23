@@ -63,6 +63,7 @@ export class MoneyCatalogsController {
                 percentage: Number(template.percentage),
                 capabilities: template.capabilities,
                 guide: template.guide,
+                isDefault: template.isDefault,
             }));
         });
     }

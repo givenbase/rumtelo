@@ -1,13 +1,22 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+    DEFAULT_GROUP_SPLIT,
     DEFAULT_JAR_SPLIT,
+    JAR_CAPABILITIES,
     JAR_GROUP_BY_KEY,
     JAR_GROUP_ORDER,
+    JAR_MAIN_KEY_BY_GROUP,
     JAR_ORDER_IN_GROUP,
     JarGroup,
     JarKey,
+    OPTIONAL_JAR_KEYS,
+    OPTIONAL_JAR_SHARE,
+    defaultJarSplitFor,
+    isMainJarKey,
     jarGroupFor,
+    mainJarKeyFor,
+    resolveJarKeyForHousehold,
     sumPercentageByGroup,
 } from '@rumtelo/contracts';
 
@@ -20,6 +29,8 @@ describe('jar groups', () => {
         expect(jarGroupFor(JarKey.EDUCATION)).toBe(JarGroup.FUTURE);
         expect(jarGroupFor(JarKey.PLAY)).toBe(JarGroup.FREE);
         expect(jarGroupFor(JarKey.GIVE)).toBe(JarGroup.FREE);
+        expect(jarGroupFor(JarKey.DAILY)).toBe(JarGroup.BASIS);
+        expect(jarGroupFor(JarKey.GOALS)).toBe(JarGroup.FUTURE);
         expect(Object.keys(JAR_GROUP_BY_KEY).sort()).toEqual(Object.values(JarKey).sort());
     });
 
@@ -31,7 +42,9 @@ describe('jar groups', () => {
         const listed = JAR_GROUP_ORDER.flatMap(group => JAR_ORDER_IN_GROUP[group]);
         expect(listed).toEqual([
             JarKey.NECESSITIES,
+            JarKey.DAILY,
             JarKey.LONG_TERM_SAVINGS,
+            JarKey.GOALS,
             JarKey.FINANCIAL_FREEDOM,
             JarKey.EDUCATION,
             JarKey.PLAY,
@@ -43,16 +56,18 @@ describe('jar groups', () => {
         }
     });
 
-    it('sums the default split to 55 / 30 / 15', () => {
+    it('sums the default split to 55 / 20 / 25', () => {
         const shares = Object.values(JarKey).map(key => ({
             key,
             percentage: DEFAULT_JAR_SPLIT[key],
         }));
-        expect(sumPercentageByGroup(shares)).toEqual({
+        const expected = {
             [JarGroup.BASIS]: 55,
-            [JarGroup.FUTURE]: 30,
-            [JarGroup.FREE]: 15,
-        });
+            [JarGroup.FUTURE]: 20,
+            [JarGroup.FREE]: 25,
+        };
+        expect(sumPercentageByGroup(shares)).toEqual(expected);
+        expect(DEFAULT_GROUP_SPLIT).toEqual(expected);
     });
 
     it('adds without float drift and reports empty groups as 0', () => {
@@ -117,5 +132,98 @@ describe('jar groups', () => {
             );
             expect(groupBasisPoints).toBe(inputBasisPoints);
         }
+    });
+});
+
+const MAIN_KEYS = [JarKey.NECESSITIES, JarKey.LONG_TERM_SAVINGS, JarKey.PLAY];
+
+function total(split: Partial<Record<JarKey, number>>): number {
+    return (
+        Object.values(split).reduce((sum, value) => sum + Math.round((value ?? 0) * 100), 0) / 100
+    );
+}
+
+describe('main and optional pots', () => {
+    it('has one main pot per group and five optional pots in group order', () => {
+        expect(JAR_MAIN_KEY_BY_GROUP).toEqual({
+            [JarGroup.BASIS]: JarKey.NECESSITIES,
+            [JarGroup.FUTURE]: JarKey.LONG_TERM_SAVINGS,
+            [JarGroup.FREE]: JarKey.PLAY,
+        });
+        expect(OPTIONAL_JAR_KEYS).toEqual([
+            JarKey.DAILY,
+            JarKey.GOALS,
+            JarKey.FINANCIAL_FREEDOM,
+            JarKey.EDUCATION,
+            JarKey.GIVE,
+        ]);
+        for (const key of MAIN_KEYS) expect(isMainJarKey(key)).toBe(true);
+        for (const key of OPTIONAL_JAR_KEYS) {
+            expect(isMainJarKey(key)).toBe(false);
+            expect(mainJarKeyFor(key)).toBe(JAR_MAIN_KEY_BY_GROUP[jarGroupFor(key)]);
+        }
+        expect(mainJarKeyFor(JarKey.PLAY)).toBe(JarKey.PLAY);
+    });
+
+    it('gives DAILY spend rights without fixed costs and GOALS the savings pot rights', () => {
+        expect(JAR_CAPABILITIES[JarKey.DAILY]).toMatchObject({
+            canSpend: true,
+            canSave: false,
+            countsTowardSafeToSpend: true,
+            allowsFixedCosts: false,
+        });
+        expect(JAR_CAPABILITIES[JarKey.GOALS]).toEqual(JAR_CAPABILITIES[JarKey.LONG_TERM_SAVINGS]);
+    });
+
+    it('defaults the three main pots to 55 / 20 / 25', () => {
+        expect(defaultJarSplitFor(MAIN_KEYS)).toEqual({
+            [JarKey.NECESSITIES]: 55,
+            [JarKey.LONG_TERM_SAVINGS]: 20,
+            [JarKey.PLAY]: 25,
+        });
+    });
+
+    it('sums to 100 with all eight pots and keeps every group total', () => {
+        const split = defaultJarSplitFor(Object.values(JarKey));
+        expect(Object.keys(split)).toHaveLength(8);
+        expect(total(split)).toBe(100);
+        const groups = sumPercentageByGroup(
+            Object.entries(split).map(([key, percentage]) => ({
+                key: key as JarKey,
+                percentage: percentage ?? 0,
+            }))
+        );
+        expect(groups).toEqual(DEFAULT_GROUP_SPLIT);
+        expect(split[JarKey.NECESSITIES]).toBe(55 - OPTIONAL_JAR_SHARE[JarKey.DAILY]);
+        expect(split[JarKey.LONG_TERM_SAVINGS]).toBe(
+            20 -
+                OPTIONAL_JAR_SHARE[JarKey.GOALS] -
+                OPTIONAL_JAR_SHARE[JarKey.FINANCIAL_FREEDOM] -
+                OPTIONAL_JAR_SHARE[JarKey.EDUCATION]
+        );
+        expect(split[JarKey.PLAY]).toBe(25 - OPTIONAL_JAR_SHARE[JarKey.GIVE]);
+    });
+
+    it.each(OPTIONAL_JAR_KEYS)('sums to 100 with the main pots plus %s', optionalKey => {
+        const split = defaultJarSplitFor([...MAIN_KEYS, optionalKey]);
+        expect(total(split)).toBe(100);
+        expect(split[optionalKey]).toBe(OPTIONAL_JAR_SHARE[optionalKey]);
+        const main = JAR_MAIN_KEY_BY_GROUP[jarGroupFor(optionalKey)];
+        expect(split[main]).toBe(
+            DEFAULT_GROUP_SPLIT[jarGroupFor(optionalKey)] - OPTIONAL_JAR_SHARE[optionalKey]
+        );
+    });
+
+    it('falls back to the main pot of the group when the pot is not turned on', () => {
+        expect(resolveJarKeyForHousehold(JarKey.DAILY, MAIN_KEYS)).toBe(JarKey.NECESSITIES);
+        expect(resolveJarKeyForHousehold(JarKey.GOALS, MAIN_KEYS)).toBe(JarKey.LONG_TERM_SAVINGS);
+        expect(resolveJarKeyForHousehold(JarKey.EDUCATION, MAIN_KEYS)).toBe(
+            JarKey.LONG_TERM_SAVINGS
+        );
+        expect(resolveJarKeyForHousehold(JarKey.GIVE, MAIN_KEYS)).toBe(JarKey.PLAY);
+        expect(resolveJarKeyForHousehold(JarKey.GIVE, [...MAIN_KEYS, JarKey.GIVE])).toBe(
+            JarKey.GIVE
+        );
+        expect(resolveJarKeyForHousehold(JarKey.PLAY, new Set(MAIN_KEYS))).toBe(JarKey.PLAY);
     });
 });

@@ -163,3 +163,85 @@ describe('splitIncomeByJar', () => {
         }
     });
 });
+
+/** A new household has only the three main pots; its templates are those three. */
+describe('three default pots', () => {
+    const DEFAULTS: JarSplitTemplate[] = [
+        { key: JarKey.PLAY, sortOrder: 2, percentage: '25.00' },
+        { key: JarKey.NECESSITIES, sortOrder: 0, percentage: '55.00' },
+        { key: JarKey.LONG_TERM_SAVINGS, sortOrder: 1, percentage: '20.00' },
+    ];
+
+    it('defaults to 55 / 20 / 25 in sortOrder', () => {
+        expect(resolveJarSplit(DEFAULTS).map(share => [share.key, share.percentage])).toEqual([
+            [JarKey.NECESSITIES, 55],
+            [JarKey.LONG_TERM_SAVINGS, 20],
+            [JarKey.PLAY, 25],
+        ]);
+    });
+
+    it('accepts a three-entry split and rejects one that names an optional pot', () => {
+        expect(() =>
+            resolveJarSplit(DEFAULTS, [
+                { key: JarKey.NECESSITIES, percentage: 50 },
+                { key: JarKey.LONG_TERM_SAVINGS, percentage: 25 },
+                { key: JarKey.PLAY, percentage: 25 },
+            ])
+        ).not.toThrow();
+        expect(() =>
+            resolveJarSplit(DEFAULTS, [
+                { key: JarKey.NECESSITIES, percentage: 35 },
+                { key: JarKey.DAILY, percentage: 20 },
+                { key: JarKey.LONG_TERM_SAVINGS, percentage: 20 },
+                { key: JarKey.PLAY, percentage: 25 },
+            ])
+        ).toThrow('jar_split_keys');
+    });
+
+    it('splits the income 55 / 20 / 25 to the cent, remainder to the largest pot', () => {
+        expect(splitIncomeByJar(100, resolveJarSplit(DEFAULTS)).map(row => row.amount)).toEqual([
+            55, 20, 25,
+        ]);
+        const odd = splitIncomeByJar(250_001, resolveJarSplit(DEFAULTS)).map(row => row.amount);
+        expect(odd).toEqual([137_501, 50_000, 62_500]);
+        expect(sum(odd)).toBe(250_001);
+    });
+});
+
+describe('resolveJarSplit on the default path fails closed on a bad catalog', () => {
+    it('throws when the template percentages total 141, not 100', () => {
+        const bad: JarSplitTemplate[] = [
+            { key: JarKey.NECESSITIES, sortOrder: 0, percentage: '55.00' },
+            { key: JarKey.LONG_TERM_SAVINGS, sortOrder: 1, percentage: '31.00' },
+            { key: JarKey.PLAY, sortOrder: 2, percentage: '55.00' },
+        ];
+        expect(() => resolveJarSplit(bad)).toThrow(/total 141%/);
+    });
+
+    it('throws on a catalog that totals a hundredth short, or has a non-number', () => {
+        const short: JarSplitTemplate[] = [
+            { key: JarKey.NECESSITIES, sortOrder: 0, percentage: '55.00' },
+            { key: JarKey.LONG_TERM_SAVINGS, sortOrder: 1, percentage: '20.00' },
+            { key: JarKey.PLAY, sortOrder: 2, percentage: '24.99' },
+        ];
+        expect(() => resolveJarSplit(short)).toThrow('not 100%');
+        expect(() =>
+            resolveJarSplit([{ key: JarKey.PLAY, sortOrder: 0, percentage: 'abc' }])
+        ).toThrow('not 100%');
+    });
+
+    it('does not apply to a custom split, which has its own jar_split_total rule', () => {
+        const bad: JarSplitTemplate[] = [
+            { key: JarKey.NECESSITIES, sortOrder: 0, percentage: '55.00' },
+            { key: JarKey.LONG_TERM_SAVINGS, sortOrder: 1, percentage: '31.00' },
+            { key: JarKey.PLAY, sortOrder: 2, percentage: '55.00' },
+        ];
+        expect(
+            resolveJarSplit(bad, [
+                { key: JarKey.NECESSITIES, percentage: 55 },
+                { key: JarKey.LONG_TERM_SAVINGS, percentage: 20 },
+                { key: JarKey.PLAY, percentage: 25 },
+            ]).map(share => share.percentage)
+        ).toEqual([55, 20, 25]);
+    });
+});

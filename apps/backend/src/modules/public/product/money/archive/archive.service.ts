@@ -1,6 +1,6 @@
 /**
  * Restore a Rumtelo JSON household export into the current household.
- * Remaps jars by JarKey; skips plan-gated / duplicate rows; dry-run by default.
+ * Remaps jars by JarKey (a pot this household has not turned on goes to its group's main pot); skips plan-gated / duplicate rows; dry-run by default.
  */
 
 import { createHash } from 'node:crypto';
@@ -11,6 +11,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
     AccountKind,
     CAPABILITIES,
+    GoalKind,
     GoalStatus,
     TransactionSource,
     TransactionStatus,
@@ -18,7 +19,8 @@ import {
     type ArchiveRestorePayload,
     type ArchiveRestoreResult,
     type ArchiveSectionCounts,
-    type JarKey,
+    JarKey,
+    resolveJarKeyForHousehold,
 } from '@rumtelo/contracts';
 
 import { PlanAccessService } from '../../../../../common/capability';
@@ -92,6 +94,10 @@ export class ArchiveService {
         // with a warning instead of aborting a half-applied import.
         const localJars = await this.jars.list();
         const localKeyToId = new Map(localJars.map(jar => [jar.key, jar.id]));
+        const localKeys = new Set(localKeyToId.keys());
+        const billJarIds = new Set(
+            localJars.filter(jar => jar.capabilities.allowsFixedCosts).map(jar => jar.id)
+        );
         let splitRows: Array<{ jarId: string; percentage: number }> | null = null;
         if (applyJarSplit && payload.jars.length > 0) {
             const checked = checkJarSplit(
@@ -259,11 +265,19 @@ export class ArchiveService {
             if (jar.id) exportIdToKey.set(jar.id, jar.key);
         }
 
-        const remapJarId = (exportJarId: string | null | undefined): string | null => {
+        // A pot the household has not turned on lands in its group's main pot, except with
+        // `exact`: a Give pledge measures spending out of its own pot, and on Play it would
+        // count every Play euro as given.
+        const remapJarId = (
+            exportJarId: string | null | undefined,
+            exact = false
+        ): string | null => {
             if (!exportJarId) return null;
             const key = exportIdToKey.get(exportJarId);
             if (!key) return null;
-            return localKeyToId.get(key) ?? null;
+            return (
+                localKeyToId.get(exact ? key : resolveJarKeyForHousehold(key, localKeys)) ?? null
+            );
         };
 
         let jarsSplitUpdated = false;
@@ -378,7 +392,10 @@ export class ArchiveService {
         );
         for (const row of payload.fixedCosts) {
             const jarId = remapJarId(row.jarId);
-            if (!jarId) {
+            // A bill that fell back to a main pot which takes no bills (Education -> Long-term
+            // savings) would be refused by `FixedCostService.create` and abort a restore that is
+            // not transactional, so it is skipped here like an unmapped jar.
+            if (!jarId || !billJarIds.has(jarId)) {
                 fixedCounts.skipped += 1;
                 warnings.push('fixed_cost_jar_unmapped');
                 continue;
@@ -431,13 +448,22 @@ export class ArchiveService {
                     warnings.push('goals_limit_reached');
                     continue;
                 }
+                // A Give pledge needs the household's own Give pot (`GoalService.create` refuses
+                // anything else, which would abort this non-transactional restore): skip it.
+                const isGive = row.kind === GoalKind.GIVE;
+                const goalJarId = remapJarId(row.jarId ?? null, isGive);
+                if (isGive && localJars.find(jar => jar.id === goalJarId)?.key !== JarKey.GIVE) {
+                    goalCounts.skipped += 1;
+                    warnings.push('goal_give_pot_missing');
+                    continue;
+                }
                 goalCounts.willImport += 1;
                 goalNames.add(row.name.toLowerCase());
                 occupied += 1;
                 if (!dryRun) {
                     await this.goals.create({
                         kind: row.kind,
-                        jarId: remapJarId(row.jarId ?? null),
+                        jarId: goalJarId,
                         name: row.name,
                         icon: row.icon ?? null,
                         target: row.target,

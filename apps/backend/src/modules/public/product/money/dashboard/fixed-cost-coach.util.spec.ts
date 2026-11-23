@@ -10,8 +10,8 @@ import {
 } from './fixed-cost-coach.util';
 
 const JARS = [
-    { id: 'jar-nec', key: JarKey.NECESSITIES, name: 'Necessities', percentage: 55 },
-    { id: 'jar-play', key: JarKey.PLAY, name: 'Play', percentage: 45 },
+    { id: 'jar-nec', key: JarKey.NECESSITIES, percentage: 55 },
+    { id: 'jar-play', key: JarKey.PLAY, percentage: 45 },
 ];
 
 function bill(overrides: Partial<CoachBill> & { id: string }): CoachBill {
@@ -48,7 +48,6 @@ describe('evaluateOverNecessities', () => {
         });
 
         expect(over).toEqual({
-            jarName: 'Necessities',
             envelopeCents: 1100_00,
             shortfallCents: 150_00,
             biggestBillId: 'rent',
@@ -103,6 +102,60 @@ describe('evaluateOverNecessities', () => {
         // Envelope floor(300.00 * 55%) = 165.00; committed 200.00.
         expect(over?.envelopeCents).toBe(165_00);
         expect(over?.shortfallCents).toBe(35_00);
+    });
+
+    it('counts only the Basics pots that can carry bills: Daily slack does not mask an overshoot', () => {
+        // Necessities 35% + Daily 20% = 55% of the household. Bills 800.00 on Necessities against
+        // its own 700.00 (35% of 2000.00): 100.00 over, although the group (1100.00) has slack.
+        const refined = [
+            { id: 'jar-nec', key: JarKey.NECESSITIES, percentage: 35 },
+            { id: 'jar-daily', key: JarKey.DAILY, percentage: 20 },
+            { id: 'jar-play', key: JarKey.PLAY, percentage: 45 },
+        ];
+        const over = evaluateOverNecessities({
+            netMonthlyCents: 2000_00,
+            jars: refined,
+            bills: [bill({ id: 'rent', amount: 800_00 })],
+            asOf: ASOF,
+        });
+
+        expect(over).toEqual({
+            envelopeCents: 700_00,
+            shortfallCents: 100_00,
+            biggestBillId: 'rent',
+        });
+    });
+
+    it('reads the same with Basics as one pot or refined, while the bills fit', () => {
+        const refined = [
+            { id: 'jar-nec', key: JarKey.NECESSITIES, percentage: 35 },
+            { id: 'jar-daily', key: JarKey.DAILY, percentage: 20 },
+            { id: 'jar-play', key: JarKey.PLAY, percentage: 45 },
+        ];
+        const bills = [bill({ id: 'rent', amount: 700_00 })];
+        expect(
+            evaluateOverNecessities({ netMonthlyCents: 2000_00, jars: refined, bills, asOf: ASOF })
+        ).toBeNull();
+        // One pot: 55% = 1100.00, bills 1250.00 -> 150.00 over, as before refining.
+        expect(
+            evaluateOverNecessities({
+                netMonthlyCents: 2000_00,
+                jars: JARS,
+                bills: [bill({ id: 'rent', amount: 1250_00 })],
+                asOf: ASOF,
+            })
+        ).toMatchObject({ envelopeCents: 1100_00, shortfallCents: 150_00 });
+    });
+
+    it('stays quiet when only a Basics group is missing (no Basics pot to measure)', () => {
+        expect(
+            evaluateOverNecessities({
+                netMonthlyCents: 1000_00,
+                jars: [{ id: 'jar-play', key: JarKey.PLAY, percentage: 100 }],
+                bills: [bill({ id: 'rent', jarId: 'jar-play', amount: 900_00 })],
+                asOf: ASOF,
+            })
+        ).toBeNull();
     });
 
     it('picks the same biggest bill on a tie', () => {

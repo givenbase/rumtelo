@@ -98,7 +98,7 @@ Both BA and Rumtelo ids validate as `z.uuid()` and share uuidv7 minting going fo
 
 Frontend session field stays `activeOrganizationId` (BA SDK name); DB column is `active_household_id`.
 - Jar **instances** → `public/product/money/plan/jar` — **household** writes (table in `public`)
-- Jar **templates** → `backoffice/product/money/template/jar` — **we** write; onboard copies into household jars
+- Jar **templates** → `backoffice/product/money/template/jar` — **we** write; onboard copies the `isDefault` ones (three main pots) into household jars, `jars.activate` copies an optional one later
 - Product **tiers** → `backoffice/plan` — **we** write; not the same as `product/money/plan` (jars/income)
 - Outbound **email** → `backoffice/communication/email` — **we** send (invites; digests later)
 - Seed data for catalogs lives next to the aggregate (`…/seed/`); runners in `src/database/seeders/` mirroring backoffice (`product/money`, `product/growth`, `plan`)

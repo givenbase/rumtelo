@@ -1,4 +1,4 @@
-import { JarKey } from '@rumtelo/contracts';
+import { JarGroup, type JarKey, jarCapabilitiesFor, jarGroupFor } from '@rumtelo/contracts';
 import { allocateByPercentage, fixedCostAppliesAsOf, monthlyAmount } from '@rumtelo/utils';
 
 import { isSubscriptionFixedCost } from '../plan/fixed-cost/fixed-cost-cancellable.util';
@@ -19,15 +19,15 @@ export type CoachBill = {
     merchantKey: string | null;
 };
 
-type CoachJar = { id: string; key: JarKey; name: string; percentage: number };
+/** No `name`: a pot's stored name changes with its group (Basics, then Fixed costs once refined). */
+type CoachJar = { id: string; key: JarKey; percentage: number };
 
 export type OverNecessities = {
-    jarName: string;
-    /** What Necessities is allocated per month (minor units). */
+    /** What the Basics pots that can carry bills are allocated per month (minor units). */
     envelopeCents: number;
-    /** Monthly OUT on Necessities minus the envelope; always above zero. */
+    /** Monthly OUT on those pots minus the envelope; always above zero. */
     shortfallCents: number;
-    /** Largest monthly bill on the Necessities jar — the secondary move. */
+    /** Largest monthly bill on those pots — the secondary move. */
     biggestBillId: string;
 };
 
@@ -37,12 +37,17 @@ function applyingOutBills(bills: readonly CoachBill[], asOf: string): CoachBill[
 }
 
 /**
- * Fixed costs on the Necessities jar that exceed what the split gives it.
+ * Fixed costs on the Basics pots that can carry bills, against what the split gives those
+ * same pots.
  *
- * Same rule as the jar meter: the envelope is the household's monthly net income split with
- * `allocateByPercentage` (remainder to the largest share), and the commitment is the
- * monthly-normalised OUT on that jar as of `asOf`. Null while there is no income to split, no
- * Necessities jar, or the bills fit. Integer minor units throughout.
+ * Basics is the NECESSITIES pot plus, when the household has turned it on, DAILY. Only pots
+ * whose capabilities allow fixed costs count (`allowsFixedCosts`: today NECESSITIES only), on
+ * both sides: with Daily on, slack in Daily cannot mask bills that overshoot the Fixed costs
+ * pot, and with Basics as one pot nothing changes. Same rule as the jar meter: the monthly net
+ * income is split with `allocateByPercentage` (remainder to the largest share), the envelope
+ * is the sum of those pots, and the commitment is the monthly-normalised OUT on them as of
+ * `asOf`. Null while there is no income to split, no such pot, or the bills fit. Integer minor
+ * units throughout.
  */
 export function evaluateOverNecessities(input: {
     netMonthlyCents: number;
@@ -50,31 +55,39 @@ export function evaluateOverNecessities(input: {
     bills: readonly CoachBill[];
     asOf: string;
 }): OverNecessities | null {
-    const necessities = input.jars.find(jar => jar.key === JarKey.NECESSITIES);
-    if (!necessities || input.netMonthlyCents <= 0) return null;
+    const basicsIds = new Set(
+        input.jars
+            .filter(
+                jar =>
+                    jarGroupFor(jar.key) === JarGroup.BASIS &&
+                    jarCapabilitiesFor(jar.key).allowsFixedCosts
+            )
+            .map(jar => jar.id)
+    );
+    if (basicsIds.size === 0 || input.netMonthlyCents <= 0) return null;
 
-    const envelopeCents =
-        allocateByPercentage(
-            input.netMonthlyCents,
-            input.jars.map(jar => ({ id: jar.id, percentage: jar.percentage }))
-        ).find(share => share.id === necessities.id)?.amount ?? 0;
+    const envelopeCents = allocateByPercentage(
+        input.netMonthlyCents,
+        input.jars.map(jar => ({ id: jar.id, percentage: jar.percentage }))
+    )
+        .filter(share => basicsIds.has(share.id))
+        .reduce((total, share) => total + share.amount, 0);
 
-    const onNecessities = applyingOutBills(input.bills, input.asOf)
-        .filter(bill => bill.jarId === necessities.id)
+    const onBasics = applyingOutBills(input.bills, input.asOf)
+        .filter(bill => basicsIds.has(bill.jarId))
         .map(bill => ({ bill, monthly: monthlyAmount(Math.abs(bill.amount), bill.cadence) }));
-    const committedCents = onNecessities.reduce((total, row) => total + row.monthly, 0);
+    const committedCents = onBasics.reduce((total, row) => total + row.monthly, 0);
     const shortfallCents = committedCents - envelopeCents;
     if (shortfallCents <= 0) return null;
 
     // Biggest first; the name breaks a tie so the same data always picks the same bill.
-    const [biggest] = [...onNecessities].sort(
+    const [biggest] = [...onBasics].sort(
         (left, right) =>
             right.monthly - left.monthly || left.bill.name.localeCompare(right.bill.name)
     );
     if (!biggest) return null;
 
     return {
-        jarName: necessities.name,
         envelopeCents,
         shortfallCents,
         biggestBillId: biggest.bill.id,
