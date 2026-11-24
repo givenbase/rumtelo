@@ -37,7 +37,12 @@ import { api } from '@/app/_lib/api';
 import { apiQuery } from '@/app/_lib/api-hooks';
 import { CAPABILITIES, lockCopyFor, memberLimitLabel, planLabel } from '@/app/_lib/plan';
 import { isLiveData } from '@/app/_lib/preview';
-import { canInviteWithRole, canRemoveMemberWithRole } from '@/app/_lib/role-permissions';
+import {
+    canInviteWithRole,
+    canRemoveMemberWithRole,
+    HouseholdPermissionSection,
+    roleCanSee,
+} from '@/app/_lib/role-permissions';
 import { settingsHref } from '@/app/_lib/settings-tabs';
 import { ConfirmActionButton } from '@/components/features/forms/confirm-action-button';
 import { SeatCapacitySummary } from '@/components/features/shell/seat-capacity-summary';
@@ -107,6 +112,8 @@ export function HouseholdSettings() {
     const myMember = members.find(member => member.userId === user?.id);
     const myRole = myMember?.role ?? HouseholdRole.VIEWER;
     const roleCanInvite = canInviteWithRole(myRole);
+    // Seats are bought under Plan; a role without billing never sees that tab.
+    const canOpenBilling = roleCanSee(myRole, HouseholdPermissionSection.HOUSEHOLD_BILLING);
     // Seats as the server counts them: pending invitations hold a seat too.
     const seatsQuery = useLiveQuery(
         apiQuery.household.seats.queryOptions({ input: { householdId: householdId! } }),
@@ -318,9 +325,17 @@ export function HouseholdSettings() {
                             <p className="text-sm text-fg-muted">
                                 {t('pages.settings.plan.add_seat_stub')}
                             </p>
-                            <Button type="button" variant="secondary" disabled>
-                                {t('pages.settings.plan.add_seat_cta')}
-                            </Button>
+                            {/* Extra seats are bought under Plan on a paid subscription; Basic
+                                has none, so its path is the upgrade button above. */}
+                            {activePlan === PlanKey.BASIC ? null : canOpenBilling ? (
+                                <Button as={Link} href={settingsHref('plan')} variant="secondary">
+                                    {t('pages.settings.plan.add_seat_cta')}
+                                </Button>
+                            ) : (
+                                <p className="text-sm text-fg-muted">
+                                    {t('pages.settings.plan.add_seat_owner')}
+                                </p>
+                            )}
                         </div>
                     ) : (
                         <Form {...inviteForm}>
