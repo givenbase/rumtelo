@@ -1,6 +1,6 @@
 import { type EntityManager } from '@mikro-orm/postgresql';
 
-import { apiNotFound } from '../../../../common/errors/api-user-error';
+import { apiBadRequest, apiNotFound } from '../../../../common/errors/api-user-error';
 import { HouseholdScopedRepository } from '../../../../common/household/household-scoped.repository';
 import { BankAccount } from './ledger/bank-account/bank-account.entity';
 import { FixedCost } from './plan/fixed-cost/fixed-cost.entity';
@@ -47,6 +47,21 @@ export async function requireOwnCategory(em: EntityManager, categoryId: string):
     });
     if (!category) throw apiNotFound('category_not_found');
     return category;
+}
+
+/**
+ * A category is "a spending line inside a pot" (`Category.jar` is required), so a row that
+ * names both a pot and a category must name a category of that pot. A category of another
+ * pot, even of the same household, is refused with the same copy as an unknown category
+ * ("Pick another category"). Nothing is checked while either side is absent: a row without
+ * a pot (an Inbox transaction) has nothing to compare against.
+ */
+export function assertCategoryInJar(
+    category: Pick<Category, 'jar'> | null | undefined,
+    jar: Pick<Jar, 'id'> | null | undefined
+): void {
+    if (!category || !jar) return;
+    if (category.jar.id !== jar.id) throw apiBadRequest('category_not_found');
 }
 
 /** The household's own debt, or `debt_not_found`. */

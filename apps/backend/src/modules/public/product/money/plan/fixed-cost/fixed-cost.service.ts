@@ -26,7 +26,12 @@ import { HouseholdScopedRepository } from '../../../../../../common/household/ho
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
 import { resolveAssetLink } from '../../asset-link.util';
 import { Transaction } from '../../ledger/transaction/transaction.entity';
-import { requireOwnCategory, requireOwnDebt, requireOwnJar } from '../../own-reference.util';
+import {
+    assertCategoryInJar,
+    requireOwnCategory,
+    requireOwnDebt,
+    requireOwnJar,
+} from '../../own-reference.util';
 import { DebtService } from '../../targets/debt/debt.service';
 import { type Jar } from '../jar/jar.entity';
 import { JarService } from '../jar/jar.service';
@@ -82,6 +87,7 @@ export class FixedCostService {
         const category = input.categoryId
             ? await requireOwnCategory(this.em, input.categoryId)
             : null;
+        assertCategoryInJar(category, jar);
         const debt = input.debtId ? await requireOwnDebt(this.em, input.debtId) : null;
         const cadence = (input.cadence as Cadence) ?? Cadence.MONTHLY;
         const dueMonth = normalizeDueMonth(input.dueMonth, cadence);
@@ -454,6 +460,12 @@ export class FixedCostService {
         const category = patch.categoryId
             ? await requireOwnCategory(this.em, patch.categoryId)
             : null;
+        if (patch.categoryId !== undefined) {
+            assertCategoryInJar(category, jar ?? entity.jar);
+        } else if (jar && entity.category) {
+            // Moving the bill to another pot while keeping its old category would split them.
+            assertCategoryInJar(await requireOwnCategory(this.em, entity.category.id), jar);
+        }
         const debt = patch.debtId ? await requireOwnDebt(this.em, patch.debtId) : null;
         if (jar) entity.jar = jar;
         if (patch.categoryId !== undefined) entity.category = category;

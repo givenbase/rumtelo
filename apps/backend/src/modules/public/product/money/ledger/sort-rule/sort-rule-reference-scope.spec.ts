@@ -69,10 +69,10 @@ describe('SortRuleService.create', () => {
         const { em, service } = setup();
 
         const rule = await asOwnerOf(HOUSEHOLD_A, () =>
-            service.create(input({ categoryId: 'category-a' }))
+            service.create(input({ categoryId: 'category-a-play' }))
         );
 
-        expect(rule).toMatchObject({ jarId: 'jar-a-play', categoryId: 'category-a' });
+        expect(rule).toMatchObject({ jarId: 'jar-a-play', categoryId: 'category-a-play' });
         expect(em.flush).toHaveBeenCalled();
     });
 });
@@ -104,10 +104,10 @@ describe('SortRuleService.update', () => {
         const { service } = setup([row]);
 
         const rule = await asOwnerOf(HOUSEHOLD_A, () =>
-            service.update(row.id, { jarId: 'jar-a-play', categoryId: 'category-a' })
+            service.update(row.id, { jarId: 'jar-a-play', categoryId: 'category-a-play' })
         );
 
-        expect(rule).toMatchObject({ jarId: 'jar-a-play', categoryId: 'category-a' });
+        expect(rule).toMatchObject({ jarId: 'jar-a-play', categoryId: 'category-a-play' });
     });
 });
 
@@ -149,5 +149,90 @@ describe('SortRuleService.upsertPayeeHint', () => {
         const rule = await asOwnerOf(HOUSEHOLD_A, () => service.upsertPayeeHint(hint({})));
 
         expect(rule).toMatchObject({ jarId: 'jar-a-play' });
+    });
+});
+
+/**
+ * A category is a line inside one pot: a rule that names a pot and a category of another pot
+ * (own household) is refused with "pick another category". `category-a` sits in the Basics
+ * main pot, `category-a-play` in Play.
+ */
+describe('SortRuleService refuses a category that belongs to another pot', () => {
+    const badRequest = (key: string) =>
+        expect.objectContaining({ response: expect.objectContaining({ message: key }) });
+
+    it('create: writes nothing', async () => {
+        const { em, service } = setup();
+
+        await expect(
+            asOwnerOf(HOUSEHOLD_A, () => service.create(input({ categoryId: 'category-a' })))
+        ).rejects.toEqual(badRequest('category_not_found'));
+
+        expect(em.create).not.toHaveBeenCalled();
+        expect(em.flush).not.toHaveBeenCalled();
+    });
+
+    it("update: a new category must sit in the rule's current pot when the pot is not changed", async () => {
+        const row = ruleRow();
+        const { em, service } = setup([row]);
+
+        await expect(
+            asOwnerOf(HOUSEHOLD_A, () => service.update(row.id, { categoryId: 'category-a-play' }))
+        ).rejects.toEqual(badRequest('category_not_found'));
+
+        expect(row.category).toBeNull();
+        expect(em.flush).not.toHaveBeenCalled();
+    });
+
+    it('update: moving the pot while keeping the old category is refused; clearing it works', async () => {
+        const row = ruleRow({ category: { id: 'category-a' } });
+        const { em, service } = setup([row]);
+
+        await expect(
+            asOwnerOf(HOUSEHOLD_A, () => service.update(row.id, { jarId: 'jar-a-play' }))
+        ).rejects.toEqual(badRequest('category_not_found'));
+        expect(row.jar).toEqual({ id: 'jar-a-necessities' });
+        expect(em.flush).not.toHaveBeenCalled();
+
+        const moved = await asOwnerOf(HOUSEHOLD_A, () =>
+            service.update(row.id, { jarId: 'jar-a-play', categoryId: null })
+        );
+        expect(moved).toMatchObject({ jarId: 'jar-a-play', categoryId: null });
+    });
+
+    it('update: an edit that touches neither pot nor category is not re-judged', async () => {
+        // A legacy rule whose category sits in another pot still saves a priority change.
+        const row = ruleRow({ category: { id: 'category-a-play' } });
+        const { service } = setup([row]);
+
+        const rule = await asOwnerOf(HOUSEHOLD_A, () => service.update(row.id, { priority: 50 }));
+
+        expect(rule).toMatchObject({ priority: 50, categoryId: 'category-a-play' });
+    });
+
+    it('upsertPayeeHint: refuses it for a new and for an existing payee rule', async () => {
+        const hint = {
+            field: 'COUNTERPARTY' as const,
+            jarId: 'jar-a-play',
+            categoryId: 'category-a',
+            explicit: true,
+        };
+        const fresh = setup();
+        await expect(
+            asOwnerOf(HOUSEHOLD_A, () =>
+                fresh.service.upsertPayeeHint({ ...hint, matchValue: 'coffee' })
+            )
+        ).rejects.toEqual(badRequest('category_not_found'));
+        expect(fresh.em.create).not.toHaveBeenCalled();
+
+        const row = ruleRow();
+        const existing = setup([row]);
+        await expect(
+            asOwnerOf(HOUSEHOLD_A, () =>
+                existing.service.upsertPayeeHint({ ...hint, matchValue: 'albert' })
+            )
+        ).rejects.toEqual(badRequest('category_not_found'));
+        expect(row.jar).toEqual({ id: 'jar-a-necessities' });
+        expect(existing.em.flush).not.toHaveBeenCalled();
     });
 });

@@ -590,6 +590,11 @@ export function ExpenseForm({
             }
 
             if (mode === 'edit' && entityId) {
+                // `update` never carries the category: the server checks a category against the
+                // row's CURRENT pot, and this edit may move the row to another pot. `sort` below
+                // sets pot and category together (and always runs, so an Inbox row ends up sorted).
+                // The fields go first on purpose: `sort` links the debt with the row's amount and
+                // learns the payee hint from its vendor, so both must already be the edited values.
                 await api.money.transactions.update({
                     id: entityId,
                     householdId,
@@ -600,7 +605,6 @@ export function ExpenseForm({
                     merchantKey,
                     partyId,
                     saveParty,
-                    categoryId,
                     inflowKey: isIn ? inflowKey : null,
                     assetId: values.assetId ?? null,
                 });
@@ -654,7 +658,19 @@ export function ExpenseForm({
             );
             dismiss();
         },
-        onError: (error: unknown) => showToast(apiError(error), 'error'),
+        onError: (error: unknown) => {
+            // Edit is two calls (fields, then pot + category). If the second one is refused the
+            // first is already saved, so refresh the lists instead of leaving them stale.
+            if (mode === 'edit') {
+                void queryClient.invalidateQueries({
+                    queryKey: apiQuery.money.transactions.list.key(),
+                });
+                void queryClient.invalidateQueries({
+                    queryKey: apiQuery.money.transactions.inbox.key(),
+                });
+            }
+            showToast(apiError(error), 'error');
+        },
     });
 
     const removeMutation = useMutation({

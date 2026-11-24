@@ -39,7 +39,7 @@ function matches(row: Row, where: Where): boolean {
     });
 }
 
-/** Two households, each with its own pot, category, bank account, debt and fixed cost. */
+/** Two households, each with its own pots, categories (one per pot), bank account, debt and fixed cost. */
 export function seedTwoHouseholds(): Map<unknown, Row[]> {
     return new Map<unknown, Row[]>([
         [
@@ -55,8 +55,25 @@ export function seedTwoHouseholds(): Map<unknown, Row[]> {
         [
             Category,
             [
-                { id: 'category-a', household: HOUSEHOLD_A, name: 'Groceries' },
-                { id: 'category-b', household: HOUSEHOLD_B, name: 'Groceries' },
+                // A category sits inside one pot (`Category.jar` is required).
+                {
+                    id: 'category-a',
+                    household: HOUSEHOLD_A,
+                    name: 'Groceries',
+                    jar: { id: 'jar-a-necessities' },
+                },
+                {
+                    id: 'category-a-play',
+                    household: HOUSEHOLD_A,
+                    name: 'Coffee',
+                    jar: { id: 'jar-a-play' },
+                },
+                {
+                    id: 'category-b',
+                    household: HOUSEHOLD_B,
+                    name: 'Groceries',
+                    jar: { id: 'jar-b-necessities' },
+                },
             ],
         ],
         [

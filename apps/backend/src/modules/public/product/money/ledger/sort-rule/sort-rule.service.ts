@@ -4,7 +4,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
 import { MerchantPresetService } from '../../../../../backoffice/product/money/preset/merchant/merchant.service';
-import { requireOwnCategory, requireOwnJar } from '../../own-reference.util';
+import { assertCategoryInJar, requireOwnCategory, requireOwnJar } from '../../own-reference.util';
 import { Category } from '../../plan/jar/category.entity';
 import { Jar } from '../../plan/jar/jar.entity';
 import { type RuleField, type RuleMatcher, TransactionStatus } from '@rumtelo/contracts';
@@ -50,6 +50,7 @@ export class SortRuleService {
         const category = input.categoryId
             ? await requireOwnCategory(this.em, input.categoryId)
             : null;
+        assertCategoryInJar(category, jar);
         const entity = this.em.create(SortRule, {
             household: currentHouseholdId(),
             field: input.field as RuleField,
@@ -94,6 +95,7 @@ export class SortRuleService {
             const category = input.categoryId
                 ? await requireOwnCategory(this.em, input.categoryId)
                 : null;
+            assertCategoryInJar(category, jar);
             await this.em.populate(existing, ['jar', 'category']);
             existing.jar = jar;
             existing.category = category;
@@ -146,6 +148,12 @@ export class SortRuleService {
         const category = patch.categoryId
             ? await requireOwnCategory(this.em, patch.categoryId)
             : null;
+        if (patch.categoryId !== undefined) {
+            assertCategoryInJar(category, jar ?? entity.jar);
+        } else if (jar && entity.category) {
+            // Moving the rule to another pot while keeping its old category would split them.
+            assertCategoryInJar(await requireOwnCategory(this.em, entity.category.id), jar);
+        }
         if (patch.field !== undefined) entity.field = patch.field as RuleField;
         if (patch.matcher !== undefined) entity.matcher = patch.matcher as RuleMatcher;
         if (patch.matchValue !== undefined) entity.matchValue = patch.matchValue.trim();

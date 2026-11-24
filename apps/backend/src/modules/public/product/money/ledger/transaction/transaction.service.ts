@@ -10,6 +10,7 @@ import { currentHouseholdId } from '../../../../../../common/household/household
 import { MerchantPresetService } from '../../../../../backoffice/product/money/preset/merchant/merchant.service';
 import { resolveAssetLink } from '../../asset-link.util';
 import {
+    assertCategoryInJar,
     requireOwnBankAccount,
     requireOwnCategory,
     requireOwnDebt,
@@ -82,6 +83,7 @@ export class TransactionService {
         const category = input.categoryId
             ? await requireOwnCategory(this.em, input.categoryId)
             : null;
+        assertCategoryInJar(category, jar);
         const account = input.accountId
             ? await requireOwnBankAccount(this.em, input.accountId)
             : null;
@@ -401,6 +403,7 @@ export class TransactionService {
         await assertBookedOnPeriodOpen(this.em, entity.bookedOn);
         const jar = await requireOwnJar(this.em, jarId);
         const category = categoryId ? await requireOwnCategory(this.em, categoryId) : null;
+        assertCategoryInJar(category, jar);
         await assertOwnLinks(this.em, debtId, fixedCostId);
         assertJarAllowsOutflow(jar, entity.amount);
         entity.jar = jar;
@@ -464,6 +467,7 @@ export class TransactionService {
         const rows = await this.transactions.find({ id: { $in: ids } });
         const jar = await requireOwnJar(this.em, jarId);
         const category = categoryId ? await requireOwnCategory(this.em, categoryId) : null;
+        assertCategoryInJar(category, jar);
         await assertOpenPeriodsForBookedOns(
             this.em,
             rows.map(row => row.bookedOn)
@@ -517,6 +521,9 @@ export class TransactionService {
         }
 
         const category = categoryId ? await requireOwnCategory(this.em, categoryId) : null;
+        // The row keeps its pot here (only `sort` moves it), so a category sent with an edit must
+        // sit in the pot the row is in now. An Inbox row has no pot and nothing to compare to.
+        assertCategoryInJar(category, entity.jar);
         await assertOwnLinks(this.em, debtId, fixedCostId);
         // A new outflow on a row already sorted into a pot must pass the same rule as sorting it.
         if (entity.jar && fields.amount !== undefined) {

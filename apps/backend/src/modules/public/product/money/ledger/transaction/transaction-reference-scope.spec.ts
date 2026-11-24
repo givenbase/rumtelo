@@ -94,13 +94,17 @@ describe('TransactionService.create refuses ids from another household', () => {
 
         const created = await asOwnerOf(HOUSEHOLD_A, () =>
             service.create(
-                create({ jarId: 'jar-a-play', categoryId: 'category-a', accountId: 'account-a' })
+                create({
+                    jarId: 'jar-a-play',
+                    categoryId: 'category-a-play',
+                    accountId: 'account-a',
+                })
             )
         );
 
         expect(created).toMatchObject({
             jarId: 'jar-a-play',
-            categoryId: 'category-a',
+            categoryId: 'category-a-play',
             accountId: 'account-a',
             status: TransactionStatus.SORTED,
             source: TransactionSource.MANUAL,
@@ -131,10 +135,10 @@ describe('TransactionService.sort refuses ids from another household', () => {
         const { service } = setup([row]);
 
         const sorted = await asOwnerOf(HOUSEHOLD_A, () =>
-            service.sort(row.id, 'jar-a-play', 'category-a')
+            service.sort(row.id, 'jar-a-play', 'category-a-play')
         );
 
-        expect(sorted).toMatchObject({ jarId: 'jar-a-play', categoryId: 'category-a' });
+        expect(sorted).toMatchObject({ jarId: 'jar-a-play', categoryId: 'category-a-play' });
         expect(row.status).toBe(TransactionStatus.SORTED);
     });
 });
@@ -215,7 +219,7 @@ describe('TransactionService.bulkSort', () => {
         const { em, service } = setup(rows);
 
         const result = await asOwnerOf(HOUSEHOLD_A, () =>
-            service.bulkSort(['transaction-a1', 'transaction-a2'], 'jar-a-play', 'category-a')
+            service.bulkSort(['transaction-a1', 'transaction-a2'], 'jar-a-play', 'category-a-play')
         );
 
         expect(result).toEqual({ updated: 2 });
@@ -252,6 +256,149 @@ describe('TransactionService.update category', () => {
         );
 
         expect(updated.categoryId).toBe('category-a');
+    });
+});
+
+/**
+ * A category is a line inside one pot. Naming a pot and a category of another pot (own
+ * household, so the household check passes) is refused with "pick another category".
+ * `category-a` sits in the Basics main pot, `category-a-play` in Play.
+ */
+describe('TransactionService refuses a category that belongs to another pot', () => {
+    const badRequest = (key: string) =>
+        expect.objectContaining({ response: expect.objectContaining({ message: key }) });
+
+    it('create: Play pot with a Basics category writes nothing', async () => {
+        const { em, service } = setup();
+
+        await expect(
+            asOwnerOf(HOUSEHOLD_A, () =>
+                service.create(create({ jarId: 'jar-a-play', categoryId: 'category-a' }))
+            )
+        ).rejects.toEqual(badRequest('category_not_found'));
+
+        expect(em.create).not.toHaveBeenCalled();
+        expect(em.flush).not.toHaveBeenCalled();
+    });
+
+    it('create: a category without a pot is not judged (the row lands in the Inbox)', async () => {
+        const { service } = setup();
+
+        const created = await asOwnerOf(HOUSEHOLD_A, () =>
+            service.create(create({ categoryId: 'category-a' }))
+        );
+
+        expect(created).toMatchObject({ jarId: null, categoryId: 'category-a' });
+    });
+
+    it('sort: the row stays in the Inbox and no payee rule is learned', async () => {
+        const row = transactionRow();
+        const { em, service, rules } = setup([row]);
+
+        await expect(
+            asOwnerOf(HOUSEHOLD_A, () => service.sort(row.id, 'jar-a-play', 'category-a'))
+        ).rejects.toEqual(badRequest('category_not_found'));
+
+        expect(row).toMatchObject({ jar: null, category: null, status: TransactionStatus.INBOX });
+        expect(rules.upsertPayeeHint).not.toHaveBeenCalled();
+        expect(em.flush).not.toHaveBeenCalled();
+    });
+
+    it('sort: a category of the chosen pot is accepted, also when it is the Basics pot', async () => {
+        const row = transactionRow();
+        const { service } = setup([row]);
+
+        const sorted = await asOwnerOf(HOUSEHOLD_A, () =>
+            service.sort(row.id, 'jar-a-necessities', 'category-a')
+        );
+
+        expect(sorted).toMatchObject({ jarId: 'jar-a-necessities', categoryId: 'category-a' });
+    });
+
+    it('bulkSort: writes none of the rows', async () => {
+        const rows = [
+            transactionRow({ id: 'transaction-a1' }),
+            transactionRow({ id: 'transaction-a2' }),
+        ];
+        const { em, service } = setup(rows);
+
+        await expect(
+            asOwnerOf(HOUSEHOLD_A, () =>
+                service.bulkSort(['transaction-a1', 'transaction-a2'], 'jar-a-play', 'category-a')
+            )
+        ).rejects.toEqual(badRequest('category_not_found'));
+
+        expect(rows.every(row => row.jar === null)).toBe(true);
+        expect(em.flush).not.toHaveBeenCalled();
+    });
+});
+
+describe('TransactionService.update checks a category against the pot the row is in', () => {
+    const badRequest = (key: string) =>
+        expect.objectContaining({ response: expect.objectContaining({ message: key }) });
+    const PLAY = { id: 'jar-a-play', key: JarKey.PLAY };
+
+    it('refuses a category of another pot and leaves the row as it was', async () => {
+        const row = transactionRow({
+            jar: PLAY,
+            status: TransactionStatus.SORTED,
+            note: 'before',
+        });
+        const { em, service } = setup([row]);
+
+        await expect(
+            asOwnerOf(HOUSEHOLD_A, () =>
+                service.update(row.id, { note: 'after', categoryId: 'category-a' })
+            )
+        ).rejects.toEqual(badRequest('category_not_found'));
+
+        expect(row).toMatchObject({ note: 'before', category: null });
+        expect(em.flush).not.toHaveBeenCalled();
+    });
+
+    it('accepts a category of the pot the row is in', async () => {
+        const row = transactionRow({ jar: PLAY, status: TransactionStatus.SORTED });
+        const { service } = setup([row]);
+
+        const updated = await asOwnerOf(HOUSEHOLD_A, () =>
+            service.update(row.id, { categoryId: 'category-a-play' })
+        );
+
+        expect(updated.categoryId).toBe('category-a-play');
+    });
+
+    it('does not judge a row without a pot (Inbox)', async () => {
+        const row = transactionRow();
+        const { service } = setup([row]);
+
+        const updated = await asOwnerOf(HOUSEHOLD_A, () =>
+            service.update(row.id, { categoryId: 'category-a' })
+        );
+
+        expect(updated.categoryId).toBe('category-a');
+    });
+
+    it('does not judge a patch without a category, or one that clears it', async () => {
+        // A legacy row: Play pot with a Basics category. A note edit or clearing still saves.
+        const legacy = () =>
+            transactionRow({
+                jar: PLAY,
+                category: { id: 'category-a' },
+                status: TransactionStatus.SORTED,
+            });
+        const noted = legacy();
+        const cleared = legacy();
+        const { service } = setup([noted, { ...cleared, id: 'transaction-a2' }]);
+
+        const withNote = await asOwnerOf(HOUSEHOLD_A, () =>
+            service.update(noted.id, { note: 'fine' })
+        );
+        const withoutCategory = await asOwnerOf(HOUSEHOLD_A, () =>
+            service.update('transaction-a2', { categoryId: null })
+        );
+
+        expect(withNote).toMatchObject({ note: 'fine', categoryId: 'category-a' });
+        expect(withoutCategory.categoryId).toBeNull();
     });
 });
 

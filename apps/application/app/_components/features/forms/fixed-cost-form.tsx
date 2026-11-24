@@ -38,6 +38,7 @@ import {
     matchesAudience,
 } from '@rumtelo/contracts';
 
+import { categoryIdInJar } from '@/app/_lib/category-in-jar';
 import { audienceKeysFromFixedCostPreset } from '@/app/_lib/household-audience-from-money';
 import { billJarForKey, jarForKey } from '@/app/_lib/jar-for-key';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
@@ -556,6 +557,18 @@ export function FixedCostForm({
 
     const showPayeeInput = customPayee || vendorsForCategory.length === 0;
 
+    // The server refuses a category that is not in the bill's pot. A prefill (a transaction in a
+    // pot that takes no bills, a stored legacy row) or the pot fallback below can leave the id of
+    // another pot's category behind: drop it, the category follows the pot again from there.
+    useEffect(() => {
+        if (!selectedCategoryId || !selectedJarId) return;
+        const jarBalance = (balancesQuery.data ?? []).find(row => row.id === selectedJarId);
+        if (!jarBalance) return;
+        if (!categoryIdInJar(selectedCategoryId, jarBalance.categories)) {
+            form.setValue('categoryId', null);
+        }
+    }, [balancesQuery.data, selectedJarId, selectedCategoryId, form]);
+
     useEffect(() => {
         // Wait for jars — otherwise a prefilled Give jarId gets overwritten while the list is empty.
         if (billJars.length === 0) return;
@@ -738,7 +751,8 @@ export function FixedCostForm({
             const name = values.name.trim() || counterpartyValue || categoryLabel?.trim() || '';
             if (!name) throw new Error('Name required');
 
-            let categoryId = values.categoryId ?? null;
+            // Belt and braces with the effect above: never send a category of another pot.
+            let categoryId = categoryIdInJar(values.categoryId, jarBalanceForName?.categories);
             const templateKey =
                 pendingCategoryTemplateKey ??
                 (() => {

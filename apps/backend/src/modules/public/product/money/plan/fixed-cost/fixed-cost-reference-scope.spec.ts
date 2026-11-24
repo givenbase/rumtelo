@@ -129,15 +129,99 @@ describe('FixedCostService.update', () => {
         const bill = await asOwnerOf(HOUSEHOLD_A, () =>
             service.update(row.id, {
                 jarId: 'jar-a-play',
-                categoryId: 'category-a',
+                categoryId: 'category-a-play',
                 debtId: 'debt-a',
             })
         );
 
         expect(bill).toMatchObject({
             jarId: 'jar-a-play',
-            categoryId: 'category-a',
+            categoryId: 'category-a-play',
             debtId: 'debt-a',
         });
+    });
+});
+
+/**
+ * A category is a line inside one pot: a bill that names a pot and a category of another pot
+ * (own household) is refused with "pick another category". `category-a` sits in the Basics
+ * main pot, `category-a-play` in Play.
+ */
+describe('FixedCostService refuses a category that belongs to another pot', () => {
+    const badRequest = (key: string) =>
+        expect.objectContaining({ response: expect.objectContaining({ message: key }) });
+
+    it('create: writes nothing', async () => {
+        const { em, service } = setup();
+
+        await expect(
+            asOwnerOf(HOUSEHOLD_A, () => service.create(input({ categoryId: 'category-a-play' })))
+        ).rejects.toEqual(badRequest('category_not_found'));
+
+        expect(em.create).not.toHaveBeenCalled();
+        expect(em.flush).not.toHaveBeenCalled();
+    });
+
+    it('update: a new category must sit in the current pot when the pot is not changed', async () => {
+        const row = billRow();
+        const { em, service } = setup([row]);
+
+        await expect(
+            asOwnerOf(HOUSEHOLD_A, () => service.update(row.id, { categoryId: 'category-a-play' }))
+        ).rejects.toEqual(badRequest('category_not_found'));
+
+        expect(row.category).toEqual({ id: 'category-a' });
+        expect(em.flush).not.toHaveBeenCalled();
+    });
+
+    it('update: moving the pot while keeping the old category is refused; sending a category of the new pot works', async () => {
+        const row = billRow();
+        const { em, service } = setup([row]);
+
+        await expect(
+            asOwnerOf(HOUSEHOLD_A, () => service.update(row.id, { jarId: 'jar-a-play' }))
+        ).rejects.toEqual(badRequest('category_not_found'));
+        expect(row.jar).toEqual({ id: 'jar-a-necessities' });
+        expect(em.flush).not.toHaveBeenCalled();
+
+        const moved = await asOwnerOf(HOUSEHOLD_A, () =>
+            service.update(row.id, { jarId: 'jar-a-play', categoryId: 'category-a-play' })
+        );
+        expect(moved).toMatchObject({ jarId: 'jar-a-play', categoryId: 'category-a-play' });
+    });
+
+    it('update: an edit that touches neither pot nor category is not re-judged', async () => {
+        // A legacy bill whose category sits in another pot still saves a rename.
+        const row = billRow({ category: { id: 'category-a-play' } });
+        const { service } = setup([row]);
+
+        const bill = await asOwnerOf(HOUSEHOLD_A, () =>
+            service.update(row.id, { name: 'Renamed' })
+        );
+
+        expect(bill).toMatchObject({ name: 'Renamed', categoryId: 'category-a-play' });
+    });
+    it('update: a legacy bill saves once the form sends its pot with the category cleared or re-picked', async () => {
+        // The bill form always sends pot and category together, so a stale category has to be
+        // replaced or cleared by the person; both exits must save.
+        const cleared = billRow({ id: 'bill-legacy-1', category: { id: 'category-a-play' } });
+        const repicked = billRow({ id: 'bill-legacy-2', category: { id: 'category-a-play' } });
+        const { em, service } = setup([cleared, repicked]);
+        // Clearing the category makes the service re-link it by preset name, then refresh the row.
+        Object.assign(em, { refresh: vi.fn<() => Promise<void>>(async () => undefined) });
+
+        await expect(
+            asOwnerOf(HOUSEHOLD_A, () =>
+                service.update(cleared.id, { jarId: 'jar-a-necessities', categoryId: null })
+            )
+        ).resolves.toMatchObject({ categoryId: null });
+        await expect(
+            asOwnerOf(HOUSEHOLD_A, () =>
+                service.update(repicked.id, {
+                    jarId: 'jar-a-necessities',
+                    categoryId: 'category-a',
+                })
+            )
+        ).resolves.toMatchObject({ categoryId: 'category-a' });
     });
 });
