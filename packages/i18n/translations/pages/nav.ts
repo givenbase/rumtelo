@@ -3,16 +3,16 @@ const nav = {
     groups: {
         home: 'Home',
         money: 'My money',
-        growth: 'My growth',
+        growth: 'My planning',
         energy: 'My energy',
-        soul: 'My soul',
+        soul: 'My mindset',
     },
     pills: {
         home: 'Home',
         money: 'Money',
-        growth: 'Growth',
+        growth: 'Planning',
         energy: 'Energy',
-        soul: 'Soul',
+        soul: 'Mindset',
         you: 'You',
     },
     children: {
@@ -111,7 +111,8 @@ const nav = {
     aria: {
         mobile_tabs: 'Main',
         money_sections: 'Money sections',
-        growth_sections: 'Growth sections',
+        growth_sections: 'Planning sections',
+        soul_sections: 'Mindset sections',
     },
 } as const;
 

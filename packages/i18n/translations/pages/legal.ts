@@ -21,11 +21,11 @@ const legal = {
             },
             what: {
                 title: 'What Rumtelo is — and is not',
-                body: 'Rumtelo is a personal overview and educational coach for money, growth, energy and soul. It helps a household see where money goes, set goals, and review a week. It is software and education — not a regulated financial product.',
+                body: 'Rumtelo is a personal overview and educational coach for money, planning, energy and mindset. It helps a household see where money goes, set goals, and review a week. It is software and education — not a regulated financial product.',
                 items: [
                     'Not a bank, payment institution, e-money issuer, or custodian. We never hold your money or move it between accounts.',
                     'Not a broker, investment firm, or licensed financial adviser. Coach tips and suggestions are general education, not personal investment, tax, credit, or legal advice.',
-                    'Not a medical, psychological, or wellness practitioner. Energy and soul features are optional self-logging tools, not diagnosis or treatment.',
+                    'Not a medical, psychological, or wellness practitioner. Energy and mindset features are optional self-logging tools, not diagnosis or treatment.',
                     'Books and methods we mention stay those authors’ property. Rumtelo is independent and is not affiliated with or endorsed by them.',
                 ],
                 after: 'You remain solely responsible for decisions about money, health, and life. If you need regulated advice, consult a licensed professional in your country.',
@@ -150,7 +150,7 @@ const legal = {
             },
             scope: {
                 title: 'Whose data and which services',
-                body: 'This policy covers visitors to the website, people who create an account, and household members who are invited. It covers account, money, growth, energy and soul data you enter or import, technical logs, and billing records. It does not cover third-party websites we link to. If we act only as a processor for a future business customer, that relationship will be under a separate data-processing agreement — for household accounts, Rumtelo is the controller.',
+                body: 'This policy covers visitors to the website, people who create an account, and household members who are invited. It covers account, money, planning, energy and mindset data you enter or import, technical logs, and billing records. It does not cover third-party websites we link to. If we act only as a processor for a future business customer, that relationship will be under a separate data-processing agreement — for household accounts, Rumtelo is the controller.',
             },
             collect: {
                 title: 'What we collect',
@@ -159,7 +159,7 @@ const legal = {
                     'Identity and contact: name, email address, optional date of birth, language and locale preferences.',
                     'Account security: password hash (we never store your password in plain text), session identifiers, optional two-factor authentication status and secrets we must keep to operate 2FA, email verification status.',
                     'Household money data you enter or import: pots, transactions, goals, debts, income splits, week checks, and related product data.',
-                    'Optional growth, energy and soul data you choose to log (for example goals, sleep, training, food, rest, intention). You can use Rumtelo without filling those portals.',
+                    'Optional planning, energy and mindset data you choose to log (for example goals, sleep, training, food, rest, intention). You can use Rumtelo without filling those portals.',
                     'Household membership: who you invite, their email, and their role in the household.',
                     'Billing: plan, renewal dates, Stripe customer and subscription identifiers. Card numbers are collected by Stripe, not by us.',
                     'Support messages you send us, and files you attach.',
@@ -169,7 +169,7 @@ const legal = {
             },
             special: {
                 title: 'Special-category and sensitive data',
-                body: 'Energy logs (sleep, training, food, rest) and soul or intention notes can reveal health or philosophical information. Under GDPR that may be special-category data (Article 9). We process it only if you choose to use those features. By entering that data you give explicit consent for us to store and display it to you and to household members you invite, and to use it to generate Coach tips inside the product. You may stop logging and ask us to delete it. We do not use this data for advertising, scoring your credit, or inferring characteristics for third parties.',
+                body: 'Energy logs (sleep, training, food, rest) and mindset or intention notes can reveal health or philosophical information. Under GDPR that may be special-category data (Article 9). We process it only if you choose to use those features. By entering that data you give explicit consent for us to store and display it to you and to household members you invite, and to use it to generate Coach tips inside the product. You may stop logging and ask us to delete it. We do not use this data for advertising, scoring your credit, or inferring characteristics for third parties.',
                 after: 'US “sensitive personal information” (including precise financial account data and health-related logs) is used only to provide the features you request. We do not sell it or share it for cross-context behavioral advertising.',
             },
             sources: {
@@ -187,7 +187,7 @@ const legal = {
                 items: [
                     'Contract (Art. 6(1)(b)) — create and authenticate your account, run the household workspace, show pots, Coach tips and portals you use, provide export, and deliver transactional email (verify, reset, security).',
                     'Legitimate interests (Art. 6(1)(f)) — keep the Service secure, prevent abuse and fraud, debug outages, understand aggregated product usage without building advertising profiles, and establish or defend legal claims. You may object; we will stop unless we have overriding grounds.',
-                    'Consent (Art. 6(1)(a) and, where needed, Art. 9(2)(a)) — optional energy/soul logs; optional bank connect; any future marketing email or non-essential cookies. You may withdraw consent at any time without affecting processing before withdrawal.',
+                    'Consent (Art. 6(1)(a) and, where needed, Art. 9(2)(a)) — optional energy/mindset logs; optional bank connect; any future marketing email or non-essential cookies. You may withdraw consent at any time without affecting processing before withdrawal.',
                     'Legal obligation (Art. 6(1)(c)) — tax, accounting and consumer-law records for paid plans; respond to lawful requests from authorities.',
                 ],
             },
@@ -329,7 +329,7 @@ const legal = {
                 items: [
                     'Contract — create and run your account, household workspace, pots, Coach tips, export, and the product features you use.',
                     'Legitimate interest — security, fraud and abuse prevention, reliability, and product improvement that does not require advertising profiles; balanced against your rights, with an opt-out for improvement analytics if we ever add optional measurement.',
-                    'Consent — optional bank connect; optional energy and soul logs (and Article 9 explicit consent where those logs are special-category data); any future marketing or non-essential cookies.',
+                    'Consent — optional bank connect; optional energy and mindset logs (and Article 9 explicit consent where those logs are special-category data); any future marketing or non-essential cookies.',
                     'Legal obligation — tax, accounting, and consumer records for paid plans; lawful requests.',
                 ],
             },
@@ -379,7 +379,7 @@ const legal = {
                     'Trade name: Rumtelo',
                     'Place of establishment: Amsterdam, the Netherlands',
                     'Registered legal name, Chamber of Commerce (KvK) number, VAT number and visiting address: published here when available for the operating entity, and always available on request at support@rumtelo.com.',
-                    'Activity: household overview and educational coach (money, growth, energy, soul). Not a bank, payment institution, or licensed financial adviser.',
+                    'Activity: household overview and educational coach (money, planning, energy, mindset). Not a bank, payment institution, or licensed financial adviser.',
                 ],
             },
             contact: {

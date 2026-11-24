@@ -23,7 +23,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.nav.children.course': 'Koers',
         'pages.meta.course': 'Koers',
         'features.capabilities.growth-course.name': 'Koers',
-        'features.growth.course.eyebrow': 'Groei · Koers',
+        'features.growth.course.eyebrow': 'Planning · Koers',
         'features.growth.course.hub_card': 'Koers',
         // Course: Today · Week · Goals; badges Focus · Gewoonte · Discipline · Check · Advies.
         'features.growth.course.tab_today': 'Vandaag',
@@ -113,7 +113,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.growth.course.week_check.rhythm_lead':
             'Doorgaan, kleiner maken of pauzeren. Niets herhaalt zonder jouw ja.',
         'features.growth.course.week_check.ahead_title': 'Jouw 3 voor {week}',
-        'features.growth.course.entry.growth_week_check': 'Groei-weekcheck',
+        'features.growth.course.entry.growth_week_check': 'Planning-weekcheck',
         'features.growth.course.entry.money_week_check': 'Geld-weekcheck',
         'features.growth.course.entry.month_close': 'Maand afsluiten: {month}',
         'features.growth.course.entry.month_close_reminder': 'Plan je maandafsluiting: {month}',
@@ -690,7 +690,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.landing.practice_plan.extra_manage_hint':
             'Jij betaalt hun Plus — {discount}% minder dan de {retail} per maand die ze zelf zouden betalen. Je ziet hun volledige bord, alleen-lezen.',
         'pages.landing.plans.basic.f1': 'GELD · je potjes, transacties, vaste kosten',
-        'pages.landing.plans.basic.f4': 'ZIEL · stilte, dankbaarheid, één intentie per week',
+        'pages.landing.plans.basic.f4': 'MINDSET · stilte, dankbaarheid, één intentie per week',
         'pages.landing.plans.basic.f5': 'De Coach, de weekcheck, de maandscore',
         'pages.landing.plans.basic.f6':
             '1 volledige plek + 1 kijkplek (partner, coach of adviseur)',
@@ -702,11 +702,11 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.landing.plans.plus.line':
             'Je deelt geld met een partner of gezin, wilt je week plannen rond je doelen, lost schulden af of wilt je bankafschriften erin. De meeste mensen komen hier uit.',
         'pages.landing.plans.plus.f2':
-            'GROEI · Koers — plan je week rond de drie dingen die je doelen vooruit helpen',
+            'PLANNING · Koers — plan je week rond de drie dingen die je doelen vooruit helpen',
         'pages.landing.plans.plus.f3':
             'GELD · aflosplan met een schuldenvrije datum, en import van bankafschriften',
         'pages.landing.plans.plus.f4':
-            'GROEI · Leren — boeken, cursussen, vaardigheden · tot {maxGoals} doelen',
+            'MINDSET · Leren — boeken, cursussen, vaardigheden · tot {maxGoals} doelen',
         'pages.landing.plans.plus.f6':
             'Tot {maxMembers} plekken — mix van volledige en kijkplekken',
         'pages.landing.plans.plus.outcome.money':
@@ -719,28 +719,28 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Nettovermogen, rendement, je vrijheidsgetal en elk doel',
         'pages.landing.plans.max.outcome.energy': 'Alles uit Plus',
         'pages.landing.plans.max.outcome.soul': 'Plus de zeven centra',
-        'pages.landing.plans.max.f4': 'ZIEL · de zeven centra',
+        'pages.landing.plans.max.f4': 'MINDSET · de zeven centra',
         'pages.landing.plans.max.f5': 'Tot {maxMembers} plekken (meer volledige toegang)',
         // App: onboarding, Home dream, tour, Coach, Why, Practice, Settings (core launch copy).
         'pages.dashboard.why.label': 'Jouw droom',
         'features.tour.pages.home.sections.what_for_core.heading': 'Wat je hier ziet',
         'features.tour.pages.home.sections.what_for_core.body':
-            'Je grip-overzicht voor deze maand — De Coach, het geldbeeld en de deur naar Groei. Start de volledige rondleiding via Help: eerst Home, dan potjes, vaste kosten en inkomen.',
+            'Je grip-overzicht voor deze maand — De Coach, het geldbeeld en de deur naar Planning. Start de volledige rondleiding via Help: eerst Home, dan potjes, vaste kosten en inkomen.',
         'features.tour.pages.home.steps.portals_core.title': 'Jouw producten',
         'features.tour.pages.home.steps.portals_core.content':
-            'Geld staat in de bovenste navigatie. Groei open je vanaf hier, wanneer je dat volgende hulpmiddel wilt.',
+            'Geld staat in de bovenste navigatie. Planning open je vanaf hier, wanneer je dat volgende hulpmiddel wilt.',
         'features.coach.session.quiet_body_core':
             'Niets dringends wacht. Sluit de maand af als je er klaar voor bent, of open de weekcheck.',
         'pages.why.lead_core':
             'Je afvragen wat? Waar je geld bleef. Rumtelo helpt je dat te zien, zodat niets een mysterie blijft. Zo krijg je weer grip: controle over wat ertoe doet. Duidelijke tools daarvoor, en we blijven er meer toevoegen. De Coach kan een tip geven. Jij kiest wat je daarna doet.',
         'pages.practice.clients.progress_blurb':
-            'Live cijfers over geld, groei, energie en ziel voor dit huishouden.',
+            'Live cijfers over geld, planning, energie en mindset voor dit huishouden.',
         'pages.practice.clients.progress_blurb_core':
-            'Live cijfers over geld en groei voor dit huishouden.',
+            'Live cijfers over geld en planning voor dit huishouden.',
         'pages.settings.panels.coach.blurb_core':
-            'De Coach geeft nooit een standje — alleen duidelijke volgende stappen. Tips op het scherm (waarom-regels, potjeskaarten) blijven aan terwijl je leert; de tiplijst onder Home → De Coach bevat tipkaarten over geld en groei.',
+            'De Coach geeft nooit een standje — alleen duidelijke volgende stappen. Tips op het scherm (waarom-regels, potjeskaarten) blijven aan terwijl je leert; de tiplijst onder Home → De Coach bevat tipkaarten over geld en planning.',
         'pages.settings.panels.sharing.blurb_core':
-            'Wat leden mogen delen bij Groei en Geld. Alleen de eigenaar kan dit wijzigen. Iets voor jezelf houden kan altijd.',
+            'Wat leden mogen delen bij Planning en Geld. Alleen de eigenaar kan dit wijzigen. Iets voor jezelf houden kan altijd.',
         'pages.settings.panels.plan.card_basic_line':
             'Solo-bord — je potjes en de routine eronder. Geen bank nodig.',
         'pages.settings.panels.plan.card_plus_line_core':
@@ -1179,7 +1179,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.tour.explain.money.title': 'Geld — Rumtelo-potjes',
         'features.tour.explain.jars.title': 'Potjes — hoe de verdeling werkt',
         'features.tour.pages.home.sections.what_for.body':
-            'Je grip-overzicht voor deze maand — De Coach, het geldbeeld en de deuren naar Groei, Energie en Ziel. Begin de volledige rondleiding bij ‘Help’ en loop vervolgens door ‘Thuis’, daarna ‘Potjes’, ‘Vaste kosten’ en ‘Inkomsten’.',
+            'Je grip-overzicht voor deze maand — De Coach, het geldbeeld en de deuren naar Planning, Energie en Mindset. Begin de volledige rondleiding bij ‘Help’ en loop vervolgens door ‘Thuis’, daarna ‘Potjes’, ‘Vaste kosten’ en ‘Inkomsten’.',
         'features.tour.pages.shell.steps.period.content':
             'Wijzig de maand die je bekijkt. De totaalbedragen en uitgaven in het potje worden op basis van deze periode bijgehouden.',
         'features.tour.pages.income.sections.simulator.body':
@@ -1630,9 +1630,10 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.nav.later_hint.month_close': 'Komt na je eerste afgesloten maand.',
         'pages.nav.locked_hint': 'Niet in je abonnement. Opent de upgradepagina.',
         'pages.nav.to_sort_badge_sr': '{count} te sorteren',
-        'pages.nav.aria.growth_sections': 'Onderdelen van Groei',
+        'pages.nav.aria.growth_sections': 'Onderdelen van Planning',
+        'pages.nav.aria.soul_sections': 'Onderdelen van Mindset',
         'pages.settings.panels.coach.blurb':
-            'De Coach geeft nooit een standje — alleen duidelijke volgende stappen. Tips op het scherm (waarom-regels, potjeskaarten) blijven aan terwijl je leert; de tiplijst onder Home → De Coach bevat tipkaarten over geld, groei, energie en ziel.',
+            'De Coach geeft nooit een standje — alleen duidelijke volgende stappen. Tips op het scherm (waarom-regels, potjeskaarten) blijven aan terwijl je leert; de tiplijst onder Home → De Coach bevat tipkaarten over geld, planning, energie en mindset.',
         'pages.settings.panels.coach.hint_on':
             'Aan — zoek het ✦ De Coach-teken. Je tips staan onder Home → De Coach.',
         'pages.settings.panels.coach.hint_off':
@@ -1955,7 +1956,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.tour.chrome.settings.blurb':
             'Je kunt op elk moment nog eens door de rubrieken ‘Thuis’, ‘Potjes’, ‘Vaste kosten’ en ‘Inkomsten’ bladeren.',
         'features.tour.pages.fallback.sections.looking_at.body':
-            'Deze pagina maakt deel uit van je instellingen voor huishoudgeld en vermogensgroei. Gebruik ‘Periode’ (rechtsboven) om van maand te wisselen. De bedragen zijn afgestemd op de verdeling over de potjes die je in ‘Instellingen’ hebt ingesteld.',
+            'Deze pagina hoort bij je geld en planning voor het huishouden. Gebruik ‘Periode’ (rechtsboven) om van maand te wisselen. De bedragen zijn afgestemd op de verdeling over de potjes die je in ‘Instellingen’ hebt ingesteld.',
         'features.tour.pages.home.steps.hero.content':
             'Wat er in de potjes is terechtgekomen, wat er nog over is en wat je veilig kunt uitgeven in de periode die je bekijkt.',
         'features.tour.pages.income.steps.simulator.content':
@@ -2007,6 +2008,91 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Je eigen potjes en geldbord voor persoonlijk of familiemoney.',
         'pages.shell.forms.income_create.description':
             'Voeg een inkomstenbron toe waarmee je je potjes kunt vullen.',
+        // Product names renamed 2026-11-24: Growth -> Planning, Soul -> Mindset (display only; code keys stay).
+        'features.brand.auth_quotes_web.how_it_works.support':
+            'Geld. Planning. Energie. Mindset — hulpmiddelen om grip op het leven te krijgen.',
+        'features.brand.auth_manifesto.portals_line':
+            'Geld. Planning. Energie. Mindset — hulpmiddelen om grip op het leven te krijgen.',
+        'features.brand.auth_manifesto.portals_line_core':
+            'Geld. Planning — hulpmiddelen om grip op het leven te krijgen, en er komt nog meer aan.',
+        'features.brand.auth_manifesto.portals.growth.name': 'Planning',
+        'features.brand.auth_manifesto.portals.growth.short': 'PLANNING',
+        'features.brand.auth_manifesto.portals.soul.name': 'Mindset',
+        'features.brand.auth_manifesto.portals.soul.short': 'MINDSET',
+        'features.auth.sign_up.audience_individual_hint':
+            'Je eigen geld, planning, energie en mindset',
+        'features.capabilities.growth-overview.description': 'Planning-overzicht.',
+        'features.capabilities.soul-overview.description': 'Mindset-overzicht.',
+        'features.coach.lead':
+            'Eén tip per keer over geld, planning, energie en mindset — zodat je de draad niet kwijtraakt. Nooit een schuldgevoel. Jij kiest.',
+        'features.coach.session.metric_mind':
+            'Stilte / rustige geest — dezelfde score die Mindset schrijft.',
+        'features.growth.hub.eyebrow': 'Planning · op lange termijn',
+        'features.growth.goals.form.pledge_tip_link':
+            'Waarom ‘geven’ in een geld-app staat → Mindset',
+        'features.soul.hub.eyebrow': 'Mindset · het waarom',
+        'features.tour.explain.growth.title': 'Planning — groei in meer dan één richting',
+        'features.tour.explain.soul.title': 'Mindset — het waarom',
+        'features.tour.pages.home.steps.portals.content':
+            'Geld staat in de bovenste navigatie. Planning, Energie en Mindset open je vanaf hier, wanneer je dat volgende hulpmiddel wilt — één product tegelijk.',
+        'features.tour.pages.shell.steps.brand.content':
+            'Tik op elk moment op het logo om terug te gaan naar het startscherm. De rubrieken ‘Geld’ en ‘Planning’ vind je in de portalen bovenaan (of onderaan op mobiele apparaten).',
+        'features.tour.pages.growth.title': 'Planning',
+        'pages.landing.portals_section.headline':
+            'Geld. Planning. Energie. Mindset. Eén overzicht.',
+        'pages.landing.portals_section.headline_core': 'Geld. Planning. Eén overzicht.',
+        'pages.landing.portals_section.lead_core':
+            'Elk product helpt je bij een bepaald aspect van je leven. Vaak beginnen mensen met geld; ‘Planning’ helpt je om van daaruit verder te gaan. Er komen nog meer producten aan. De Coach geeft een tip. Jij beslist.',
+        'pages.landing.portals_section.lead':
+            'Elk product helpt je bij een bepaald aspect van je leven. Vaak beginnen mensen met ‘Geld’. Ga verder met ‘Planning’, ‘Energie’ of ‘Mindset’ als je daar vervolgens behoefte aan hebt. De Coach geeft een tip. Jij beslist.',
+        'pages.landing.portals.growth.name': 'Planning',
+        'pages.landing.portals.growth.alt_name': 'Planning',
+        'pages.landing.portals.soul.name': 'Mindset',
+        'pages.landing.portals.soul.alt_name': 'Mindset',
+        'pages.landing.plans.basic.f2':
+            'PLANNING · inkomen en {maxGoals, plural, one {# doel} other {# doelen}} — proef van Planning',
+        'pages.landing.plans.max.f3':
+            'MINDSET · Leren — aanbevelingen op Masterclass, niet op Udemy',
+        'pages.landing.faq.budgeting.answer':
+            'Nee. Budgetapps houden alleen bij wat er al gebeurd is. Rumtelo helpt je te zien waar je geld naartoe is gegaan, zodat je weer grip op de situatie krijgt — eerst het geld, dan planning, energie en het waarom. Boekhouden is een neveneffect, niet het doel.',
+        'pages.landing.faq.sleep.answer':
+            'Want grip op het leven is meer dan alleen geld. Een vermoeid hoofd geeft geld uit; een uitgerust hoofd neemt beslissingen. Energie vormt de basis van elke beslissing. Planning omvat leren en vooruitgaan. Mindset houdt het ‘waarom’ vast. Laat die aspecten buiten beschouwing en een app wordt niet meer dan een boekhoudprogramma.',
+        'pages.legal.terms.sections.what.body':
+            'Rumtelo is een persoonlijke overzicht- en ontwikkelingscoach op het gebied van geld, planning, energie en mindset. Het helpt een huishouden inzicht te krijgen in waar het geld naartoe gaat, doelen te stellen en de week te evalueren. Het is software en een educatief hulpmiddel — geen gereguleerd financieel product.',
+        'pages.legal.terms.sections.what.items.2':
+            'Geen medisch, psychologisch of wellness-behandelaar. De functies voor energie en mindset zijn optionele hulpmiddelen om zelf je voortgang bij te houden, en geen diagnose of behandeling.',
+        'pages.legal.privacy.sections.scope.body':
+            'Dit beleid is van toepassing op bezoekers van de website, mensen die een account aanmaken en uitgenodigde gezinsleden. Het heeft betrekking op gegevens over accounts, geld, planning, energie en mindset die u invoert of importeert, technische logbestanden en factureringsgegevens. Het is niet van toepassing op websites van derden waarnaar wij linken. Indien wij uitsluitend optreden als verwerker voor een toekomstige zakelijke klant, zal die relatie onder een afzonderlijke gegevensverwerkingsovereenkomst vallen — voor huishoudelijke accounts is Rumtelo de verwerkingsverantwoordelijke.',
+        'pages.legal.privacy.sections.collect.items.3':
+            'Optionele gegevens over planning, energie en mindset die je zelf kunt vastleggen (bijvoorbeeld doelen, slaap, training, voeding, rust, intenties). Je kunt Rumtelo gebruiken zonder deze velden in te vullen.',
+        'pages.legal.privacy.sections.special.body':
+            'Energie-logboeken (slaap, training, voeding, rust) en aantekeningen over mindset of intenties kunnen informatie over je gezondheid of filosofische opvattingen onthullen. Op grond van de AVG kan het hier gaan om gegevens van bijzondere categorieën (artikel 9). We verwerken deze gegevens alleen als je ervoor kiest om deze functies te gebruiken. Door deze gegevens in te voeren, geeft u uitdrukkelijk toestemming aan ons om deze op te slaan en weer te geven aan u en aan de gezinsleden die u uitnodigt, en om deze te gebruiken voor het genereren van Coach-tips binnen het product. U kunt het bijhouden van gegevens stopzetten en ons vragen deze te verwijderen. Wij gebruiken deze gegevens niet voor reclame, het beoordelen van uw kredietwaardigheid of het afleiden van kenmerken ten behoeve van derden.',
+        'pages.legal.privacy.sections.use.items.2':
+            'Toestemming (art. 6, lid 1, onder a) en, indien van toepassing, art. 9, lid 2, onder a)) — optionele energie-/mindset-logs; optionele bankkoppeling; eventuele toekomstige marketing-e-mails of niet-essentiële cookies. U kunt uw toestemming te allen tijde intrekken, zonder dat dit gevolgen heeft voor de verwerking vóór de intrekking.',
+        'pages.legal.data_processing.sections.purposes.items.2':
+            'Toestemming — optionele koppeling met de bank; optionele energie- en mindset-logs (en uitdrukkelijke toestemming overeenkomstig artikel 9 wanneer die logs tot de bijzondere categorieën gegevens behoren); eventuele toekomstige marketing- of niet-essentiële cookies.',
+        'pages.legal.company.sections.identity.items.3':
+            'Activiteit: huishoudoverzicht en educatieve coach (geld, planning, energie, mindset). Geen bank, betalingsinstelling of erkend financieel adviseur.',
+        'pages.meta.growth': 'Planning · overzicht',
+        'pages.meta.soul': 'Mindset · overzicht',
+        'pages.nav.groups.growth': 'Mijn planning',
+        'pages.nav.groups.soul': 'Mijn mindset',
+        'pages.nav.pills.growth': 'Planning',
+        'pages.nav.pills.soul': 'Mindset',
+        'pages.practice.clients.portal_growth': 'Planning',
+        'pages.practice.clients.portal_soul': 'Mindset',
+        'pages.settings.sections.growth': 'Planning',
+        'pages.settings.sections.soul': 'Mindset',
+        'pages.settings.panels.growth.stub':
+            'Horizon wordt bewaard bij de planninginstellingen zodra die API er is.',
+        'pages.settings.panels.sharing.blurb':
+            'Wat leden mogen delen op het gebied van Planning, Energie, Mindset en Geld. Alleen de eigenaar kan dit wijzigen. Je kunt altijd iets voor jezelf houden.',
+        'pages.why.meaning.direction.body':
+            'Terugkijken is maar de helft van het verhaal. Planning helpt je vooruit te komen — vaardigheden, doelen, kennis en inkomen, als je dat wilt.',
+        'pages.why.wider_lead_full':
+            'Open een product wanneer je dat hulpmiddel nodig hebt. Vandaag kun je gebruikmaken van ‘Geld’, ‘Planning’, ‘Energie’ en ‘Mindset’ — en er komen er nog meer bij. De Coach geeft een tip. Jij beslist.',
+        'pages.why.wider_lead_core':
+            'Open een product wanneer je dat hulpmiddel nodig hebt. ‘Geld’ en ‘Planning’ zijn vandaag al beschikbaar — er volgen er nog meer. De Coach geeft een tip. Jij beslist.',
     },
     es: {
         // ICU argument names stay English; the generator translated them and format threw.

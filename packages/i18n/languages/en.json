@@ -418,7 +418,7 @@
                 "plan_monthly": "monthly",
                 "audience_label": "I’m signing up as",
                 "audience_individual": "Individual or household",
-                "audience_individual_hint": "Your own money, growth, energy and soul",
+                "audience_individual_hint": "Your own money, planning, energy and mindset",
                 "audience_practice": "Practice",
                 "audience_practice_hint": "A coach or advisor helping clients",
                 "practice_note": "After you confirm your email, you’ll set up your practice desk.",
@@ -506,7 +506,7 @@
                 "how_it_works": {
                     "eyebrow": "How it works",
                     "headline": "Split first. Spend second.",
-                    "support": "Money. Growth. Energy. Soul — tools for grip on life."
+                    "support": "Money. Planning. Energy. Mindset — tools for grip on life."
                 },
                 "who_its_for": {
                     "eyebrow": "Who it’s for",
@@ -522,8 +522,8 @@
             "auth_manifesto": {
                 "brand_lines_aria": "Brand lines",
                 "portals_eyebrow": "Grip on life",
-                "portals_line": "Money. Growth. Energy. Soul — tools for grip on life.",
-                "portals_line_core": "Money. Growth — tools for grip on life, with more to come.",
+                "portals_line": "Money. Planning. Energy. Mindset — tools for grip on life.",
+                "portals_line_core": "Money. Planning — tools for grip on life, with more to come.",
                 "jars_eyebrow": "Rumtelo Pots",
                 "jars_line": "Paycheck in. Already assigned.",
                 "portals": {
@@ -532,16 +532,16 @@
                         "short": "MONEY"
                     },
                     "growth": {
-                        "name": "Growth",
-                        "short": "GROWTH"
+                        "name": "Planning",
+                        "short": "PLANNING"
                     },
                     "energy": {
                         "name": "Energy",
                         "short": "ENERGY"
                     },
                     "soul": {
-                        "name": "Soul",
-                        "short": "SOUL"
+                        "name": "Mindset",
+                        "short": "MINDSET"
                     }
                 }
             },
@@ -613,7 +613,7 @@
             },
             "growth-overview": {
                 "name": "Overview",
-                "description": "Growth overview."
+                "description": "Planning overview."
             },
             "growth-goals": {
                 "name": "Goals",
@@ -655,7 +655,7 @@
             },
             "soul-overview": {
                 "name": "Overview",
-                "description": "Soul overview."
+                "description": "Mindset overview."
             },
             "soul-stillness": {
                 "name": "Stillness",
@@ -694,7 +694,7 @@
         "coach": {
             "page_title": "The Coach",
             "eyebrow": "Across every portal",
-            "lead": "One tip at a time from money, growth, energy, and soul — so you keep grip. Never shame. You choose.",
+            "lead": "One tip at a time from money, planning, energy, and mindset — so you keep grip. Never shame. You choose.",
             "empty_title": "Nothing to coach yet",
             "empty_body": "Log income, pots, or sleep — the Coach speaks when there is enough to see.",
             "empty_quiet": "No open tips right now. The Coach speaks when a pot, habit, or week needs a nudge.",
@@ -751,7 +751,7 @@
                 "metric_sleep": "Quality, not hours — the diary already holds sleep length.",
                 "metric_food": "How well did you fuel — not a calorie log.",
                 "metric_train": "Session quality if you trained; skip if you did not.",
-                "metric_mind": "Stillness / settled mind — same score Soul writes.",
+                "metric_mind": "Stillness / settled mind — same score Mindset writes.",
                 "toast_sorted": "Sorted into a pot",
                 "toast_paid": "Marked paid",
                 "toast_skipped": "Skipped for this month",
@@ -1218,7 +1218,7 @@
         },
         "growth": {
             "hub": {
-                "eyebrow": "Growth · long term",
+                "eyebrow": "Planning · long term",
                 "title": "Grow in more than one direction.",
                 "line": "Grip on your growth — skills, goals, learning; you move forward.",
                 "cards": {
@@ -1304,7 +1304,7 @@
                     "give_mode_manual": "I know who",
                     "give_mode_org": "Help me choose",
                     "give_mode_open": "Keep it open",
-                    "pledge_tip_link": "Why giving is in a money app → Soul",
+                    "pledge_tip_link": "Why giving is in a money app → Mindset",
                     "pledge_tip_body": "Every sorted amount that leaves your Giving pot this year counts toward it — nothing to move by hand.",
                     "cause_label": "Cause (purpose)",
                     "cause_aria": "Giving cause",
@@ -1738,7 +1738,7 @@
                 "tip_behind_income": "{need}/mo would finish this in {months} months. {jar} cannot cover that here."
             },
             "course": {
-                "eyebrow": "Growth · Course",
+                "eyebrow": "Planning · Course",
                 "tabs_aria": "Course view",
                 "tab_today": "Today",
                 "tab_week": "Week",
@@ -2200,7 +2200,7 @@
                     "ahead_lead": "What matters most? Link one to a goal if you like."
                 },
                 "entry": {
-                    "growth_week_check": "Growth week check",
+                    "growth_week_check": "Planning week check",
                     "growth_week_check_lead": "Look back, keep your routines, set the next 3.",
                     "money_week_check": "Money week check",
                     "money_week_check_lead": "Surplus and one intention for the week.",
@@ -3478,7 +3478,7 @@
         },
         "soul": {
             "hub": {
-                "eyebrow": "Soul · the why",
+                "eyebrow": "Mindset · the why",
                 "title": "The why under the numbers.",
                 "line": "Grip on your why — stillness, gratitude, intention.",
                 "cards": {
@@ -3751,7 +3751,7 @@
                     "url": ""
                 },
                 "growth": {
-                    "title": "Growth — grow in more than one direction",
+                    "title": "Planning — grow in more than one direction",
                     "url": ""
                 },
                 "energy": {
@@ -3759,7 +3759,7 @@
                     "url": ""
                 },
                 "soul": {
-                    "title": "Soul — the why",
+                    "title": "Mindset — the why",
                     "url": ""
                 },
                 "jars": {
@@ -3781,7 +3781,7 @@
                     "sections": {
                         "looking_at": {
                             "heading": "What you’re looking at",
-                            "body": "This page is part of your household money and growth setup. Use Period (top right) to switch months. Numbers follow the pots split you set in Settings."
+                            "body": "This page is part of your household money and planning setup. Use Period (top right) to switch months. Numbers follow the pots split you set in Settings."
                         }
                     }
                 },
@@ -3790,11 +3790,11 @@
                     "sections": {
                         "what_for": {
                             "heading": "What you’re looking at",
-                            "body": "Your grip snapshot for this month — The Coach, the money picture, and doors into Growth, Energy, and Soul. Start the full tour from Help to walk through Home, then pots, fixed costs, and income."
+                            "body": "Your grip snapshot for this month — The Coach, the money picture, and doors into Planning, Energy, and Mindset. Start the full tour from Help to walk through Home, then pots, fixed costs, and income."
                         },
                         "what_for_core": {
                             "heading": "What you’re looking at",
-                            "body": "Your grip snapshot for this month — The Coach, the money picture, and the door into Growth. Start the full tour from Help to walk through Home, then pots, fixed costs, and income."
+                            "body": "Your grip snapshot for this month — The Coach, the money picture, and the door into Planning. Start the full tour from Help to walk through Home, then pots, fixed costs, and income."
                         },
                         "how": {
                             "heading": "How to use it",
@@ -3816,11 +3816,11 @@
                         },
                         "portals": {
                             "title": "Your products",
-                            "content": "Money lives in the top nav. Growth, Energy, and Soul open from here when you want that next tool — one product at a time."
+                            "content": "Money lives in the top nav. Planning, Energy, and Mindset open from here when you want that next tool — one product at a time."
                         },
                         "portals_core": {
                             "title": "Your products",
-                            "content": "Money lives in the top nav. Growth opens from here when you want that next tool."
+                            "content": "Money lives in the top nav. Planning opens from here when you want that next tool."
                         }
                     }
                 },
@@ -3828,7 +3828,7 @@
                     "steps": {
                         "brand": {
                             "title": "Home",
-                            "content": "Tap the wordmark anytime to return home. Money and Growth live in the portals along the top (or bottom on mobile)."
+                            "content": "Tap the wordmark anytime to return home. Money and Planning live in the portals along the top (or bottom on mobile)."
                         },
                         "period": {
                             "title": "Period",
@@ -3968,7 +3968,7 @@
                     }
                 },
                 "growth": {
-                    "title": "Growth",
+                    "title": "Planning",
                     "sections": {
                         "what_for": {
                             "heading": "What this area is for",
@@ -4380,11 +4380,11 @@
             },
             "portals_section": {
                 "eyebrow": "GRIP ON LIFE — THE PRODUCTS",
-                "headline": "Money. Growth. Energy. Soul. One overview.",
-                "headline_core": "Money. Growth. One overview.",
+                "headline": "Money. Planning. Energy. Mindset. One overview.",
+                "headline_core": "Money. Planning. One overview.",
                 "more_soon": "More soon",
-                "lead_core": "Each product helps with one part of your life. Money is often where people start; Growth helps you move forward from there. More products are on the way. The Coach gives a tip. You decide.",
-                "lead": "Each product helps with one part of your life. Money is often where people start. Open Growth, Energy, or Soul when you want that next. The Coach gives a tip. You decide."
+                "lead_core": "Each product helps with one part of your life. Money is often where people start; Planning helps you move forward from there. More products are on the way. The Coach gives a tip. You decide.",
+                "lead": "Each product helps with one part of your life. Money is often where people start. Open Planning, Energy, or Mindset when you want that next. The Coach gives a tip. You decide."
             },
             "portals": {
                 "money": {
@@ -4394,8 +4394,8 @@
                     "line": "Grip on your money — three groups, a clear picture."
                 },
                 "growth": {
-                    "name": "Growth",
-                    "alt_name": "Groei",
+                    "name": "Planning",
+                    "alt_name": "Planning",
                     "question": "How do I grow from here?",
                     "line": "Grip on your growth — as a person, in more than one direction."
                 },
@@ -4406,8 +4406,8 @@
                     "line": "Grip on your energy — sleep, hours, body under every decision."
                 },
                 "soul": {
-                    "name": "Soul",
-                    "alt_name": "Ziel",
+                    "name": "Mindset",
+                    "alt_name": "Mindset",
                     "question": "Why am I doing this?",
                     "line": "Grip on your why — the quiet under the numbers."
                 }
@@ -4745,9 +4745,9 @@
                     "best_for": "Getting started, on your own",
                     "line": "You want to see where your money goes and build the ten-minute weekly routine — solo, at no cost. Enough to start, and never a reason to stop.",
                     "f1": "MONEY · your pots, transactions, fixed costs",
-                    "f2": "GROWTH · income and {maxGoals, plural, one {# goal} other {# goals}} — taste Growth",
+                    "f2": "PLANNING · income and {maxGoals, plural, one {# goal} other {# goals}} — taste Planning",
                     "f3": "ENERGY · sleep",
-                    "f4": "SOUL · stillness, gratitude, one intention a week",
+                    "f4": "MINDSET · stillness, gratitude, one intention a week",
                     "f5": "The Coach, the week check, the month score",
                     "f6": "1 full + 1 viewer seat (partner, coach or advisor)",
                     "outcome": {
@@ -4763,9 +4763,9 @@
                     "best_for": "Households, couples, paying off debt",
                     "line": "You share money with a partner or family, want your week planned around your goals, are paying off debt, or want your bank statements in. Most people land here.",
                     "f1": "Everything in Basic",
-                    "f2": "GROWTH · Course — plan your week around the three things that move your goals",
+                    "f2": "PLANNING · Course — plan your week around the three things that move your goals",
                     "f3": "MONEY · debt plan with a freedom date, and bank statement import",
-                    "f4": "GROWTH · Learn — books, courses, skills · up to {maxGoals} goals",
+                    "f4": "MINDSET · Learn — books, courses, skills · up to {maxGoals} goals",
                     "f5": "ENERGY · your 168 hours, training, food",
                     "f6": "Up to {maxMembers} seats — full and viewer mix",
                     "outcome": {
@@ -4782,8 +4782,8 @@
                     "line": "Your basics run steady and you’re growing wealth: net worth, returns, your freedom number — and every feature in every product.",
                     "f1": "Everything in Plus",
                     "f2": "MONEY · net worth, returns and your freedom number",
-                    "f3": "GROWTH · Learn picks on Masterclass, not Udemy",
-                    "f4": "SOUL · the seven centers",
+                    "f3": "MINDSET · Learn picks on Masterclass, not Udemy",
+                    "f4": "MINDSET · the seven centers",
                     "f5": "Up to {maxMembers} seats (more full access)",
                     "outcome": {
                         "money": "Everything in Plus",
@@ -4801,7 +4801,7 @@
             "faq": {
                 "budgeting": {
                     "question": "Is Rumtelo a budgeting app?",
-                    "answer": "No. Budget apps count what already happened. Rumtelo helps you see where it went, then get grip again — money first, then growth, energy, why. Bookkeeping is a side effect, not the point."
+                    "answer": "No. Budget apps count what already happened. Rumtelo helps you see where it went, then get grip again — money first, then planning, energy, why. Bookkeeping is a side effect, not the point."
                 },
                 "bank": {
                     "question": "Do I need to connect my bank?",
@@ -4809,7 +4809,7 @@
                 },
                 "sleep": {
                     "question": "Why are sleep, training and books in a money product?",
-                    "answer": "Because grip on life is more than money. A tired head spends; a rested head decides. Energy is the floor under every decision. Growth covers learning and moving forward. Soul keeps the why. Leave those out and an app becomes bookkeeping."
+                    "answer": "Because grip on life is more than money. A tired head spends; a rested head decides. Energy is the floor under every decision. Planning covers learning and moving forward. Mindset keeps the why. Leave those out and an app becomes bookkeeping."
                 },
                 "coach": {
                     "question": "What does the Coach actually do?",
@@ -4884,11 +4884,11 @@
                     },
                     "what": {
                         "title": "What Rumtelo is — and is not",
-                        "body": "Rumtelo is a personal overview and educational coach for money, growth, energy and soul. It helps a household see where money goes, set goals, and review a week. It is software and education — not a regulated financial product.",
+                        "body": "Rumtelo is a personal overview and educational coach for money, planning, energy and mindset. It helps a household see where money goes, set goals, and review a week. It is software and education — not a regulated financial product.",
                         "items": [
                             "Not a bank, payment institution, e-money issuer, or custodian. We never hold your money or move it between accounts.",
                             "Not a broker, investment firm, or licensed financial adviser. Coach tips and suggestions are general education, not personal investment, tax, credit, or legal advice.",
-                            "Not a medical, psychological, or wellness practitioner. Energy and soul features are optional self-logging tools, not diagnosis or treatment.",
+                            "Not a medical, psychological, or wellness practitioner. Energy and mindset features are optional self-logging tools, not diagnosis or treatment.",
                             "Books and methods we mention stay those authors’ property. Rumtelo is independent and is not affiliated with or endorsed by them."
                         ],
                         "after": "You remain solely responsible for decisions about money, health, and life. If you need regulated advice, consult a licensed professional in your country."
@@ -5013,7 +5013,7 @@
                     },
                     "scope": {
                         "title": "Whose data and which services",
-                        "body": "This policy covers visitors to the website, people who create an account, and household members who are invited. It covers account, money, growth, energy and soul data you enter or import, technical logs, and billing records. It does not cover third-party websites we link to. If we act only as a processor for a future business customer, that relationship will be under a separate data-processing agreement — for household accounts, Rumtelo is the controller."
+                        "body": "This policy covers visitors to the website, people who create an account, and household members who are invited. It covers account, money, planning, energy and mindset data you enter or import, technical logs, and billing records. It does not cover third-party websites we link to. If we act only as a processor for a future business customer, that relationship will be under a separate data-processing agreement — for household accounts, Rumtelo is the controller."
                     },
                     "collect": {
                         "title": "What we collect",
@@ -5022,7 +5022,7 @@
                             "Identity and contact: name, email address, optional date of birth, language and locale preferences.",
                             "Account security: password hash (we never store your password in plain text), session identifiers, optional two-factor authentication status and secrets we must keep to operate 2FA, email verification status.",
                             "Household money data you enter or import: pots, transactions, goals, debts, income splits, week checks, and related product data.",
-                            "Optional growth, energy and soul data you choose to log (for example goals, sleep, training, food, rest, intention). You can use Rumtelo without filling those portals.",
+                            "Optional planning, energy and mindset data you choose to log (for example goals, sleep, training, food, rest, intention). You can use Rumtelo without filling those portals.",
                             "Household membership: who you invite, their email, and their role in the household.",
                             "Billing: plan, renewal dates, Stripe customer and subscription identifiers. Card numbers are collected by Stripe, not by us.",
                             "Support messages you send us, and files you attach.",
@@ -5032,7 +5032,7 @@
                     },
                     "special": {
                         "title": "Special-category and sensitive data",
-                        "body": "Energy logs (sleep, training, food, rest) and soul or intention notes can reveal health or philosophical information. Under GDPR that may be special-category data (Article 9). We process it only if you choose to use those features. By entering that data you give explicit consent for us to store and display it to you and to household members you invite, and to use it to generate Coach tips inside the product. You may stop logging and ask us to delete it. We do not use this data for advertising, scoring your credit, or inferring characteristics for third parties.",
+                        "body": "Energy logs (sleep, training, food, rest) and mindset or intention notes can reveal health or philosophical information. Under GDPR that may be special-category data (Article 9). We process it only if you choose to use those features. By entering that data you give explicit consent for us to store and display it to you and to household members you invite, and to use it to generate Coach tips inside the product. You may stop logging and ask us to delete it. We do not use this data for advertising, scoring your credit, or inferring characteristics for third parties.",
                         "after": "US “sensitive personal information” (including precise financial account data and health-related logs) is used only to provide the features you request. We do not sell it or share it for cross-context behavioral advertising."
                     },
                     "sources": {
@@ -5050,7 +5050,7 @@
                         "items": [
                             "Contract (Art. 6(1)(b)) — create and authenticate your account, run the household workspace, show pots, Coach tips and portals you use, provide export, and deliver transactional email (verify, reset, security).",
                             "Legitimate interests (Art. 6(1)(f)) — keep the Service secure, prevent abuse and fraud, debug outages, understand aggregated product usage without building advertising profiles, and establish or defend legal claims. You may object; we will stop unless we have overriding grounds.",
-                            "Consent (Art. 6(1)(a) and, where needed, Art. 9(2)(a)) — optional energy/soul logs; optional bank connect; any future marketing email or non-essential cookies. You may withdraw consent at any time without affecting processing before withdrawal.",
+                            "Consent (Art. 6(1)(a) and, where needed, Art. 9(2)(a)) — optional energy/mindset logs; optional bank connect; any future marketing email or non-essential cookies. You may withdraw consent at any time without affecting processing before withdrawal.",
                             "Legal obligation (Art. 6(1)(c)) — tax, accounting and consumer-law records for paid plans; respond to lawful requests from authorities."
                         ]
                     },
@@ -5191,7 +5191,7 @@
                         "items": [
                             "Contract — create and run your account, household workspace, pots, Coach tips, export, and the product features you use.",
                             "Legitimate interest — security, fraud and abuse prevention, reliability, and product improvement that does not require advertising profiles; balanced against your rights, with an opt-out for improvement analytics if we ever add optional measurement.",
-                            "Consent — optional bank connect; optional energy and soul logs (and Article 9 explicit consent where those logs are special-category data); any future marketing or non-essential cookies.",
+                            "Consent — optional bank connect; optional energy and mindset logs (and Article 9 explicit consent where those logs are special-category data); any future marketing or non-essential cookies.",
                             "Legal obligation — tax, accounting, and consumer records for paid plans; lawful requests."
                         ]
                     },
@@ -5241,7 +5241,7 @@
                             "Trade name: Rumtelo",
                             "Place of establishment: Amsterdam, the Netherlands",
                             "Registered legal name, Chamber of Commerce (KvK) number, VAT number and visiting address: published here when available for the operating entity, and always available on request at support@rumtelo.com.",
-                            "Activity: household overview and educational coach (money, growth, energy, soul). Not a bank, payment institution, or licensed financial adviser."
+                            "Activity: household overview and educational coach (money, planning, energy, mindset). Not a bank, payment institution, or licensed financial adviser."
                         ]
                     },
                     "contact": {
@@ -5285,7 +5285,7 @@
             "fixed_costs": "Fixed costs",
             "fixed_cost": "Fixed cost",
             "week_check": "Week check",
-            "growth": "Growth · overview",
+            "growth": "Planning · overview",
             "goals": "Goals",
             "goal": "Goal",
             "income": "My income",
@@ -5301,7 +5301,7 @@
             "sleep": "Sleep",
             "training": "Training",
             "food": "Food",
-            "soul": "Soul · overview",
+            "soul": "Mindset · overview",
             "stillness": "Stillness",
             "gratitude": "Gratitude",
             "giving": "Giving",
@@ -5341,16 +5341,16 @@
             "groups": {
                 "home": "Home",
                 "money": "My money",
-                "growth": "My growth",
+                "growth": "My planning",
                 "energy": "My energy",
-                "soul": "My soul"
+                "soul": "My mindset"
             },
             "pills": {
                 "home": "Home",
                 "money": "Money",
-                "growth": "Growth",
+                "growth": "Planning",
                 "energy": "Energy",
-                "soul": "Soul",
+                "soul": "Mindset",
                 "you": "You"
             },
             "children": {
@@ -5441,7 +5441,8 @@
             "aria": {
                 "mobile_tabs": "Main",
                 "money_sections": "Money sections",
-                "growth_sections": "Growth sections"
+                "growth_sections": "Planning sections",
+                "soul_sections": "Mindset sections"
             }
         },
         "onboarding": {
@@ -5642,14 +5643,14 @@
                 "household_label": "Household",
                 "access_eyebrow": "Access",
                 "progress_eyebrow": "Portal snapshot",
-                "progress_blurb": "Live money, growth, energy, and soul metrics for this household.",
-                "progress_blurb_core": "Live money and growth metrics for this household.",
+                "progress_blurb": "Live money, planning, energy, and mindset metrics for this household.",
+                "progress_blurb_core": "Live money and planning metrics for this household.",
                 "progress_pending": "Waiting for the household to accept the invitation.",
                 "progress_view_only": "View access — invite accepted. Switch to Manage to sponsor their Plus plan.",
                 "portal_money": "Money",
-                "portal_growth": "Growth",
+                "portal_growth": "Planning",
                 "portal_energy": "Energy",
-                "portal_soul": "Soul",
+                "portal_soul": "Mindset",
                 "portal_placeholder": "—",
                 "portal_coming": "Available after the household accepts the invite",
                 "portal_money_hint": "Spent this month",
@@ -5896,9 +5897,9 @@
             "sections": {
                 "general": "General",
                 "money": "Money",
-                "growth": "Growth",
+                "growth": "Planning",
                 "energy": "Energy",
-                "soul": "Soul",
+                "soul": "Mindset",
                 "data": "Data"
             },
             "tabs": {
@@ -6211,8 +6212,8 @@
                 },
                 "coach": {
                     "eyebrow": "The Coach",
-                    "blurb": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, pot cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money, growth, energy, and soul.",
-                    "blurb_core": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, pot cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money and growth.",
+                    "blurb": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, pot cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money, planning, energy, and mindset.",
+                    "blurb_core": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, pot cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money and planning.",
                     "toggle": "Show The Coach on screens",
                     "hint_on": "On — look for the ✦ The Coach mark. Your tips stay at Home → The Coach.",
                     "hint_off": "Off — on-screen tips hidden. Your tips are still at Home → The Coach anytime."
@@ -6372,7 +6373,7 @@
                     "blurb": "How far ahead the goal and freedom calculations look. Shorter feels urgent, longer shows the compounding.",
                     "horizon_aria": "Planning horizon in months",
                     "months": "{count} months",
-                    "stub": "Horizon persists with growth settings when that API lands."
+                    "stub": "Horizon persists with planning settings when that API lands."
                 },
                 "course_calendar": {
                     "eyebrow": "Your calendar",
@@ -6424,8 +6425,8 @@
                 },
                 "sharing": {
                     "eyebrow": "Privacy and sharing",
-                    "blurb": "What members may share in Growth, Energy, Soul and Money. Only the owner changes this. Keeping something to yourself is always possible.",
-                    "blurb_core": "What members may share in Growth and Money. Only the owner changes this. Keeping something to yourself is always possible.",
+                    "blurb": "What members may share in Planning, Energy, Mindset and Money. Only the owner changes this. Keeping something to yourself is always possible.",
+                    "blurb_core": "What members may share in Planning and Money. Only the owner changes this. Keeping something to yourself is always possible.",
                     "owner_only": "Only the owner of the household can change this.",
                     "mode_label": "What may members share?",
                     "modes": {
@@ -7139,12 +7140,12 @@
                     "body": "Income comes in and splits over Basics, Future and Free. Split first. Spend second. Rumtelo never moves money at your bank — you do. We show the overview."
                 },
                 "direction": {
-                    "body": "Looking back is only half the story. Growth helps you move forward — skills, goals, learning, and income if you want."
+                    "body": "Looking back is only half the story. Planning helps you move forward — skills, goals, learning, and income if you want."
                 }
             },
             "wider_eyebrow": "✦ Products. One idea: grip on life.",
-            "wider_lead_full": "Open a product when you want that tool. Today you can use Money, Growth, Energy, and Soul — and more will come. The Coach gives a tip. You decide.",
-            "wider_lead_core": "Open a product when you want that tool. Money and Growth are ready today — more will come. The Coach gives a tip. You decide.",
+            "wider_lead_full": "Open a product when you want that tool. Today you can use Money, Planning, Energy, and Mindset — and more will come. The Coach gives a tip. You decide.",
+            "wider_lead_core": "Open a product when you want that tool. Money and Planning are ready today — more will come. The Coach gives a tip. You decide.",
             "portals": {
                 "money": {
                     "line": "Grip on your money.",

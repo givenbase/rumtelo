@@ -58,7 +58,7 @@ const tour = {
             url: '',
         },
         growth: {
-            title: 'Growth — grow in more than one direction',
+            title: 'Planning — grow in more than one direction',
             url: '',
         },
         energy: {
@@ -66,7 +66,7 @@ const tour = {
             url: '',
         },
         soul: {
-            title: 'Soul — the why',
+            title: 'Mindset — the why',
             url: '',
         },
         jars: {
@@ -88,7 +88,7 @@ const tour = {
             sections: {
                 looking_at: {
                     heading: 'What you’re looking at',
-                    body: 'This page is part of your household money and growth setup. Use Period (top right) to switch months. Numbers follow the pots split you set in Settings.',
+                    body: 'This page is part of your household money and planning setup. Use Period (top right) to switch months. Numbers follow the pots split you set in Settings.',
                 },
             },
         },
@@ -97,11 +97,11 @@ const tour = {
             sections: {
                 what_for: {
                     heading: 'What you’re looking at',
-                    body: 'Your grip snapshot for this month — The Coach, the money picture, and doors into Growth, Energy, and Soul. Start the full tour from Help to walk through Home, then pots, fixed costs, and income.',
+                    body: 'Your grip snapshot for this month — The Coach, the money picture, and doors into Planning, Energy, and Mindset. Start the full tour from Help to walk through Home, then pots, fixed costs, and income.',
                 },
                 what_for_core: {
                     heading: 'What you’re looking at',
-                    body: 'Your grip snapshot for this month — The Coach, the money picture, and the door into Growth. Start the full tour from Help to walk through Home, then pots, fixed costs, and income.',
+                    body: 'Your grip snapshot for this month — The Coach, the money picture, and the door into Planning. Start the full tour from Help to walk through Home, then pots, fixed costs, and income.',
                 },
                 how: {
                     heading: 'How to use it',
@@ -126,12 +126,12 @@ const tour = {
                 portals: {
                     title: 'Your products',
                     content:
-                        'Money lives in the top nav. Growth, Energy, and Soul open from here when you want that next tool — one product at a time.',
+                        'Money lives in the top nav. Planning, Energy, and Mindset open from here when you want that next tool — one product at a time.',
                 },
                 portals_core: {
                     title: 'Your products',
                     content:
-                        'Money lives in the top nav. Growth opens from here when you want that next tool.',
+                        'Money lives in the top nav. Planning opens from here when you want that next tool.',
                 },
             },
         },
@@ -140,7 +140,7 @@ const tour = {
                 brand: {
                     title: 'Home',
                     content:
-                        'Tap the wordmark anytime to return home. Money and Growth live in the portals along the top (or bottom on mobile).',
+                        'Tap the wordmark anytime to return home. Money and Planning live in the portals along the top (or bottom on mobile).',
                 },
                 period: {
                     title: 'Period',
@@ -290,7 +290,7 @@ const tour = {
             },
         },
         growth: {
-            title: 'Growth',
+            title: 'Planning',
             sections: {
                 what_for: {
                     heading: 'What this area is for',

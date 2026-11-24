@@ -15,14 +15,14 @@ const why = {
             body: 'Income comes in and splits over Basics, Future and Free. Split first. Spend second. Rumtelo never moves money at your bank — you do. We show the overview.',
         },
         direction: {
-            body: 'Looking back is only half the story. Growth helps you move forward — skills, goals, learning, and income if you want.',
+            body: 'Looking back is only half the story. Planning helps you move forward — skills, goals, learning, and income if you want.',
         },
     },
     wider_eyebrow: '✦ Products. One idea: grip on life.',
     wider_lead_full:
-        'Open a product when you want that tool. Today you can use Money, Growth, Energy, and Soul — and more will come. The Coach gives a tip. You decide.',
+        'Open a product when you want that tool. Today you can use Money, Planning, Energy, and Mindset — and more will come. The Coach gives a tip. You decide.',
     wider_lead_core:
-        'Open a product when you want that tool. Money and Growth are ready today — more will come. The Coach gives a tip. You decide.',
+        'Open a product when you want that tool. Money and Planning are ready today — more will come. The Coach gives a tip. You decide.',
     portals: {
         money: {
             line: 'Grip on your money.',

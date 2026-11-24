@@ -1,7 +1,7 @@
-/** Growth portal — empty states and common copy. */
+/** Planning portal (code key `growth`) — empty states and common copy. */
 const growth = {
     hub: {
-        eyebrow: 'Growth · long term',
+        eyebrow: 'Planning · long term',
         title: 'Grow in more than one direction.',
         line: 'Grip on your growth — skills, goals, learning; you move forward.',
         cards: {
@@ -96,7 +96,7 @@ const growth = {
             give_mode_manual: 'I know who',
             give_mode_org: 'Help me choose',
             give_mode_open: 'Keep it open',
-            pledge_tip_link: 'Why giving is in a money app → Soul',
+            pledge_tip_link: 'Why giving is in a money app → Mindset',
             pledge_tip_body:
                 'Every sorted amount that leaves your Giving pot this year counts toward it — nothing to move by hand.',
             cause_label: 'Cause (purpose)',
@@ -568,7 +568,7 @@ const growth = {
             '{need}/mo would finish this in {months} months. {jar} cannot cover that here.',
     },
     course: {
-        eyebrow: 'Growth · Course',
+        eyebrow: 'Planning · Course',
         tabs_aria: 'Course view',
         tab_today: 'Today',
         tab_week: 'Week',
@@ -1054,7 +1054,7 @@ const growth = {
         },
         /** Check and advice rows on Today and Week. */
         entry: {
-            growth_week_check: 'Growth week check',
+            growth_week_check: 'Planning week check',
             growth_week_check_lead: 'Look back, keep your routines, set the next 3.',
             money_week_check: 'Money week check',
             money_week_check_lead: 'Surplus and one intention for the week.',

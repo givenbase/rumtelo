@@ -418,7 +418,7 @@
                 "plan_monthly": "mensual",
                 "audience_label": "Me inscribo como",
                 "audience_individual": "Particular o unidad familiar",
-                "audience_individual_hint": "Tu propio dinero, tu crecimiento, tu energía y tu alma",
+                "audience_individual_hint": "Your own money, planning, energy and mindset",
                 "audience_practice": "Práctica",
                 "audience_practice_hint": "Un coach o asesor que ayuda a sus clientes",
                 "practice_note": "Una vez que hayas confirmado tu correo electrónico, podrás configurar tu espacio de trabajo.",
@@ -506,7 +506,7 @@
                 "how_it_works": {
                     "eyebrow": "Cómo funciona",
                     "headline": "Primero, divide. Después, gasta.",
-                    "support": "Dinero. Crecimiento. Energía. Alma: herramientas para tomar las riendas de la vida."
+                    "support": "Money. Planning. Energy. Mindset — tools for grip on life."
                 },
                 "who_its_for": {
                     "eyebrow": "A quién va dirigido",
@@ -522,8 +522,8 @@
             "auth_manifesto": {
                 "brand_lines_aria": "Líneas de marca",
                 "portals_eyebrow": "Aferrarse a la vida",
-                "portals_line": "Dinero. Crecimiento. Energía. Alma: herramientas para tomar las riendas de la vida.",
-                "portals_line_core": "Dinero. Crecimiento: herramientas para tomar las riendas de la vida, y mucho más por venir.",
+                "portals_line": "Money. Planning. Energy. Mindset — tools for grip on life.",
+                "portals_line_core": "Money. Planning — tools for grip on life, with more to come.",
                 "jars_eyebrow": "Rumtelo Pots",
                 "jars_line": "Nómina recibida. Ya asignada.",
                 "portals": {
@@ -532,16 +532,16 @@
                         "short": "DINERO"
                     },
                     "growth": {
-                        "name": "Crecimiento",
-                        "short": "CRECIMIENTO"
+                        "name": "Planning",
+                        "short": "PLANNING"
                     },
                     "energy": {
                         "name": "Energía",
                         "short": "ENERGÍA"
                     },
                     "soul": {
-                        "name": "Alma",
-                        "short": "ALMA"
+                        "name": "Mindset",
+                        "short": "MINDSET"
                     }
                 }
             },
@@ -613,7 +613,7 @@
             },
             "growth-overview": {
                 "name": "Resumen",
-                "description": "Panorama general del crecimiento."
+                "description": "Planning overview."
             },
             "growth-goals": {
                 "name": "Objetivos",
@@ -655,7 +655,7 @@
             },
             "soul-overview": {
                 "name": "Resumen",
-                "description": "Descripción general de Soul."
+                "description": "Mindset overview."
             },
             "soul-stillness": {
                 "name": "Silencio",
@@ -694,7 +694,7 @@
         "coach": {
             "page_title": "El entrenador",
             "eyebrow": "En todos los portales",
-            "lead": "Un consejo cada vez sobre dinero, crecimiento, energía y alma, para que no pierdas el rumbo. Sin juzgar nunca. Tú eliges.",
+            "lead": "One tip at a time from money, planning, energy, and mindset — so you keep grip. Never shame. You choose.",
             "empty_title": "De momento no hay nada que entrenar",
             "empty_body": "Log income, pots, or sleep — the Coach speaks when there is enough to see.",
             "empty_quiet": "No open tips right now. The Coach speaks when a pot, habit, or week needs a nudge.",
@@ -751,7 +751,7 @@
                 "metric_sleep": "La calidad, no las horas: el diario ya registra la duración del sueño.",
                 "metric_food": "¿Cómo te has alimentado? — No es un registro de calorías.",
                 "metric_train": "Calidad de la sesión si has entrenado; omite esta sección si no lo has hecho.",
-                "metric_mind": "Quietud / mente serena: la misma partitura que escribe el Alma.",
+                "metric_mind": "Stillness / settled mind — same score Mindset writes.",
                 "toast_sorted": "Sorted into a pot",
                 "toast_paid": "Marcado como pagado",
                 "toast_skipped": "Se ha omitido este mes",
@@ -1218,7 +1218,7 @@
         },
         "growth": {
             "hub": {
-                "eyebrow": "Crecimiento · a largo plazo",
+                "eyebrow": "Planning · long term",
                 "title": "Crece en más de una dirección.",
                 "line": "Toma las riendas de tu crecimiento: habilidades, objetivos, aprendizaje; así avanzarás.",
                 "cards": {
@@ -1304,7 +1304,7 @@
                     "give_mode_manual": "Sé quién",
                     "give_mode_org": "Ayúdame a elegir",
                     "give_mode_open": "Déjalo abierto",
-                    "pledge_tip_link": "¿Por qué la función de donaciones está en una aplicación de gestión financiera? → Soul",
+                    "pledge_tip_link": "Why giving is in a money app → Mindset",
                     "pledge_tip_body": "Every sorted amount that leaves your Giving pot this year counts toward it — nothing to move by hand.",
                     "cause_label": "Causa (propósito)",
                     "cause_aria": "Dar motivo",
@@ -1738,7 +1738,7 @@
                 "tip_behind_income": "{need} al mes permitiría terminar esto en {months} meses. {jar} no puede cubrir eso aquí."
             },
             "course": {
-                "eyebrow": "Crecimiento · Curso",
+                "eyebrow": "Planning · Course",
                 "tabs_aria": "Vista del curso",
                 "tab_today": "Hoy",
                 "tab_week": "Semana",
@@ -2200,7 +2200,7 @@
                     "ahead_lead": "¿Qué es lo más importante? Si quieres, relaciona cada uno con un objetivo."
                 },
                 "entry": {
-                    "growth_week_check": "Revisión semanal del crecimiento",
+                    "growth_week_check": "Planning week check",
                     "growth_week_check_lead": "Echa la vista atrás, mantén tus rutinas y fija los tres siguientes.",
                     "money_week_check": "Revisión de la «Semana del dinero»",
                     "money_week_check_lead": "Excedente y un propósito para la semana.",
@@ -3478,7 +3478,7 @@
         },
         "soul": {
             "hub": {
-                "eyebrow": "El alma · el porqué",
+                "eyebrow": "Mindset · the why",
                 "title": "El porqué que se esconde tras las cifras.",
                 "line": "No pierdas de vista tu motivo: la tranquilidad, la gratitud, la intención.",
                 "cards": {
@@ -3751,7 +3751,7 @@
                     "url": ""
                 },
                 "growth": {
-                    "title": "Crecimiento: crecer en más de una dirección",
+                    "title": "Planning — grow in more than one direction",
                     "url": ""
                 },
                 "energy": {
@@ -3759,7 +3759,7 @@
                     "url": ""
                 },
                 "soul": {
-                    "title": "El alma: el porqué",
+                    "title": "Mindset — the why",
                     "url": ""
                 },
                 "jars": {
@@ -3781,7 +3781,7 @@
                     "sections": {
                         "looking_at": {
                             "heading": "Lo que estás viendo",
-                            "body": "This page is part of your household money and growth setup. Use Period (top right) to switch months. Numbers follow the pots split you set in Settings."
+                            "body": "This page is part of your household money and planning setup. Use Period (top right) to switch months. Numbers follow the pots split you set in Settings."
                         }
                     }
                 },
@@ -3790,11 +3790,11 @@
                     "sections": {
                         "what_for": {
                             "heading": "Lo que estás viendo",
-                            "body": "Your grip snapshot for this month — The Coach, the money picture, and doors into Growth, Energy, and Soul. Start the full tour from Help to walk through Home, then pots, fixed costs, and income."
+                            "body": "Your grip snapshot for this month — The Coach, the money picture, and doors into Planning, Energy, and Mindset. Start the full tour from Help to walk through Home, then pots, fixed costs, and income."
                         },
                         "what_for_core": {
                             "heading": "What you’re looking at",
-                            "body": "Your grip snapshot for this month — The Coach, the money picture, and the door into Growth. Start the full tour from Help to walk through Home, then pots, fixed costs, and income."
+                            "body": "Your grip snapshot for this month — The Coach, the money picture, and the door into Planning. Start the full tour from Help to walk through Home, then pots, fixed costs, and income."
                         },
                         "how": {
                             "heading": "Cómo utilizarlo",
@@ -3816,11 +3816,11 @@
                         },
                         "portals": {
                             "title": "Vuestros productos",
-                            "content": "La sección «Dinero» se encuentra en la barra de navegación superior. Desde aquí puedes acceder a «Crecimiento», «Energía» y «Alma» cuando necesites la siguiente herramienta, un producto cada vez."
+                            "content": "Money lives in the top nav. Planning, Energy, and Mindset open from here when you want that next tool — one product at a time."
                         },
                         "portals_core": {
                             "title": "Your products",
-                            "content": "Money lives in the top nav. Growth opens from here when you want that next tool."
+                            "content": "Money lives in the top nav. Planning opens from here when you want that next tool."
                         }
                     }
                 },
@@ -3828,7 +3828,7 @@
                     "steps": {
                         "brand": {
                             "title": "Inicio",
-                            "content": "Toca el logotipo en cualquier momento para volver a la página de inicio. Las secciones «Dinero» y «Crecimiento» se encuentran en los paneles de la parte superior (o inferior, en dispositivos móviles)."
+                            "content": "Tap the wordmark anytime to return home. Money and Planning live in the portals along the top (or bottom on mobile)."
                         },
                         "period": {
                             "title": "Período",
@@ -3968,7 +3968,7 @@
                     }
                 },
                 "growth": {
-                    "title": "Crecimiento",
+                    "title": "Planning",
                     "sections": {
                         "what_for": {
                             "heading": "Para qué sirve esta sección",
@@ -4380,11 +4380,11 @@
             },
             "portals_section": {
                 "eyebrow": "GRIP ON LIFE — LOS PRODUCTOS",
-                "headline": "Dinero. Crecimiento. Energía. Alma. Una visión general.",
-                "headline_core": "Dinero. Crecimiento. Una visión general.",
+                "headline": "Money. Planning. Energy. Mindset. One overview.",
+                "headline_core": "Money. Planning. One overview.",
                 "more_soon": "Más información próximamente",
-                "lead_core": "Cada producto te ayuda en un aspecto concreto de tu vida. El dinero suele ser el punto de partida para mucha gente; «Crecimiento» te ayuda a avanzar a partir de ahí. Próximamente habrá más productos disponibles. El coach te da un consejo. Tú decides.",
-                "lead": "Cada producto te ayuda en un aspecto concreto de tu vida. El dinero suele ser el punto de partida para mucha gente. Elige «Crecimiento», «Energía» o «Alma» cuando quieras dar el siguiente paso. El coach te da un consejo. Tú decides."
+                "lead_core": "Each product helps with one part of your life. Money is often where people start; Planning helps you move forward from there. More products are on the way. The Coach gives a tip. You decide.",
+                "lead": "Each product helps with one part of your life. Money is often where people start. Open Planning, Energy, or Mindset when you want that next. The Coach gives a tip. You decide."
             },
             "portals": {
                 "money": {
@@ -4394,8 +4394,8 @@
                     "line": "Grip on your money — three groups, a clear picture."
                 },
                 "growth": {
-                    "name": "Crecimiento",
-                    "alt_name": "Crecimiento",
+                    "name": "Planning",
+                    "alt_name": "Planning",
                     "question": "¿Cómo puedo seguir creciendo a partir de aquí?",
                     "line": "Toma las riendas de tu crecimiento —como persona, en más de un sentido—."
                 },
@@ -4406,8 +4406,8 @@
                     "line": "Controla tu energía: el sueño, las horas y el cuerpo están presentes en cada decisión."
                 },
                 "soul": {
-                    "name": "Alma",
-                    "alt_name": "Objetivo",
+                    "name": "Mindset",
+                    "alt_name": "Mindset",
                     "question": "¿Por qué estoy haciendo esto?",
                     "line": "No pierdas de vista tu «porqué»: lo que se esconde tras las cifras."
                 }
@@ -4745,9 +4745,9 @@
                     "best_for": "Primeros pasos, por tu cuenta",
                     "line": "¿Quieres saber en qué te gastas el dinero y crear una rutina semanal de diez minutos, por tu cuenta y sin ningún coste? Es suficiente para empezar, y nunca tendrás motivos para dejarlo.",
                     "f1": "MONEY · your pots, transactions, fixed costs",
-                    "f2": "CRECIMIENTO · ingresos y {maxGoals, plural, one {# objetivo} other {# objetivos}} — prueba Growth",
+                    "f2": "PLANNING · income and {maxGoals, plural, one {# goal} other {# goals}} — taste Planning",
                     "f3": "ENERGÍA · sueño",
-                    "f4": "ALMA · tranquilidad, gratitud, una intención a la semana",
+                    "f4": "MINDSET · stillness, gratitude, one intention a week",
                     "f5": "El entrenador, el control semanal, la puntuación mensual",
                     "f6": "1 plaza completa + 1 plaza de espectador (pareja, entrenador o asesor)",
                     "outcome": {
@@ -4763,9 +4763,9 @@
                     "best_for": "Hogares, parejas, liquidación de deudas",
                     "line": "You share money with a partner or family, want your week planned around your goals, are paying off debt, or want your bank statements in. Most people land here.",
                     "f1": "Todo en Basic",
-                    "f2": "GROWTH · Course — plan your week around the three things that move your goals",
+                    "f2": "PLANNING · Course — plan your week around the three things that move your goals",
                     "f3": "MONEY · debt plan with a freedom date, and bank statement import",
-                    "f4": "CRECIMIENTO · Aprender — libros, cursos, habilidades · hasta {maxGoals} objetivos",
+                    "f4": "MINDSET · Learn — books, courses, skills · up to {maxGoals} goals",
                     "f5": "ENERGÍA · tus 168 horas, entrenamiento, alimentación",
                     "f6": "Hasta {maxMembers} localidades: mezcla de espectadores y público general",
                     "outcome": {
@@ -4782,8 +4782,8 @@
                     "line": "Tus aspectos básicos se mantienen estables y tu patrimonio crece: tu patrimonio neto, la rentabilidad, tu «número de libertad»… y todas las características de todos los productos.",
                     "f1": "Todo lo que incluye la versión Plus",
                     "f2": "DINERO · patrimonio neto, rentabilidad y tu «número de libertad»",
-                    "f3": "CRECIMIENTO · Descubre las recomendaciones en Masterclass, no en Udemy",
-                    "f4": "ALMA · los siete centros",
+                    "f3": "MINDSET · Learn picks on Masterclass, not Udemy",
+                    "f4": "MINDSET · the seven centers",
                     "f5": "Hasta {maxMembers} plazas (más acceso completo)",
                     "outcome": {
                         "money": "Everything in Plus",
@@ -4801,7 +4801,7 @@
             "faq": {
                 "budgeting": {
                     "question": "¿Rumtelo es una aplicación para gestionar el presupuesto?",
-                    "answer": "No. Las aplicaciones de presupuesto se limitan a contabilizar lo que ya ha pasado. Rumtelo te ayuda a ver dónde se ha ido el dinero y a recuperar el control: primero el dinero, luego el crecimiento, la energía y el porqué. La contabilidad es un efecto secundario, no el objetivo."
+                    "answer": "No. Budget apps count what already happened. Rumtelo helps you see where it went, then get grip again — money first, then planning, energy, why. Bookkeeping is a side effect, not the point."
                 },
                 "bank": {
                     "question": "¿Tengo que vincular mi cuenta bancaria?",
@@ -4809,7 +4809,7 @@
                 },
                 "sleep": {
                     "question": "¿Por qué aparecen el sueño, el entrenamiento y los libros en un producto financiero?",
-                    "answer": "Porque lo que da sentido a la vida es algo más que el dinero. Una mente cansada gasta; una mente descansada decide. La energía es la base de toda decisión. El crecimiento abarca el aprendizaje y el avance. El alma guarda el «porqué». Si se omiten esos elementos, una aplicación se convierte en una simple herramienta de contabilidad."
+                    "answer": "Because grip on life is more than money. A tired head spends; a rested head decides. Energy is the floor under every decision. Planning covers learning and moving forward. Mindset keeps the why. Leave those out and an app becomes bookkeeping."
                 },
                 "coach": {
                     "question": "¿Qué hace realmente el entrenador?",
@@ -4884,11 +4884,11 @@
                     },
                     "what": {
                         "title": "Qué es Rumtelo — y qué no es—",
-                        "body": "Rumtelo es una herramienta de gestión personal y un asesor educativo en materia de dinero, crecimiento, energía y bienestar espiritual. Ayuda a las familias a ver en qué se gasta el dinero, a fijarse objetivos y a hacer un balance semanal. Se trata de un software y de un servicio educativo, no de un producto financiero regulado.",
+                        "body": "Rumtelo is a personal overview and educational coach for money, planning, energy and mindset. It helps a household see where money goes, set goals, and review a week. It is software and education — not a regulated financial product.",
                         "items": [
                             "No somos un banco, una entidad de pago, un emisor de dinero electrónico ni un depositario. Nunca retenemos tu dinero ni lo transferimos entre cuentas.",
                             "No soy un corredor de bolsa, una empresa de inversión ni un asesor financiero autorizado. Los consejos y sugerencias del coach tienen carácter informativo general y no constituyen asesoramiento personalizado en materia de inversiones, impuestos, crédito o cuestiones legales.",
-                            "No soy profesional de la medicina, la psicología ni el bienestar. Las funciones relacionadas con la energía y el alma son herramientas opcionales de registro personal, no constituyen un diagnóstico ni un tratamiento.",
+                            "Not a medical, psychological, or wellness practitioner. Energy and mindset features are optional self-logging tools, not diagnosis or treatment.",
                             "Los libros y métodos que mencionamos siguen siendo propiedad de sus respectivos autores. Rumtelo es una entidad independiente y no está afiliada a ellos ni cuenta con su respaldo."
                         ],
                         "after": "Tú eres el único responsable de las decisiones relacionadas con el dinero, la salud y la vida. Si necesitas asesoramiento regulado, consulta a un profesional autorizado en tu país."
@@ -5013,7 +5013,7 @@
                     },
                     "scope": {
                         "title": "¿De quién son los datos y qué servicios?",
-                        "body": "Esta política se aplica a los visitantes del sitio web, a las personas que crean una cuenta y a los miembros del hogar invitados. Abarca los datos relativos a la cuenta, el dinero, el crecimiento, la energía y el alma que introduzcas o importes, así como los registros técnicos y los registros de facturación. No se aplica a los sitios web de terceros a los que enlazamos. Si actuamos únicamente como encargados del tratamiento para un futuro cliente empresarial, dicha relación se regirá por un acuerdo de tratamiento de datos independiente; en el caso de las cuentas familiares, Rumtelo es el responsable del tratamiento."
+                        "body": "This policy covers visitors to the website, people who create an account, and household members who are invited. It covers account, money, planning, energy and mindset data you enter or import, technical logs, and billing records. It does not cover third-party websites we link to. If we act only as a processor for a future business customer, that relationship will be under a separate data-processing agreement — for household accounts, Rumtelo is the controller."
                     },
                     "collect": {
                         "title": "Qué datos recopilamos",
@@ -5022,7 +5022,7 @@
                             "Datos de identidad y contacto: nombre, dirección de correo electrónico, fecha de nacimiento (opcional), preferencias de idioma y configuración regional.",
                             "Seguridad de la cuenta: hash de la contraseña (nunca almacenamos tu contraseña en texto sin cifrar), identificadores de sesión, estado de la autenticación de dos factores (opcional) y claves secretas que debemos conservar para que funcione la autenticación de dos factores, así como el estado de la verificación por correo electrónico.",
                             "Household money data you enter or import: pots, transactions, goals, debts, income splits, week checks, and related product data.",
-                            "Datos opcionales sobre crecimiento, energía y estado de ánimo que decidas registrar (por ejemplo, objetivos, sueño, entrenamiento, alimentación, descanso, intenciones). Puedes utilizar Rumtelo sin rellenar esos campos.",
+                            "Optional planning, energy and mindset data you choose to log (for example goals, sleep, training, food, rest, intention). You can use Rumtelo without filling those portals.",
                             "Miembros del hogar: a quién invitas, su correo electrónico y su función en el hogar.",
                             "Facturación: plan, fechas de renovación, identificadores de cliente y de suscripción de Stripe. Los números de tarjeta los recopila Stripe, no nosotros.",
                             "Los mensajes de asistencia que nos envíes y los archivos que adjuntes.",
@@ -5032,7 +5032,7 @@
                     },
                     "special": {
                         "title": "Datos de categorías especiales y datos sensibles",
-                        "body": "Los registros de actividad (sueño, entrenamiento, alimentación, descanso) y las notas sobre el estado de ánimo o las intenciones pueden revelar información relacionada con la salud o de carácter filosófico. Según el RGPD, estos datos pueden pertenecer a una categoría especial (artículo 9). Solo los tratamos si decides utilizar esas funciones. Al introducir esos datos, nos das tu consentimiento explícito para almacenarlos y mostrártelos a ti y a los miembros de tu hogar a los que invites, así como para utilizarlos con el fin de generar consejos del Coach dentro del producto. Puedes dejar de registrar datos y solicitarnos que los eliminemos. No utilizamos estos datos con fines publicitarios, para evaluar tu solvencia crediticia ni para deducir características para terceros.",
+                        "body": "Energy logs (sleep, training, food, rest) and mindset or intention notes can reveal health or philosophical information. Under GDPR that may be special-category data (Article 9). We process it only if you choose to use those features. By entering that data you give explicit consent for us to store and display it to you and to household members you invite, and to use it to generate Coach tips inside the product. You may stop logging and ask us to delete it. We do not use this data for advertising, scoring your credit, or inferring characteristics for third parties.",
                         "after": "La «información personal sensible» de EE. UU. (incluidos datos financieros precisos de cuentas y registros relacionados con la salud) se utiliza únicamente para ofrecerte las funciones que solicitas. No la vendemos ni la compartimos con fines de publicidad comportamental en distintos contextos."
                     },
                     "sources": {
@@ -5050,7 +5050,7 @@
                         "items": [
                             "Contract (Art. 6(1)(b)) — create and authenticate your account, run the household workspace, show pots, Coach tips and portals you use, provide export, and deliver transactional email (verify, reset, security).",
                             "Intereses legítimos (art. 6, apartado 1, letra f) — garantizar la seguridad del Servicio, prevenir abusos y fraudes, solucionar fallos, conocer el uso agregado del producto sin crear perfiles publicitarios y interponer o defender reclamaciones legales. Puede oponerse; dejaremos de hacerlo a menos que tengamos motivos imperiosos para seguir adelante.",
-                            "Consentimiento (art. 6, apartado 1, letra a), y, en su caso, art. 9, apartado 2, letra a)): registros opcionales de consumo energético o de actividad; conexión opcional con la cuenta bancaria; cualquier correo electrónico de marketing futuro o cookies no esenciales. Puede retirar su consentimiento en cualquier momento sin que ello afecte al tratamiento realizado antes de dicha retirada.",
+                            "Consent (Art. 6(1)(a) and, where needed, Art. 9(2)(a)) — optional energy/mindset logs; optional bank connect; any future marketing email or non-essential cookies. You may withdraw consent at any time without affecting processing before withdrawal.",
                             "Obligación legal (art. 6, apartado 1, letra c) — registros fiscales, contables y relacionados con la legislación en materia de consumo para los planes de pago; responder a las solicitudes legítimas de las autoridades."
                         ]
                     },
@@ -5191,7 +5191,7 @@
                         "items": [
                             "Contract — create and run your account, household workspace, pots, Coach tips, export, and the product features you use.",
                             "Interés legítimo: seguridad, prevención del fraude y los abusos, fiabilidad y mejora del producto que no requiera perfiles publicitarios; sopesado frente a tus derechos, con la posibilidad de excluirte de los análisis de mejora en caso de que, en su momento, incorporemos métricas opcionales.",
-                            "Consentimiento: conexión bancaria opcional; registros opcionales de energía y del alma (y consentimiento explícito según el artículo 9 cuando dichos registros constituyan datos de categorías especiales); cualquier cookie futura de marketing o no esencial.",
+                            "Consent — optional bank connect; optional energy and mindset logs (and Article 9 explicit consent where those logs are special-category data); any future marketing or non-essential cookies.",
                             "Obligación legal: registros fiscales, contables y de consumidores para los planes de pago; solicitudes legítimas."
                         ]
                     },
@@ -5241,7 +5241,7 @@
                             "Nombre comercial: Rumtelo",
                             "Lugar de establecimiento: Ámsterdam, Países Bajos",
                             "Denominación social, número de la Cámara de Comercio (KvK), número de IVA y dirección de contacto: se publicarán aquí cuando estén disponibles para la entidad operadora, y siempre estarán disponibles previa solicitud en support@rumtelo.com.",
-                            "Actividad: visión general del presupuesto familiar y asesoramiento educativo (dinero, crecimiento, energía, espíritu). No es un banco, una entidad de pago ni un asesor financiero autorizado."
+                            "Activity: household overview and educational coach (money, planning, energy, mindset). Not a bank, payment institution, or licensed financial adviser."
                         ]
                     },
                     "contact": {
@@ -5285,7 +5285,7 @@
             "fixed_costs": "Costes fijos",
             "fixed_cost": "Coste fijo",
             "week_check": "Resumen semanal",
-            "growth": "Crecimiento · visión general",
+            "growth": "Planning · overview",
             "goals": "Objetivos",
             "goal": "Objetivo",
             "income": "Mis ingresos",
@@ -5301,7 +5301,7 @@
             "sleep": "Sueño",
             "training": "Formación",
             "food": "Alimentación",
-            "soul": "Soul · descripción general",
+            "soul": "Mindset · overview",
             "stillness": "Silencio",
             "gratitude": "Agradecimiento",
             "giving": "Dar",
@@ -5341,16 +5341,16 @@
             "groups": {
                 "home": "Inicio",
                 "money": "Mi dinero",
-                "growth": "Mi crecimiento",
+                "growth": "My planning",
                 "energy": "Mi energía",
-                "soul": "Mi alma"
+                "soul": "My mindset"
             },
             "pills": {
                 "home": "Inicio",
                 "money": "Dinero",
-                "growth": "Crecimiento",
+                "growth": "Planning",
                 "energy": "Energía",
-                "soul": "Alma",
+                "soul": "Mindset",
                 "you": "You"
             },
             "children": {
@@ -5441,7 +5441,8 @@
             "aria": {
                 "mobile_tabs": "Main",
                 "money_sections": "Money sections",
-                "growth_sections": "Growth sections"
+                "growth_sections": "Planning sections",
+                "soul_sections": "Mindset sections"
             }
         },
         "onboarding": {
@@ -5642,14 +5643,14 @@
                 "household_label": "Hogar",
                 "access_eyebrow": "Acceso",
                 "progress_eyebrow": "Instantánea del portal",
-                "progress_blurb": "Live money, growth, energy, and soul metrics will appear here for managed clients.",
-                "progress_blurb_core": "Live money and growth metrics for this household.",
+                "progress_blurb": "Live money, planning, energy, and mindset metrics for this household.",
+                "progress_blurb_core": "Live money and planning metrics for this household.",
                 "progress_pending": "Waiting for the client to accept the invitation.",
                 "progress_view_only": "Acceso de lectura: invitación aceptada. Cambia a Gestionar para patrocinar su plan Plus.",
                 "portal_money": "Dinero",
-                "portal_growth": "Crecimiento",
+                "portal_growth": "Planning",
                 "portal_energy": "Energía",
-                "portal_soul": "Alma",
+                "portal_soul": "Mindset",
                 "portal_placeholder": "—",
                 "portal_coming": "Connects when live coaching data is available",
                 "portal_money_hint": "Gasto de este mes",
@@ -5896,9 +5897,9 @@
             "sections": {
                 "general": "Generalidades",
                 "money": "Dinero",
-                "growth": "Crecimiento",
+                "growth": "Planning",
                 "energy": "Energía",
-                "soul": "Alma",
+                "soul": "Mindset",
                 "data": "Datos"
             },
             "tabs": {
@@ -6211,8 +6212,8 @@
                 },
                 "coach": {
                     "eyebrow": "El entrenador",
-                    "blurb": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, pot cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money, growth, energy, and soul.",
-                    "blurb_core": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, pot cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money and growth.",
+                    "blurb": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, pot cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money, planning, energy, and mindset.",
+                    "blurb_core": "The Coach never scolds — only clear next moves. On-screen tips (why-lines, pot cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money and planning.",
                     "toggle": "Mostrar «The Coach» en las pantallas",
                     "hint_on": "On — look for the ✦ The Coach mark. Your tips stay at Home → The Coach.",
                     "hint_off": "Off — on-screen tips hidden. Your tips are still at Home → The Coach anytime."
@@ -6372,7 +6373,7 @@
                     "blurb": "Qué lejanos parecen los cálculos sobre los objetivos y la libertad. A corto plazo, todo parece urgente; a largo plazo, se aprecia el efecto de la capitalización.",
                     "horizon_aria": "Horizonte de planificación en meses",
                     "months": "{count} meses",
-                    "stub": "Horizon conserva la configuración de crecimiento cuando se implementa esa API."
+                    "stub": "Horizon persists with planning settings when that API lands."
                 },
                 "course_calendar": {
                     "eyebrow": "Tu calendario",
@@ -6424,8 +6425,8 @@
                 },
                 "sharing": {
                     "eyebrow": "Privacidad y uso compartido",
-                    "blurb": "Lo que los miembros pueden compartir en las secciones «Crecimiento», «Energía», «Alma» y «Dinero». Solo el propietario puede modificar esto. Siempre es posible guardarse algo para uno mismo.",
-                    "blurb_core": "What members may share in Growth and Money. Only the owner changes this. Keeping something to yourself is always possible.",
+                    "blurb": "What members may share in Planning, Energy, Mindset and Money. Only the owner changes this. Keeping something to yourself is always possible.",
+                    "blurb_core": "What members may share in Planning and Money. Only the owner changes this. Keeping something to yourself is always possible.",
                     "owner_only": "Solo el titular del hogar puede modificarlo.",
                     "mode_label": "¿Qué pueden compartir los socios?",
                     "modes": {
@@ -7139,12 +7140,12 @@
                     "body": "Income comes in and splits over Basics, Future and Free. Split first. Spend second. Rumtelo never moves money at your bank — you do. We show the overview."
                 },
                 "direction": {
-                    "body": "Mirar atrás es solo la mitad de la historia. El crecimiento te ayuda a avanzar: habilidades, objetivos, aprendizaje e ingresos, si así lo deseas."
+                    "body": "Looking back is only half the story. Planning helps you move forward — skills, goals, learning, and income if you want."
                 }
             },
             "wider_eyebrow": "✦ Productos. Una idea: agarre a la vida.",
-            "wider_lead_full": "Abre un producto cuando necesites esa herramienta. Hoy puedes utilizar «Dinero», «Crecimiento», «Energía» y «Alma», y pronto habrá más. El coach te da un consejo. Tú decides.",
-            "wider_lead_core": "Abre un producto cuando necesites esa herramienta. «Dinero» y «Crecimiento» ya están disponibles; pronto habrá más. El Coach te da un consejo. Tú decides.",
+            "wider_lead_full": "Open a product when you want that tool. Today you can use Money, Planning, Energy, and Mindset — and more will come. The Coach gives a tip. You decide.",
+            "wider_lead_core": "Open a product when you want that tool. Money and Planning are ready today — more will come. The Coach gives a tip. You decide.",
             "portals": {
                 "money": {
                     "line": "Toma las riendas de tu dinero.",

@@ -1,7 +1,7 @@
-/** Soul portal — page headings and empty states. */
+/** Mindset portal (code key `soul`) — page headings and empty states. */
 const soul = {
     hub: {
-        eyebrow: 'Soul · the why',
+        eyebrow: 'Mindset · the why',
         title: 'The why under the numbers.',
         line: 'Grip on your why — stillness, gratitude, intention.',
         cards: {

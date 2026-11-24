@@ -22,7 +22,7 @@ const brand = {
         how_it_works: {
             eyebrow: 'How it works',
             headline: 'Split first. Spend second.',
-            support: 'Money. Growth. Energy. Soul — tools for grip on life.',
+            support: 'Money. Planning. Energy. Mindset — tools for grip on life.',
         },
         who_its_for: {
             eyebrow: 'Who it’s for',
@@ -39,16 +39,16 @@ const brand = {
     auth_manifesto: {
         brand_lines_aria: 'Brand lines',
         portals_eyebrow: 'Grip on life',
-        portals_line: 'Money. Growth. Energy. Soul — tools for grip on life.',
-        /** While Energy + Soul are held back in production. */
-        portals_line_core: 'Money. Growth — tools for grip on life, with more to come.',
+        portals_line: 'Money. Planning. Energy. Mindset — tools for grip on life.',
+        /** While Energy + Mindset are held back in production. */
+        portals_line_core: 'Money. Planning — tools for grip on life, with more to come.',
         jars_eyebrow: 'Rumtelo Pots',
         jars_line: 'Paycheck in. Already assigned.',
         portals: {
             money: { name: 'Money', short: 'MONEY' },
-            growth: { name: 'Growth', short: 'GROWTH' },
+            growth: { name: 'Planning', short: 'PLANNING' },
             energy: { name: 'Energy', short: 'ENERGY' },
-            soul: { name: 'Soul', short: 'SOUL' },
+            soul: { name: 'Mindset', short: 'MINDSET' },
         },
     },
     /** Application auth — pull them back into the habit. */

@@ -2,7 +2,7 @@
 const coach = {
     page_title: 'The Coach',
     eyebrow: 'Across every portal',
-    lead: 'One tip at a time from money, growth, energy, and soul — so you keep grip. Never shame. You choose.',
+    lead: 'One tip at a time from money, planning, energy, and mindset — so you keep grip. Never shame. You choose.',
     empty_title: 'Nothing to coach yet',
     empty_body: 'Log income, pots, or sleep — the Coach speaks when there is enough to see.',
     empty_quiet:
@@ -63,7 +63,7 @@ const coach = {
         metric_sleep: 'Quality, not hours — the diary already holds sleep length.',
         metric_food: 'How well did you fuel — not a calorie log.',
         metric_train: 'Session quality if you trained; skip if you did not.',
-        metric_mind: 'Stillness / settled mind — same score Soul writes.',
+        metric_mind: 'Stillness / settled mind — same score Mindset writes.',
         toast_sorted: 'Sorted into a pot',
         toast_paid: 'Marked paid',
         toast_skipped: 'Skipped for this month',

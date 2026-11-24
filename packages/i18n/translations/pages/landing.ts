@@ -152,13 +152,13 @@ const landing = {
     },
     portals_section: {
         eyebrow: 'GRIP ON LIFE — THE PRODUCTS',
-        headline: 'Money. Growth. Energy. Soul. One overview.',
-        /** `*_core` while Energy + Soul are held back in production. */
-        headline_core: 'Money. Growth. One overview.',
+        headline: 'Money. Planning. Energy. Mindset. One overview.',
+        /** `*_core` while Energy + Mindset are held back in production. */
+        headline_core: 'Money. Planning. One overview.',
         more_soon: 'More soon',
         lead_core:
-            'Each product helps with one part of your life. Money is often where people start; Growth helps you move forward from there. More products are on the way. The Coach gives a tip. You decide.',
-        lead: 'Each product helps with one part of your life. Money is often where people start. Open Growth, Energy, or Soul when you want that next. The Coach gives a tip. You decide.',
+            'Each product helps with one part of your life. Money is often where people start; Planning helps you move forward from there. More products are on the way. The Coach gives a tip. You decide.',
+        lead: 'Each product helps with one part of your life. Money is often where people start. Open Planning, Energy, or Mindset when you want that next. The Coach gives a tip. You decide.',
     },
     portals: {
         money: {
@@ -168,8 +168,8 @@ const landing = {
             line: 'Grip on your money — three groups, a clear picture.',
         },
         growth: {
-            name: 'Growth',
-            alt_name: 'Groei',
+            name: 'Planning',
+            alt_name: 'Planning',
             question: 'How do I grow from here?',
             line: 'Grip on your growth — as a person, in more than one direction.',
         },
@@ -180,8 +180,8 @@ const landing = {
             line: 'Grip on your energy — sleep, hours, body under every decision.',
         },
         soul: {
-            name: 'Soul',
-            alt_name: 'Ziel',
+            name: 'Mindset',
+            alt_name: 'Mindset',
             question: 'Why am I doing this?',
             line: 'Grip on your why — the quiet under the numbers.',
         },
@@ -312,7 +312,7 @@ const landing = {
     },
     principles_section: {
         eyebrow: 'FOUR PRINCIPLES WE DON’T BREAK',
-        /** Used while Energy + Soul are held back in production (principle 3 is hidden). */
+        /** Used while Energy + Mindset are held back in production (principle 3 is hidden). */
         eyebrow_core: 'THREE PRINCIPLES WE DON’T BREAK',
         headline: 'If a feature fights a principle, the feature loses.',
     },
@@ -512,9 +512,9 @@ const landing = {
             best_for: 'Getting started, on your own',
             line: 'You want to see where your money goes and build the ten-minute weekly routine — solo, at no cost. Enough to start, and never a reason to stop.',
             f1: 'MONEY · your pots, transactions, fixed costs',
-            f2: 'GROWTH · income and {maxGoals, plural, one {# goal} other {# goals}} — taste Growth',
+            f2: 'PLANNING · income and {maxGoals, plural, one {# goal} other {# goals}} — taste Planning',
             f3: 'ENERGY · sleep',
-            f4: 'SOUL · stillness, gratitude, one intention a week',
+            f4: 'MINDSET · stillness, gratitude, one intention a week',
             f5: 'The Coach, the week check, the month score',
             f6: '1 full + 1 viewer seat (partner, coach or advisor)',
             outcome: {
@@ -530,9 +530,9 @@ const landing = {
             best_for: 'Households, couples, paying off debt',
             line: 'You share money with a partner or family, want your week planned around your goals, are paying off debt, or want your bank statements in. Most people land here.',
             f1: 'Everything in Basic',
-            f2: 'GROWTH · Course — plan your week around the three things that move your goals',
+            f2: 'PLANNING · Course — plan your week around the three things that move your goals',
             f3: 'MONEY · debt plan with a freedom date, and bank statement import',
-            f4: 'GROWTH · Learn — books, courses, skills · up to {maxGoals} goals',
+            f4: 'MINDSET · Learn — books, courses, skills · up to {maxGoals} goals',
             f5: 'ENERGY · your 168 hours, training, food',
             f6: 'Up to {maxMembers} seats — full and viewer mix',
             outcome: {
@@ -549,8 +549,8 @@ const landing = {
             line: 'Your basics run steady and you’re growing wealth: net worth, returns, your freedom number — and every feature in every product.',
             f1: 'Everything in Plus',
             f2: 'MONEY · net worth, returns and your freedom number',
-            f3: 'GROWTH · Learn picks on Masterclass, not Udemy',
-            f4: 'SOUL · the seven centers',
+            f3: 'MINDSET · Learn picks on Masterclass, not Udemy',
+            f4: 'MINDSET · the seven centers',
             f5: 'Up to {maxMembers} seats (more full access)',
             outcome: {
                 money: 'Everything in Plus',
@@ -568,7 +568,7 @@ const landing = {
     faq: {
         budgeting: {
             question: 'Is Rumtelo a budgeting app?',
-            answer: 'No. Budget apps count what already happened. Rumtelo helps you see where it went, then get grip again — money first, then growth, energy, why. Bookkeeping is a side effect, not the point.',
+            answer: 'No. Budget apps count what already happened. Rumtelo helps you see where it went, then get grip again — money first, then planning, energy, why. Bookkeeping is a side effect, not the point.',
         },
         bank: {
             question: 'Do I need to connect my bank?',
@@ -576,7 +576,7 @@ const landing = {
         },
         sleep: {
             question: 'Why are sleep, training and books in a money product?',
-            answer: 'Because grip on life is more than money. A tired head spends; a rested head decides. Energy is the floor under every decision. Growth covers learning and moving forward. Soul keeps the why. Leave those out and an app becomes bookkeeping.',
+            answer: 'Because grip on life is more than money. A tired head spends; a rested head decides. Energy is the floor under every decision. Planning covers learning and moving forward. Mindset keeps the why. Leave those out and an app becomes bookkeeping.',
         },
         coach: {
             question: 'What does the Coach actually do?',

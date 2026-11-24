@@ -44,7 +44,7 @@ const capabilities = {
     },
     'growth-overview': {
         name: 'Overview',
-        description: 'Growth overview.',
+        description: 'Planning overview.',
     },
     'growth-goals': {
         name: 'Goals',
@@ -87,7 +87,7 @@ const capabilities = {
     },
     'soul-overview': {
         name: 'Overview',
-        description: 'Soul overview.',
+        description: 'Mindset overview.',
     },
     'soul-stillness': {
         name: 'Stillness',

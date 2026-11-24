@@ -7,9 +7,9 @@ const settings = {
     sections: {
         general: 'General',
         money: 'Money',
-        growth: 'Growth',
+        growth: 'Planning',
         energy: 'Energy',
-        soul: 'Soul',
+        soul: 'Mindset',
         data: 'Data',
     },
     tabs: {
@@ -289,9 +289,9 @@ const settings = {
         },
         coach: {
             eyebrow: 'The Coach',
-            blurb: 'The Coach never scolds — only clear next moves. On-screen tips (why-lines, pot cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money, growth, energy, and soul.',
+            blurb: 'The Coach never scolds — only clear next moves. On-screen tips (why-lines, pot cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money, planning, energy, and mindset.',
             blurb_core:
-                'The Coach never scolds — only clear next moves. On-screen tips (why-lines, pot cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money and growth.',
+                'The Coach never scolds — only clear next moves. On-screen tips (why-lines, pot cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money and planning.',
             toggle: 'Show The Coach on screens',
             hint_on: 'On — look for the ✦ The Coach mark. Your tips stay at Home → The Coach.',
             hint_off:
@@ -461,7 +461,7 @@ const settings = {
             blurb: 'How far ahead the goal and freedom calculations look. Shorter feels urgent, longer shows the compounding.',
             horizon_aria: 'Planning horizon in months',
             months: '{count} months',
-            stub: 'Horizon persists with growth settings when that API lands.',
+            stub: 'Horizon persists with planning settings when that API lands.',
         },
         course_calendar: {
             eyebrow: 'Your calendar',
@@ -516,9 +516,9 @@ const settings = {
         },
         sharing: {
             eyebrow: 'Privacy and sharing',
-            blurb: 'What members may share in Growth, Energy, Soul and Money. Only the owner changes this. Keeping something to yourself is always possible.',
+            blurb: 'What members may share in Planning, Energy, Mindset and Money. Only the owner changes this. Keeping something to yourself is always possible.',
             blurb_core:
-                'What members may share in Growth and Money. Only the owner changes this. Keeping something to yourself is always possible.',
+                'What members may share in Planning and Money. Only the owner changes this. Keeping something to yourself is always possible.',
             owner_only: 'Only the owner of the household can change this.',
             mode_label: 'What may members share?',
             modes: {

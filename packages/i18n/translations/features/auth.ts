@@ -36,7 +36,7 @@ const auth = {
         /** Sign-up direction — pre-picked from the pricing tab (`?as=`). */
         audience_label: 'I’m signing up as',
         audience_individual: 'Individual or household',
-        audience_individual_hint: 'Your own money, growth, energy and soul',
+        audience_individual_hint: 'Your own money, planning, energy and mindset',
         audience_practice: 'Practice',
         audience_practice_hint: 'A coach or advisor helping clients',
         practice_note: 'After you confirm your email, you’ll set up your practice desk.',
