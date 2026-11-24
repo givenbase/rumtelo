@@ -8,10 +8,15 @@ import { useForm, useWatch } from 'react-hook-form';
 
 import {
     JAR_GROUP_ORDER,
+    JAR_MAIN_KEY_BY_GROUP,
+    JAR_ORDER_IN_GROUP,
     JarGroup,
+    OPTIONAL_JAR_SHARE,
+    isMainJarKey,
     jarGroupFor,
     sumPercentageByGroup,
     type Jar,
+    type OptionalJarKey,
 } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
@@ -33,10 +38,9 @@ import { sameShares } from '@/app/_lib/jar-group-split';
 import { isLiveData } from '@/app/_lib/preview';
 import { evaluateSplitCoach, orderSplitTips, pctByJarKey } from '@/app/_lib/split-coach';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
-import { useJarName } from '@/app/_lib/use-jar-name';
+import { useJarName, useJarPurpose } from '@/app/_lib/use-jar-name';
 import { HelperGate } from '@/components/features/helpers';
 import { BankAccountRow } from '@/components/features/money/bank-account-row';
-import { JarsRefineGroup } from '@/components/features/money/jars-refine-group';
 import { usePotRefineControls } from '@/components/features/money/use-pot-refine-controls';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -53,7 +57,9 @@ type JarsSettingsValues = {
 export function JarsSettings() {
     const t = useTranslations();
     const tGroups = useTranslations('features.money.groups');
+    const tJars = useTranslations('features.money.jars');
     const jarName = useJarName();
+    const jarPurpose = useJarPurpose();
     const locale = useLocale();
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
@@ -451,31 +457,117 @@ export function JarsSettings() {
                                         {formatShare(groupShares[group], locale)}%
                                     </span>
                                 </header>
-                                {groupJars.map((jar, i) => {
-                                    const value = pct[jar.id] ?? jar.percentage;
+                                {/* One list per group: every pot it can have. A pot that is on
+                                    shows its share and amount; an optional pot has its on/off
+                                    button on the same row; the main pot is always on. */}
+                                {JAR_ORDER_IN_GROUP[group].map((key, i, keys) => {
+                                    const jar = groupJars.find(row => row.key === key) ?? null;
+                                    const isMain = isMainJarKey(key);
+                                    const optionalKey = isMain ? null : (key as OptionalJarKey);
+                                    const name = jar ? jarName(jar) : tJars(`names.${key}`);
+                                    const groupTitle = tGroups(`${group}.title`);
+                                    const mainJar = groupJars.find(
+                                        row => row.key === JAR_MAIN_KEY_BY_GROUP[group]
+                                    );
+                                    const mainName = mainJar ? jarName(mainJar) : groupTitle;
+                                    const nameId = `pct-name-${key}`;
+                                    const buttonId = `pct-action-${key}`;
+                                    const working = pendingKey === key;
+                                    const value = jar ? (pct[jar.id] ?? jar.percentage) : 0;
                                     const allocated = Math.round((monthlyNet * value) / 100);
-                                    const name = jarName(jar);
+                                    const badge = isMain
+                                        ? tGroups('refine.always_on')
+                                        : jar
+                                          ? tGroups('refine.turned_on')
+                                          : tGroups('refine.optional_label');
+                                    const toggle =
+                                        optionalKey && canRefine ? (
+                                            <Button
+                                                id={buttonId}
+                                                type="button"
+                                                variant={jar ? 'secondary' : 'primary'}
+                                                size="sm"
+                                                // The button's own text plus the pot name: "Turn off Daily".
+                                                aria-labelledby={`${buttonId} ${nameId}`}
+                                                disabled={hasUnsavedShares || pendingKey !== null}
+                                                aria-busy={working}
+                                                className="min-h-11 shrink-0"
+                                                onClick={() =>
+                                                    jar ? onTurnOff(jar) : onTurnOn(optionalKey)
+                                                }>
+                                                {working
+                                                    ? t('pages.settings.working')
+                                                    : jar
+                                                      ? tGroups('refine.turn_off')
+                                                      : tGroups('refine.turn_on')}
+                                            </Button>
+                                        ) : null;
+                                    const nameAndBadge = (
+                                        <>
+                                            <label
+                                                id={nameId}
+                                                htmlFor={jar ? `pct-${jar.id}` : undefined}
+                                                className="min-w-0 text-sm break-words text-fg">
+                                                {name}
+                                            </label>
+                                            <span className="rounded-full border border-line bg-raised px-2 py-0.5 font-mono text-[11px] leading-snug whitespace-nowrap text-fg-muted">
+                                                {badge}
+                                            </span>
+                                        </>
+                                    );
+                                    const rowClass = cn(
+                                        'grid gap-1.5 py-2',
+                                        i < keys.length - 1 && 'border-b border-line'
+                                    );
+                                    if (!jar) {
+                                        // An optional pot that is off: what it is for, what turning it on does.
+                                        return (
+                                            <div key={key} className={rowClass}>
+                                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                                                    <span className="grid min-w-0 basis-full gap-0.5 sm:flex-1 sm:basis-0">
+                                                        <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                                                            {nameAndBadge}
+                                                        </span>
+                                                        <span className="text-xs leading-snug text-fg-muted">
+                                                            {jarPurpose(key)}
+                                                        </span>
+                                                        {optionalKey ? (
+                                                            <span className="text-xs leading-snug text-fg-secondary">
+                                                                {tGroups('refine.turn_on_effect', {
+                                                                    share: formatShare(
+                                                                        OPTIONAL_JAR_SHARE[
+                                                                            optionalKey
+                                                                        ],
+                                                                        locale
+                                                                    ),
+                                                                    main: mainName,
+                                                                    pot: name,
+                                                                    group: groupTitle,
+                                                                    percent: formatShare(
+                                                                        groupShares[group],
+                                                                        locale
+                                                                    ),
+                                                                })}
+                                                            </span>
+                                                        ) : null}
+                                                    </span>
+                                                    {toggle}
+                                                </div>
+                                            </div>
+                                        );
+                                    }
                                     return (
-                                        <div
-                                            key={jar.id}
-                                            className={cn(
-                                                'grid gap-1.5 py-2',
-                                                i < groupJars.length - 1 && 'border-b border-line'
-                                            )}>
+                                        <div key={key} className={rowClass}>
                                             {/* Below sm the label gets its own line and wraps, so a long Dutch pot name is never clipped; the controls sit under it. */}
                                             <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
-                                                <span className="flex min-w-0 basis-full items-center gap-2 sm:flex-1 sm:basis-0">
+                                                <span className="flex min-w-0 basis-full flex-wrap items-center gap-x-2 gap-y-1 sm:flex-1 sm:basis-0">
                                                     <span
                                                         className={cn(
                                                             'size-1.5 shrink-0 rounded-sm',
                                                             JAR_COLOR[jar.key] ?? 'bg-accent'
                                                         )}
                                                     />
-                                                    <label
-                                                        htmlFor={`pct-${jar.id}`}
-                                                        className="min-w-0 text-sm break-words text-fg">
-                                                        {name}
-                                                    </label>
+                                                    {nameAndBadge}
                                                 </span>
                                                 <Input
                                                     id={`pct-${jar.id}`}
@@ -501,6 +593,7 @@ export function JarsSettings() {
                                                 <span className="ml-auto w-20 shrink-0 text-right text-xs whitespace-nowrap text-fg-muted tabular-nums sm:ml-0">
                                                     {formatMoney(allocated)}
                                                 </span>
+                                                {toggle}
                                             </div>
                                             <Meter
                                                 value={value / 100}
@@ -509,17 +602,11 @@ export function JarsSettings() {
                                         </div>
                                     );
                                 })}
-                                <JarsRefineGroup
-                                    group={group}
-                                    groupTitle={tGroups(`${group}.title`)}
-                                    groupShare={groupShares[group]}
-                                    jars={jars}
-                                    canRefine={canRefine}
-                                    blockedByEdits={hasUnsavedShares}
-                                    pendingKey={pendingKey}
-                                    onTurnOn={onTurnOn}
-                                    onTurnOff={onTurnOff}
-                                />
+                                {canRefine && hasUnsavedShares ? (
+                                    <p className="pb-1 text-xs leading-snug text-warning">
+                                        {tGroups('refine.save_first')}
+                                    </p>
+                                ) : null}
                             </section>
                         );
                     })}

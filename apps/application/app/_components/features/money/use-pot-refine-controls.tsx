@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from 'react';
 
-import { mainJarKeyFor, type OptionalJarKey } from '@rumtelo/contracts';
+import { mainJarKeyFor, type Jar, type OptionalJarKey } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import {
     Button,
@@ -18,10 +18,11 @@ import { formatShare } from '@/app/_lib/jar-group';
 import { useJarName } from '@/app/_lib/use-jar-name';
 import { usePotActivation } from '@/app/_lib/use-pot-activation';
 
-import type { RefineJar } from './jars-refine-group';
+/** What turning a pot off needs to know about it. */
+export type RefineJar = Pick<Jar, 'id' | 'key' | 'name' | 'percentage'>;
 
 /**
- * Everything `JarsRefineGroup` needs from its parent, in one place so Settings › Pots and the
+ * Everything a list of pots needs to turn optional pots on and off, in one place so Settings › Pots and the
  * pots board turn pots on and off the same way: the mutations (`usePotActivation`), which pot is
  * pending, and the confirmation for turning one off. Render `dialog` once next to the groups.
  */
