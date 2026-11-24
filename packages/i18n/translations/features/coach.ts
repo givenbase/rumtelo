@@ -101,28 +101,6 @@ const coach = {
     got_it: 'Got it',
     split_more: '{count, plural, =1 {1 more tip} other {# more tips}}',
     split_tips: {
-        'play-above-default':
-            'Fun above 10% usually comes out of Investing or Buffer and goals. Those two build your future; Fun spends this month.',
-        'play-above-default-saver':
-            'Fun above 10% can be healthy if you rarely spend on joy — just don’t pay for it by cutting Investing.',
-        'give-above-default':
-            'Giving above 5% is generous — keep Investing at 10% or more so giving doesn’t replace paying yourself first.',
-        'edu-above-soft':
-            'Learning raises your earning power — still keep Investing at 10% so learning doesn’t crowd out investing.',
-        'ff-below-default':
-            'Investing under 10% means you’re paying everyone else first. Put yourself back in the split before raising Fun or Giving.',
-        'lts-below-default':
-            'Buffer and goals under 10% leaves little room for setbacks and planned big things. Raise this before raising Fun.',
-        'future-vs-fun':
-            'You’re funding today (Fun, Giving) while shrinking tomorrow (Investing, Buffer and goals). Raise those two before fun.',
-        'nec-high':
-            'Fixed costs and daily above 60% squeezes every other pot. Cutting fixed costs usually helps more than cutting Investing.',
-        'nec-low':
-            'Fixed costs and daily under 45% is tight for most households — check that rent, insurance and debt instalments still fit.',
-        'spender-ff':
-            'Your pattern leans spender — try 1–2% more into Investing before adding to Fun.',
-        'saver-play':
-            'Your pattern leans saver — a little more Fun helps you keep the split up. Joy that is planned is not waste.',
         // Group-level tips for Rumtelo Pots (three pots by default); limits in GROUP_SOFT_CEILING / _FLOOR.
         'basics-high':
             'Basics is above 60% of your income — what must be paid takes most of it. Look at your biggest fixed cost first; the split is not the thing to squeeze.',

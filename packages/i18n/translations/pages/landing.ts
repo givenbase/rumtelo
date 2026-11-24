@@ -292,7 +292,6 @@ const landing = {
         signature: 'Given Loyiso, founder & CEO · Charissa Peroti, co-founder · Amsterdam',
         manifesto: 'Don’t chase the number. Own the direction.',
         audience: 'Built for people who are doing well — and for people who are ready to.',
-        more_books: 'More books',
         books: {
             rich_dad: {
                 title: 'Rich Dad Poor Dad',
@@ -303,11 +302,6 @@ const landing = {
                 title: 'Think and Grow Rich',
                 author: 'Napoleon Hill',
                 line: 'Intention, habit and a clear why — the mindset under every number.',
-            },
-            millionaire_mind: {
-                title: 'Secrets of the Millionaire Mind',
-                author: 'T. Harv Eker',
-                line: 'Give every amount a job the second it lands.',
             },
             psychology: {
                 title: 'The Psychology of Money',

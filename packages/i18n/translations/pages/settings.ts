@@ -131,9 +131,10 @@ const settings = {
         upgrade_overlay_body:
             'You chose {plan} ({interval}) on the website. Account setup is done — next is Stripe Checkout to activate the plan. You can skip and stay on Basic, then upgrade anytime in Settings → Plan.',
         stay_on_basic: 'Stay on Basic',
-        add_seat_cta: 'Add a seat (€2.50 / month)',
+        add_seat_cta: 'Add a seat under Plan',
+        add_seat_owner: 'Ask the owner to add a seat.',
         add_seat_stub:
-            'Extra seats are coming soon — you can still use the seats included in your plan.',
+            'Need more people on the board? A paid plan can add extra seats — the price is shown under Plan.',
     },
     saved: 'Settings saved',
     save_failed: 'Could not save settings',
@@ -730,8 +731,49 @@ const settings = {
             split_ok: 'Pot split will be applied',
             split_skip: 'Pot split unchanged',
             format_note:
-                'Accepts Rumtelo JSON, the CSV zip from Export, or one sheet (settings.csv, pots.csv, transactions.csv, …). We detect the sheet from the file name or columns. Bank statement CSVs still go under Bank.',
+                'Accepts Rumtelo JSON, the CSV zip from Export, or one sheet (settings.csv, jars.csv, transactions.csv, …). We detect the sheet from the file name or columns. Bank statement CSVs still go under Bank.',
             sign_in_stub: 'Sign in to import data.',
+            /** Restore errors whose standard copy points at a form this screen does not have. */
+            errors: {
+                invalid_iban:
+                    'An IBAN in the file is not valid. Fix that row in the CSV, or export again, then import again. What is already in is skipped.',
+                due_month_required:
+                    'A quarterly or yearly fixed cost in the file has no month it is charged in. Add the month to that row in the CSV, or export again, then import again.',
+                settlement_account_invalid:
+                    'A row in the file names an account to pay from that is not valid. Fix that row in the CSV, or export again, then import again.',
+            },
+            warnings_more: 'and {count} more',
+            /** Restore warnings (`ArchiveRestoreResult.warnings`): what happened, then one next move. */
+            warnings: {
+                title_preview: 'Check before you import',
+                title_done: 'Imported, with a few things to look at',
+                generic:
+                    'Part of this file could not be applied. Check the counts above, then add what is missing by hand.',
+                jar_split_incomplete:
+                    'The pot split in the file does not match the pots you have on, so your split stays as it is. Set it under Pots.',
+                jar_split_not_100:
+                    'The pot split in the file does not add up to 100%, so your split stays as it is. Set it under Pots.',
+                bank_unknown_key:
+                    'The bank "{bank}" from the file is not available here, so its accounts are skipped. Add them by hand under Bank.',
+                bank_unknown:
+                    'A bank from the file is not available here, so its accounts are skipped. Add them by hand under Bank.',
+                account_reconnect_needed:
+                    'Accounts that were linked to a bank come in unlinked. Link them again under Bank.',
+                settlement_account_missing:
+                    'A credit account could not be tied to the account that pays it off. Choose the paying account on the credit account.',
+                asset_link_unmapped:
+                    'Some items pointed to an asset this household does not have, so that link is empty. Add the asset, then link it again.',
+                debts_skipped_plan:
+                    'Your plan does not include debts, so they are skipped. Look under Plan to bring them in.',
+                goals_skipped_plan:
+                    'Your plan does not include goals, so they are skipped. Look under Plan to bring them in.',
+                goals_limit_reached:
+                    'You have reached the goal limit of your plan, so the other goals are skipped. Finish a goal or look under Plan.',
+                fixed_cost_jar_unmapped:
+                    'Some fixed costs have no pot here that takes bills, so they are skipped. Turn that pot on under Pots, or add the cost by hand.',
+                goal_give_pot_missing:
+                    'Giving goals need the Giving pot, which is off in this household, so they are skipped. Turn it on under Pots, then import again.',
+            },
         },
         sign_out_sub: 'You stay signed in for 30 days on this device',
     },

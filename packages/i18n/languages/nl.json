@@ -543,32 +543,6 @@
                         "name": "Ziel",
                         "short": "SOUL"
                     }
-                },
-                "jars": {
-                    "necessity": {
-                        "name": "Vaste kosten",
-                        "short": "KOSTEN"
-                    },
-                    "freedom": {
-                        "name": "Beleggen",
-                        "short": "BELEGGEN"
-                    },
-                    "education": {
-                        "name": "Leren",
-                        "short": "LEREN"
-                    },
-                    "savings": {
-                        "name": "Buffer",
-                        "short": "BUFFER"
-                    },
-                    "play": {
-                        "name": "Plezier",
-                        "short": "PLEZIER"
-                    },
-                    "give": {
-                        "name": "Geven",
-                        "short": "GEVEN"
-                    }
                 }
             },
             "auth_quotes_app": {
@@ -814,17 +788,6 @@
             "got_it": "Oké, begrepen",
             "split_more": "{count, plural, =1 {Nog 1 tip} other {Nog # tips}}",
             "split_tips": {
-                "play-above-default": "Plezier boven 10% komt meestal uit Beleggen of Buffer en doelen. Die twee bouwen je toekomst; Plezier geef je deze maand uit.",
-                "play-above-default-saver": "Plezier boven 10% kan gezond zijn als je zelden iets voor plezier uitgeeft — haal het alleen niet uit Beleggen.",
-                "give-above-default": "Geven boven 5% is gul — houd Beleggen op minstens 10%, zodat geven niet in de plaats komt van eerst jezelf betalen.",
-                "edu-above-soft": "Leren verhoogt je verdienvermogen — houd Beleggen toch op 10%, zodat leren beleggen niet verdringt.",
-                "ff-below-default": "Beleggen onder 10% betekent dat je eerst iedereen anders betaalt. Zet jezelf terug in de verdeling voordat je Plezier of Geven verhoogt.",
-                "lts-below-default": "Buffer en doelen onder 10% laat weinig ruimte voor tegenvallers en geplande grote dingen. Verhoog dit voordat je Plezier verhoogt.",
-                "future-vs-fun": "Je geeft meer aan vandaag (Plezier, Geven) en minder aan morgen (Beleggen, Buffer en doelen). Verhoog eerst die twee.",
-                "nec-high": "Vaste kosten en dagelijks boven 60% knijpt elk ander potje af. Vaste kosten verlagen helpt meestal meer dan minder beleggen.",
-                "nec-low": "Vaste kosten en dagelijks onder 45% is krap voor de meeste huishoudens — check of huur, verzekeringen en aflossingen er nog in passen.",
-                "spender-ff": "Je patroon neigt naar uitgeven — probeer 1–2% extra naar Beleggen voordat je Plezier verhoogt.",
-                "saver-play": "Je patroon neigt naar sparen — met iets meer Plezier houd je de verdeling vol. Geplande vreugde is geen verspilling.",
                 "basics-high": "Basis zit boven 60% van je inkomen — wat moet, neemt het meeste in. Kijk eerst naar je grootste vaste kostenpost; aan de verdeling hoef je niet te knijpen.",
                 "future-low": "Toekomst zit onder 10% van je inkomen, dus er blijft weinig over om mee op te bouwen. Zet 1–2% van Vrij naar Toekomst."
             },
@@ -4566,7 +4529,6 @@
                 "signature": "Given Loyiso, oprichter en CEO · Charissa Peroti, medeoprichtster · Amsterdam",
                 "manifesto": "Jaag niet op het getal. Kies de richting.",
                 "audience": "Voor wie het goed doet — en voor wie er klaar voor is.",
-                "more_books": "Meer boeken",
                 "books": {
                     "rich_dad": {
                         "title": "Rijke vader, arme vader",
@@ -4577,11 +4539,6 @@
                         "title": "Denk en word rijk",
                         "author": "Napoleon Hill",
                         "line": "Intentie, gewoonte en een duidelijk ‘waarom’ — de mentaliteit achter elk cijfer."
-                    },
-                    "millionaire_mind": {
-                        "title": "De geheimen van de miljonairsmentaliteit",
-                        "author": "T. Harv Eker",
-                        "line": "Geef elk bedrag een taak zodra het binnenkomt."
                     },
                     "psychology": {
                         "title": "De psychologie van geld",
@@ -6097,8 +6054,9 @@
                 "upgrade_overlay_eyebrow": "Voltooi je upgrade",
                 "upgrade_overlay_body": "Je hebt op de website gekozen voor {plan} ({interval}). Het aanmaken van je account is voltooid — nu moet je via Stripe Checkout het abonnement activeren. Je kunt deze stap overslaan en bij het Basic-abonnement blijven, en vervolgens op elk moment upgraden via Instellingen → Abonnement.",
                 "stay_on_basic": "Blijf bij Basic",
-                "add_seat_cta": "Een zitplaats toevoegen (€ 2,50 per maand)",
-                "add_seat_stub": "Er komen binnenkort extra zitplaatsen beschikbaar — je kunt voorlopig nog gebruikmaken van de zitplaatsen die bij je abonnement zijn inbegrepen."
+                "add_seat_cta": "Plek toevoegen onder Plan",
+                "add_seat_owner": "Vraag de eigenaar om een plek toe te voegen.",
+                "add_seat_stub": "Meer mensen aan boord? Een betaald plan kan extra plekken toevoegen — de prijs zie je onder Plan."
             },
             "saved": "Instellingen opgeslagen",
             "save_failed": "Instellingen konden niet worden opgeslagen",
@@ -6621,7 +6579,7 @@
                 },
                 "import": {
                     "eyebrow": "Een Rumtelo-bestand herstellen",
-                    "blurb": "Kies een JSON-archief of een CSV-zipbestand dat je vanuit Rumtelo hebt geëxporteerd. Bord- en accountinstellingen worden toegepast wanneer aanwezig; jars worden op basis van de sleutel opnieuw toegewezen; duplicaten worden overgeslagen. Schulden en doelen volgen je plan.",
+                    "blurb": "Kies een JSON-archief, een CSV-zipbestand of één CSV-blad uit Exporteren. Bord- en accountinstellingen worden toegepast wanneer aanwezig; potjes worden op basis van de sleutel opnieuw toegewezen; duplicaten worden overgeslagen. Schulden en doelen volgen je plan.",
                     "choose": "Kies JSON of CSV (zip)",
                     "preview": "Voorbeeld van import",
                     "confirm": "In dit huishouden binnenhalen",
@@ -6658,8 +6616,31 @@
                     "skipped_plan": "{count} overgeslagen (plan)",
                     "split_ok": "Er wordt een verdeling van het potje toegepast",
                     "split_skip": "De verdeling van het potje blijft ongewijzigd",
-                    "format_note": "Ondersteunt Rumtelo JSON of de CSV-zip uit ‘Exporteren’ (settings.csv, jars.csv, transactions.csv, …). CSV-bestanden van bankafschriften horen nog steeds thuis onder ‘Bank’.",
-                    "sign_in_stub": "Meld je aan om gegevens te importeren."
+                    "format_note": "Ondersteunt Rumtelo JSON, de CSV-zip uit ‘Exporteren’ of één blad (settings.csv, jars.csv, transactions.csv, …). We herkennen het blad aan de bestandsnaam of de kolommen. CSV-bestanden van bankafschriften horen nog steeds thuis onder ‘Bank’.",
+                    "sign_in_stub": "Meld je aan om gegevens te importeren.",
+                    "errors": {
+                        "invalid_iban": "Een IBAN in het bestand is niet geldig. Pas die rij aan in de CSV of exporteer opnieuw en importeer daarna nog een keer. Wat er al in staat, wordt overgeslagen.",
+                        "due_month_required": "Een vaste kost per kwartaal of jaar in het bestand heeft geen maand waarin die wordt afgeschreven. Vul de maand in bij die rij in de CSV of exporteer opnieuw en importeer daarna nog een keer.",
+                        "settlement_account_invalid": "Een rij in het bestand noemt een rekening om van te betalen die niet geldig is. Pas die rij aan in de CSV of exporteer opnieuw en importeer daarna nog een keer."
+                    },
+                    "warnings_more": "en nog {count}",
+                    "warnings": {
+                        "title_preview": "Controleer voordat je importeert",
+                        "title_done": "Geïmporteerd, met een paar punten om te bekijken",
+                        "generic": "Een deel van dit bestand kon niet worden toegepast. Bekijk de aantallen hierboven en voeg wat ontbreekt zelf toe.",
+                        "jar_split_incomplete": "De potjesverdeling uit het bestand past niet bij de potjes die je aan hebt, dus je eigen verdeling blijft zoals die is. Stel hem in onder Potjes.",
+                        "jar_split_not_100": "De potjesverdeling uit het bestand komt niet op 100% uit, dus je eigen verdeling blijft zoals die is. Stel hem in onder Potjes.",
+                        "bank_unknown_key": "De bank \"{bank}\" uit het bestand is hier niet beschikbaar, dus de rekeningen daarvan worden overgeslagen. Voeg ze zelf toe onder Bank.",
+                        "bank_unknown": "Een bank uit het bestand is hier niet beschikbaar, dus de rekeningen daarvan worden overgeslagen. Voeg ze zelf toe onder Bank.",
+                        "account_reconnect_needed": "Rekeningen die aan een bank gekoppeld waren, komen binnen zonder koppeling. Koppel ze opnieuw onder Bank.",
+                        "settlement_account_missing": "Een creditrekening kon niet aan de rekening worden gekoppeld waarmee je die aflost. Kies de aflosrekening bij de creditrekening.",
+                        "asset_link_unmapped": "Een paar onderdelen verwezen naar een bezit dat dit huishouden niet heeft, dus die koppeling is leeg. Voeg het bezit toe en koppel het opnieuw.",
+                        "debts_skipped_plan": "Schulden zitten niet in je abonnement, dus ze worden overgeslagen. Kijk onder Plan om ze erbij te nemen.",
+                        "goals_skipped_plan": "Doelen zitten niet in je abonnement, dus ze worden overgeslagen. Kijk onder Plan om ze erbij te nemen.",
+                        "goals_limit_reached": "Je hebt de doelgrens van je abonnement bereikt, dus de overige doelen worden overgeslagen. Rond een doel af of kijk onder Plan.",
+                        "fixed_cost_jar_unmapped": "Voor sommige vaste kosten is hier geen potje dat rekeningen betaalt, dus ze worden overgeslagen. Zet dat potje aan onder Potjes of voeg de kosten zelf toe.",
+                        "goal_give_pot_missing": "Gevendoelen hebben het potje Geven nodig en dat staat in dit huishouden uit, dus ze worden overgeslagen. Zet het aan onder Potjes en importeer daarna opnieuw."
+                    }
                 },
                 "sign_out_sub": "Je blijft 30 dagen ingelogd op dit apparaat"
             },

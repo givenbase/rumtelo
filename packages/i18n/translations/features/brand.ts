@@ -50,14 +50,6 @@ const brand = {
             energy: { name: 'Energy', short: 'ENERGY' },
             soul: { name: 'Soul', short: 'SOUL' },
         },
-        jars: {
-            necessity: { name: 'Fixed costs', short: 'FIXED' },
-            freedom: { name: 'Investing', short: 'INVEST' },
-            education: { name: 'Learning', short: 'LEARN' },
-            savings: { name: 'Buffer', short: 'BUFFER' },
-            play: { name: 'Fun', short: 'FUN' },
-            give: { name: 'Giving', short: 'GIVING' },
-        },
     },
     /** Application auth — pull them back into the habit. */
     auth_quotes_app: {

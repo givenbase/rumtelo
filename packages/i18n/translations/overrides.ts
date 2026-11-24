@@ -616,8 +616,6 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Een potje dat over de streep gaat is een signaal, geen oordeel. Bij elke waarschuwing hoort de ene stap die het oplost.',
         'pages.landing.why.body':
             'We bouwden Rumtelo eerst voor onszelf. We verdienden prima en vroegen ons toch af waar het bleef: geld, leven, energie, tijd. Budgetapps telden achteraf. Niemand hielp ons weer grip te krijgen. Dus maakten we wat we nodig hadden: duidelijke tools, een tip van De Coach, en jij kiest. Daarna brachten we het op de markt, zodat anderen hetzelfde kunnen doen.',
-        'pages.landing.why.books.millionaire_mind.line':
-            'Geef elk bedrag een taak zodra het binnenkomt.',
         'pages.landing.why.books.psychology.line':
             'Gedrag wint van slimheid — rustige systemen boven paniek en schaamte.',
         'pages.landing.coach_section.lead':
@@ -1228,6 +1226,46 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.settings.panels.import.found_jars_other': '{count} potjes',
         'pages.settings.panels.import.split_ok': 'Er wordt een verdeling van het potje toegepast',
         'pages.settings.panels.import.split_skip': 'De verdeling van het potje blijft ongewijzigd',
+        'pages.settings.panels.import.errors.invalid_iban':
+            'Een IBAN in het bestand is niet geldig. Pas die rij aan in de CSV of exporteer opnieuw en importeer daarna nog een keer. Wat er al in staat, wordt overgeslagen.',
+        'pages.settings.panels.import.errors.due_month_required':
+            'Een vaste kost per kwartaal of jaar in het bestand heeft geen maand waarin die wordt afgeschreven. Vul de maand in bij die rij in de CSV of exporteer opnieuw en importeer daarna nog een keer.',
+        'pages.settings.panels.import.errors.settlement_account_invalid':
+            'Een rij in het bestand noemt een rekening om van te betalen die niet geldig is. Pas die rij aan in de CSV of exporteer opnieuw en importeer daarna nog een keer.',
+        'pages.settings.panels.import.warnings_more': 'en nog {count}',
+        'pages.settings.plan.add_seat_owner': 'Vraag de eigenaar om een plek toe te voegen.',
+        'pages.settings.plan.add_seat_cta': 'Plek toevoegen onder Plan',
+        'pages.settings.plan.add_seat_stub':
+            'Meer mensen aan boord? Een betaald plan kan extra plekken toevoegen — de prijs zie je onder Plan.',
+        'pages.settings.panels.import.warnings.title_preview': 'Controleer voordat je importeert',
+        'pages.settings.panels.import.warnings.title_done':
+            'Geïmporteerd, met een paar punten om te bekijken',
+        'pages.settings.panels.import.warnings.generic':
+            'Een deel van dit bestand kon niet worden toegepast. Bekijk de aantallen hierboven en voeg wat ontbreekt zelf toe.',
+        'pages.settings.panels.import.warnings.jar_split_incomplete':
+            'De potjesverdeling uit het bestand past niet bij de potjes die je aan hebt, dus je eigen verdeling blijft zoals die is. Stel hem in onder Potjes.',
+        'pages.settings.panels.import.warnings.jar_split_not_100':
+            'De potjesverdeling uit het bestand komt niet op 100% uit, dus je eigen verdeling blijft zoals die is. Stel hem in onder Potjes.',
+        'pages.settings.panels.import.warnings.bank_unknown_key':
+            'De bank "{bank}" uit het bestand is hier niet beschikbaar, dus de rekeningen daarvan worden overgeslagen. Voeg ze zelf toe onder Bank.',
+        'pages.settings.panels.import.warnings.bank_unknown':
+            'Een bank uit het bestand is hier niet beschikbaar, dus de rekeningen daarvan worden overgeslagen. Voeg ze zelf toe onder Bank.',
+        'pages.settings.panels.import.warnings.account_reconnect_needed':
+            'Rekeningen die aan een bank gekoppeld waren, komen binnen zonder koppeling. Koppel ze opnieuw onder Bank.',
+        'pages.settings.panels.import.warnings.settlement_account_missing':
+            'Een creditrekening kon niet aan de rekening worden gekoppeld waarmee je die aflost. Kies de aflosrekening bij de creditrekening.',
+        'pages.settings.panels.import.warnings.asset_link_unmapped':
+            'Een paar onderdelen verwezen naar een bezit dat dit huishouden niet heeft, dus die koppeling is leeg. Voeg het bezit toe en koppel het opnieuw.',
+        'pages.settings.panels.import.warnings.debts_skipped_plan':
+            'Schulden zitten niet in je abonnement, dus ze worden overgeslagen. Kijk onder Plan om ze erbij te nemen.',
+        'pages.settings.panels.import.warnings.goals_skipped_plan':
+            'Doelen zitten niet in je abonnement, dus ze worden overgeslagen. Kijk onder Plan om ze erbij te nemen.',
+        'pages.settings.panels.import.warnings.goals_limit_reached':
+            'Je hebt de doelgrens van je abonnement bereikt, dus de overige doelen worden overgeslagen. Rond een doel af of kijk onder Plan.',
+        'pages.settings.panels.import.warnings.fixed_cost_jar_unmapped':
+            'Voor sommige vaste kosten is hier geen potje dat rekeningen betaalt, dus ze worden overgeslagen. Zet dat potje aan onder Potjes of voeg de kosten zelf toe.',
+        'pages.settings.panels.import.warnings.goal_give_pot_missing':
+            'Gevendoelen hebben het potje Geven nodig en dat staat in dit huishouden uit, dus ze worden overgeslagen. Zet het aan onder Potjes en importeer daarna opnieuw.',
         'pages.shell.forms.tx_update.description':
             'Pas de richting, het bedrag, het potje of de notitie aan.',
         'pages.shell.forms.fixed_create.description': 'Wat verdwijnt er elke maand uit het potje?',
@@ -1264,14 +1302,6 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             '{members} · Alleen solo · Spaarpotjes · 1 doel · Coach',
         'pages.shell.forms.tx_create.description':
             'Uitgeven: eruit; cadeaus, terugbetalingen en bijvullen van het spaarpotje: erin.',
-        // Necessity jar = Noodzakelijk (not Noodzaak / Necessities); jar names match the landing page.
-        'features.coach.split_tips.nec-high':
-            'Vaste kosten en dagelijks boven 60% knijpt elk ander potje af. Vaste kosten verlagen helpt meestal meer dan minder beleggen.',
-        'features.brand.auth_manifesto.jars.necessity.name': 'Vaste kosten',
-        'features.brand.auth_manifesto.jars.education.name': 'Leren',
-        'features.brand.auth_manifesto.jars.savings.name': 'Buffer',
-        'features.brand.auth_manifesto.jars.play.name': 'Plezier',
-        'features.brand.auth_manifesto.jars.give.name': 'Geven',
         'features.coach.money_coach.necessities_share.text':
             'Basis staat op {pct}%, boven de 55% waarmee de standaardverdeling begint. Prima voor nu — wil je het omlaag, verlaag dan vaste kosten of verhoog je inkomen.',
         'features.growth.goals.detail.advice_give_gap_body':
@@ -1663,34 +1693,9 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.growth.income_simulator.gap_over': '{amount} boven je doel',
         // Rumtelo Pots (2026-11-23): three pots Basis · Toekomst · Vrij; refined pot names Vaste
         // kosten, Dagelijks, Buffer, Doelen, Beleggen, Leren, Plezier, Geven. Hand-set, not machine output.
-        'features.brand.auth_manifesto.jars.education.short': 'LEREN',
-        'features.brand.auth_manifesto.jars.freedom.name': 'Beleggen',
-        'features.brand.auth_manifesto.jars.freedom.short': 'BELEGGEN',
-        'features.brand.auth_manifesto.jars.give.short': 'GEVEN',
-        'features.brand.auth_manifesto.jars.necessity.short': 'KOSTEN',
-        'features.brand.auth_manifesto.jars.play.short': 'PLEZIER',
-        'features.brand.auth_manifesto.jars.savings.short': 'BUFFER',
         'features.brand.auth_quotes_app.how_it_works.support':
             'Wijs het toe. Geef het daarna uit. Basis, Toekomst, Vrij.',
         'features.capabilities.money-jars.description': 'Rumtelo-potjes — het kernmodel voor geld.',
-        'features.coach.split_tips.edu-above-soft':
-            'Leren verhoogt je verdienvermogen — houd Beleggen toch op 10%, zodat leren beleggen niet verdringt.',
-        'features.coach.split_tips.ff-below-default':
-            'Beleggen onder 10% betekent dat je eerst iedereen anders betaalt. Zet jezelf terug in de verdeling voordat je Plezier of Geven verhoogt.',
-        'features.coach.split_tips.future-vs-fun':
-            'Je geeft meer aan vandaag (Plezier, Geven) en minder aan morgen (Beleggen, Buffer en doelen). Verhoog eerst die twee.',
-        'features.coach.split_tips.give-above-default':
-            'Geven boven 5% is gul — houd Beleggen op minstens 10%, zodat geven niet in de plaats komt van eerst jezelf betalen.',
-        'features.coach.split_tips.lts-below-default':
-            'Buffer en doelen onder 10% laat weinig ruimte voor tegenvallers en geplande grote dingen. Verhoog dit voordat je Plezier verhoogt.',
-        'features.coach.split_tips.nec-low':
-            'Vaste kosten en dagelijks onder 45% is krap voor de meeste huishoudens — check of huur, verzekeringen en aflossingen er nog in passen.',
-        'features.coach.split_tips.play-above-default':
-            'Plezier boven 10% komt meestal uit Beleggen of Buffer en doelen. Die twee bouwen je toekomst; Plezier geef je deze maand uit.',
-        'features.coach.split_tips.play-above-default-saver':
-            'Plezier boven 10% kan gezond zijn als je zelden iets voor plezier uitgeeft — haal het alleen niet uit Beleggen.',
-        'features.coach.split_tips.saver-play':
-            'Je patroon neigt naar sparen — met iets meer Plezier houd je de verdeling vol. Geplande vreugde is geen verspilling.',
         // Group-level split tips (Rumtelo Pots, 2026-11-23).
         'features.coach.split_tips.basics-high':
             'Basis zit boven 60% van je inkomen — wat moet, neemt het meeste in. Kijk eerst naar je grootste vaste kostenpost; aan de verdeling hoef je niet te knijpen.',
@@ -1699,8 +1704,6 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         // Giving is optional now: no default share in the tip.
         'features.soul.giving.coach_tip_1':
             'Het hoeft niet veel te zijn. Een klein deel, automatisch overgemaakt, naar een plek die je bewust koos. Het bedrag is niet het punt — de gewoonte wel.',
-        'features.coach.split_tips.spender-ff':
-            'Je patroon neigt naar uitgeven — probeer 1–2% extra naar Beleggen voordat je Plezier verhoogt.',
         'features.growth.goals.detail.advice_give_planned_body':
             'Automatiseer een maandelijkse gift als wilskracht het knelpunt is — de toezegging vult zich met wat echt uit het potje Geven ging.',
         'features.growth.net_worth.empty_body':
@@ -1988,9 +1991,9 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'pages.settings.panels.export.format_note':
             'Alles wordt gedownload als een zip-bestand met één echt CSV-bestand per onderwerp (instellingen, potjes, inkomen, transacties, …). ‘Alleen transacties’ en ‘deze maand’ bestaan uit één CSV-bestand met vaste kolommen (datum, bedrag, omschrijving, begunstigde, potje, notitie). Het JSON-bestand is het volledige Rumtelo-archief — gebruik ‘Importeren’ om het later te herstellen.',
         'pages.settings.panels.import.blurb':
-            'Kies een JSON-archief of een CSV-zipbestand dat je vanuit Rumtelo hebt geëxporteerd. Bord- en accountinstellingen worden toegepast wanneer aanwezig; jars worden op basis van de sleutel opnieuw toegewezen; duplicaten worden overgeslagen. Schulden en doelen volgen je plan.',
+            'Kies een JSON-archief, een CSV-zipbestand of één CSV-blad uit Exporteren. Bord- en accountinstellingen worden toegepast wanneer aanwezig; potjes worden op basis van de sleutel opnieuw toegewezen; duplicaten worden overgeslagen. Schulden en doelen volgen je plan.',
         'pages.settings.panels.import.format_note':
-            'Ondersteunt Rumtelo JSON of de CSV-zip uit ‘Exporteren’ (settings.csv, jars.csv, transactions.csv, …). CSV-bestanden van bankafschriften horen nog steeds thuis onder ‘Bank’.',
+            'Ondersteunt Rumtelo JSON, de CSV-zip uit ‘Exporteren’ of één blad (settings.csv, jars.csv, transactions.csv, …). We herkennen het blad aan de bestandsnaam of de kolommen. CSV-bestanden van bankafschriften horen nog steeds thuis onder ‘Bank’.',
         'pages.shell.viewer.chooser_household_body':
             'Je eigen potjes en geldbord voor persoonlijk of familiemoney.',
         'pages.shell.forms.income_create.description':

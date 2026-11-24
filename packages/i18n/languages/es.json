@@ -543,32 +543,6 @@
                         "name": "Alma",
                         "short": "ALMA"
                     }
-                },
-                "jars": {
-                    "necessity": {
-                        "name": "Costes fijos",
-                        "short": "FIXED"
-                    },
-                    "freedom": {
-                        "name": "Investing",
-                        "short": "INVEST"
-                    },
-                    "education": {
-                        "name": "Learning",
-                        "short": "LEARN"
-                    },
-                    "savings": {
-                        "name": "Búfer",
-                        "short": "BUFFER"
-                    },
-                    "play": {
-                        "name": "Fun",
-                        "short": "FUN"
-                    },
-                    "give": {
-                        "name": "Giving",
-                        "short": "GIVING"
-                    }
                 }
             },
             "auth_quotes_app": {
@@ -814,17 +788,6 @@
             "got_it": "Entendido",
             "split_more": "{count, plural, =1 {1 more tip} other {# more tips}}",
             "split_tips": {
-                "play-above-default": "Fun above 10% usually comes out of Investing or Buffer and goals. Those two build your future; Fun spends this month.",
-                "play-above-default-saver": "Fun above 10% can be healthy if you rarely spend on joy — just don’t pay for it by cutting Investing.",
-                "give-above-default": "Giving above 5% is generous — keep Investing at 10% or more so giving doesn’t replace paying yourself first.",
-                "edu-above-soft": "Learning raises your earning power — still keep Investing at 10% so learning doesn’t crowd out investing.",
-                "ff-below-default": "Investing under 10% means you’re paying everyone else first. Put yourself back in the split before raising Fun or Giving.",
-                "lts-below-default": "Buffer and goals under 10% leaves little room for setbacks and planned big things. Raise this before raising Fun.",
-                "future-vs-fun": "You’re funding today (Fun, Giving) while shrinking tomorrow (Investing, Buffer and goals). Raise those two before fun.",
-                "nec-high": "Fixed costs and daily above 60% squeezes every other pot. Cutting fixed costs usually helps more than cutting Investing.",
-                "nec-low": "Fixed costs and daily under 45% is tight for most households — check that rent, insurance and debt instalments still fit.",
-                "spender-ff": "Your pattern leans spender — try 1–2% more into Investing before adding to Fun.",
-                "saver-play": "Your pattern leans saver — a little more Fun helps you keep the split up. Joy that is planned is not waste.",
                 "basics-high": "Los gastos básicos superan el 60 % de tus ingresos: lo que hay que pagar se lleva la mayor parte. Fíjate primero en tu mayor gasto fijo; no es en la cuota donde hay que recortar.",
                 "future-low": "La partida «Futuro» representa menos del 10 % de tus ingresos, por lo que te queda muy poco para ahorrar. Transfiere entre un 1 % y un 2 % de la partida «Libre» a la partida «Futuro»."
             },
@@ -4566,7 +4529,6 @@
                 "signature": "Given Loyiso, fundador y director ejecutivo · Charissa Peroti, cofundadora · Ámsterdam",
                 "manifesto": "No te obsesiones con las cifras. Asume el control de la dirección.",
                 "audience": "Creado para quienes ya tienen éxito… y para quienes están preparados para alcanzarlo.",
-                "more_books": "Más libros",
                 "books": {
                     "rich_dad": {
                         "title": "El padre rico, el padre pobre",
@@ -4577,11 +4539,6 @@
                         "title": "Piensa y hazte rico",
                         "author": "Napoleón Hill",
                         "line": "La intención, el hábito y un «por qué» claro: la mentalidad que hay detrás de cada cifra."
-                    },
-                    "millionaire_mind": {
-                        "title": "Los secretos de la mentalidad millonaria",
-                        "author": "T. Harv Eker",
-                        "line": "Give every amount a job the second it lands."
                     },
                     "psychology": {
                         "title": "La psicología del dinero",
@@ -6097,8 +6054,9 @@
                 "upgrade_overlay_eyebrow": "Finaliza la actualización",
                 "upgrade_overlay_body": "Has elegido {plan} ({interval}) en la página web. La configuración de la cuenta ya está lista; ahora tienes que pasar por Stripe Checkout para activar el plan. Puedes saltarte este paso y quedarte con el plan Básico, y luego cambiar a un plan superior en cualquier momento en Ajustes → Plan.",
                 "stay_on_basic": "Quédate en «Básico»",
-                "add_seat_cta": "Añadir una plaza (2,50 € al mes)",
-                "add_seat_stub": "Próximamente habrá plazas adicionales; mientras tanto, puedes seguir utilizando las plazas incluidas en tu plan."
+                "add_seat_cta": "Add a seat under Plan",
+                "add_seat_owner": "Ask the owner to add a seat.",
+                "add_seat_stub": "Need more people on the board? A paid plan can add extra seats — the price is shown under Plan."
             },
             "saved": "Configuración guardada",
             "save_failed": "No se han podido guardar los ajustes",
@@ -6658,8 +6616,31 @@
                     "skipped_plan": "{count} omitido (plan)",
                     "split_ok": "Pot split will be applied",
                     "split_skip": "Pot split unchanged",
-                    "format_note": "Accepts Rumtelo JSON, the CSV zip from Export, or one sheet (settings.csv, pots.csv, transactions.csv, …). We detect the sheet from the file name or columns. Bank statement CSVs still go under Bank.",
-                    "sign_in_stub": "Inicia sesión para importar datos."
+                    "format_note": "Admite archivos JSON de Rumtelo o el archivo ZIP con los archivos CSV de la sección «Exportar» (settings.csv, jars.csv, transactions.csv, …). Los archivos CSV de los extractos bancarios siguen debiendo guardarse en la sección «Banco».",
+                    "sign_in_stub": "Inicia sesión para importar datos.",
+                    "errors": {
+                        "invalid_iban": "An IBAN in the file is not valid. Fix that row in the CSV, or export again, then import again. What is already in is skipped.",
+                        "due_month_required": "A quarterly or yearly fixed cost in the file has no month it is charged in. Add the month to that row in the CSV, or export again, then import again.",
+                        "settlement_account_invalid": "A row in the file names an account to pay from that is not valid. Fix that row in the CSV, or export again, then import again."
+                    },
+                    "warnings_more": "and {count} more",
+                    "warnings": {
+                        "title_preview": "Check before you import",
+                        "title_done": "Imported, with a few things to look at",
+                        "generic": "Part of this file could not be applied. Check the counts above, then add what is missing by hand.",
+                        "jar_split_incomplete": "The pot split in the file does not match the pots you have on, so your split stays as it is. Set it under Pots.",
+                        "jar_split_not_100": "The pot split in the file does not add up to 100%, so your split stays as it is. Set it under Pots.",
+                        "bank_unknown_key": "The bank \"{bank}\" from the file is not available here, so its accounts are skipped. Add them by hand under Bank.",
+                        "bank_unknown": "A bank from the file is not available here, so its accounts are skipped. Add them by hand under Bank.",
+                        "account_reconnect_needed": "Accounts that were linked to a bank come in unlinked. Link them again under Bank.",
+                        "settlement_account_missing": "A credit account could not be tied to the account that pays it off. Choose the paying account on the credit account.",
+                        "asset_link_unmapped": "Some items pointed to an asset this household does not have, so that link is empty. Add the asset, then link it again.",
+                        "debts_skipped_plan": "Your plan does not include debts, so they are skipped. Look under Plan to bring them in.",
+                        "goals_skipped_plan": "Your plan does not include goals, so they are skipped. Look under Plan to bring them in.",
+                        "goals_limit_reached": "You have reached the goal limit of your plan, so the other goals are skipped. Finish a goal or look under Plan.",
+                        "fixed_cost_jar_unmapped": "Some fixed costs have no pot here that takes bills, so they are skipped. Turn that pot on under Pots, or add the cost by hand.",
+                        "goal_give_pot_missing": "Giving goals need the Giving pot, which is off in this household, so they are skipped. Turn it on under Pots, then import again."
+                    }
                 },
                 "sign_out_sub": "Permanecerás conectado durante 30 días en este dispositivo"
             },
