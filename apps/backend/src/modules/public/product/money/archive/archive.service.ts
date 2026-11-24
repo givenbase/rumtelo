@@ -2,6 +2,9 @@
  * Restore a Rumtelo JSON household export into the current household.
  * Remaps jars by JarKey (a pot this household has not turned on goes to its group's main pot); skips plan-gated / duplicate rows; dry-run by default.
  * The real run is one database transaction: every section is written or none is.
+ * Household settings are applied only for a role that may update them (OWNER); anyone else's
+ * restore skips that section with `household_settings_skipped_role`. The exporter's private
+ * `direction` / `directionWhy` are never imported (`personal_direction_skipped`).
  */
 
 import { createHash } from 'node:crypto';
@@ -21,14 +24,21 @@ import {
     type ArchiveRestorePayload,
     type ArchiveRestoreResult,
     type ArchiveSectionCounts,
+    HouseholdPermissionAction,
+    HouseholdPermissionSection,
+    type HouseholdRole,
     JarKey,
     resolveJarKeyForHousehold,
+    roleCan,
 } from '@rumtelo/contracts';
 
 import { PlanAccessService } from '../../../../../common/capability';
 import { apiBadRequest } from '../../../../../common/errors/api-user-error';
 import { checkJarSplit } from '../../../../../common/utils/jar-split.util';
-import { currentHouseholdId } from '../../../../../common/household/household.context';
+import {
+    currentHouseholdContext,
+    currentHouseholdId,
+} from '../../../../../common/household/household.context';
 import { HouseholdScopedRepository } from '../../../../../common/household/household-scoped.repository';
 import { HouseholdSettingsService } from '../../../../auth/household/household-settings/household-settings.service';
 import { AccountSettingsService } from '../../../../auth/user/account/account-settings/account-settings.service';
@@ -120,6 +130,13 @@ export class ArchiveService {
         const canDebt = hasCapability(CAPABILITIES.moneyDebt, planKey);
         const canGoals = hasCapability(CAPABILITIES.growthGoals, planKey);
         const householdId = currentHouseholdId();
+        // Same helper and matrix `RolePermissionInterceptor` uses, with the role the scope
+        // interceptor stored for this request (never a hard-coded OWNER).
+        const canUpdateHouseholdSettings = roleCan(
+            currentHouseholdContext().role as HouseholdRole,
+            HouseholdPermissionSection.HOUSEHOLD_SETTINGS,
+            HouseholdPermissionAction.UPDATE
+        );
 
         // Decide the jar split before anything is written: the same rule `updateSplit`
         // enforces (`checkJarSplit`) runs here, in the dry run too, and a bad split is skipped
@@ -162,7 +179,14 @@ export class ArchiveService {
                 patch.features !== undefined ||
                 patch.answers !== undefined ||
                 patch.audienceKeys !== undefined;
-            if (hasPatch) {
+            if (hasPatch && !canUpdateHouseholdSettings) {
+                // `money/archive/restore` is gated as MONEY, which a MEMBER may call, but board
+                // settings are OWNER-only (`HOUSEHOLD_SETTINGS` UPDATE). Skip the section instead
+                // of letting a restore change what the settings screen would refuse. Dry run and
+                // real run take the same branch, so the preview tells the truth.
+                settingsCounts.skipped = 1;
+                warnings.push('household_settings_skipped_role');
+            } else if (hasPatch) {
                 settingsCounts.willImport = 1;
                 if (!dryRun) {
                     await this.householdSettings.update(householdId, patch);
@@ -173,13 +197,38 @@ export class ArchiveService {
         }
 
         if (applySettings && payload.accountSettings) {
+            // Person prefs and the person's own answers land on the account of whoever runs the
+            // restore (`update` resolves it from the session) — never on another account.
             const { locale, theme, spendingStyle } = payload.accountSettings;
+            // An export written by a person who had not answered carries null: that must not
+            // wipe what the restoring person has now, so null means "leave" here.
+            const workSituation = payload.accountSettings.workSituation ?? undefined;
+            const yearIntention = payload.accountSettings.yearIntention ?? undefined;
+            // `direction` / `directionWhy` are the exporter's private words: they stay in the
+            // file for that person's own copy but are never written onto whoever restores it
+            // (a file can come from anyone), so they are not part of the patch below.
+            if (
+                payload.accountSettings.direction?.trim() ||
+                payload.accountSettings.directionWhy?.trim()
+            ) {
+                warnings.push('personal_direction_skipped');
+            }
             const hasPatch =
-                locale !== undefined || theme !== undefined || spendingStyle !== undefined;
+                locale !== undefined ||
+                theme !== undefined ||
+                spendingStyle !== undefined ||
+                workSituation !== undefined ||
+                yearIntention !== undefined;
             if (hasPatch) {
                 accountSettingsCounts.willImport = 1;
                 if (!dryRun) {
-                    await this.accountSettings.update({ locale, theme, spendingStyle });
+                    await this.accountSettings.update({
+                        locale,
+                        theme,
+                        spendingStyle,
+                        workSituation,
+                        yearIntention,
+                    });
                 }
             } else {
                 accountSettingsCounts.skipped = 1;

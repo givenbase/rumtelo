@@ -19,7 +19,7 @@ import { Account } from '../account.entity';
  * Account Settings Entity
  *
  * Person-scoped UI prefs — language, appearance, spending style, work situation, year intention,
- * and tour progress.
+ * the personal Mindset direction (north star), and tour progress.
  * One row per account.
  *
  * Currency and board debt strategy stay on auth.household_settings.
@@ -30,6 +30,17 @@ import { Account } from '../account.entity';
 @Entity(entityConfig({ schema: 'auth', domain: 'account', tableName: 'settings' }))
 export class AccountSettings extends BaseEntity {
     // ? PROPERTIES
+    /**
+     * Where the person wants to be a year from now, in their own words (max 280, trimmed by the
+     * contract). Personal Mindset text: never read for a housemate or a practice. Null = not written.
+     */
+    @Property({ type: 'text', nullable: true })
+    direction: string | null = null;
+
+    /** What the direction is for, in the person's own words (max 280). Same privacy. Null = not written. */
+    @Property({ type: 'text', nullable: true })
+    directionWhy: string | null = null;
+
     /** Guided tour / Help walkthrough progress (offer + per-chapter status). */
     @Property(Jsonb())
     tour: AccountTourProgress = { ...DEFAULT_ACCOUNT_TOUR_PROGRESS, tours: {} };

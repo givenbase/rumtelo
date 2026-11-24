@@ -1,6 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { GoalKind, JarKey, PlanKey, type ArchiveRestorePayload } from '@rumtelo/contracts';
+import {
+    Currency,
+    GoalKind,
+    JarKey,
+    PlanKey,
+    WorkSituation,
+    YearIntention,
+    type ArchiveRestorePayload,
+} from '@rumtelo/contracts';
 
 import { householdStorage } from '../../../../../common/household/household.context';
 import { ArchiveService } from './archive.service';
@@ -59,6 +67,9 @@ function buildService() {
         updateSplit: vi.fn<(split: unknown) => Promise<typeof LOCAL_JARS>>(async () => LOCAL_JARS),
     };
     const householdSettings = { update: vi.fn<() => Promise<void>>(async () => undefined) };
+    const accountSettings = {
+        update: vi.fn<(patch: unknown) => Promise<void>>(async () => undefined),
+    };
     const empty = { list: vi.fn<() => Promise<never[]>>(async () => []) };
     const service = new ArchiveService(
         { transactional: async (run: () => Promise<unknown>) => run() } as never,
@@ -74,22 +85,23 @@ function buildService() {
         empty as never,
         empty as never,
         householdSettings as never,
-        { update: vi.fn<() => Promise<void>>() } as never
+        accountSettings as never
     );
-    return { service, jars, householdSettings };
+    return { service, jars, householdSettings, accountSettings };
 }
 
 function restore(
     service: ArchiveService,
     payload: ArchiveRestorePayload,
     dryRun: boolean,
-    applyJarSplit = true
+    applyJarSplit = true,
+    role: 'OWNER' | 'MEMBER' | 'VIEWER' = 'OWNER'
 ) {
     return householdStorage.run(
         {
             userId: 'user-1',
             householdId: HOUSEHOLD,
-            role: 'OWNER',
+            role,
             source: 'SEAT' as never,
             relation: null,
         },
@@ -392,5 +404,188 @@ describe('ArchiveService.restore into a three-pot household', () => {
 
         expect(result.jarsSplitUpdated).toBe(false);
         expect(result.warnings).toEqual(['jar_split_incomplete']);
+    });
+});
+
+describe('ArchiveService.restore account settings', () => {
+    function payloadWithAccountSettings(
+        accountSettings: NonNullable<ArchiveRestorePayload['accountSettings']>
+    ): ArchiveRestorePayload {
+        return { ...payloadWith([]), accountSettings };
+    }
+
+    it('writes the person answers through the signed-in person own settings update', async () => {
+        const { service, accountSettings } = buildService();
+
+        const result = await restore(
+            service,
+            payloadWithAccountSettings({
+                workSituation: WorkSituation.EMPLOYED,
+                yearIntention: YearIntention.GROW,
+            }),
+            false
+        );
+
+        expect(result.accountSettings.willImport).toBe(1);
+        expect(accountSettings.update).toHaveBeenCalledTimes(1);
+        // `update` takes no account id: it resolves the restoring person from the session.
+        expect(accountSettings.update).toHaveBeenCalledWith(
+            expect.objectContaining({
+                workSituation: WorkSituation.EMPLOYED,
+                yearIntention: YearIntention.GROW,
+            })
+        );
+        expect(result.warnings).not.toContain('personal_direction_skipped');
+    });
+
+    it.each([false, true])(
+        'never imports the exporter direction text and warns once (dryRun %s)',
+        async dryRun => {
+            const { service, accountSettings } = buildService();
+
+            const result = await restore(
+                service,
+                payloadWithAccountSettings({
+                    workSituation: WorkSituation.EMPLOYED,
+                    direction: 'Debt free and calm',
+                    directionWhy: 'So we can breathe',
+                }),
+                dryRun
+            );
+
+            expect(result.warnings.filter(id => id === 'personal_direction_skipped')).toHaveLength(
+                1
+            );
+            expect(result.accountSettings.willImport).toBe(1);
+            for (const call of accountSettings.update.mock.calls) {
+                const patch = call[0] as Record<string, unknown>;
+                expect(patch).not.toHaveProperty('direction');
+                expect(patch).not.toHaveProperty('directionWhy');
+            }
+            expect(accountSettings.update).toHaveBeenCalledTimes(dryRun ? 0 : 1);
+        }
+    );
+
+    it('writes nothing and warns when the file carries only direction text', async () => {
+        const { service, accountSettings } = buildService();
+
+        const result = await restore(
+            service,
+            payloadWithAccountSettings({ directionWhy: 'So we can breathe' }),
+            false
+        );
+
+        expect(accountSettings.update).not.toHaveBeenCalled();
+        expect(result.accountSettings.skipped).toBe(1);
+        expect(result.warnings).toContain('personal_direction_skipped');
+    });
+
+    it('does not warn when the file has no direction text', async () => {
+        const { service } = buildService();
+
+        const withoutFields = await restore(
+            service,
+            payloadWithAccountSettings({ yearIntention: YearIntention.GROW }),
+            false
+        );
+        const withEmpty = await restore(
+            service,
+            payloadWithAccountSettings({ direction: null, directionWhy: '' }),
+            false
+        );
+
+        expect(withoutFields.warnings).not.toContain('personal_direction_skipped');
+        expect(withEmpty.warnings).not.toContain('personal_direction_skipped');
+    });
+
+    it('previews the person answers in the dry run without writing them', async () => {
+        const { service, accountSettings } = buildService();
+
+        const result = await restore(
+            service,
+            payloadWithAccountSettings({ yearIntention: YearIntention.GROW }),
+            true
+        );
+
+        expect(result.accountSettings.willImport).toBe(1);
+        expect(accountSettings.update).not.toHaveBeenCalled();
+    });
+
+    it('leaves what the person has now when the export carries null answers', async () => {
+        const { service, accountSettings } = buildService();
+
+        const result = await restore(
+            service,
+            payloadWithAccountSettings({
+                workSituation: null,
+                yearIntention: null,
+                direction: null,
+                directionWhy: null,
+            }),
+            false
+        );
+
+        expect(result.accountSettings.skipped).toBe(1);
+        expect(accountSettings.update).not.toHaveBeenCalled();
+    });
+});
+
+describe('ArchiveService.restore household settings by role', () => {
+    const settingsPayload = (): ArchiveRestorePayload => ({
+        ...payloadWith(archiveJars([50, 15, 10, 10, 10, 5])),
+        settings: { why: 'restore me', currency: Currency.EUR },
+        accountSettings: { yearIntention: YearIntention.GROW },
+    });
+
+    it('skips the household settings for a MEMBER, with one warning, and restores the rest', async () => {
+        const { service, householdSettings, accountSettings, jars } = buildService();
+
+        const result = await restore(service, settingsPayload(), false, true, 'MEMBER');
+
+        expect(householdSettings.update).not.toHaveBeenCalled();
+        expect(result.settings).toEqual({ willImport: 0, skipped: 1, skippedPlan: 0 });
+        expect(result.warnings.filter(id => id === 'household_settings_skipped_role')).toHaveLength(
+            1
+        );
+        // Everything else still runs for a MEMBER.
+        expect(accountSettings.update).toHaveBeenCalledTimes(1);
+        expect(result.accountSettings.willImport).toBe(1);
+        expect(jars.updateSplit).toHaveBeenCalledTimes(1);
+    });
+
+    it('reports a MEMBER dry run exactly like the real run', async () => {
+        const dry = await restore(buildService().service, settingsPayload(), true, true, 'MEMBER');
+        const real = await restore(
+            buildService().service,
+            settingsPayload(),
+            false,
+            true,
+            'MEMBER'
+        );
+
+        expect({ ...dry, dryRun: false }).toEqual(real);
+    });
+
+    it('applies the household settings for an OWNER with no warning', async () => {
+        const { service, householdSettings } = buildService();
+
+        const result = await restore(service, settingsPayload(), false, true, 'OWNER');
+
+        expect(householdSettings.update).toHaveBeenCalledWith(
+            HOUSEHOLD,
+            expect.objectContaining({ why: 'restore me' })
+        );
+        expect(result.settings.willImport).toBe(1);
+        expect(result.warnings).not.toContain('household_settings_skipped_role');
+    });
+
+    it('does not warn a MEMBER when the file carries no household settings', async () => {
+        const { service, householdSettings } = buildService();
+        const payload = { ...settingsPayload(), settings: undefined };
+
+        const result = await restore(service, payload, false, true, 'MEMBER');
+
+        expect(householdSettings.update).not.toHaveBeenCalled();
+        expect(result.warnings).not.toContain('household_settings_skipped_role');
     });
 });

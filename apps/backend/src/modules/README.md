@@ -277,7 +277,7 @@ Managed entities: mutate properties, then `await this.em.flush()`.
 - `auth/engine/` — Better Auth config; `auth/*/managed/` — better-auth owns writes; we map read entities
 - `auth/user/account/` — Rumtelo-owned person rows (`account`, `account-settings`)
 - Board prefs (currency, period, week-check, kind) → `auth/household/household-settings`
-- Person prefs (theme, locale) → `account-settings`
+- Person prefs (theme, locale) and the personal Mindset direction (`direction`, `directionWhy` — never shared with the household or a practice) → `account-settings`
 - better-auth credential store table is `provider`, not `account`
 
 ### Adding a product portal

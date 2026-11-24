@@ -29,6 +29,10 @@ export type AccountSettingsPatch = {
     workSituation?: WorkSituation | null;
     /** `null` clears the answer. */
     yearIntention?: YearIntention | null;
+    /** `null` (or empty after trim) clears it. Personal text — never log it. */
+    direction?: string | null;
+    /** `null` (or empty after trim) clears it. Personal text — never log it. */
+    directionWhy?: string | null;
     tour?: AccountTourProgress;
     showAllSurfaces?: boolean;
 };
@@ -84,6 +88,12 @@ export class AccountSettingsService {
             }
             if (defaults.yearIntention !== undefined) {
                 existing.yearIntention = defaults.yearIntention;
+            }
+            if (defaults.direction !== undefined) {
+                existing.direction = normalizeDirection(defaults.direction);
+            }
+            if (defaults.directionWhy !== undefined) {
+                existing.directionWhy = normalizeDirection(defaults.directionWhy);
             }
             if (defaults.tour !== undefined) existing.tour = normalizeTour(defaults.tour);
             if (defaults.showAllSurfaces !== undefined) {
@@ -212,8 +222,13 @@ export class AccountSettingsService {
         return pending ? `/invite/${pending.id}` : null;
     }
 
+    /** One settings row by id — only the signed-in person's own; any other id is "not found". */
     async findOne(id: string): Promise<AccountSettingsDto> {
-        const row = await this.em.findOne(AccountSettings, { id }, { populate: ['account'] });
+        const row = await this.em.findOne(
+            AccountSettings,
+            { id, account: { user: currentUserId() } },
+            { populate: ['account'] }
+        );
         if (!row) throw apiNotFound('account_settings_not_found');
         return toDto(row);
     }
@@ -232,6 +247,10 @@ export class AccountSettingsService {
         if (patch.spendingStyle !== undefined) row.spendingStyle = patch.spendingStyle;
         if (patch.workSituation !== undefined) row.workSituation = patch.workSituation;
         if (patch.yearIntention !== undefined) row.yearIntention = patch.yearIntention;
+        if (patch.direction !== undefined) row.direction = normalizeDirection(patch.direction);
+        if (patch.directionWhy !== undefined) {
+            row.directionWhy = normalizeDirection(patch.directionWhy);
+        }
         if (patch.tour !== undefined) row.tour = normalizeTour(patch.tour);
         if (patch.showAllSurfaces !== undefined) row.isShowingAllSurfaces = patch.showAllSurfaces;
         await this.em.flush();
@@ -244,10 +263,14 @@ export class AccountSettingsService {
     // ====================================================================
 
     /**
-     * Delete settings by id. The Account row is left intact.
+     * Delete the signed-in person's settings row by id. The Account row is left intact.
+     * Another person's id is "not found": a row is never reachable across people.
      */
     async delete(id: string): Promise<{ ok: true }> {
-        const row = await this.em.findOne(AccountSettings, { id });
+        const row = await this.em.findOne(AccountSettings, {
+            id,
+            account: { user: currentUserId() },
+        });
         if (!row) throw apiNotFound('account_settings_not_found');
         await this.em.remove(row).flush();
         return { ok: true };
@@ -283,12 +306,20 @@ export class AccountSettingsService {
             spendingStyle: defaults.spendingStyle ?? SpendingStyle.UNKNOWN,
             workSituation: defaults.workSituation ?? null,
             yearIntention: defaults.yearIntention ?? null,
+            direction: normalizeDirection(defaults.direction),
+            directionWhy: normalizeDirection(defaults.directionWhy),
             tour: normalizeTour(defaults.tour ?? DEFAULT_ACCOUNT_TOUR_PROGRESS),
             isShowingAllSurfaces: defaults.showAllSurfaces ?? false,
         } as never);
         await this.em.persist(settings).flush();
         return settings;
     }
+}
+
+/** Trim a personal sentence; empty after trim (or null/undefined) is stored as null. */
+function normalizeDirection(value: string | null | undefined): string | null {
+    const trimmed = value?.trim();
+    return trimmed ? trimmed : null;
 }
 
 function normalizeTour(tour: AccountTourProgress): AccountTourProgress {
@@ -308,6 +339,8 @@ function toDto(row: AccountSettings): AccountSettingsDto {
         spendingStyle: row.spendingStyle,
         workSituation: row.workSituation,
         yearIntention: row.yearIntention,
+        direction: row.direction,
+        directionWhy: row.directionWhy,
         tour: normalizeTour(row.tour ?? DEFAULT_ACCOUNT_TOUR_PROGRESS),
         showAllSurfaces: row.isShowingAllSurfaces,
         onboardedAt: row.onboardedAt ? row.onboardedAt.toISOString() : null,

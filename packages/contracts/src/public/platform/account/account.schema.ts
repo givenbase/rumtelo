@@ -71,6 +71,16 @@ export const DEFAULT_ACCOUNT_TOUR_PROGRESS = {
     seriesIndex: 0,
 } satisfies z.infer<typeof AccountTourProgress>;
 
+/** Longest `direction` / `directionWhy` text, in characters. */
+export const ACCOUNT_DIRECTION_MAX_LENGTH = 280;
+
+/**
+ * One short personal sentence (the Mindset "direction"). Trimmed, at most 280 characters.
+ * An empty string passes here on purpose: the service reads "empty after trim" as "cleared"
+ * and stores null, so a form can send what the person typed.
+ */
+export const AccountDirectionText = z.string().trim().max(ACCOUNT_DIRECTION_MAX_LENGTH);
+
 /**
  * Person UI prefs. Currency is NOT here — the household board has one accounting
  * currency. Theme, locale, spending style, work situation and year intention can differ between members.
@@ -85,6 +95,17 @@ export const AccountSettings = z.object({
     workSituation: z.enum(WorkSituation).nullable(),
     /** What the person wants from the year; null = not told. Sets the tone of "Plan your year". */
     yearIntention: z.enum(YearIntention).nullable(),
+    /**
+     * Where the person wants to be a year from now, in their own words; null = not written.
+     * Personal: never shown to housemates or to a practice, and never part of a household
+     * read. Patch: undefined leaves it, null (or empty after trim) clears it.
+     */
+    direction: AccountDirectionText.nullable(),
+    /**
+     * What the direction is for, in the person's own words; null = not written.
+     * Personal, same privacy as `direction`. Patch: undefined leaves it, null clears it.
+     */
+    directionWhy: AccountDirectionText.nullable(),
     /** Guided tour / Help walkthrough progress. */
     tour: AccountTourProgress,
     /**
@@ -103,4 +124,5 @@ export type AccountProfileSeed = z.infer<typeof AccountProfileSeed>;
 export type AccountTourChapterStatus = z.infer<typeof AccountTourChapterStatus>;
 export type AccountTourOfferStatus = z.infer<typeof AccountTourOfferStatus>;
 export type AccountTourProgress = z.infer<typeof AccountTourProgress>;
+export type AccountDirectionText = z.infer<typeof AccountDirectionText>;
 export type AccountSettings = z.infer<typeof AccountSettings>;
