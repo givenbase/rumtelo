@@ -6,7 +6,7 @@ The one place to find open work. Each row is one item and points to the doc with
 
 **Ways of working:** no local DB — `dev` deploys to Railway staging, `main` to production; pushing migrations to `dev` runs `db-migrate.yml`. Claude commits; Given pushes. Hand-written migrations stay "unverified" until they run on staging.
 
-Last updated: 2026-11-23 (Rumtelo Pots sections).
+Last updated: 2026-11-24 (CI, restore, category-in-pot; new findings waiting for Given).
 
 ## Waiting for Given
 
@@ -20,11 +20,14 @@ Last updated: 2026-11-23 (Rumtelo Pots sections).
 | # | Item | Priority | Size | Details |
 | --- | --- | --- | --- | --- |
 | 1 | **Practice MANAGE writes** — MANAGE sponsors Plus and bills a seat but grants read-only access (VIEW and MANAGE both map to VIEWER). Build writes or stop billing it. | Critical | L | `apps/backend/src/common/household/membership.service.ts`, [`docs/product/practice.md`](/docs/product/practice.md) |
-| 2 | **CI gates** — add `pnpm lint:check`, `pnpm check-types`, backend Vitest, contracts/utils/i18n node tests and `next build` to GitHub Actions (only `db-migrate`, `api-smoke`, `e2e-smoke` exist). | High | M | [`.github/workflows/README.md`](/.github/workflows/README.md), [`docs/engineering/pr-gates.md`](/docs/engineering/pr-gates.md) |
 | 3 | **Staging launch gating** — staging runs `NODE_ENV=production`, so Energy and Soul are deferred there too. Decide and gate on an explicit flag, not `NODE_ENV`. | High | S | `packages/contracts/src/backoffice/plan/launch-products.ts`, `apps/backend/src/common/config/launch-products.util.ts` |
 | 4 | **Customer clarity programme** — audit done (2026-11-16); work through the CL items below, starting with release "Clarity 1" (CL-1, CL-2, CL-3, CL-7, CL-10). Decisions D1–D11 wait for Given. | High | — | [`docs/product/clarity-audit.md`](/docs/product/clarity-audit.md) |
-| 5 | **Stale "coming soon" copy** — "Extra seats are coming soon" while Stripe household seat add-ons exist; review other "coming soon" strings (bank connect, CHF, account deletion, wearables). | Medium | S | `packages/i18n/translations/pages/settings.ts` |
-| 6 | **Fix failing node tests** — `@rumtelo/utils` and `@rumtelo/i18n` each have 1 failing test (2026-11-16 run). | Medium | S | `pnpm --filter @rumtelo/utils test`, `pnpm --filter @rumtelo/i18n test` |
+| 5 | **Stale "coming soon" copy** — the Members card seat line is fixed (2026-11-24); the rest is listed under "Found on 2026-11-24" (needs Given: copy and pricing). | Medium | S | `packages/i18n/translations/pages/settings.ts` |
+
+### Closed on 2026-11-24
+
+- **CI gates** — `.github/workflows/ci.yml` runs on GitHub Actions (details in [`.github/workflows/README.md`](/.github/workflows/README.md) and [`docs/engineering/pr-gates.md`](/docs/engineering/pr-gates.md)). It reports, it does not block: making it a required check in branch protection, or Railway "wait for CI", is the owner's setting. First run happens after the push.
+- **Failing node tests** — `pnpm --filter @rumtelo/utils test` (100 pass) and `pnpm --filter @rumtelo/i18n test` (20 pass) are green in the working tree.
 
 ## Clarity (from the clarity audit)
 
@@ -75,10 +78,8 @@ Step 1 (three groups, new pot names, split validation) is on `dev`. See `docs/pr
 
 - **Not yet seen running.** The UI was verified by type checks, unit tests and code review only. Check on staging: the pots board at 360/430/768 px, `?group=` links, onboarding and settings grouping, one pot name on every screen for an NL-seeded, an EN-seeded and a renamed household, Save in settings only at exactly 100%.
 - **`pnpm i18n:gen` (Given).** es/fr show the changed strings in English until it runs with the DeepL key.
-- **Coach lines composed in the backend still use the stored pot name (Medium, S).** `money-coach.service.ts:175` and `fixed-cost-coach.util.ts:77` — e.g. "Noodzakelijk bills come to …". Needs the name resolved by key server-side or the text composed in the application.
-- **Archive restore is not transactional (Medium, M).** A service-level failure in a later section (income, debts, fixed costs, goals) leaves a half-applied import; the dry run can promise rows the real run rejects. Wrap the real run in one transaction or pre-validate each section.
 - **Application unit tests are not part of `pnpm test` (Low, S).** `apps/application` has no `test` script; its 16 node:test files only run by hand. Needs `tsx` as a devDependency — Given's approval.
-- **Decisions for Given:** remove the "Secrets of the Millionaire Mind / T. Harv Eker" book card (`landing-why.tsx`, copy in `pages/landing.ts`) and the footer attribution (`pages/landing.ts`) — being done in the working tree on 2026-11-23, not committed yet; the brand line replacing "Six jars. Ten minutes a week." (`docs/brand/quotes.md`); the Coach tip that names 55% as the default starting point (changes with the default split in step 2); the pot name "Beleggen / Investing".
+- **Decisions for Given:** remove the "Secrets of the Millionaire Mind / T. Harv Eker" book card (`landing-why.tsx`, copy in `pages/landing.ts`) and the footer attribution (`pages/landing.ts`) — done in `3c2132aa` / `cc84a832` (the landing no longer credits the book); the brand line replacing "Six jars. Ten minutes a week." (`docs/brand/quotes.md`); the Coach tip that names 55% as the default starting point (changes with the default split in step 2); the pot name "Beleggen / Investing".
 - **Step 2 (done) and step 3:** the three-pot default, Giving off by default and the must/choose question are built; Buffer that fills first, category tags (ECOICOP, Nibud group, must/choose) and automatic Basis from real fixed costs are open — see the step 2 table below.
 
 ## Rumtelo Pots — follow-ups after step 2 (2026-11-23)
@@ -87,22 +88,42 @@ Step 2 = three pots by default (55 / 20 / 25), optional pots turned on inside a 
 
 | Priority | Item | Note |
 | --- | --- | --- |
-| Done (uncommitted) | Cross-household reference on write | Fixed 2026-11-23: `own-reference.util.ts` (`requireOwn*`) resolves every jar, category, debt, fixed cost and bank account id from the client through `HouseholdScopedRepository`; applied to transactions, sort rules, fixed costs, goals and week-check allocations; the device wearer must be a household member. Debt and fixed-cost links are validated before a transaction is written. Verify with the read-only queries in `HANDOFF.md` §14 |
-| Medium | Category may belong to another pot of the same household | A category id is checked against the household, not against the chosen pot; a transaction can carry a category of a different pot (security pass) |
+| Done | Cross-household reference on write | Fixed 2026-11-23 (`c8d0d0fa`): `own-reference.util.ts` (`requireOwn*`) resolves every jar, category, debt, fixed cost and bank account id from the client through `HouseholdScopedRepository`; applied to transactions, sort rules, fixed costs, goals and week-check allocations; the device wearer must be a household member. Debt and fixed-cost links are validated before a transaction is written. Verify with the read-only queries in `HANDOFF.md` §14 |
 | Low | Composite foreign keys `(id, household_id)` | Defence in depth: let the database refuse a cross-household reference even if a service forgets the check |
 | Low | Demo passwords in the root `README.md` | Owner to decide whether they belong there; do not copy them anywhere |
 | High | Staging check after deploy | No household onboarded in the window between the migration and the new backend (the old backend reads all eight templates, 141%); the backend that reads `money_jar_share` must not start before `Migration20261123120000_JarShare` has run; the rest of the list is `HANDOFF.md` §14 |
 | Medium | Given confirms | `OPTIONAL_JAR_SHARE` (Daily 20, Goals 6, Investing 5, Learning 5, Giving 5); Coach tips `basics-high` / `future-low`; MEMBER may turn pots on/off (same as the split); sweep rule "Basics surplus → Investing" when Investing is off |
-| Medium | Step 3, what is left | Built (uncommitted): "Moet dit, of kies je dit?" on the fixed-cost form (picks the pot, stores nothing) and the "Basics fit" hint in split settings (a button that fills in the split). Not built: Buffer fills first (options A–D and four open questions in [`split-step3-decisions.md`](/docs/product/split-step3-decisions.md)), category tags, automatic derivation of Basics from real fixed costs |
+| Medium | Step 3, what is left | Built (`0855c1e2`): "Moet dit, of kies je dit?" on the fixed-cost form (picks the pot, stores nothing) and the "Basics fit" hint in split settings (a button that fills in the split). Not built: Buffer fills first (options A–D and four open questions in [`split-step3-decisions.md`](/docs/product/split-step3-decisions.md)), category tags, automatic derivation of Basics from real fixed costs |
 | Medium | Bill preset for an optional pot that is off | `fixed-cost.service.ts` ~515: an Education bill preset resolved to Future's main pot is refused (pot takes no bills) — decide whether Buffer may carry bills |
-| Low | Dead copy keys | old `features.coach.split_tips.*` ids (`play-above-default`, `give-above-default`, … see `split-coach/README.md`) and `features.brand.auth_manifesto.jars.*` are still in `packages/i18n/translations` (`features/coach.ts`, `features/brand.ts`) though nothing renders them. `DEFAULT_JAR_SPLIT` and `AUTH_MANIFESTO_JAR_VISUALS` are gone. `.claude/rules/frontend.md` "six jars" is in the prepared instruction patch |
 | Low | Guide card for a lone main pot | shows the key's guide, not the group purpose; `giving-finder.tsx:262` hard-codes the Give key; NL `guides.LONG_TERM_SAVINGS.links.goals` says "Doelstellingen" |
-| Low | Archive restore | warning `goal_give_pot_missing` has no translated text yet; restore is still not transactional |
 | Medium | "Sweep surplus" is a toggle with no code behind it | Settings → Automation (`automation-settings.tsx`, `AUTO_RULE_KEYS` `split` / `guard` / `sweep` in `settings-shared.ts`): the three switches are component `useState` defaults; nothing is saved and nothing in the backend reads them. Decide: hide the switches or build the rules |
-| Medium | Archive restore warnings are never shown | `archive.service.ts` returns `warnings` (`fixed_cost_jar_unmapped`, `goal_give_pot_missing`, `account_reconnect_needed`, …); `import-settings.tsx` stores the result but renders no warning, and no key has translated text |
 | Medium | The role interceptor lets unmapped household paths through | `RolePermissionInterceptor` skips any path `permissionSectionFromPath` does not map (a new area is open to a VIEWER until someone maps it). Decide: default-deny for household paths |
-| Low | Docs left for the copywriter | `docs/explain/*` scripts (L1-P, L2 Money, L3 Jars, L3 Income) got a short factual correction only; they need a voice pass for "pots". `docs/product/practice.md` pitch texts and `docs/engineering/outreach-pis.md` mails say "six jars" / "zes potjes" in copy that is not ours to rewrite. `docs/demo/demo-2026-11-18.md` (untracked) says "zes potjes". `.claude/**` and `CLAUDE.md` still say "six jars" (needs Given's go-ahead, patch prepared) |
-| Low | Code comments and one catalog line still say six | `plan.util.ts:62` ("The six jars — core money model."), `jar.entity.ts:16` and `:55`, `plan.module.ts:9`, `necessities-pressure.ts:5` and `:22` ("Eker envelope", "defaults to Eker 55") |
+| Low | Docs left for the copywriter | `docs/explain/*` scripts (L1-P, L2 Money, L3 Jars, L3 Income) got a short factual correction only; they need a voice pass for "pots". `docs/product/practice.md` pitch texts and `docs/engineering/outreach-pis.md` mails say "six jars" / "zes potjes" in copy that is not ours to rewrite. `docs/demo/demo-2026-11-18.md` (untracked) says "zes potjes". |
+
+### Closed on 2026-11-24 (Rumtelo Pots follow-ups)
+
+- **Coach lines in the backend** no longer bake in a stored pot name: `money-coach.service.ts` and `fixed-cost-coach.util.ts` speak of "the pot that pays them" (fixed earlier; checked in the code).
+- **Archive restore is atomic.** The real run is one `em.transactional`; the dry run pre-validates the same rules (`archive-rules.util.ts`: `invalid_iban`, `due_month_required`, `settlement_account_invalid`, party-name dedupe) and refuses in the preview too. The pot split is written last so pot row locks are short. Needs a staging check (HANDOFF §14).
+- **A category must belong to the chosen pot** (`assertCategoryInJar`, refusal `category_not_found`) on transaction create/sort/bulk sort/update, sort-rule create/update/payee hint and fixed-cost create/update. Legacy rows are not rewritten: a read-only count is in HANDOFF §14.
+- **Restore warnings and refusal reasons are shown** in Settings → Import (at most 10 lines); every backend warning id, `goal_give_pot_missing` included, has EN + NL copy and a test fails when a new id has none.
+- **Dead copy keys removed** (old `features.coach.split_tips.*` ids, `features.brand.auth_manifesto.jars.*`, `pages.landing.why.books.millionaire_mind.*`, `pages.landing.why.more_books`).
+- **Six-jar leftovers**: the code comments are reworded (`f3242643`) and the agent instructions and `CLAUDE.md` describe three pots (`edc19ce2`).
+
+## Found on 2026-11-24 — waiting for Given
+
+| Priority | Item | Note |
+| --- | --- | --- |
+| Medium | A MEMBER can change household settings through a restore | `/money/archive/restore` maps to MONEY (a MEMBER may create), but `ArchiveService.restore` calls `householdSettings.update` (currency, period start day, payoff strategy, features, …, `archive.service.ts:168`) while MEMBER is read-only on `HOUSEHOLD_SETTINGS` (`role-permissions.ts:36`). Options: apply `settings` only when the role may update household settings (else skip with a warning), or make restore OWNER-only. Role decision — Given |
+| Medium | A restore has no size or time bound | The archive arrays in `archive.schema.ts` (`transactions`, `fixedCosts`, `income`, …) have no `.max()`; only the 8 MiB body limit (`main.ts:43`) caps a file. The real run holds one DB connection for its whole run, and there is no `statement_timeout` / `lock_timeout`. Needs sizing against real exports and a database to test |
+| Low | Restored transactions skip two checks | The transactions section creates rows directly (`archive.service.ts:619`): no closed-period check (`assertPeriodOpen`) and no "pot refuses outflow" check (`assertJarAllowsOutflow`) |
+| Low | A transaction can be linked to a fixed cost in another pot | `assertOwnLinks` (`transaction.service.ts:603`) checks the household only, not the pot |
+| Low | A yearly/quarterly row without a due month refuses the whole file | `due_month_required`; skipping that row with a warning would be friendlier |
+| Low | Upgrade buttons on the Members card for a MEMBER | `household-members-settings.tsx:307` and `:319` link to Settings → Plan, a tab a MEMBER cannot open (the seat line was fixed; these two were not) |
+| Low | "Coming soon" copy that may be stale | `StubNotice` panels whose feature exists (import / export / income split sign-in stubs, devices empty, members, plan); `panels.automation.stub`; `toasts.bank_coming` is unused; `toasts.delete_coming` and `toasts.chf_coming` are still true. Copy and pricing — Given |
+| Low | Export sheet and file are named "Jars" / `jars.csv` while the UI says pots | Renaming needs the importer to accept both names |
+| Low | Test artefacts and `pnpm test` | `apps/e2e/playwright-report/index.html` and `apps/e2e/test-results/.last-run.json` are tracked in git; root `pnpm test` (`turbo run test`) also starts Playwright via `apps/e2e` (CI filters it out); `CLAUDE.md` describes `pnpm test` without e2e |
+| Low | Refusal copy and a stale rule line | `category_not_found` says "no longer here" also for a wrong-pot refusal; `.claude/rules/workflow.md` line 9 mentions a fix "in the same patch" (stale wording) |
+| Low | Actions are pinned by tag, not by commit SHA | All workflows (`actions/checkout@v5`, `pnpm/action-setup@v6`, `dorny/paths-filter@v4`, …) |
 
 ## Found by the reviews on 2026-11-23 (night) — waiting for Given
 
@@ -116,4 +137,3 @@ Step 2 = three pots by default (55 / 20 / 25), optional pots turned on inside a 
 | Low | Income amount periods have no cap | one per source per day, back-dating allowed; the balance walk grows with them |
 | Low | Deactivating a pot shifts cents in past months | the remainder rule re-runs on fewer pots: up to a few cents per month per pot; the household total stays exact |
 | Low | Learn library still lists "Secrets of the Millionaire Mind" | `book.seed-data.ts:43`; a book in a catalog, not a credit for the method — keep or remove |
-| Low | Dead i18n keys | `pages.landing.why.books.millionaire_mind.*`, `pages.landing.why.more_books`, old `features.coach.split_tips.*`, `features.brand.auth_manifesto.jars.*` |

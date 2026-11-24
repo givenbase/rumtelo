@@ -233,8 +233,7 @@ aggregates.
   group `BASIS` / `FUTURE` / `FREE`, 55 / 20 / 25) and turns optional pots on or off
   inside a group (`money.jars.activate` / `deactivate`); existing households keep their
   six. Source: `packages/contracts/src/public/product/money/jar/jar.util.ts`, behaviour
-  in `apps/backend/src/modules/public/product/money/README.md`. **Built (uncommitted when
-  written):** the fixed-cost form asks "Moet dit, of kies je dit?" (the answer only picks
+  in `apps/backend/src/modules/public/product/money/README.md`. **Built (`0855c1e2`):** the fixed-cost form asks "Moet dit, of kies je dit?" (the answer only picks
   the pot; nothing new is stored — `features/forms/fixed-cost-pot-choice.tsx`), and split
   settings show a "Basics fit" hint (`app/_lib/basics-fit.ts`,
   `settings/_components/jars-basics-fit.tsx`): a button that fills in the split, never
@@ -446,7 +445,7 @@ search, classes 36 and 42.
 
 ### 2026-11-23 — Rumtelo Pots: three pots by default, refine inside a group
 
-Commits `28d470d3` … `ef5ad43f` on `dev`, plus work that was still uncommitted in the worktree when this entry was written (marked below). Checked against the code; **migrations and every
+Commits `28d470d3` … `edc19ce2` on `dev`. Checked against the code; **migrations and every
 screen are unverified until Given has run them on staging.**
 
 **Breaking**
@@ -468,7 +467,7 @@ screen are unverified until Given has run them on staging.**
 - Contract limits tightened: bulk sort `transactionIds` at most 500; week-check `allocations` at
   most one per pot (8).
 - New API error keys: `jar_not_optional`, `jar_already_active`, `jar_not_empty`,
-  `jar_share_too_small`, `goal_give_needs_give_jar`, and (uncommitted) `jar_not_found`,
+  `jar_share_too_small`, `goal_give_needs_give_jar`, and `jar_not_found`,
   `category_not_found`, `transaction_not_found`, `debt_not_found`, `fixed_cost_not_found`. They
   need i18n text under `common.message.error.api`.
 - Writes that take a jar, category, debt, fixed cost or bank account id from the client now
@@ -486,7 +485,7 @@ screen are unverified until Given has run them on staging.**
     sets NECESSITIES / LONG_TERM_SAVINGS / PLAY as default at 55 / 20 / 25 and the optional
     templates' shares, inserts the `DAILY` and `GOALS` templates with nl/es/fr names and category
     links. Household data is not touched.
-- `Migration20261123120000_JarShare` (uncommitted when written; hand-written, **unverified until
+- `Migration20261123120000_JarShare` (`88f57350`; hand-written, **unverified until
   staging**) — creates `public.money_jar_share` (one row per pot per month in which its share
   changed; unique `(jar_id, period)`, cascade from `money_jar`, `YYYY-MM` and 0–100 checks) and
   backfills one baseline row (`period` `1970-01`) per existing pot with its current percentage. No
@@ -526,8 +525,7 @@ screen are unverified until Given has run them on staging.**
   deposited is kept (the main pot can differ by a few cents from the old two-pot sum; the
   household total is exact). Looking Ahead still carries the current split forward.
 - The fixed-cost form asks "Moet dit, of kies je dit?" (the answer only picks the pot) and split
-  settings show a "Basics fit" hint with a button that fills in the split. Both uncommitted when
-  written.
+  settings show a "Basics fit" hint with a button that fills in the split. Both in `0855c1e2`.
 - A main pot shows the group name while alone and its own name once refined (Fixed costs,
   Buffer, Fun).
 - Anything aimed at a pot that is off (presets, merchants, categories, archive restore) lands in
@@ -536,8 +534,7 @@ screen are unverified until Given has run them on staging.**
   10 %); the per-pot tips are gone.
 - Existing households keep their six pots and count as refined.
 - Landing: the book card for "Secrets of the Millionaire Mind" and the footer attribution to the
-  six-jar method are being replaced by "Rumtelo Pots is our own method". This was uncommitted work
-  when these notes were written — check `git log` before telling anyone it shipped.
+  six-jar method are replaced by "Rumtelo Pots is our own method" (`3c2132aa`, `cc84a832`).
 
 **Fixed**
 
@@ -550,18 +547,45 @@ screen are unverified until Given has run them on staging.**
 
 - Split save, activate and deactivate lock all of the household's pots so concurrent writes cannot
   leave the total off 100 %.
-- **Fixed (uncommitted when written):** jar, category, debt, fixed cost and bank account ids from
+- **Fixed (`c8d0d0fa`):** jar, category, debt, fixed cost and bank account ids from
   the client were not checked against the household on transaction, fixed-cost, sort-rule, goal and
   week-check writes, so a member who knew another household's id could attach own rows to it
   (pre-existing, not from this change). `own-reference.util.ts` (`requireOwn*`) now resolves each id
   through `HouseholdScopedRepository`, applied to transactions, sort rules, fixed costs, goals,
   week-check allocations and the device wearer; debt and fixed-cost links are validated before a
-  transaction is written. Remaining, in `docs/BACKLOG.md`: a category can belong to another pot of
-  the same household (Medium), composite foreign keys `(id, household_id)` as defence in depth
-  (Low), demo credentials in the root `README.md` (Low, for the owner to decide).
+  transaction is written. Remaining, in `docs/BACKLOG.md`: composite foreign keys `(id, household_id)` as defence in depth
+  (Low), demo credentials in the root `README.md` (Low, for the owner to decide). The category-in-pot gap closed on 2026-11-24 (below).
 
 **To verify on staging before `main`:** the ordered checklist is §14. Open follow-ups:
 `docs/BACKLOG.md` ("Rumtelo Pots — follow-ups").
+
+### 2026-11-24 — pot and category must match, restore is all-or-nothing
+
+Uncommitted in the working tree when written; checked against the code. Nothing has run on staging.
+
+**Changed**
+
+- **A category must belong to the chosen pot.** A row that names both a pot and a category is
+  refused with `category_not_found` when the category sits in another pot (`assertCategoryInJar`
+  in `own-reference.util.ts`): transaction create / sort / bulk sort / update, sort-rule create /
+  update / payee hint, fixed-cost create / update. No check when the row has no pot or no category
+  is sent; an edit that touches neither is not re-judged. In the app, editing an expense sends the
+  category only when sorting, and the fixed-cost form clears a category that is not in the selected
+  pot. Rows saved before this are not rewritten (count them: §14, check 12).
+- **Archive restore is all-or-nothing.** The real run is one transaction, so a failure in a late
+  section leaves nothing behind. The preview (dry run) checks the same rules (`invalid_iban`,
+  `due_month_required`, `settlement_account_invalid`, duplicate party names) and refuses in the
+  preview too. The pot split is written last so pot locks are short.
+- **Restore warnings and reasons are shown** in Settings → Import (at most 10 lines), in English and
+  Dutch; a test fails when a backend warning id has no text.
+- **Copy:** dead keys removed; the Members card seat line links to Settings → Plan (no price) for
+  roles that can see billing; the import copy names the real file, `jars.csv`.
+
+**Added:** `.github/workflows/ci.yml` (lint, types, tests, builds; see `docs/engineering/pr-gates.md`).
+It reports; making it a required check is a GitHub / Railway setting.
+
+**Needs Given:** `pnpm i18n:gen` for 23 new or changed EN strings from this batch (es and fr show
+English until then). New findings from the review are in `docs/BACKLOG.md` ("Found on 2026-11-24").
 
 ---
 
@@ -652,3 +676,36 @@ only, never production before staging passes. Queries return ids, never names or
    a wearer who is not a member is refused with `member_not_found`.
 10. **Last:** the pot board and onboarding at 360 / 430 / 768 px, and an existing six-pot household
     (it keeps six pots).
+
+11. **Fixed cost from a transaction (2026-11-24).** Open a transaction sorted in Daily, Buffer or
+    Goals, choose "Make this a fixed cost": the form saves, and the bill lands in Basics.
+12. **Pot and category together.** Edit an expense and change the pot and the category in one save
+    (it saves); pick a category of another pot through an old link (refused, "Pick another
+    category"). Count legacy rows whose category sits in another pot (SELECT only; each count is
+    information, not a failure):
+
+    ```sql
+    select 'transaction' as row_kind, count(*) from public.money_transaction t
+      join public.money_category c on c.id = t.category_id
+      where t.jar_id is not null and c.jar_id <> t.jar_id
+    union all
+    select 'fixed_cost', count(*) from public.money_fixed_cost f
+      join public.money_category c on c.id = f.category_id
+      where f.jar_id is not null and c.jar_id <> f.jar_id
+    union all
+    select 'sort_rule', count(*) from public.money_sort_rule r
+      join public.money_category c on c.id = r.category_id
+      where r.jar_id is not null and c.jar_id <> r.jar_id;
+    ```
+
+    Such a row keeps working until someone edits its pot or category.
+13. **Restore.** Settings → Import: (a) the dry run of a file with a yearly bill without a due month
+    shows the reason and writes nothing; (b) a valid file restores; (c) a real run that fails anyway
+    (the preview already refuses the known cases, so this is hard to provoke by hand) leaves
+    nothing behind, not even the settings or parties it wrote first;
+    (d) the warnings list shows readable lines (cap 10).
+14. **First CI run.** After the push, `ci.yml` runs on GitHub and is green; decide whether to make
+    it a required check.
+15. **Members card.** As OWNER at the seat limit the seat line links to Settings → Plan; as MEMBER
+    it shows the "ask the owner" line and no link. (The upgrade buttons above it still link to
+    Plan for a MEMBER: open item in `docs/BACKLOG.md`.)
