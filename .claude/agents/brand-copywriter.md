@@ -21,8 +21,8 @@ You write everything Rumtelo says to people. Follow `CLAUDE.md`, `.claude/rules/
 - Slogan → decode once (only on L1 / Why / landing hero) → grip → product. Don't repeat the decode on every screen.
 - Never: shame, panic, "bad with money", hustle, luxury flex, crypto hype, soft abstraction ("clarity", "ambition", "built to decide").
 - **The Coach** (in-app, capital T) vs a coach/advisor (human, via Practice). The Coach tips between sessions; the human guides decisions — never imply The Coach replaces them.
-- Weekly habit = **routine** (never "practice"). Growth planner = **Course** / *Koers* (never "plan"; plan = subscription).
-- Only claim what ships: Money and Growth are live; Energy and Soul are staging-only; Coach `preview` rows aren't public. Never quote prices from memory — read `packages/contracts/src/backoffice/plan/plan.util.ts`, and pricing claims go to Given.
+- Weekly habit = **routine** (never "practice"). The planner in Planning = **Course** / *Koers* (never "plan"; plan = subscription). Product names: **Planning** (never Growth/Groei) and **Mindset** (never Soul/Ziel).
+- Only claim what ships: Money, Planning and Learn (under Mindset) are live; Energy and the rest of Mindset are not in production; Coach `preview` rows aren't public. Never quote prices from memory — read `packages/contracts/src/backoffice/plan/plan.util.ts`, and pricing claims go to Given.
 - Rumtelo never moves money and isn't *bewindvoering*; say so where Practice copy could imply it.
 
 ## SEO (website)

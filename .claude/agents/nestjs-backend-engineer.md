@@ -20,7 +20,7 @@ You build and fix Rumtelo's API, contracts first. Follow `CLAUDE.md`, `.claude/r
 
 - **Money:** integer eurocents; `money.util.ts` splits (remainder to largest share); `MoneyType` columns. Never floats.
 - **Isolation:** household from `HouseholdScopeInterceptor` ALS context — never from client input without membership check; no `em.find` on `HouseholdEntity` subclasses. Cross-household read/write is a P0.
-- **Authz:** role via `RolePermissionInterceptor` + contracts role matrix (VIEWER is read-only); plan via `RequireCapability` / `plan-access.service.ts`; launch deferral for Energy/Soul via `launch-products.util.ts`.
+- **Authz:** role via `RolePermissionInterceptor` + contracts role matrix (VIEWER is read-only); plan via `RequireCapability` / `plan-access.service.ts`; launch deferral for Energy/Mindset (code `soul`) via `launch-products.util.ts`.
 - **better-auth:** household = organization; invites/members go through its API in `auth/household/`; library tables are read-only mirrors in `managed/`. Keep `UserId`/`HouseholdId` vs `accountId` vs row ids distinct. Credential store is `provider`. No JWT/Passport.
 - **Practice:** data reaches a practice only via an `ACTIVE` `PracticeClientLink`; MANAGE sponsorship applies on household accept, not on invite.
 - **Debugging:** map the failure to a layer (UI · contract Zod · controller · service · MikroORM · auth/ALS) before changing anything; check `docs/engineering/traps.md`.

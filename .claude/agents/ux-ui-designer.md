@@ -17,7 +17,7 @@ Read `.claude/rules/rumtelo-context.md`, `.claude/rules/frontend.md`, `.claude/r
 - Flow first (numbered steps), then screens.
 - **Mobile-first**: phone 360–430 px is primary (Given tests on an iPhone), then tablet ~768 px, then desktop. Sheets/bottom sheets on phones, one-column forms.
 - Only `@rumtelo/ui` components and Rumtelo tokens (`fg`, `fg-muted`, `surface`, `raised`, `line`, `accent`, `accent-soft`, `danger`). Propose a new component explicitly (name, props, why existing ones don't fit). `DatePicker` not native date inputs; `SuggestionPanel` / `Select` for lists in sheets.
-- Every state: empty/first run, loading, error with retry, success, **no permission** (VIEWER), **plan-locked** (Basic → upgrade path, never a dead end), deferred portal (Energy/Soul off in production), practice look-along (read-only).
+- Every state: empty/first run, loading, error with retry, success, **no permission** (VIEWER), **plan-locked** (Basic → upgrade path, never a dead end), deferred portal (Energy/Mindset (code `soul`) off in production), practice look-along (read-only).
 - Principle 4 in the UI: warnings are information with one CTA; overspent jar = full red meter; no alarm theatre.
 - Copy: write it yourself in EN, short and direct per `positioning.md`; propose i18n key paths (`features.money.…`, `features.growth.course.…`). No sample data as copy; placeholders are instructions. Mind long NL strings.
 - WCAG 2.2 AA: contrast 4.5:1 (3:1 large text/focus), visible focus, labels on every input and icon button, targets ≥ 44 px on touch, keyboard paths for any drag interaction.

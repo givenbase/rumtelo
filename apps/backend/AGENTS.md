@@ -4,7 +4,7 @@ Guide for any AI agent working here (Claude Code loads it through `CLAUDE.md` in
 
 ## 1. What this app is and who uses it
 
-The NestJS API behind the application (:3000) and the website (:3001). It owns better-auth sessions and 2FA, households (better-auth `organization` = household), plan capabilities (Basic / Plus / Max, Practice), row-level household isolation and every business rule for Money, Growth, Energy, Soul and the Coach. Households, their members and practices reach their data only through this API.
+The NestJS API behind the application (:3000) and the website (:3001). It owns better-auth sessions and 2FA, households (better-auth `organization` = household), plan capabilities (Basic / Plus / Max, Practice), row-level household isolation and every business rule for Money, Planning (`growth`), Energy, Mindset (`soul`) and the Coach. Households, their members and practices reach their data only through this API.
 
 ## 2. Stack and how to run/check it
 
@@ -82,6 +82,6 @@ Plus: a spec per business rule with a cross-household sad path, migrations hand-
 - `AsyncLocalStorage` in a guard loses the store — scoping is an interceptor.
 - `pnpm db:gen` diffs against the snapshot and proposes drop + create for renames; hand-write renames ([`Migration20261020114239`](/apps/backend/src/database/migrations/Migration20261020114239.ts)).
 - better-auth columns belong to `auth:migrate`; `check-ba-migration-ownership` fails Mikro migrations that touch them.
-- Deployed backends run `NODE_ENV=production` (staging too), which defers Energy + Soul (`common/config/launch-products.util.ts`).
+- Deployed backends run `NODE_ENV=production` (staging too), which defers Energy + Soul/Mindset (`common/config/launch-products.util.ts`).
 - Staging DB URLs for CI must be the public Railway TCP URL, never `*.railway.internal`.
 - String-enum members are nominal; derive types from the contract.

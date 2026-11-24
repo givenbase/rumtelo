@@ -4,7 +4,7 @@ Guide for any AI agent working here (Claude Code loads it through `CLAUDE.md` in
 
 ## 1. What this app is and who uses it
 
-The authenticated Rumtelo product: Money (pots in three groups — Basics, Future, Free — three by default, up to eight; inbox, fixed costs, goals, debts, week check, month score), Growth (Course), Energy, Soul, the Coach, household settings and the Practice portal. Used by household members (full or viewer), on Basic / Plus / Max plans, and by practices (coaches, advisors) looking along with clients. Every screen shows one household's data, filtered by role, plan and visibility.
+The authenticated Rumtelo product: Money (pots in three groups — Basics, Future, Free — three by default, up to eight; inbox, fixed costs, goals, debts, week check, month score), Planning (Course; code `growth`), Energy, Mindset (Learn; code `soul`), the Coach, household settings and the Practice portal. Used by household members (full or viewer), on Basic / Plus / Max plans, and by practices (coaches, advisors) looking along with clients. Every screen shows one household's data, filtered by role, plan and visibility.
 
 ## 2. Stack and how to run/check it
 
@@ -72,6 +72,6 @@ Plus helper tests where logic changed, no hard-coded copy, checked at 375 px, la
 - Overspent jar = full red meter, never empty (empty reads as "no data").
 - `"use client"` is re-added to contracts by `scripts/add-use-client.mjs`; a stale `packages/contracts/dist` gives odd type or hook errors — rebuild contracts.
 - `next.config.js` is ESM (`export default`).
-- Staging runs `NODE_ENV=production`, so Energy + Soul are deferred there (`app/_lib/launch-products.ts`).
+- Staging runs `NODE_ENV=production`, so Energy + Soul (Mindset's own pages) are deferred there (`app/_lib/launch-products.ts`); the Mindset tab shows with only Learn.
 - Stable empty fallbacks only where they feed query fallbacks or hook deps; no no-op effect cleanups.
-- Growth planner is **Course** (`course` keys and routes), never `plan`.
+- The planner in Planning is **Course** (`course` keys and routes), never `plan`.

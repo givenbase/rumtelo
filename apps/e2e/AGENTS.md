@@ -52,5 +52,5 @@ Always on: [`workflow.md`](/.claude/rules/workflow.md), [`rumtelo-context.md`](/
 
 - The practice invite outbox needs memory email + Swagger enabled on the target (see `.env.example`).
 - `retries` is 1 locally and 2 on CI; a pass after retry is still flaky — fix it.
-- Staging runs `NODE_ENV=production`: Energy and Soul are deferred, so specs must not expect them there.
+- Staging runs `NODE_ENV=production`: Energy and Soul (Mindset's own pages) are deferred, so specs must not expect them there; the Mindset tab shows with only Learn.
 - `playwright-report/` and `test-results/` are output; do not commit them.

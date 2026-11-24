@@ -11,14 +11,14 @@ The loop: income lands and splits into **pots** the same second (three to start:
 | Portal (NL) | Answers | Code | Launch |
 | --- | --- | --- | --- |
 | **Money** (Geld) | Where does this month go? | `money/*` — jar, income, fixed-cost, account, transaction, rule, goal, debt, month-score, week-check, dashboard | Production |
-| **Growth** (Groei) | How do I grow from here? | `growth/*` — goals, **Course** (NL *Koers*: Today/Week/Goals; Focus, Habit, Discipline, Check, Advice), income levers/milestones, learn, assets | Production |
+| **Planning** (Planning) | How do I move forward from here? | `growth/*` — goals, **Course** (NL *Koers*: Today/Week/Goals; Focus, Habit, Discipline, Check, Advice), income levers/milestones, assets | Production |
 | **Energy** (Energie) | What am I running on? | `energy/*` | Staging only |
-| **Soul** (Ziel) | Why am I doing this? | `soul/*` | Staging only |
+| **Mindset** (Mindset) | Why am I doing this? | **Learn** (code and route still `growth/learn`) + `soul/*` | Learn in production; the `soul/*` pages local dev only |
 
-Naming under revision: user-facing, Soul becomes **Mindset** and Growth is no longer a product name in the owner's map. Code keys, routes and folders stay as they are.
+Names decided 2026-11-24: user-facing, Growth is **Planning** and Soul is **Mindset** (same word in EN and NL); Learn sits under the Mindset tab. Code keys, routes, folders, enums and tables keep `growth` and `soul`. Never write Growth/Groei or Soul/Ziel as a product name in copy; the ordinary word grow/growth is fine. Still open: Bedrijf/Business, Mensen/People, Administratie/Admin.
 
 - **Rumtelo Pots** (NL *Rumtelo-potjes*; UI word "pot", code `jar`). Every household starts with three main pots, one per group (`JarGroup`): **Basics/Basis 55 %** (`NECESSITIES`, "what has to be paid"), **Future/Toekomst 20 %** (`LONG_TERM_SAVINGS`, "what you build"), **Free/Vrij 25 %** (`PLAY`, "what you choose"). It can refine a group by turning on optional pots — `DAILY` (Basics); `GOALS`, `FINANCIAL_FREEDOM` (Investing), `EDUCATION` (Learning) (Future); `GIVE` (Free) — each takes its share out of the group's main pot, so group totals never change. A household has 3–8 pots; existing ones keep six. Anything aimed at an absent pot lands in the group's main pot. Source: `jar.util.ts`; behaviour: `apps/backend/src/modules/public/product/money/README.md`. Built: the fixed-cost form asks "Moet dit, of kies je dit?" (picks the pot, stores nothing) and split settings show a "Basics fit" hint (a button that fills in the split). A pot's running balance is priced month by month from `money_jar_share`. Planned, not built: Buffer fills first, category tags, automatic Basics from real fixed costs (`docs/BACKLOG.md`). Pots hold money; goals hold decisions (focus/rank, then claim).
-- **Launch gating:** `packages/contracts/src/backoffice/plan/launch-products.ts` defers Energy + Soul when `NODE_ENV=production`. Coach surfaces are gated per row in `coach-readiness.ts` (`ship` / `preview` / `backlog`; see `docs/product/coach-readiness.md`).
+- **Launch gating:** `packages/contracts/src/backoffice/plan/launch-products.ts` defers Energy + Soul (Mindset's own pages) when `NODE_ENV=production` — staging included. The Mindset tab still shows there, with only Learn in it (`apps/application/app/_lib/nav.ts`). Coach surfaces are gated per row in `coach-readiness.ts` (`ship` / `preview` / `backlog`; see `docs/product/coach-readiness.md`).
 - **The Coach** (`public/platform/coach`): rule-based tips, always with one CTA. Not AI advice, never replaces a human coach.
 - Every new area is added in all four layers or not at all: backend module, contract, route, DB.
 
@@ -62,7 +62,7 @@ People who are doing well, people who want change, people who want to be success
 
 ## Voice (`docs/brand/positioning.md`, lines in `docs/brand/quotes.md`)
 
-Direct, punchy, product-clear; strong and calm. Name the problem (where it went), then one move. No shame, panic, hustle, luxury flex, crypto hype or soft abstraction ("clarity", "ambition"). **The Coach** = in-app; a coach/advisor = human via Practice. Weekly habit = **routine**, never "practice". Growth planner = **Course**, never "plan".
+Direct, punchy, product-clear; strong and calm. Name the problem (where it went), then one move. No shame, panic, hustle, luxury flex, crypto hype or soft abstraction ("clarity", "ambition"). **The Coach** = in-app; a coach/advisor = human via Practice. Weekly habit = **routine**, never "practice". The planner in Planning = **Course**, never "plan".
 
 ## Quality bar
 

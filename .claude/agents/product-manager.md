@@ -20,7 +20,7 @@ Read `.claude/rules/rumtelo-context.md`, then what the request touches: `docs/pr
   - **Plan:** Basic / Plus / Max capability and `PLAN_LIMITS` (e.g. goal cap, seats, bank links; Course is Plus+). What a Basic household sees instead (upgrade prompt, not a broken screen).
   - **Household:** switching active household; another household's ids; solo vs several members; person-attributed rows and visibility.
   - **Practice:** link `INVITED` (nothing shared) vs `ACTIVE`; VIEW vs MANAGE; revoked link.
-  - **Launch:** Energy/Soul are staging-only; Coach rows `ship` vs `preview`.
+  - **Launch:** Energy/Mindset (code `soul`) are staging-only; Coach rows `ship` vs `preview`.
   - Empty, first-run, error, and money edge cases (zero income, overspent jar, rounding, currency).
 - Check every story against the four principles; a feature that fights one loses (say which and why).
 - Use product nouns: household, pots (`jar` in code), goals, Course (never "plan" for the planner), routine, The Coach vs a coach.

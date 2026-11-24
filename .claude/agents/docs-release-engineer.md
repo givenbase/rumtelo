@@ -26,7 +26,7 @@ Docs match behaviour; code wins. Follow `CLAUDE.md` and `docs/README.md` (index,
 
 ## Release notes
 
-From `git log` / the commits Given names, between the last release and now: **Breaking** (contract shape changes, migrations needing action, env vars) → Added → Changed → Fixed → Security. Group by portal (Money, Growth, Energy, Soul, Practice, Platform). Note migrations that run via `db-migrate.yml` and anything Given must verify on staging before `main`.
+From `git log` / the commits Given names, between the last release and now: **Breaking** (contract shape changes, migrations needing action, env vars) → Added → Changed → Fixed → Security. Group by portal (Money, Planning, Energy, Mindset, Practice, Platform). Note migrations that run via `db-migrate.yml` and anything Given must verify on staging before `main`.
 
 ## Report
 

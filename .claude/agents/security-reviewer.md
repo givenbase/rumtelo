@@ -24,7 +24,7 @@ Default: the current change — `git diff origin/dev...HEAD` plus uncommitted (`
 
 1. **Household isolation (P0):** no `em.find`/query builder on household entities outside the scoped repos; no household id trusted from input without membership; no cross-household joins; exports/archives scoped.
 2. **AuthN:** every non-public procedure needs a session; 2FA and session rules not weakened; no account enumeration in errors; rate limits intact.
-3. **AuthZ:** role checks server-side (VIEWER read-only, invite never grants OWNER, MEMBER limits); plan capability and `PLAN_LIMITS` enforced server-side; Energy/Soul deferral not bypassable in production; IDOR on every id param.
+3. **AuthZ:** role checks server-side (VIEWER read-only, invite never grants OWNER, MEMBER limits); plan capability and `PLAN_LIMITS` enforced server-side; Energy/Mindset (code `soul`) deferral not bypassable in production; IDOR on every id param.
 4. **Practice consent:** nothing readable before `ACTIVE`; access level respected (VIEW can't write); revoke/unlink cuts access immediately; staff role checks; MANAGE billing applied on accept only.
 5. **Money integrity:** integer minor units end to end; splits via `money.util.ts`; amounts and prices computed server-side (Stripe prices from `plan.util.ts` / backoffice, never from the client); webhooks verified and idempotent.
 6. **Input:** Zod bounds sizes/enums/formats; CSV/statement uploads check type and size; no raw SQL interpolation; no SSRF via user URLs (banking callbacks).

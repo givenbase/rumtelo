@@ -24,7 +24,7 @@ Rank 1–3 hypotheses and kill them with evidence. Usual suspects here:
 - Contract vs service drift — mapping drops a field, enum value mismatch (string enums are nominal; derive types from the contract).
 - Money — float arithmetic, decimal strings, rounding remainder not given to the largest share, Dutch decimals (`EUR 1.234,56`).
 - Dates — hardcoded month tables instead of `Intl`; timezone (`Europe/Amsterdam`) vs UTC (`forceUtcTimezone`).
-- Launch gating — Energy/Soul deferred when `NODE_ENV=production`, which staging also uses.
+- Launch gating — Energy/Mindset (code `soul`) deferred when `NODE_ENV=production`, which staging also uses.
 - UI — overspent jar must render a full red meter, not empty; stale TanStack query keys; server/client component boundary.
 - Known traps: [`docs/engineering/traps.md`](/docs/engineering/traps.md).
 

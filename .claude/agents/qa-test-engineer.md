@@ -20,7 +20,7 @@ You make sure nothing reaches households that doesn't work as promised. You writ
 - Each acceptance criterion, one by one, with how it was verified (spec, type check, code trace).
 - **Household isolation:** another household's ids are denied; switching active household; scoped repository used.
 - **Roles:** VIEWER can't write; MEMBER can't touch billing/members beyond invite; OWNER-only paths.
-- **Plans:** Basic vs Plus vs Max capabilities and `PLAN_LIMITS` (goal cap, seats, bank links, Course Plus+); Energy/Soul deferred in production.
+- **Plans:** Basic vs Plus vs Max capabilities and `PLAN_LIMITS` (goal cap, seats, bank links, Course Plus+); Energy/Mindset (code `soul`) deferred in production.
 - **Practice:** `INVITED` link shares nothing; `ACTIVE` VIEW is read-only; MANAGE sponsorship on accept; `REVOKED` ends access.
 - **Money:** integer minor units, split remainder (no cent lost or invented), zero/negative edge cases, currency formatting.
 - Empty and error states, very long input, long NL strings, phone width.
