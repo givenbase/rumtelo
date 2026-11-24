@@ -1,4 +1,9 @@
-import { AccountKind, HouseholdRelation, HouseholdRole } from '@rumtelo/contracts';
+import {
+    AccountKind,
+    HouseholdRelation,
+    HouseholdRole,
+    HouseholdSettingsPatch,
+} from '@rumtelo/contracts';
 import { isValidIban, normalizeIban } from '@rumtelo/utils';
 import { z } from 'zod';
 
@@ -81,3 +86,16 @@ export function createBankWizardSeatFormSchema(msg: SettingsFormT) {
 }
 
 export type BankWizardSeatFormValues = z.infer<ReturnType<typeof createBankWizardSeatFormSchema>>;
+
+/** Longest household dream, read from the contract so the field can never disagree with the server. */
+export const HOUSEHOLD_WHY_MAX_LENGTH = (() => {
+    const max = HouseholdSettingsPatch.shape.why.unwrap().unwrap().maxLength;
+    if (max === null) throw new Error('HouseholdSettingsPatch.why has no maximum length');
+    return max;
+})();
+
+export const householdDreamFormSchema = z.object({
+    why: z.string().trim().max(HOUSEHOLD_WHY_MAX_LENGTH),
+});
+
+export type HouseholdDreamFormValues = z.infer<typeof householdDreamFormSchema>;

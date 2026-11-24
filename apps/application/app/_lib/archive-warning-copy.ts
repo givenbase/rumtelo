@@ -20,6 +20,8 @@ export const KNOWN_ARCHIVE_WARNINGS: ReadonlySet<string> = new Set([
     'goals_skipped_plan',
     'goals_limit_reached',
     'goal_give_pot_missing',
+    'household_settings_skipped_role',
+    'personal_direction_skipped',
 ]);
 
 /** `bank_unknown_key:<bank key>` carries the bank the file named. */

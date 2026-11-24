@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useTranslations } from '@rumtelo/i18n';
 import { Button, Eyebrow, Typography } from '@rumtelo/ui';
 
+import { DirectionLine } from '@/components/features/direction/direction-line';
+
 export type DoneAllocation = { jarId: string; name: string; amount: number };
 
 /** The Done summary: what moved, the intention, next week's three. */
@@ -101,6 +103,8 @@ export function WeekCheckDone({
                             </Button>
                         </div>
                     ) : null}
+                    {/* Once, read-only, quiet: where this week's choices are meant to lead. */}
+                    <DirectionLine />
                 </div>
             </div>
             <div className="flex flex-wrap items-center justify-end gap-3">

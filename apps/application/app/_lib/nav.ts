@@ -1,8 +1,8 @@
 /**
  * Navigation model: products as pills and tabs (Home · Money · Growth · Soul), each with
  * its own subnav, plus You (The Coach, Why, Settings, Help, Practice, staging previews).
- * Soul is the Mindset tab: in production it carries Learn alone (the other Soul pages are
- * launch-deferred), elsewhere it carries every Soul page plus Learn.
+ * Soul is the Mindset tab: it opens "Where you're going" (a personal page that needs no plan
+ * capability) and then Learn; the other Soul pages are launch-deferred and not in the tab yet.
  *
  * Labels, hrefs, ordering and active-state matching only. Plan and role GATING lives in
  * `route-capabilities.ts` and never reads this file, so moving a page into or out of the
@@ -68,7 +68,14 @@ export type MoneySubnavKey =
     | 'debt'
     | 'net_worth';
 export type GrowthSubnavKey = 'course' | 'goals';
-export type SoulSubnavKey = 'learn' | 'stillness' | 'gratitude' | 'intent' | 'giving' | 'centers';
+export type SoulSubnavKey =
+    | 'direction'
+    | 'learn'
+    | 'stillness'
+    | 'gratitude'
+    | 'intent'
+    | 'giving'
+    | 'centers';
 export type SubnavKey = MoneySubnavKey | GrowthSubnavKey | SoulSubnavKey;
 
 /**
@@ -191,13 +198,13 @@ export function growthTabHref(ctx: Pick<NavContext, 'has' | 'planReady'>): strin
 }
 
 /**
- * Where the Soul (Mindset) tab lands: the Soul overview when the Soul pages are live, the
- * Learn page when Learn is all there is (production), so the tab never opens a deferred hub.
+ * Where the Soul (Mindset) tab lands: the Soul overview when the Soul pages are live, else its
+ * first item ("Where you're going", then Learn), so the tab never opens a deferred hub.
  */
 export function soulTabHref(soulSubnav: readonly SoulSubnavItem[]): string {
-    const hasSoulPages = soulSubnav.some(item => item.key !== 'learn');
+    const hasSoulPages = soulSubnav.some(item => item.key !== 'learn' && item.key !== 'direction');
     if (hasSoulPages) return productPath('soul');
-    return soulSubnav[0]?.href ?? productPath('growth/learn');
+    return soulSubnav[0]?.href ?? DIRECTION_PATH;
 }
 
 /** A person who can change the plan: lock rows are an upgrade path, so only for them. */
@@ -221,7 +228,14 @@ interface SubnavDefinition<Key extends SubnavKey> {
     badge?: 'to_sort';
 }
 
-const { MONEY, GROWTH, SOUL } = HouseholdPermissionSection;
+const { HOME, MONEY, GROWTH, SOUL } = HouseholdPermissionSection;
+
+/**
+ * "Where you're going": the person's own direction. It lives outside `/product/soul` because
+ * that layout redirects every Soul page to Learn while Soul is launch-deferred, and outside
+ * `/product/growth` because Growth is role-gated. Gate: `route-capabilities.ts` (Home).
+ */
+export const DIRECTION_PATH = productPath('direction');
 
 // Left to right = how money moves: it comes in, is split over the jars, fixed costs go
 // out, spending gets sorted. Then the longer view (debt, net worth).
@@ -411,16 +425,35 @@ function buildGrowthSubnav(ctx: NavContext): GrowthSubnavItem[] {
 }
 
 /**
- * The Soul (Mindset) tab. Learn follows Growth's launch and role gate, so it shows in
- * production; the Soul pages follow Soul's, so they are staging-only until released. A
- * deferred Soul capability is never resolved (it would read as a plan lock).
+ * "Where you're going" is first in the Mindset tab for every plan and role that reads Home
+ * (all of them). It is personal (the signed-in person's account), so it needs no plan
+ * capability, and it never shows in a Practice preview: the preview is a client's board and
+ * the person's own words do not belong in it.
+ */
+function buildDirectionItem(ctx: NavContext): SoulSubnavItem[] {
+    if (ctx.preview.active || !roleCanSee(ctx.role, HOME)) return [];
+    return [
+        {
+            key: 'direction',
+            href: DIRECTION_PATH,
+            labelKey: 'pages.nav.children.direction',
+            state: 'open',
+        },
+    ];
+}
+
+/**
+ * The Soul (Mindset) tab. Direction first, then Learn. Learn follows Growth's launch and role
+ * gate, so it shows in production; the Soul pages follow Soul's, so they are staging-only
+ * until released. A deferred Soul capability is never resolved (it would read as a plan lock).
  */
 function buildSoulSubnav(ctx: NavContext): SoulSubnavItem[] {
-    return SOUL_DEFINITIONS.flatMap(definition => {
+    const pages = SOUL_DEFINITIONS.flatMap(definition => {
         if (!MINDSET_TAB_KEYS.has(definition.key)) return [];
         if (!growthAvailable(ctx)) return [];
         return resolveSubnavItem(ctx, definition) ?? [];
     });
+    return [...buildDirectionItem(ctx), ...pages];
 }
 
 /** Cross-product rows (The Coach, Why Rumtelo, Settings, Help, Practice) and staging previews. */
@@ -564,16 +597,19 @@ function buildTabs(ctx: NavContext, soulSubnav: readonly SoulSubnavItem[]): NavT
             ...(ctx.stageReady ? {} : { pending: true }),
         });
     }
-    // Soul (Mindset) joins with Growth. While the plan loads Learn cannot resolve yet, so a
-    // person who may see Learn gets the slot reserved instead of a tab that pops in.
+    // Soul (Mindset) joins with Growth, from the first week check. "Where you're going" needs
+    // no plan, so the tab is there as soon as the stage is. Only in a Practice preview, where
+    // that page is left out, can the tab still depend on Learn: while the plan loads Learn
+    // cannot resolve yet, so a person who may see it gets the slot reserved instead of a pop-in.
     const soulPossible = soulSubnav.length > 0 || (!ctx.planReady && growthAvailable(ctx));
     if (soulPossible && stageAtLeast(ctx.stage, BoardStage.ROUTINE)) {
+        const planDependent = !soulSubnav.some(item => item.key === 'direction');
         tabs.push({
             key: 'soul',
             href: soulTabHref(soulSubnav),
             labelKey: TOP_PILL_LABEL_KEYS.soul!,
             glyph: '✦',
-            ...(ctx.stageReady && ctx.planReady ? {} : { pending: true }),
+            ...(ctx.stageReady && (ctx.planReady || !planDependent) ? {} : { pending: true }),
         });
     }
     tabs.push(YOU_TAB);
@@ -742,7 +778,11 @@ export function activeTabForPath(pathname: string): NavTabKey | null {
     if (pathMatchesHref(path, productPath('money')) || pathMatchesHref(path, GROWTH_NET_WORTH)) {
         return 'money';
     }
-    if (pathMatchesHref(path, productPath('soul')) || pathMatchesHref(path, LEARN_PATH)) {
+    if (
+        pathMatchesHref(path, productPath('soul')) ||
+        pathMatchesHref(path, LEARN_PATH) ||
+        pathMatchesHref(path, DIRECTION_PATH)
+    ) {
         return 'soul';
     }
     if (pathMatchesHref(path, productPath('growth'))) return 'growth';
@@ -775,9 +815,10 @@ export function activeGrowthSubnavKey(pathname: string): GrowthSubnavKey | null 
     return null;
 }
 
-/** Which Soul sub-item is active: Learn, or one Soul page. Null for the Soul overview. */
+/** Which Soul sub-item is active: Direction, Learn, or one Soul page. Null for the Soul overview. */
 export function activeSoulSubnavKey(pathname: string): SoulSubnavKey | null {
     const path = normalizeAppPathname(pathname);
+    if (pathMatchesHref(path, DIRECTION_PATH)) return 'direction';
     if (pathMatchesHref(path, LEARN_PATH)) return 'learn';
     return (
         SOUL_DEFINITIONS.find(

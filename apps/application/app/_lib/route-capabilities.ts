@@ -26,6 +26,9 @@ export const ROUTE_CAPABILITIES: readonly RouteCapability[] = [
     { prefix: '/', capabilityKey: CAPABILITIES.homeOverview, section: HOME },
     { prefix: '/product/coach', capabilityKey: CAPABILITIES.homeCoach, section: COACH },
     { prefix: '/product/why', capabilityKey: CAPABILITIES.homeWhy, section: HOME },
+    // "Where you're going" (Mindset tab): the person's own account text, so it needs no plan
+    // feature. Home is in every plan and every role (a VIEWER too), which is the gate we want.
+    { prefix: '/product/direction', capabilityKey: CAPABILITIES.homeOverview, section: HOME },
 
     { prefix: '/product/money', capabilityKey: CAPABILITIES.moneyOverview, section: MONEY },
     { prefix: '/product/money/jars', capabilityKey: CAPABILITIES.moneyJars, section: MONEY },

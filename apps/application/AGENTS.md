@@ -72,6 +72,6 @@ Plus helper tests where logic changed, no hard-coded copy, checked at 375 px, la
 - Overspent jar = full red meter, never empty (empty reads as "no data").
 - `"use client"` is re-added to contracts by `scripts/add-use-client.mjs`; a stale `packages/contracts/dist` gives odd type or hook errors — rebuild contracts.
 - `next.config.js` is ESM (`export default`).
-- Staging runs `NODE_ENV=production`, so Energy + Soul (Mindset's own pages) are deferred there (`app/_lib/launch-products.ts`); the Mindset tab shows with only Learn.
+- Staging runs `NODE_ENV=production`, so Energy + Soul (Mindset's own pages) are deferred there (`app/_lib/launch-products.ts`); the Mindset tab shows "Where you're going" (`/product/direction`, personal, no plan capability, gated by Home) and Learn.
 - Stable empty fallbacks only where they feed query fallbacks or hook deps; no no-op effect cleanups.
 - The planner in Planning is **Course** (`course` keys and routes), never `plan`.

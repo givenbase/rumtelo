@@ -26,6 +26,7 @@ import { CREATE_HREF } from '@/app/_lib/create-routes';
 import { CAPABILITIES } from '@/app/_lib/plan';
 import { growthPath } from '@/app/_lib/routes';
 import { isLiveData } from '@/app/_lib/preview';
+import { DirectionLine } from '@/components/features/direction/direction-line';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
@@ -204,6 +205,7 @@ export function CourseGoalsView({
 
     return (
         <div className="grid gap-6">
+            <DirectionLine className="-mb-3" />
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="text-sm text-fg-muted">{tGoal('count', { count: goalCount })}</p>
                 <div className="flex flex-wrap items-center gap-2">

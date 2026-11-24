@@ -43,6 +43,16 @@ test('every page under /product resolves to a capability (no ungated route)', ()
     assert.deepEqual(ungated, []);
 });
 
+test("Where you're going is gated by Home alone: every plan, every role", () => {
+    const access = routeAccessForPath('/product/direction');
+    assert.equal(access?.capabilityKey, CAPABILITIES.homeOverview);
+    assert.equal(access?.section, HouseholdPermissionSection.HOME);
+    assert.equal(
+        routeAccessForPath('/nl/product/direction')?.section,
+        HouseholdPermissionSection.HOME
+    );
+});
+
 test('the home page is gated by homeOverview', () => {
     assert.equal(routeAccessForPath('/')?.capabilityKey, CAPABILITIES.homeOverview);
 });

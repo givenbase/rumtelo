@@ -22,6 +22,8 @@ import {
     RuleMatcher,
     SpendingStyle,
     Theme,
+    WorkSituation,
+    YearIntention,
     type ArchiveAccountSettings,
     type ArchiveBankAccount,
     type ArchiveHouseholdSettings,
@@ -503,6 +505,17 @@ function parseAccountSettingsSheet(row: Row | undefined): ArchiveAccountSettings
         (Object.values(SpendingStyle) as string[]).includes(row.spendingStyle)
             ? { spendingStyle: row.spendingStyle as SpendingStyle }
             : {}),
+        ...(row.workSituation &&
+        (Object.values(WorkSituation) as string[]).includes(row.workSituation)
+            ? { workSituation: row.workSituation as WorkSituation }
+            : {}),
+        ...(row.yearIntention &&
+        (Object.values(YearIntention) as string[]).includes(row.yearIntention)
+            ? { yearIntention: row.yearIntention as YearIntention }
+            : {}),
+        // Free text: the contract trims and caps it (280); empty means "not written".
+        ...(row.direction?.trim() ? { direction: row.direction.trim() } : {}),
+        ...(row.directionWhy?.trim() ? { directionWhy: row.directionWhy.trim() } : {}),
     };
     return Object.keys(settings).length > 0 ? settings : undefined;
 }

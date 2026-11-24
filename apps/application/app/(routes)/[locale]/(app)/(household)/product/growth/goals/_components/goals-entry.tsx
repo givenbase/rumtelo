@@ -7,6 +7,7 @@ import { useTranslations } from '@rumtelo/i18n';
 import { BrandLoader } from '@rumtelo/ui';
 
 import { CAPABILITIES } from '@/app/_lib/plan';
+import { DirectionLine } from '@/components/features/direction/direction-line';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
 import { courseHref } from '@/product/growth/course/_utils/course-route';
@@ -34,6 +35,7 @@ export function GoalsEntry() {
     if (!planReady || hasCourse) return <BrandLoader label={t('loading')} />;
     return (
         <>
+            <DirectionLine className="mb-4" />
             <CoursePreviewCard />
             <GoalsPageClient />
         </>

@@ -146,11 +146,20 @@ function portableHouseholdSettings(settings: HouseholdSettings): ArchiveHousehol
     };
 }
 
-function portableAccountSettings(settings: AccountSettings): ArchiveAccountSettings {
+/**
+ * The person's own prefs and answers, for their own export. `workSituation`, `yearIntention`,
+ * `direction` and `directionWhy` are personal data (the last two are free text) and belong in
+ * the export they can take with them; null stays null, so "not answered" is explicit.
+ */
+export function portableAccountSettings(settings: AccountSettings): ArchiveAccountSettings {
     return {
         locale: settings.locale,
         theme: settings.theme,
         spendingStyle: settings.spendingStyle,
+        workSituation: settings.workSituation,
+        yearIntention: settings.yearIntention,
+        direction: settings.direction,
+        directionWhy: settings.directionWhy,
     };
 }
 
@@ -272,6 +281,10 @@ export function buildExportSheets(bundle: HouseholdExportBundle): ExportSheet[] 
                     locale: bundle.accountSettings.locale ?? '',
                     theme: bundle.accountSettings.theme ?? '',
                     spendingStyle: bundle.accountSettings.spendingStyle ?? '',
+                    workSituation: bundle.accountSettings.workSituation ?? '',
+                    yearIntention: bundle.accountSettings.yearIntention ?? '',
+                    direction: bundle.accountSettings.direction ?? '',
+                    directionWhy: bundle.accountSettings.directionWhy ?? '',
                 },
             ],
         },
