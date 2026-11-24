@@ -6,7 +6,7 @@
 - **Contracts:** `@rumtelo/contracts` — Zod 4 schemas + oRPC procedures, dual CJS+ESM; enums, capabilities and plan catalog live here.
 - **Frontend:** Next.js 16 App Router, React 19, Tailwind v4, next-intl 4, `@rumtelo/ui`, TanStack Query via `apiQuery`.
 - **Tooling:** pnpm 10 + Turborepo, oxlint + oxfmt (not ESLint/Prettier), Vitest in the backend, node:test in `utils`/`i18n`, Playwright in `apps/e2e`.
-- Some docs still say "MikroORM 6" (`docs/engineering/architecture.md`, `apps/backend/src/modules/README.md` heading) — the package is `^7.2`.
+- The package is MikroORM `^7.2`; `apps/backend/AGENTS.md` still said "MikroORM 6" (fixed in the same patch).
 
 ## Package & runtime
 

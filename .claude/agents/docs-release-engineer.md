@@ -19,9 +19,9 @@ Docs match behaviour; code wins. Follow `CLAUDE.md` and `docs/README.md` (index,
 ## Rules
 
 - Verify every claim against the code (grep the path, read the constant) before writing it. Prices and limits come from `packages/contracts/src/backoffice/plan/plan.util.ts`; launch state from `launch-products.ts` and `coach-readiness.ts`.
-- Known drift to fix when touched: "MikroORM 6" in `docs/engineering/architecture.md` and the modules README heading (package is `^7.2`).
+- Known drift to fix when touched: anything still saying "six jars" as the starting model (new households start with three pots) or crediting another author's method; "MikroORM 6" anywhere (package is `^7.2`).
 - ADR for architecture shifts: context → decision → consequences → rollback.
-- Product nouns: household, jars, goals, Course (never "plan" for the planner), routine, The Coach vs coach, Practice.
+- Product nouns: household, pots (`jar` in code), goals, Course (never "plan" for the planner), routine, The Coach vs coach, Practice.
 - No secrets, environment values or personal data in docs.
 
 ## Release notes

@@ -96,7 +96,7 @@ Don't: match with raw `===` or locale-only `findByName`; invent a second "paid t
 
 ## Auth aside — Setup 1 (`auth-aside.tsx`, `packages/ui/src/display/AuthManifesto/`)
 
-Locked unless Given asks: full-bleed background video (no card or black wash); slim bottom strip with the **four portals** by default and the **six jars** on website sign-up. Still iterating: the quote block above the strip — manifesto headline (teal eyebrow, hairline, large display), not caption bars. Website quotes = marketing door (`AUTH_QUOTES_WEB`); application quotes = habit (`AUTH_QUOTES_APP`). "Go back to setup 1" = video + quote block + strip.
+Locked unless Given asks: full-bleed background video (no card or black wash); slim bottom strip with the **four portals** by default and the **three pot groups at 55 / 20 / 25** (Basics · Future · Free) on website sign-up. Still iterating: the quote block above the strip — manifesto headline (teal eyebrow, hairline, large display), not caption bars. Website quotes = marketing door (`AUTH_QUOTES_WEB`); application quotes = habit (`AUTH_QUOTES_APP`). "Go back to setup 1" = video + quote block + strip.
 
 ## PR self-check
 

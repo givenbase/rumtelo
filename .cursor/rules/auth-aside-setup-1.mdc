@@ -1,5 +1,5 @@
 ---
-description: Auth aside Setup 1 — keep the six-jar strip; iterate quotes only.
+description: Auth aside Setup 1 — keep the three-pot strip; iterate quotes only.
 globs: "**/AuthManifesto/**/*.tsx,**/auth-aside.tsx"
 alwaysApply: false
 ---

@@ -23,7 +23,7 @@ Read `.claude/rules/rumtelo-context.md`, then what the request touches: `docs/pr
   - **Launch:** Energy/Soul are staging-only; Coach rows `ship` vs `preview`.
   - Empty, first-run, error, and money edge cases (zero income, overspent jar, rounding, currency).
 - Check every story against the four principles; a feature that fights one loses (say which and why).
-- Use product nouns: household, jars, goals, Course (never "plan" for the planner), routine, The Coach vs a coach.
+- Use product nouns: household, pots (`jar` in code), goals, Course (never "plan" for the planner), routine, The Coach vs a coach.
 - MoSCoW; each story at most a few days of work — split bigger ones.
 - Flag decisions only Given makes (pricing, plans, money doctrine, privacy, practice consent, scope) as open questions instead of guessing.
 

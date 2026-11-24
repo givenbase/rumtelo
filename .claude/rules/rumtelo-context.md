@@ -6,7 +6,7 @@ Shared context for the main session and every agent. Stack and code conventions 
 
 **Stop wondering where it went.** Rumtelo — grip on life. Not a budget app: clear tools so a household sees where money, time and energy went and gets grip again, with The Coach tipping and the household choosing.
 
-The loop: income lands and splits into **six jars** the same second → fixed costs draw from those jars → transactions land in an **Inbox** and get sorted (rule or hand) → a ten-minute **week check** each week (LOOK → REDIRECT → INTEND → DONE) → a **month score** closes the turn.
+The loop: income lands and splits into **pots** the same second (three to start: Basics 55 · Future 20 · Free 25) → fixed costs draw from those pots → transactions land in an **Inbox** and get sorted (rule or hand) → a ten-minute **week check** each week (LOOK → REDIRECT → INTEND → DONE) → a **month score** closes the turn.
 
 | Portal (NL) | Answers | Code | Launch |
 | --- | --- | --- | --- |
@@ -15,7 +15,9 @@ The loop: income lands and splits into **six jars** the same second → fixed co
 | **Energy** (Energie) | What am I running on? | `energy/*` | Staging only |
 | **Soul** (Ziel) | Why am I doing this? | `soul/*` | Staging only |
 
-- Jars (`JarKey`): `NECESSITIES`, `FINANCIAL_FREEDOM`, `EDUCATION`, `LONG_TERM_SAVINGS`, `PLAY`, `GIVE`. Jars hold money; goals hold decisions (focus/rank, then claim).
+Naming under revision: user-facing, Soul becomes **Mindset** and Growth is no longer a product name in the owner's map. Code keys, routes and folders stay as they are.
+
+- **Rumtelo Pots** (NL *Rumtelo-potjes*; UI word "pot", code `jar`). Every household starts with three main pots, one per group (`JarGroup`): **Basics/Basis 55 %** (`NECESSITIES`, "what has to be paid"), **Future/Toekomst 20 %** (`LONG_TERM_SAVINGS`, "what you build"), **Free/Vrij 25 %** (`PLAY`, "what you choose"). It can refine a group by turning on optional pots — `DAILY` (Basics); `GOALS`, `FINANCIAL_FREEDOM` (Investing), `EDUCATION` (Learning) (Future); `GIVE` (Free) — each takes its share out of the group's main pot, so group totals never change. A household has 3–8 pots; existing ones keep six. Anything aimed at an absent pot lands in the group's main pot. Source: `jar.util.ts`; behaviour: `apps/backend/src/modules/public/product/money/README.md`. Built: the fixed-cost form asks "Moet dit, of kies je dit?" (picks the pot, stores nothing) and split settings show a "Basics fit" hint (a button that fills in the split). A pot's running balance is priced month by month from `money_jar_share`. Planned, not built: Buffer fills first, category tags, automatic Basics from real fixed costs (`docs/BACKLOG.md`). Pots hold money; goals hold decisions (focus/rank, then claim).
 - **Launch gating:** `packages/contracts/src/backoffice/plan/launch-products.ts` defers Energy + Soul when `NODE_ENV=production`. Coach surfaces are gated per row in `coach-readiness.ts` (`ship` / `preview` / `backlog`; see `docs/product/coach-readiness.md`).
 - **The Coach** (`public/platform/coach`): rule-based tips, always with one CTA. Not AI advice, never replaces a human coach.
 - Every new area is added in all four layers or not at all: backend module, contract, route, DB.

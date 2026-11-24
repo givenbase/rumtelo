@@ -8,7 +8,7 @@ The NestJS API behind the application (:3000) and the website (:3001). It owns b
 
 ## 2. Stack and how to run/check it
 
-NestJS 11 + Fastify, **ESM**, oRPC implementing Zod contracts from `@rumtelo/contracts`, MikroORM 6 + PostgreSQL, better-auth, Vitest. Runs with `tsx`. Port **3002**.
+NestJS 11 + Fastify, **ESM**, oRPC implementing Zod contracts from `@rumtelo/contracts`, MikroORM 7 (`^7.2`) + PostgreSQL, better-auth, Vitest. Runs with `tsx`. Port **3002**.
 
 **No local database or Docker.** Postgres and the apps run on Railway: `dev` → staging, `main` → production. Pushing migrations to `dev` runs [`db-migrate.yml`](/.github/workflows/db-migrate.yml) (`db:push` + `auth:migrate`) then API smoke. Claude commits; Given pushes.
 

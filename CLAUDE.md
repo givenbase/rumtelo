@@ -4,7 +4,7 @@ Code wins over docs. When this file, `HANDOFF.md` or a README disagrees with the
 
 ## Product
 
-Rumtelo ("grip on life", from Spanish *rumbo*, course) helps a **household** see where its money and life went, and steer it. Four portals — **Money · Growth · Energy · Soul** — sit on one board: income splits into **six jars** the same second, fixed costs draw from jars, transactions land in an Inbox, a ten-minute **week check** redirects surplus, and a month score closes the turn; Growth holds goals and the **Course** planner (NL *Koers*), and **The Coach** gives rule-based tips with one next move. **Rumtelo Practice** is the B2B desk where coaches and advisors follow client households, only with the household's consent.
+Rumtelo ("grip on life", from Spanish *rumbo*, course) helps a **household** see where its money and life went, and steer it. Four portals — **Money · Growth · Energy · Soul** — sit on one board: income splits into **pots** the same second (three to start — Basics 55 · Future 20 · Free 25, **Rumtelo Pots** — refined per household with optional pots), fixed costs draw from pots, transactions land in an Inbox, a ten-minute **week check** redirects surplus, and a month score closes the turn; Growth holds goals and the **Course** planner (NL *Koers*), and **The Coach** gives rule-based tips with one next move. **Rumtelo Practice** is the B2B desk where coaches and advisors follow client households, only with the household's consent.
 
 Audience: people who are doing well, people who want change, and people who want to be successful but lack a map — plus the practices that help them. NL/EU-first (Railway EU, EU-resident data). Copy is **English first, Dutch second**; `es` and `fr` are machine-generated. Full context: `.claude/rules/rumtelo-context.md`.
 
@@ -61,6 +61,7 @@ Per app: `apps/<app>/AGENTS.md` holds what the app is for, its folder map, comma
 - **i18n**: EN source in `packages/i18n/translations/`; never edit `languages/*.json`; wrong machine output is fixed in `translations/overrides.ts`. `pnpm i18n:gen` needs the DeepL key — Given runs it or approves it.
 - **Migrations**: `pnpm db:gen` needs a database, which agents don't have. Hand-write the migration following the latest file in `apps/backend/src/database/migrations/` (class `Migration<yyyyMMddHHmmss>`, `up`/`down`, `addSql`, rename-in-place over drop+create), update `.snapshot-railway.json` to match the entities, and flag it as **unverified** for Given to check on staging. Never alter better-auth tables in a Mikro migration (`check-ba-migration-ownership.ts`).
 - **Product principles** (a feature that fights one loses): (1) split first, spend second; (2) ten minutes a week; (3) energy carries money; (4) information, never shame — every warning carries one next move.
+- **Pots**: the user-facing word is **pot** (NL *potje*), the code says `jar`. One main pot per group (`JarKey.NECESSITIES` / `LONG_TERM_SAVINGS` / `PLAY`), five optional pots a household turns on (`DAILY`, `GOALS`, `FINANCIAL_FREEDOM`, `EDUCATION`, `GIVE`); source `packages/contracts/src/public/product/money/jar/jar.util.ts`. The product never credits another author's six-jar method.
 - **Naming**: **The Coach** (capital, in-app tips) vs a coach/advisor (human, via **Practice**); the weekly habit is a **routine**, never "practice"; the Growth planner is **Course** (`course` keys everywhere), never `plan` — `plan` means the subscription (`PlanKey` Basic/Plus/Max). Code, routes, tables English.
 
 ## Traps already hit (`docs/engineering/traps.md`)
@@ -72,6 +73,9 @@ Per app: `apps/<app>/AGENTS.md` holds what the app is for, its folder map, comma
 - String-enum members are nominal: derive DTO types from the contract.
 - Overspent jar = full red meter, not empty.
 - Banking adapters never silently return `[]`; CSV import is the always-on path (`docs/engineering/banking.md`).
+- A Postgres enum value added in a migration can't be used in the same transaction: own non-transactional migration first.
+- A computed balance must not be priced at today's split or income: store the history and price each month at its own values (`money_jar_share`).
+- Never bake a stored pot name into text; resolve it by `JarKey` (a main pot reads "Basics" alone, "Fixed costs" once refined). A household has 3–8 pots; never assume an optional one exists.
 
 ## Where to read first
 

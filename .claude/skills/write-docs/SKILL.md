@@ -31,7 +31,7 @@ Target: $ARGUMENTS
 
 ## Style
 
-- English; product words: household, jars, goals, Course (never "plan" for Course), week check, month score.
+- English; product words: household, pots (`jar` in code), goals, Course (never "plan" for Course), week check, month score.
 - Lead with what it is and why it exists; short paragraphs, tables for reference.
 - State plan gates (Basic / Plus / Max) and household-role limits explicitly.
 - No real people, emails or bank data beyond the seeded demo personas.
