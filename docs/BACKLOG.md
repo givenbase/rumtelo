@@ -113,6 +113,10 @@ Step 2 = three pots by default (55 / 20 / 25), optional pots turned on inside a 
 
 | Priority | Item | Note |
 | --- | --- | --- |
+| Medium | Money opens on Pots, the second tab | Given, 2026-11-24: opening Geld lands on Potjes while Inkomen is the first tab — confusing. To be picked up with Given (which tab Money opens on, or the tab order) |
+| Medium | Free: "Plezier" and what goes in it | Given, 2026-11-24: Plezier is missing from the on/off list (it is the main pot, always on) and the name reads oddly; he wants a better pre-selection (eating out, activities). Open choice: show the seeded categories inside Plezier, or add optional pots to Free (new `JarKey`s — money doctrine) |
+| Low | Amounts use English notation in Dutch | `formatMoney` defaults to `en-IE` (`packages/utils/src/format.ts`) and `useHouseholdCurrency` passes no locale: €2,642.50 on a Dutch board |
+| Low | Six identical "not set up" lines in Settings › Pots | One note above the list would be calmer than a warning line per pot |
 | Medium | A MEMBER can change household settings through a restore | `/money/archive/restore` maps to MONEY (a MEMBER may create), but `ArchiveService.restore` calls `householdSettings.update` (currency, period start day, payoff strategy, features, …, `archive.service.ts:168`) while MEMBER is read-only on `HOUSEHOLD_SETTINGS` (`role-permissions.ts:36`). Options: apply `settings` only when the role may update household settings (else skip with a warning), or make restore OWNER-only. Role decision — Given |
 | Medium | A restore has no size or time bound | The archive arrays in `archive.schema.ts` (`transactions`, `fixedCosts`, `income`, …) have no `.max()`; only the 8 MiB body limit (`main.ts:43`) caps a file. The real run holds one DB connection for its whole run, and there is no `statement_timeout` / `lock_timeout`. Needs sizing against real exports and a database to test |
 | Low | Restored transactions skip two checks | The transactions section creates rows directly (`archive.service.ts:619`): no closed-period check (`assertPeriodOpen`) and no "pot refuses outflow" check (`assertJarAllowsOutflow`) |
