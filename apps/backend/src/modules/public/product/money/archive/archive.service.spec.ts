@@ -61,7 +61,7 @@ function buildService() {
     const householdSettings = { update: vi.fn<() => Promise<void>>(async () => undefined) };
     const empty = { list: vi.fn<() => Promise<never[]>>(async () => []) };
     const service = new ArchiveService(
-        {} as never,
+        { transactional: async (run: () => Promise<unknown>) => run() } as never,
         {
             planKeyForCurrentHousehold: vi.fn<() => Promise<PlanKey>>(async () => PlanKey.BASIC),
         } as never,
@@ -269,7 +269,10 @@ describe('ArchiveService.restore into a three-pot household', () => {
         };
         const list = vi.fn<() => Promise<never[]>>(async () => []);
         const service = new ArchiveService(
-            { find: async () => [] } as never,
+            {
+                find: async () => [],
+                transactional: async (run: () => Promise<unknown>) => run(),
+            } as never,
             {
                 planKeyForCurrentHousehold: async () => PlanKey.MAX,
                 assertWithinLimit: async () => {},
