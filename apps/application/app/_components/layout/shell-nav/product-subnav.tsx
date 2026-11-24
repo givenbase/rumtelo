@@ -17,7 +17,7 @@ import { useHouseholdShell } from '@/components/features/shell/household-shell-c
 
 /**
  * The sections of one product (Money: Jars · Transactions · Fixed costs · Income · Debt ·
- * Net worth; Growth: Course · Goals · Learn). One row of links on every width; when the row
+ * Net worth; Growth: Course or Goals; Soul: Learn, plus the Soul pages on staging). One row of links on every width; when the row
  * is longer than the screen it scrolls inside itself and the active link scrolls into view.
  * Links, not tabs: each is a page, with `aria-current="page"`.
  *

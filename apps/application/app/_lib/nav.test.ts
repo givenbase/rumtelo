@@ -6,6 +6,7 @@ import { BoardStage, HouseholdRole } from '@rumtelo/contracts';
 import {
     activeGrowthSubnavKey,
     activeMoneySubnavKey,
+    activeSoulSubnavKey,
     activeTabForPath,
     activeYouRowKey,
     buildNav,
@@ -64,11 +65,13 @@ function describeYou(nav: ReturnType<typeof buildNav>): string[] {
 
 const tabKeys = (nav: ReturnType<typeof buildNav>) => nav.tabs.map(tab => tab.key);
 
-test('Plus OWNER: Home · Money · Growth · You; Money and Growth carry their own pages', () => {
+test('Plus OWNER: Home · Money · Growth · Soul · You; Learn is the whole Soul tab in production', () => {
     env.NODE_ENV = 'production';
     const nav = buildNav(ctx({ plan: PlanKey.PLUS }));
-    assert.deepEqual(tabKeys(nav), ['home', 'money', 'growth', 'you']);
+    assert.deepEqual(tabKeys(nav), ['home', 'money', 'growth', 'soul', 'you']);
     assert.equal(nav.tabs.find(tab => tab.key === 'growth')?.href, '/product/growth/course');
+    // The tab opens Learn directly: the Soul overview is deferred in production.
+    assert.equal(nav.tabs.find(tab => tab.key === 'soul')?.href, '/product/growth/learn');
     assert.equal(nav.tabs.find(tab => tab.key === 'you')?.href, null);
     assert.deepEqual(describeSubnav(nav.moneySubnav), [
         'income',
@@ -79,7 +82,8 @@ test('Plus OWNER: Home · Money · Growth · You; Money and Growth carry their o
         'net_worth:locked',
     ]);
     assert.equal(nav.moneySubnav.find(item => item.key === 'transactions')?.badge, 'to_sort');
-    assert.deepEqual(describeSubnav(nav.growthSubnav), ['course', 'learn']);
+    assert.deepEqual(describeSubnav(nav.growthSubnav), ['course']);
+    assert.deepEqual(describeSubnav(nav.soulSubnav), ['learn']);
     // No product feature and no upgrade row in You.
     assert.deepEqual(describeYou(nav), ['coach', 'why', 'settings', 'help']);
 });
@@ -105,7 +109,9 @@ test('Basic OWNER: Course and the paid Money pages show a lock; Goals is the lan
         'debt:locked',
         'net_worth:locked',
     ]);
-    assert.deepEqual(describeSubnav(nav.growthSubnav), ['goals', 'learn:locked']);
+    assert.deepEqual(describeSubnav(nav.growthSubnav), ['goals']);
+    // Learn keeps its plan lock, now under the Soul tab.
+    assert.deepEqual(describeSubnav(nav.soulSubnav), ['learn:locked']);
     // Locks still link to the page, which renders the LockCard.
     assert.equal(nav.moneySubnav.find(item => item.key === 'debt')?.href, '/product/money/debt');
     assert.deepEqual(describeYou(nav), ['coach', 'why', 'settings', 'help']);
@@ -122,7 +128,8 @@ test('Max OWNER: every Money and Growth page is open, no locks', () => {
         'debt',
         'net_worth',
     ]);
-    assert.deepEqual(describeSubnav(nav.growthSubnav), ['course', 'learn']);
+    assert.deepEqual(describeSubnav(nav.growthSubnav), ['course']);
+    assert.deepEqual(describeSubnav(nav.soulSubnav), ['learn']);
 });
 
 test('locks are an upgrade path: MEMBER sees them, an unknown membership and a VIEWER do not', () => {
@@ -132,9 +139,11 @@ test('locks are an upgrade path: MEMBER sees them, an unknown membership and a V
     const unknown = buildNav(ctx({ plan: PlanKey.BASIC, membershipKnown: false }));
     assert.ok(!describeSubnav(unknown.moneySubnav).some(item => item.endsWith(':locked')));
     assert.ok(!describeSubnav(unknown.growthSubnav).some(item => item.endsWith(':locked')));
+    assert.ok(!describeSubnav(unknown.soulSubnav).some(item => item.endsWith(':locked')));
+    assert.ok(!tabKeys(unknown).includes('soul'));
 });
 
-test('VIEWER: no Growth tab, no Income, no Coach, no locks; keeps Debt and Net worth on Max', () => {
+test('VIEWER: no Growth or Soul tab, no Income, no Coach, no locks; keeps Debt and Net worth on Max', () => {
     env.NODE_ENV = 'production';
     const nav = buildNav(ctx({ plan: PlanKey.MAX, role: HouseholdRole.VIEWER }));
     assert.deepEqual(tabKeys(nav), ['home', 'money', 'you']);
@@ -146,6 +155,7 @@ test('VIEWER: no Growth tab, no Income, no Coach, no locks; keeps Debt and Net w
         'net_worth',
     ]);
     assert.deepEqual(nav.growthSubnav, []);
+    assert.deepEqual(nav.soulSubnav, []);
     assert.deepEqual(describeYou(nav), ['why', 'settings']);
     const viewerBasic = buildNav(ctx({ plan: PlanKey.BASIC, role: HouseholdRole.VIEWER }));
     assert.ok(!describeSubnav(viewerBasic.moneySubnav).some(item => item.endsWith(':locked')));
@@ -184,14 +194,15 @@ test('"Go to practice" shows only for practice staff outside a preview', () => {
     assert.ok(!describeYou(buildNav(ctx({ isPracticeStaff: false }))).includes('practice'));
 });
 
-test('production never lists Energy or Soul (You or search); staging lists them under Preview', () => {
+test('production never lists Energy or the Soul pages (You or search); staging lists Energy under Preview and Soul as a tab', () => {
     env.NODE_ENV = 'production';
     const prod = buildNav(ctx());
     assert.ok(!describeYou(prod).includes('energy'));
-    assert.ok(!describeYou(prod).includes('soul'));
     assert.ok(
         !prod.searchable.some(item => item.href.includes('/energy') || item.href.includes('/soul'))
     );
+    // Learn is the one Soul-tab page that ships: findable, and still under its Growth URL.
+    assert.ok(prod.searchable.some(item => item.href === '/product/growth/learn'));
 
     env.NODE_ENV = 'development';
     const staging = buildNav(ctx());
@@ -200,10 +211,20 @@ test('production never lists Energy or Soul (You or search); staging lists them 
     );
     assert.deepEqual(
         preview.map(row => (row.kind === 'link' ? row.key : null)),
-        ['energy', 'soul']
+        ['energy']
     );
-    // Previews are never pills: the tab bar stays Home · Money · Growth · You.
-    assert.deepEqual(tabKeys(staging), ['home', 'money', 'growth', 'you']);
+    // Soul is a tab (Mindset) that opens its overview; Energy stays a preview row in You.
+    assert.deepEqual(tabKeys(staging), ['home', 'money', 'growth', 'soul', 'you']);
+    assert.equal(staging.tabs.find(tab => tab.key === 'soul')?.href, '/product/soul');
+    assert.deepEqual(describeSubnav(staging.soulSubnav), [
+        'learn',
+        'stillness',
+        'gratitude',
+        'intent',
+        'giving',
+        'centers:locked',
+    ]);
+    assert.ok(staging.searchable.some(item => item.href === '/product/soul/stillness'));
 });
 
 test('while the plan loads: Growth links to the redirect and nothing plan-dependent appears', () => {
@@ -232,6 +253,7 @@ test('Quick add search covers Money pages, Course tabs, Learn and You rows', () 
     assert.ok(plus.has('pages.nav.children.debt'));
     assert.ok(plus.has('pages.nav.children.learn'));
     assert.ok(plus.has('pages.nav.children.coach'));
+    assert.ok(!plus.has('pages.nav.children.stillness'));
     const basic = new Set(
         buildNav(ctx({ plan: PlanKey.BASIC })).searchable.map(item => item.labelKey)
     );
@@ -241,7 +263,7 @@ test('Quick add search covers Money pages, Course tabs, Learn and You rows', () 
     assert.ok(basic.has('pages.nav.children.goals'));
 });
 
-test('the active tab follows the product: Debt is Money, Learn is Growth, You owns Coach, Why, Settings', () => {
+test('the active tab follows the product: Debt is Money, Learn is Soul, You owns Coach, Why, Settings', () => {
     assert.equal(activeTabForPath('/'), 'home');
     assert.equal(activeTabForPath('/product/money'), 'money');
     assert.equal(activeTabForPath('/product/money/income/create'), 'money');
@@ -250,13 +272,15 @@ test('the active tab follows the product: Debt is Money, Learn is Growth, You ow
     assert.equal(activeTabForPath('/product/money/net-worth/create'), 'money');
     assert.equal(activeTabForPath('/product/growth/net-worth'), 'money');
     assert.equal(activeTabForPath('/product/growth/course/2026-W47'), 'growth');
-    assert.equal(activeTabForPath('/product/growth/learn'), 'growth');
+    assert.equal(activeTabForPath('/product/growth/learn'), 'soul');
+    assert.equal(activeTabForPath('/product/growth/learn/library'), 'soul');
+    assert.equal(activeTabForPath('/product/soul'), 'soul');
+    assert.equal(activeTabForPath('/product/soul/stillness'), 'soul');
     for (const path of [
         '/product/coach',
         '/product/why',
         '/settings/general/plan',
         '/product/energy',
-        '/product/soul',
     ]) {
         assert.equal(activeTabForPath(path), 'you', path);
     }
@@ -274,12 +298,21 @@ test('the active Money page: Jars by default, then Transactions, Fixed costs, In
     assert.equal(activeMoneySubnavKey('/product/money/net-worth'), 'net_worth');
 });
 
-test('the active Growth page: Course by default, then Goals and Learn', () => {
+test('the active Growth page: Course by default, then Goals; Learn belongs to Soul', () => {
     assert.equal(activeGrowthSubnavKey('/product/growth'), 'course');
     assert.equal(activeGrowthSubnavKey('/product/growth/course/2026-W47'), 'course');
     assert.equal(activeGrowthSubnavKey('/product/growth/goals'), 'goals');
-    assert.equal(activeGrowthSubnavKey('/product/growth/learn'), 'learn');
+    assert.equal(activeGrowthSubnavKey('/product/growth/learn'), null);
     assert.equal(activeGrowthSubnavKey('/product/growth/income'), null);
+});
+
+test('the active Soul page: Learn (under its Growth URL) or one Soul page; the overview has none', () => {
+    assert.equal(activeSoulSubnavKey('/product/growth/learn'), 'learn');
+    assert.equal(activeSoulSubnavKey('/product/growth/learn/library'), 'learn');
+    assert.equal(activeSoulSubnavKey('/product/soul/stillness'), 'stillness');
+    assert.equal(activeSoulSubnavKey('/product/soul/centers'), 'centers');
+    assert.equal(activeSoulSubnavKey('/product/soul'), null);
+    assert.equal(activeSoulSubnavKey('/product/growth/course'), null);
 });
 
 // ── The board ladder (Clarity 3): deferred pages stay in their subnav, muted ────
@@ -318,8 +351,9 @@ test('Plus OWNER in week 1: Debt waits in Money, muted until the first closed mo
 test('Basic OWNER at ROUTINE: Growth, The Coach and the locks arrive; Coming up points at the month', () => {
     env.NODE_ENV = 'production';
     const nav = buildNav(ctx({ plan: PlanKey.BASIC, stage: BoardStage.ROUTINE }));
-    assert.deepEqual(tabKeys(nav), ['home', 'money', 'growth', 'you']);
-    assert.deepEqual(describeSubnav(nav.growthSubnav), ['goals', 'learn:locked']);
+    assert.deepEqual(tabKeys(nav), ['home', 'money', 'growth', 'soul', 'you']);
+    assert.deepEqual(describeSubnav(nav.growthSubnav), ['goals']);
+    assert.deepEqual(describeSubnav(nav.soulSubnav), ['learn:locked']);
     assert.deepEqual(describeYou(nav), ['coach', 'why', 'settings', 'help', 'coming_up:month']);
 });
 
@@ -334,7 +368,8 @@ test('Plus OWNER at ROUTINE: Debt and Learn are muted until the month closes; Co
         'debt:later:month_close',
         'net_worth:locked',
     ]);
-    assert.deepEqual(describeSubnav(nav.growthSubnav), ['course', 'learn:later:month_close']);
+    assert.deepEqual(describeSubnav(nav.growthSubnav), ['course']);
+    assert.deepEqual(describeSubnav(nav.soulSubnav), ['learn:later:month_close']);
     assert.equal(nav.tabs.find(tab => tab.key === 'growth')?.href, '/product/growth/course');
     assert.deepEqual(describeYou(nav), ['coach', 'why', 'settings', 'help', 'coming_up:month']);
 });
@@ -343,7 +378,8 @@ test('Plus OWNER at MONTH: everything open, no Coming up', () => {
     env.NODE_ENV = 'production';
     const nav = buildNav(ctx({ plan: PlanKey.PLUS, stage: BoardStage.MONTH }));
     assert.ok(!describeSubnav(nav.moneySubnav).some(item => item.includes(':later')));
-    assert.deepEqual(describeSubnav(nav.growthSubnav), ['course', 'learn']);
+    assert.deepEqual(describeSubnav(nav.growthSubnav), ['course']);
+    assert.deepEqual(describeSubnav(nav.soulSubnav), ['learn']);
     assert.deepEqual(describeYou(nav), ['coach', 'why', 'settings', 'help']);
 });
 
@@ -390,17 +426,19 @@ test('Practice preview and an unknown membership never get Coming up', () => {
     assert.ok(!describeYou(unknown).some(row => row.startsWith('coming_up')));
 });
 
-test('while the stage loads: the Growth slot is reserved (pending), no Coming up yet', () => {
+test('while the stage loads: the Growth and Soul slots are reserved (pending), no Coming up yet', () => {
     env.NODE_ENV = 'production';
     const nav = buildNav(ctx({ plan: PlanKey.BASIC, stageReady: false }));
     const growth = nav.tabs.find(tab => tab.key === 'growth');
     assert.equal(growth?.pending, true);
+    assert.equal(nav.tabs.find(tab => tab.key === 'soul')?.pending, true);
     assert.ok(!describeYou(nav).some(row => row.startsWith('coming_up')));
     const ready = buildNav(ctx({ plan: PlanKey.BASIC, stage: BoardStage.ROUTINE }));
     assert.equal(ready.tabs.find(tab => tab.key === 'growth')?.pending, undefined);
+    assert.equal(ready.tabs.find(tab => tab.key === 'soul')?.pending, undefined);
     // A VIEWER has no Growth tab, so nothing is reserved.
     const viewer = buildNav(ctx({ role: HouseholdRole.VIEWER, stageReady: false }));
-    assert.ok(!viewer.tabs.some(tab => tab.key === 'growth'));
+    assert.ok(!viewer.tabs.some(tab => tab.key === 'growth' || tab.key === 'soul'));
 });
 
 test('stageAdditions and nextVisibleStage follow the nav on this plan and role', () => {
@@ -462,13 +500,44 @@ test('deferred pages stay findable in search with what brings them to the front'
     assert.ok(!basicSplit.searchable.some(item => item.href === '/product/money/debt'));
 });
 
-test('production never lists Energy or Soul at any stage', () => {
+test('production never lists Energy or a Soul page at any stage; the Soul tab carries Learn only', () => {
     env.NODE_ENV = 'production';
     for (const stage of [BoardStage.SPLIT, BoardStage.ROUTINE, BoardStage.MONTH]) {
         const nav = buildNav(ctx({ plan: PlanKey.MAX, stage }));
         assert.ok(!describeYou(nav).includes('energy'));
-        assert.ok(!describeYou(nav).includes('soul'));
+        assert.ok(nav.soulSubnav.every(item => item.key === 'learn'));
     }
+});
+
+test('the Soul tab: production Plus and Basic, staging Plus; from the first week check on', () => {
+    env.NODE_ENV = 'production';
+    const plus = buildNav(ctx({ plan: PlanKey.PLUS, stage: BoardStage.ROUTINE }));
+    assert.deepEqual(describeSubnav(plus.soulSubnav), ['learn:later:month_close']);
+    const basic = buildNav(ctx({ plan: PlanKey.BASIC, stage: BoardStage.MONTH }));
+    assert.deepEqual(describeSubnav(basic.soulSubnav), ['learn:locked']);
+    assert.equal(basic.tabs.find(tab => tab.key === 'soul')?.href, '/product/growth/learn');
+    const early = buildNav(ctx({ plan: PlanKey.PLUS, stage: BoardStage.SORTING }));
+    assert.ok(!tabKeys(early).includes('soul'));
+    // Learn stays findable in search before the tab arrives; the tab (and so Learn) comes with the week check.
+    assert.equal(
+        early.searchable.find(item => item.href === '/product/growth/learn')?.deferredUntil,
+        'week_check'
+    );
+    // While the plan loads, a person who may see Learn gets the slot reserved, nothing resolved.
+    const loading = buildNav(ctx({ plan: PlanKey.PLUS, planReady: false }));
+    assert.equal(loading.tabs.find(tab => tab.key === 'soul')?.pending, true);
+    assert.deepEqual(loading.soulSubnav, []);
+
+    env.NODE_ENV = 'development';
+    const staging = buildNav(ctx({ plan: PlanKey.PLUS, stage: BoardStage.ROUTINE }));
+    assert.deepEqual(describeSubnav(staging.soulSubnav), [
+        'learn:later:month_close',
+        'stillness:later:month_close',
+        'gratitude:later:month_close',
+        'intent:later:month_close',
+        'giving:later:month_close',
+        'centers:locked',
+    ]);
 });
 
 test('Growth shows one planner item named Course: Plus opens Course, Basic opens its goals list', () => {

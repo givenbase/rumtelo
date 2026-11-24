@@ -10,7 +10,12 @@ import { useTranslations } from '@rumtelo/i18n';
 import { Icon } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
-import { activeGrowthSubnavKey, activeMoneySubnavKey, activeTabForPath } from '@/app/_lib/nav';
+import {
+    activeGrowthSubnavKey,
+    activeMoneySubnavKey,
+    activeSoulSubnavKey,
+    activeTabForPath,
+} from '@/app/_lib/nav';
 import { consumeTourOfferPending } from '@/app/_lib/offer-tour-flag';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
@@ -158,7 +163,7 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                         </div>
                     </div>
 
-                    {/* Product sections (Money, Growth): one row of links, same on every width */}
+                    {/* Product sections (Money, Growth, Soul): one row of links, same on every width */}
                     {activeTab === 'money' && nav.moneySubnav.length > 0 ? (
                         <div className="border-t-2 border-t-jar-give bg-bg-app">
                             <div className="mx-auto max-w-7xl px-4 py-2">
@@ -177,6 +182,17 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                                     items={nav.growthSubnav}
                                     activeKey={activeGrowthSubnavKey(pathname)}
                                     ariaLabel={t('pages.nav.aria.growth_sections')}
+                                />
+                            </div>
+                        </div>
+                    ) : null}
+                    {activeTab === 'soul' && nav.soulSubnav.length > 0 ? (
+                        <div className="border-t-2 border-t-jar-give bg-bg-app">
+                            <div className="mx-auto max-w-7xl px-4 py-2">
+                                <ProductSubnav
+                                    items={nav.soulSubnav}
+                                    activeKey={activeSoulSubnavKey(pathname)}
+                                    ariaLabel={t('pages.nav.aria.soul_sections')}
                                 />
                             </div>
                         </div>

@@ -11,7 +11,7 @@ const PILL =
     'flex items-center gap-1.5 rounded-full px-3 py-2 font-mono lg:px-4 text-xs font-semibold tracking-widest uppercase outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent/40';
 
 /**
- * Desktop pill bar: the products (Home · Money · Growth). You is the avatar menu at the
+ * Desktop pill bar: the products (Home · Money · Growth · Soul). You is the avatar menu at the
  * top right, so it has no pill here. The active pill has `aria-current="page"`.
  */
 export function PortalPills({

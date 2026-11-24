@@ -7,9 +7,16 @@ import { cn } from '@rumtelo/utils';
 
 import type { NavTab, NavTabKey } from '@/app/_lib/nav';
 
+/** Literal class names, so Tailwind sees them. */
+const TAB_GRID_COLUMNS: Record<number, string> = {
+    3: 'grid-cols-3',
+    4: 'grid-cols-4',
+    5: 'grid-cols-5',
+};
+
 /**
- * Phone bottom tabs: Home · Money · Growth · You. Growth joins after the first week check
- * and a VIEWER never has it, so the bar is three cells until then.
+ * Phone bottom tabs: Home · Money · Growth · Soul · You. Growth and Soul (Mindset) join after
+ * the first week check and a VIEWER never has them, so the bar is three cells until then.
  * The active tab is text-accent plus a 2 px top bar, so the state is never colour alone,
  * and links carry `aria-current="page"`. You is a button that opens the sheet (the phone version of the avatar menu).
  */
@@ -30,11 +37,11 @@ export function BottomTabs({
         <nav
             className={cn(
                 'fixed inset-x-0 bottom-0 z-40 grid border-t border-line bg-chrome pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden',
-                tabs.length <= 3 ? 'grid-cols-3' : 'grid-cols-4'
+                TAB_GRID_COLUMNS[Math.min(tabs.length, 5)] ?? 'grid-cols-5'
             )}
             aria-label={t('pages.nav.aria.mobile_tabs')}>
             {tabs.map(tab => {
-                // The Growth slot while the stage loads: keeps the grid still, offers nothing.
+                // The Growth and Soul slots while the stage loads: keeps the grid still, offers nothing.
                 if (tab.pending) {
                     return <span key={tab.key} aria-hidden className="min-h-14" />;
                 }

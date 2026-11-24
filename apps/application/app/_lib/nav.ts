@@ -1,6 +1,8 @@
 /**
- * Navigation model: products as pills and tabs (Home · Money · Growth), each with its own
- * subnav, plus You (The Coach, Why, Settings, Help, Practice, staging previews).
+ * Navigation model: products as pills and tabs (Home · Money · Growth · Soul), each with
+ * its own subnav, plus You (The Coach, Why, Settings, Help, Practice, staging previews).
+ * Soul is the Mindset tab: in production it carries Learn alone (the other Soul pages are
+ * launch-deferred), elsewhere it carries every Soul page plus Learn.
  *
  * Labels, hrefs, ordering and active-state matching only. Plan and role GATING lives in
  * `route-capabilities.ts` and never reads this file, so moving a page into or out of the
@@ -32,7 +34,7 @@ export { normalizeAppPathname };
 /** Same as `pathMatchesHref`; kept under its original name for existing importers. */
 export const pathMatchesNavHref = pathMatchesHref;
 
-export type NavTabKey = 'home' | 'money' | 'growth' | 'you';
+export type NavTabKey = 'home' | 'money' | 'growth' | 'soul' | 'you';
 
 /** Compact labels for the desktop pill bar and bottom tabs. */
 export const TOP_PILL_LABEL_KEYS: Record<string, string> = {
@@ -51,8 +53,9 @@ export interface NavTab {
     labelKey: string;
     glyph: string;
     /**
-     * True for the Growth slot while the board stage is still loading: the bottom tabs keep
-     * the cell (no jump) but render nothing in it; the desktop pills skip it.
+     * True for the Growth and Soul slots while the board stage (or, for Soul, the plan) is
+     * still loading: the bottom tabs keep the cell (no jump) but render nothing in it; the
+     * desktop pills skip it.
      */
     pending?: boolean;
 }
@@ -64,8 +67,9 @@ export type MoneySubnavKey =
     | 'income'
     | 'debt'
     | 'net_worth';
-export type GrowthSubnavKey = 'course' | 'goals' | 'learn';
-export type SubnavKey = MoneySubnavKey | GrowthSubnavKey;
+export type GrowthSubnavKey = 'course' | 'goals';
+export type SoulSubnavKey = 'learn' | 'stillness' | 'gratitude' | 'intent' | 'giving' | 'centers';
+export type SubnavKey = MoneySubnavKey | GrowthSubnavKey | SoulSubnavKey;
 
 /**
  * How a product page shows in its subnav.
@@ -91,8 +95,9 @@ export interface SubnavItem<Key extends SubnavKey = SubnavKey> {
 
 export type MoneySubnavItem = SubnavItem<MoneySubnavKey>;
 export type GrowthSubnavItem = SubnavItem<GrowthSubnavKey>;
+export type SoulSubnavItem = SubnavItem<SoulSubnavKey>;
 
-export type YouRowKey = 'coach' | 'why' | 'settings' | 'energy' | 'soul';
+export type YouRowKey = 'coach' | 'why' | 'settings' | 'energy';
 
 export type YouRow =
     | {
@@ -153,6 +158,7 @@ export interface ShellNav {
     tabs: NavTab[];
     moneySubnav: MoneySubnavItem[];
     growthSubnav: GrowthSubnavItem[];
+    soulSubnav: SoulSubnavItem[];
     youRows: YouRow[];
     searchable: SearchableNavItem[];
 }
@@ -184,6 +190,16 @@ export function growthTabHref(ctx: Pick<NavContext, 'has' | 'planReady'>): strin
         : productPath('growth/goals');
 }
 
+/**
+ * Where the Soul (Mindset) tab lands: the Soul overview when the Soul pages are live, the
+ * Learn page when Learn is all there is (production), so the tab never opens a deferred hub.
+ */
+export function soulTabHref(soulSubnav: readonly SoulSubnavItem[]): string {
+    const hasSoulPages = soulSubnav.some(item => item.key !== 'learn');
+    if (hasSoulPages) return productPath('soul');
+    return soulSubnav[0]?.href ?? productPath('growth/learn');
+}
+
 /** A person who can change the plan: lock rows are an upgrade path, so only for them. */
 function isWriter(ctx: NavContext): boolean {
     return ctx.membershipKnown && ctx.role !== HouseholdRole.VIEWER && !ctx.preview.active;
@@ -205,7 +221,7 @@ interface SubnavDefinition<Key extends SubnavKey> {
     badge?: 'to_sort';
 }
 
-const { MONEY, GROWTH } = HouseholdPermissionSection;
+const { MONEY, GROWTH, SOUL } = HouseholdPermissionSection;
 
 // Left to right = how money moves: it comes in, is split over the jars, fixed costs go
 // out, spending gets sorted. Then the longer view (debt, net worth).
@@ -271,12 +287,57 @@ const GROWTH_DEFINITIONS: SubnavDefinition<GrowthSubnavKey>[] = [
         capability: CAPABILITIES.growthGoals,
         fromStage: BoardStage.ROUTINE,
     },
+];
+
+// Learn keeps its route, Growth role section and Growth capability (plan Plus and Max, from
+// the first closed month); only its tab changed. The Soul pages are staging-only.
+const SOUL_DEFINITIONS: SubnavDefinition<SoulSubnavKey>[] = [
     {
         key: 'learn',
         href: productPath('growth/learn'),
         labelKey: 'pages.nav.children.learn',
         section: GROWTH,
         capability: CAPABILITIES.growthLearn,
+        fromStage: BoardStage.MONTH,
+    },
+    {
+        key: 'stillness',
+        href: productPath('soul/stillness'),
+        labelKey: 'pages.nav.children.stillness',
+        section: SOUL,
+        capability: CAPABILITIES.soulStillness,
+        fromStage: BoardStage.MONTH,
+    },
+    {
+        key: 'gratitude',
+        href: productPath('soul/gratitude'),
+        labelKey: 'pages.nav.children.gratitude',
+        section: SOUL,
+        capability: CAPABILITIES.soulGratitude,
+        fromStage: BoardStage.MONTH,
+    },
+    {
+        key: 'intent',
+        href: productPath('soul/intent'),
+        labelKey: 'pages.nav.children.intent',
+        section: SOUL,
+        capability: CAPABILITIES.soulIntent,
+        fromStage: BoardStage.MONTH,
+    },
+    {
+        key: 'giving',
+        href: productPath('soul/giving'),
+        labelKey: 'pages.nav.children.giving',
+        section: SOUL,
+        capability: CAPABILITIES.soulGiving,
+        fromStage: BoardStage.MONTH,
+    },
+    {
+        key: 'centers',
+        href: productPath('soul/centers'),
+        labelKey: 'pages.nav.children.centers',
+        section: SOUL,
+        capability: CAPABILITIES.soulCenters,
         fromStage: BoardStage.MONTH,
     },
 ];
@@ -342,6 +403,19 @@ function buildGrowthSubnav(ctx: NavContext): GrowthSubnavItem[] {
     });
 }
 
+/**
+ * The Soul (Mindset) tab. Learn follows Growth's launch and role gate, so it shows in
+ * production; the Soul pages follow Soul's, so they are staging-only until released. A
+ * deferred Soul capability is never resolved (it would read as a plan lock).
+ */
+function buildSoulSubnav(ctx: NavContext): SoulSubnavItem[] {
+    const soulLive = isProductEnabled('soul');
+    return SOUL_DEFINITIONS.flatMap(definition => {
+        if (definition.key === 'learn' ? !growthAvailable(ctx) : !soulLive) return [];
+        return resolveSubnavItem(ctx, definition) ?? [];
+    });
+}
+
 /** Cross-product rows (The Coach, Why Rumtelo, Settings, Help, Practice) and staging previews. */
 function buildYouRows(ctx: NavContext, comingUp: YouRow | null): YouRow[] {
     const { role, preview } = ctx;
@@ -390,8 +464,8 @@ function buildYouRows(ctx: NavContext, comingUp: YouRow | null): YouRow[] {
     }
     if (comingUp) rows.push(comingUp);
 
-    // Staging only: production never lists Energy or Soul (launch surface is Money + Growth).
-    // They sit in You under "Preview" so the phone tab bar stays at four cells.
+    // Staging only: production never lists Energy (launch surface is Money, Growth and Learn).
+    // It sits in You under "Preview". Soul is its own tab (Mindset), see `buildSoulSubnav`.
     if (
         atLeast(BoardStage.MONTH) &&
         isProductEnabled('energy') &&
@@ -406,20 +480,6 @@ function buildYouRows(ctx: NavContext, comingUp: YouRow | null): YouRow[] {
             badgeKey: 'preview',
         });
     }
-    if (
-        atLeast(BoardStage.MONTH) &&
-        isProductEnabled('soul') &&
-        sees(HouseholdPermissionSection.SOUL)
-    ) {
-        rows.push({
-            kind: 'link',
-            key: 'soul',
-            href: productPath('soul'),
-            labelKey: 'pages.nav.pills.soul',
-            icon: 'sparkle',
-            badgeKey: 'preview',
-        });
-    }
 
     return rows;
 }
@@ -429,6 +489,7 @@ function buildSearchable(
     tabs: NavTab[],
     moneySubnav: MoneySubnavItem[],
     growthSubnav: GrowthSubnavItem[],
+    soulSubnav: SoulSubnavItem[],
     youRows: YouRow[]
 ): SearchableNavItem[] {
     const items: SearchableNavItem[] = [];
@@ -460,9 +521,9 @@ function buildSearchable(
         } else if (ctx.planReady && ctx.has(CAPABILITIES.growthGoals)) {
             add(productPath('growth/goals'), 'pages.nav.children.goals');
         }
-        for (const item of growthSubnav) {
-            if (item.key === 'learn') offer(item);
-        }
+    }
+    if (tabs.some(tab => tab.key === 'soul')) {
+        for (const item of soulSubnav) offer(item);
     }
     for (const row of youRows) {
         if (row.kind === 'link') add(row.href, row.labelKey);
@@ -470,7 +531,7 @@ function buildSearchable(
     return items;
 }
 
-function buildTabs(ctx: NavContext): NavTab[] {
+function buildTabs(ctx: NavContext, soulSubnav: readonly SoulSubnavItem[]): NavTab[] {
     const tabs: NavTab[] = [HOME_TAB, MONEY_TAB];
     if (growthAvailable(ctx) && stageAtLeast(ctx.stage, BoardStage.ROUTINE)) {
         tabs.push({
@@ -481,22 +542,36 @@ function buildTabs(ctx: NavContext): NavTab[] {
             ...(ctx.stageReady ? {} : { pending: true }),
         });
     }
+    // Soul (Mindset) joins with Growth. While the plan loads Learn cannot resolve yet, so a
+    // person who may see Learn gets the slot reserved instead of a tab that pops in.
+    const soulPossible = soulSubnav.length > 0 || (!ctx.planReady && growthAvailable(ctx));
+    if (soulPossible && stageAtLeast(ctx.stage, BoardStage.ROUTINE)) {
+        tabs.push({
+            key: 'soul',
+            href: soulTabHref(soulSubnav),
+            labelKey: TOP_PILL_LABEL_KEYS.soul!,
+            glyph: '✦',
+            ...(ctx.stageReady && ctx.planReady ? {} : { pending: true }),
+        });
+    }
     tabs.push(YOU_TAB);
     return tabs;
 }
 
 /** Tabs, product subnavs, You rows and search for one context, without the Coming up row. */
 function buildParts(ctx: NavContext, comingUp: YouRow | null) {
-    const tabs = buildTabs(ctx);
     const moneySubnav = buildMoneySubnav(ctx);
     const growthSubnav = buildGrowthSubnav(ctx);
+    const soulSubnav = buildSoulSubnav(ctx);
+    const tabs = buildTabs(ctx, soulSubnav);
     const youRows = buildYouRows(ctx, comingUp);
     return {
         tabs,
         moneySubnav,
         growthSubnav,
+        soulSubnav,
         youRows,
-        searchable: buildSearchable(ctx, tabs, moneySubnav, growthSubnav, youRows),
+        searchable: buildSearchable(ctx, tabs, moneySubnav, growthSubnav, soulSubnav, youRows),
     };
 }
 
@@ -511,6 +586,7 @@ function ladderItems(ctx: NavContext): { key: StageItemKey; from: BoardStage }[]
     // Resolve at the full board so a plan-locked page (never part of the ladder) drops out.
     const full: NavContext = { ...ctx, stage: BoardStage.MONTH, stageReady: true };
     const growth = buildGrowthSubnav(full);
+    const soul = buildSoulSubnav(full);
     const money = buildMoneySubnav(full);
     const open = (items: readonly SubnavItem[], key: SubnavKey) =>
         items.find(item => item.key === key && item.state === 'open');
@@ -522,7 +598,7 @@ function ladderItems(ctx: NavContext): { key: StageItemKey; from: BoardStage }[]
     }
     if (open(money, 'debt')) items.push({ key: 'debt', from: BoardStage.MONTH });
     if (open(money, 'net_worth')) items.push({ key: 'net_worth', from: BoardStage.MONTH });
-    if (open(growth, 'learn')) items.push({ key: 'learn', from: BoardStage.MONTH });
+    if (open(soul, 'learn')) items.push({ key: 'learn', from: BoardStage.MONTH });
     if (buildYouRows(full, null).some(row => row.kind === 'link' && row.key === 'coach')) {
         items.push({ key: 'coach', from: BoardStage.ROUTINE });
     }
@@ -605,6 +681,7 @@ export function buildNav(ctx: NavContext): ShellNav {
         tabs: parts.tabs,
         moneySubnav: parts.moneySubnav,
         growthSubnav: parts.growthSubnav,
+        soulSubnav: parts.soulSubnav,
         youRows: parts.youRows,
         searchable: ctx.stageReady
             ? [...parts.searchable, ...deferredSearchable(ctx, parts.searchable)]
@@ -617,7 +694,6 @@ const YOU_PATHS: ReadonlyArray<{ prefix: string; key: YouRowKey }> = [
     { prefix: productPath('why'), key: 'why' },
     { prefix: '/settings', key: 'settings' },
     { prefix: productPath('energy'), key: 'energy' },
-    { prefix: productPath('soul'), key: 'soul' },
 ];
 
 /** The You row that owns this path, if any. */
@@ -629,10 +705,13 @@ export function activeYouRowKey(pathname: string): YouRowKey | null {
 /** The legacy Net worth route under Growth still belongs to Money. */
 const GROWTH_NET_WORTH = productPath('growth/net-worth');
 
+/** Learn keeps its Growth URL but belongs to the Soul (Mindset) tab. */
+const LEARN_PATH = productPath('growth/learn');
+
 /**
  * Which top tab is active. A page that belongs to a product highlights that product
- * (Debt and Net worth are Money, Learn is Growth); The Coach, Why, Settings and the
- * staging previews highlight You.
+ * (Debt and Net worth are Money, Learn is Soul); The Coach, Why, Settings and the
+ * Energy preview highlight You.
  */
 export function activeTabForPath(pathname: string): NavTabKey | null {
     const path = normalizeAppPathname(pathname);
@@ -640,6 +719,9 @@ export function activeTabForPath(pathname: string): NavTabKey | null {
     if (activeYouRowKey(path)) return 'you';
     if (pathMatchesHref(path, productPath('money')) || pathMatchesHref(path, GROWTH_NET_WORTH)) {
         return 'money';
+    }
+    if (pathMatchesHref(path, productPath('soul')) || pathMatchesHref(path, LEARN_PATH)) {
+        return 'soul';
     }
     if (pathMatchesHref(path, productPath('growth'))) return 'growth';
     return null;
@@ -661,13 +743,23 @@ export function activeMoneySubnavKey(pathname: string): MoneySubnavKey {
     return 'jars';
 }
 
-/** Which Growth sub-item is active; the Growth root opens Course. Null for other Growth pages. */
+/** Which Growth sub-item is active; the Growth root opens Course. Null for other Growth pages (Learn is Soul's). */
 export function activeGrowthSubnavKey(pathname: string): GrowthSubnavKey | null {
     const path = normalizeAppPathname(pathname);
     if (pathMatchesHref(path, productPath('growth/goals'))) return 'goals';
-    if (pathMatchesHref(path, productPath('growth/learn'))) return 'learn';
     if (path === productPath('growth') || pathMatchesHref(path, productPath('growth/course'))) {
         return 'course';
     }
     return null;
+}
+
+/** Which Soul sub-item is active: Learn, or one Soul page. Null for the Soul overview. */
+export function activeSoulSubnavKey(pathname: string): SoulSubnavKey | null {
+    const path = normalizeAppPathname(pathname);
+    if (pathMatchesHref(path, LEARN_PATH)) return 'learn';
+    return (
+        SOUL_DEFINITIONS.find(
+            definition => definition.key !== 'learn' && pathMatchesHref(path, definition.href)
+        )?.key ?? null
+    );
 }
