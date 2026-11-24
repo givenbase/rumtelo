@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 
 import type { FixedCost, JarBalance } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
-import { useTranslations } from '@rumtelo/i18n';
+import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { cn } from '@rumtelo/utils';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
@@ -15,6 +15,7 @@ import { openBillCountsByJar } from '@/app/_lib/jar-open-bills';
 import {
     GROUP_CHROME,
     GROUP_PARAM,
+    formatShare,
     groupBlocks,
     groupSlug,
     groupViews,
@@ -72,6 +73,7 @@ export function JarTile({
 }) {
     const t = useTranslations('features.money.jars');
     const tGroups = useTranslations('features.money.groups');
+    const locale = useLocale();
     const { formatMoney } = useHouseholdCurrency();
     const figures = jarTileFigures(jar);
     const translators = { jars: t, groups: tGroups };
@@ -128,6 +130,12 @@ export function JarTile({
                         amount: formatMoney(figures.envelope),
                     })}
                 </span>
+                {/* The pot's share of the split, as a memory aid next to the amount it gives. */}
+                <span className="font-mono text-xs leading-snug text-fg-muted">
+                    {tGroups('share_of_income', {
+                        percent: formatShare(jar.percentage, locale),
+                    })}
+                </span>
             </span>
 
             <span
@@ -177,7 +185,7 @@ export function JarTileSkeleton() {
     return (
         <div
             aria-hidden
-            className="h-[10.5rem] animate-pulse rounded-2xl border border-line bg-surface"
+            className="h-[11.5rem] animate-pulse rounded-2xl border border-line bg-surface"
         />
     );
 }
