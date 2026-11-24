@@ -68,7 +68,8 @@ describe('snapshot and entity agree on the jar key enum', () => {
         expect(snapshot.nativeEnums['money_jar_key']!.items).toEqual(ALL_KEYS);
         const columns = snapshot.tables.flatMap(table =>
             Object.values(table.columns)
-                .filter(column => column.nativeEnumName === 'money_jar_key')
+                // db:gen writes the name schema-qualified (`public.money_jar_key`).
+                .filter(column => column.nativeEnumName?.split('.').pop() === 'money_jar_key')
                 .map(column => ({ table: table.name, column }))
         );
         // public.money_jar.key, jar template key, transaction-in preset jar_key.
