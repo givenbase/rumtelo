@@ -113,6 +113,7 @@ Step 2 = three pots by default (55 / 20 / 25), optional pots turned on inside a 
 
 | Priority | Item | Note |
 | --- | --- | --- |
+| Medium | Product names: follow-ups after Planning / Mindset (2026-11-24) | Decided and built: Growth → Planning, Soul → Mindset (copy only), Learn under the Mindset tab (production shows the tab with only Learn). Open for Given: the tagline "Grip on your growth" under Planning (`features.growth.hub.line`, `pages.landing.portals.growth.line`, `pages.why.portals.growth.line`, `pages.dashboard.widgets.growth.tagline`); "Planning week check" wording; legal pages wording; es/fr product names after `i18n:gen`; `CLAUDE.md`, `.claude/**`, `docs/explain/02-growth.md` / `02-soul.md` and other docs still say Growth / Soul; Bedrijf, Mensen, Administratie undecided |
 | Medium | Money opens on Pots, the second tab | Given, 2026-11-24: opening Geld lands on Potjes while Inkomen is the first tab — confusing. To be picked up with Given (which tab Money opens on, or the tab order) |
 | Medium | Free: "Plezier" and what goes in it | Given, 2026-11-24: Plezier is missing from the on/off list (it is the main pot, always on) and the name reads oddly; he wants a better pre-selection (eating out, activities). Open choice: show the seeded categories inside Plezier, or add optional pots to Free (new `JarKey`s — money doctrine) |
 | Low | Amounts use English notation in Dutch | `formatMoney` defaults to `en-IE` (`packages/utils/src/format.ts`) and `useHouseholdCurrency` passes no locale: €2,642.50 on a Dutch board |
