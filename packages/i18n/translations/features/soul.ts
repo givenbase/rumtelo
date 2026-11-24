@@ -1,5 +1,50 @@
 /** Mindset portal (code key `soul`) — page headings and empty states. */
 const soul = {
+    /**
+     * "Where you're going" (route `/product/direction`): the signed-in person's own direction.
+     * Personal, so no sentence names a household or a housemate. Never "north star": that is
+     * the brand slogan's name.
+     */
+    direction: {
+        eyebrow: 'Mindset',
+        title: "Where you're going",
+        lead: 'A year from now, in your own words. Then the goals that get you there.',
+        private_note: 'Only you see this, in every household you are in.',
+        load_error: 'This did not load. Try again in a moment.',
+        now: {
+            title: 'Where you are now',
+            lead: 'Read from your board. Nothing to fill in.',
+            split_title: 'This month, split',
+            buffer_row: 'Saved in {pot}',
+            debt_free_row: 'Debt-free by {date}',
+            no_income_writer: 'Add your income to see how it splits.',
+            no_income_cta: 'Add income',
+            no_income_viewer: 'No income has been added to this board yet.',
+            you_told_us: 'You told us: {summary}',
+        },
+        form: {
+            direction_label: 'Where do you want to be a year from now?',
+            direction_hint:
+                'Optional. One or two sentences are enough. Leave it empty to clear it.',
+            why_title: 'What is it for?',
+            why_lead: 'Optional. Pick one if it fits.',
+            why_words_label: 'In your own words',
+            why_words_hint: 'Optional. No need to share health or religion details.',
+            counter: '{count} of {max}',
+            save: 'Save',
+            saving: 'Saving…',
+            saved: 'Saved',
+        },
+        goals: {
+            title: 'The goals that get you there',
+            first_step: 'First step: {step}',
+            empty: 'No goal yet. Turn this into one, with a first step.',
+            make_goal: 'Make this a goal',
+            see_all: 'See all goals',
+        },
+        line: "Where you're going: {direction}",
+        line_open: 'Open',
+    },
     hub: {
         eyebrow: 'Mindset · the why',
         title: 'The why under the numbers.',

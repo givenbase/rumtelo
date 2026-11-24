@@ -3477,6 +3477,45 @@
             }
         },
         "soul": {
+            "direction": {
+                "eyebrow": "Mindset",
+                "title": "Waar je naartoe gaat",
+                "lead": "Over een jaar, in je eigen woorden. Daarna de doelen die je daar brengen.",
+                "private_note": "Alleen jij ziet dit, in elk huishouden waar je bij hoort.",
+                "load_error": "Dit laadde niet. Probeer het zo nog eens.",
+                "now": {
+                    "title": "Waar je nu staat",
+                    "lead": "Afgelezen van je bord. Je hoeft niets in te vullen.",
+                    "split_title": "Deze maand, verdeeld",
+                    "buffer_row": "Gespaard in {pot}",
+                    "debt_free_row": "Schuldenvrij in {date}",
+                    "no_income_writer": "Voeg je inkomen toe om te zien hoe het wordt verdeeld.",
+                    "no_income_cta": "Inkomen toevoegen",
+                    "no_income_viewer": "Er is nog geen inkomen toegevoegd aan dit bord.",
+                    "you_told_us": "Je vertelde ons: {summary}"
+                },
+                "form": {
+                    "direction_label": "Waar wil je over een jaar staan?",
+                    "direction_hint": "Optioneel. Een of twee zinnen zijn genoeg. Laat het leeg om het te wissen.",
+                    "why_title": "Waar doe je het voor?",
+                    "why_lead": "Optioneel. Kies er één als het past.",
+                    "why_words_label": "In je eigen woorden",
+                    "why_words_hint": "Optioneel. Je hoeft geen details over gezondheid of geloof te delen.",
+                    "counter": "{count} van {max}",
+                    "save": "Opslaan",
+                    "saving": "Opslaan…",
+                    "saved": "Opgeslagen"
+                },
+                "goals": {
+                    "title": "De doelen die je daar brengen",
+                    "first_step": "Eerste stap: {step}",
+                    "empty": "Nog geen doel. Maak hier een doel van, met een eerste stap.",
+                    "make_goal": "Maak hier een doel van",
+                    "see_all": "Alle doelen bekijken"
+                },
+                "line": "Waar je naartoe gaat: {direction}",
+                "line_open": "Openen"
+            },
             "hub": {
                 "eyebrow": "Mindset · het waarom",
                 "title": "Het verhaal achter de cijfers.",
@@ -5290,6 +5329,7 @@
             "goal": "Doel",
             "income": "Mijn inkomen",
             "learn": "Meer informatie",
+            "direction": "Waar je naartoe gaat",
             "course": "Koers",
             "course_week_check": "Weekcheck",
             "course_plan": "Plan je jaar",
@@ -5364,6 +5404,7 @@
                 "goals": "Doelen",
                 "income": "Inkomen",
                 "learn": "Leren",
+                "direction": "Waar je naartoe gaat",
                 "net_worth": "Nettovermogen",
                 "energy_overview": "Overzicht",
                 "week": "Week",
@@ -6095,6 +6136,18 @@
                     "date_of_birth": "Geboortedatum",
                     "add_details": "Voeg naam, telefoonnummer en geboortedatum toe"
                 },
+                "dream": {
+                    "eyebrow": "Jouw droom",
+                    "blurb": "Waar dit huishouden naartoe werkt, in één zin. Het staat op Home voor iedereen in het huishouden.",
+                    "label": "Jouw droom",
+                    "hint": "Optioneel. Laat het leeg om het te wissen.",
+                    "owner_only": "Alleen de eigenaar kan dit wijzigen.",
+                    "empty": "Nog niet opgeschreven.",
+                    "counter": "{count} van {max}",
+                    "save": "Droom opslaan",
+                    "saving": "Opslaan…",
+                    "saved": "Droom opgeslagen"
+                },
                 "money_style": {
                     "eyebrow": "Hoe je met geld omgaat",
                     "blurb": "Persoonlijke stijl — partners kunnen hierin verschillen. Gebruik dit voor tips over de verdeling van de potjes. De volgorde waarin schulden worden afgelost, vind je onder ‘Schuldinstellingen’ voor het hele bord.",
@@ -6649,7 +6702,9 @@
                         "goals_skipped_plan": "Doelen zitten niet in je abonnement, dus ze worden overgeslagen. Kijk onder Plan om ze erbij te nemen.",
                         "goals_limit_reached": "Je hebt de doelgrens van je abonnement bereikt, dus de overige doelen worden overgeslagen. Rond een doel af of kijk onder Plan.",
                         "fixed_cost_jar_unmapped": "Voor sommige vaste kosten is hier geen potje dat rekeningen betaalt, dus ze worden overgeslagen. Zet dat potje aan onder Potjes of voeg de kosten zelf toe.",
-                        "goal_give_pot_missing": "Gevendoelen hebben het potje Geven nodig en dat staat in dit huishouden uit, dus ze worden overgeslagen. Zet het aan onder Potjes en importeer daarna opnieuw."
+                        "goal_give_pot_missing": "Gevendoelen hebben het potje Geven nodig en dat staat in dit huishouden uit, dus ze worden overgeslagen. Zet het aan onder Potjes en importeer daarna opnieuw.",
+                        "household_settings_skipped_role": "Huishoudinstellingen in het bestand worden overgeslagen, want alleen de eigenaar kan die wijzigen. Vraag de eigenaar het bestand te importeren.",
+                        "personal_direction_skipped": "Het bestand bevat een persoonlijke tekst van \"Waar je naartoe gaat\". Die wordt nooit geïmporteerd; schrijf je eigen tekst onder Mindset."
                     }
                 },
                 "sign_out_sub": "Je blijft 30 dagen ingelogd op dit apparaat"

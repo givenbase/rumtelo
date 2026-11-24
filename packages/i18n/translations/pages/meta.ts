@@ -17,6 +17,7 @@ const meta = {
     goal: 'Goal',
     income: 'My income',
     learn: 'Learn',
+    direction: "Where you're going",
     course: 'Course',
     course_week_check: 'Week check',
     course_plan: 'Plan your year',

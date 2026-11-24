@@ -3477,6 +3477,45 @@
             }
         },
         "soul": {
+            "direction": {
+                "eyebrow": "Mindset",
+                "title": "Where you're going",
+                "lead": "A year from now, in your own words. Then the goals that get you there.",
+                "private_note": "Only you see this, in every household you are in.",
+                "load_error": "This did not load. Try again in a moment.",
+                "now": {
+                    "title": "Where you are now",
+                    "lead": "Read from your board. Nothing to fill in.",
+                    "split_title": "This month, split",
+                    "buffer_row": "Saved in {pot}",
+                    "debt_free_row": "Debt-free by {date}",
+                    "no_income_writer": "Add your income to see how it splits.",
+                    "no_income_cta": "Add income",
+                    "no_income_viewer": "No income has been added to this board yet.",
+                    "you_told_us": "You told us: {summary}"
+                },
+                "form": {
+                    "direction_label": "Where do you want to be a year from now?",
+                    "direction_hint": "Optional. One or two sentences are enough. Leave it empty to clear it.",
+                    "why_title": "What is it for?",
+                    "why_lead": "Optional. Pick one if it fits.",
+                    "why_words_label": "In your own words",
+                    "why_words_hint": "Optional. No need to share health or religion details.",
+                    "counter": "{count} of {max}",
+                    "save": "Save",
+                    "saving": "Saving…",
+                    "saved": "Saved"
+                },
+                "goals": {
+                    "title": "The goals that get you there",
+                    "first_step": "First step: {step}",
+                    "empty": "No goal yet. Turn this into one, with a first step.",
+                    "make_goal": "Make this a goal",
+                    "see_all": "See all goals"
+                },
+                "line": "Where you're going: {direction}",
+                "line_open": "Open"
+            },
             "hub": {
                 "eyebrow": "Mindset · the why",
                 "title": "Ce qui se cache derrière les chiffres.",
@@ -5290,6 +5329,7 @@
             "goal": "Objectif",
             "income": "Mes revenus",
             "learn": "En savoir plus",
+            "direction": "Where you're going",
             "course": "Cours",
             "course_week_check": "Bilan hebdomadaire",
             "course_plan": "Plan your year",
@@ -5364,6 +5404,7 @@
                 "goals": "Objectifs",
                 "income": "Revenus",
                 "learn": "En savoir plus",
+                "direction": "Where you're going",
                 "net_worth": "Patrimoine net",
                 "energy_overview": "Présentation générale",
                 "week": "Semaine",
@@ -6095,6 +6136,18 @@
                     "date_of_birth": "Date de naissance",
                     "add_details": "Indiquez le nom, le numéro de téléphone et la date de naissance"
                 },
+                "dream": {
+                    "eyebrow": "Your dream",
+                    "blurb": "What this household works towards, in a sentence. It shows on Home for everyone in the household.",
+                    "label": "Your dream",
+                    "hint": "Optional. Leave it empty to clear it.",
+                    "owner_only": "Only the owner can change this.",
+                    "empty": "Not written yet.",
+                    "counter": "{count} of {max}",
+                    "save": "Save dream",
+                    "saving": "Saving…",
+                    "saved": "Dream saved"
+                },
                 "money_style": {
                     "eyebrow": "Votre rapport à l'argent",
                     "blurb": "Personal style — partners can differ. Tips on the pot split use this. Debt payoff order lives under Debt settings for the whole board.",
@@ -6649,7 +6702,9 @@
                         "goals_skipped_plan": "Your plan does not include goals, so they are skipped. Look under Plan to bring them in.",
                         "goals_limit_reached": "You have reached the goal limit of your plan, so the other goals are skipped. Finish a goal or look under Plan.",
                         "fixed_cost_jar_unmapped": "Some fixed costs have no pot here that takes bills, so they are skipped. Turn that pot on under Pots, or add the cost by hand.",
-                        "goal_give_pot_missing": "Giving goals need the Giving pot, which is off in this household, so they are skipped. Turn it on under Pots, then import again."
+                        "goal_give_pot_missing": "Giving goals need the Giving pot, which is off in this household, so they are skipped. Turn it on under Pots, then import again.",
+                        "household_settings_skipped_role": "Household settings in the file are skipped, because only the owner can change them. Ask the owner to import the file.",
+                        "personal_direction_skipped": "The file holds a personal \"Where you're going\" text. That is never imported; write your own under Mindset."
                     }
                 },
                 "sign_out_sub": "Vous resterez connecté pendant 30 jours sur cet appareil"

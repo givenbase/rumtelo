@@ -164,6 +164,18 @@ const settings = {
             date_of_birth: 'Date of birth',
             add_details: 'Add name, phone, and date of birth',
         },
+        dream: {
+            eyebrow: 'Your dream',
+            blurb: 'What this household works towards, in a sentence. It shows on Home for everyone in the household.',
+            label: 'Your dream',
+            hint: 'Optional. Leave it empty to clear it.',
+            owner_only: 'Only the owner can change this.',
+            empty: 'Not written yet.',
+            counter: '{count} of {max}',
+            save: 'Save dream',
+            saving: 'Saving…',
+            saved: 'Dream saved',
+        },
         money_style: {
             eyebrow: 'How you handle money',
             blurb: 'Personal style — partners can differ. Tips on the pot split use this. Debt payoff order lives under Debt settings for the whole board.',
@@ -773,6 +785,10 @@ const settings = {
                     'Some fixed costs have no pot here that takes bills, so they are skipped. Turn that pot on under Pots, or add the cost by hand.',
                 goal_give_pot_missing:
                     'Giving goals need the Giving pot, which is off in this household, so they are skipped. Turn it on under Pots, then import again.',
+                household_settings_skipped_role:
+                    'Household settings in the file are skipped, because only the owner can change them. Ask the owner to import the file.',
+                personal_direction_skipped:
+                    'The file holds a personal "Where you\'re going" text. That is never imported; write your own under Mindset.',
             },
         },
         sign_out_sub: 'You stay signed in for 30 days on this device',

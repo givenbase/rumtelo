@@ -1266,6 +1266,10 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Voor sommige vaste kosten is hier geen potje dat rekeningen betaalt, dus ze worden overgeslagen. Zet dat potje aan onder Potjes of voeg de kosten zelf toe.',
         'pages.settings.panels.import.warnings.goal_give_pot_missing':
             'Gevendoelen hebben het potje Geven nodig en dat staat in dit huishouden uit, dus ze worden overgeslagen. Zet het aan onder Potjes en importeer daarna opnieuw.',
+        'pages.settings.panels.import.warnings.household_settings_skipped_role':
+            'Huishoudinstellingen in het bestand worden overgeslagen, want alleen de eigenaar kan die wijzigen. Vraag de eigenaar het bestand te importeren.',
+        'pages.settings.panels.import.warnings.personal_direction_skipped':
+            'Het bestand bevat een persoonlijke tekst van "Waar je naartoe gaat". Die wordt nooit geïmporteerd; schrijf je eigen tekst onder Mindset.',
         'pages.shell.forms.tx_update.description':
             'Pas de richting, het bedrag, het potje of de notitie aan.',
         'pages.shell.forms.fixed_create.description': 'Wat verdwijnt er elke maand uit het potje?',
@@ -2093,6 +2097,59 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
             'Open een product wanneer je dat hulpmiddel nodig hebt. Vandaag kun je gebruikmaken van ‘Geld’, ‘Planning’, ‘Energie’ en ‘Mindset’ — en er komen er nog meer bij. De Coach geeft een tip. Jij beslist.',
         'pages.why.wider_lead_core':
             'Open een product wanneer je dat hulpmiddel nodig hebt. ‘Geld’ en ‘Planning’ zijn vandaag al beschikbaar — er volgen er nog meer. De Coach geeft een tip. Jij beslist.',
+        // "Where you're going" (Mindset tab): je/jij, literal, positive. Hand-set, not machine output.
+        'pages.nav.children.direction': 'Waar je naartoe gaat',
+        'pages.meta.direction': 'Waar je naartoe gaat',
+        'features.soul.direction.eyebrow': 'Mindset',
+        'features.soul.direction.title': 'Waar je naartoe gaat',
+        'features.soul.direction.lead':
+            'Over een jaar, in je eigen woorden. Daarna de doelen die je daar brengen.',
+        'features.soul.direction.private_note':
+            'Alleen jij ziet dit, in elk huishouden waar je bij hoort.',
+        'features.soul.direction.load_error': 'Dit laadde niet. Probeer het zo nog eens.',
+        'features.soul.direction.now.title': 'Waar je nu staat',
+        'features.soul.direction.now.lead': 'Afgelezen van je bord. Je hoeft niets in te vullen.',
+        'features.soul.direction.now.split_title': 'Deze maand, verdeeld',
+        'features.soul.direction.now.buffer_row': 'Gespaard in {pot}',
+        'features.soul.direction.now.debt_free_row': 'Schuldenvrij in {date}',
+        'features.soul.direction.now.no_income_writer':
+            'Voeg je inkomen toe om te zien hoe het wordt verdeeld.',
+        'features.soul.direction.now.no_income_cta': 'Inkomen toevoegen',
+        'features.soul.direction.now.no_income_viewer':
+            'Er is nog geen inkomen toegevoegd aan dit bord.',
+        'features.soul.direction.now.you_told_us': 'Je vertelde ons: {summary}',
+        'features.soul.direction.form.direction_label': 'Waar wil je over een jaar staan?',
+        'features.soul.direction.form.direction_hint':
+            'Optioneel. Een of twee zinnen zijn genoeg. Laat het leeg om het te wissen.',
+        'features.soul.direction.form.why_title': 'Waar doe je het voor?',
+        'features.soul.direction.form.why_lead': 'Optioneel. Kies er één als het past.',
+        'features.soul.direction.form.why_words_label': 'In je eigen woorden',
+        'features.soul.direction.form.why_words_hint':
+            'Optioneel. Je hoeft geen details over gezondheid of geloof te delen.',
+        'features.soul.direction.form.counter': '{count} van {max}',
+        'features.soul.direction.form.save': 'Opslaan',
+        'features.soul.direction.form.saving': 'Opslaan…',
+        'features.soul.direction.form.saved': 'Opgeslagen',
+        'features.soul.direction.goals.title': 'De doelen die je daar brengen',
+        'features.soul.direction.goals.first_step': 'Eerste stap: {step}',
+        'features.soul.direction.goals.empty':
+            'Nog geen doel. Maak hier een doel van, met een eerste stap.',
+        'features.soul.direction.goals.make_goal': 'Maak hier een doel van',
+        'features.soul.direction.goals.see_all': 'Alle doelen bekijken',
+        'features.soul.direction.line': 'Waar je naartoe gaat: {direction}',
+        'features.soul.direction.line_open': 'Openen',
+        // Household dream in Settings (Home shows it as "Jouw droom").
+        'pages.settings.panels.dream.eyebrow': 'Jouw droom',
+        'pages.settings.panels.dream.blurb':
+            'Waar dit huishouden naartoe werkt, in één zin. Het staat op Home voor iedereen in het huishouden.',
+        'pages.settings.panels.dream.label': 'Jouw droom',
+        'pages.settings.panels.dream.hint': 'Optioneel. Laat het leeg om het te wissen.',
+        'pages.settings.panels.dream.owner_only': 'Alleen de eigenaar kan dit wijzigen.',
+        'pages.settings.panels.dream.empty': 'Nog niet opgeschreven.',
+        'pages.settings.panels.dream.counter': '{count} van {max}',
+        'pages.settings.panels.dream.save': 'Droom opslaan',
+        'pages.settings.panels.dream.saving': 'Opslaan…',
+        'pages.settings.panels.dream.saved': 'Droom opgeslagen',
     },
     es: {
         // ICU argument names stay English; the generator translated them and format threw.

@@ -26,6 +26,7 @@ const nav = {
         goals: 'Goals',
         income: 'Income',
         learn: 'Learn',
+        direction: "Where you're going",
         net_worth: 'Net worth',
         energy_overview: 'Overview',
         week: 'Week',
