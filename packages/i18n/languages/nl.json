@@ -2309,6 +2309,7 @@
                     "turn_off": "Uitzetten",
                     "turned_on": "Aan",
                     "turned_off": "Uit",
+                    "always_on": "Altijd aan",
                     "refined_badge": "Verfijnd",
                     "not_refined_hint": "{group} is één potje. Zet hieronder een potje aan om het te verdelen.",
                     "turn_on_effect": "{share}% gaat van {main} naar {pot}. {group} blijft {percent}%.",

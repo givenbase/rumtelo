@@ -2309,6 +2309,7 @@
                     "turn_off": "Désactiver",
                     "turned_on": "Le",
                     "turned_off": "Désactivé",
+                    "always_on": "Always on",
                     "refined_badge": "Raffiné",
                     "not_refined_hint": "{group} correspond à un seul pot. Cochez une case ci-dessous pour le diviser.",
                     "turn_on_effect": "{share} % passe de {main} à {pot}. {group} reste à {percent} %.",

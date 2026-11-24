@@ -68,6 +68,8 @@ const money = {
             turn_off: 'Turn off',
             turned_on: 'On',
             turned_off: 'Off',
+            /** Badge on a group's main pot in the list of pots: it cannot be turned off. */
+            always_on: 'Always on',
             refined_badge: 'Refined',
             not_refined_hint: '{group} is one pot. Turn on a pot below to split it.',
             turn_on_effect: '{share}% moves from {main} to {pot}. {group} stays {percent}%.',

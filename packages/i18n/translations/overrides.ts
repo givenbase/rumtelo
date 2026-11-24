@@ -1903,6 +1903,7 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.money.groups.refine.toast_turned_off':
             '{pot} staat uit — het aandeel staat weer in {main}',
         // Pots board: split a group between its own pots (2026-11-24). The group total stays.
+        'features.money.groups.refine.always_on': 'Altijd aan',
         'features.money.groups.split.title': 'Verdeling binnen {group}',
         'features.money.groups.split.intro':
             'Verschuif aandeel tussen de potjes van {group}. {group} zelf blijft {percent}% van je inkomen.',

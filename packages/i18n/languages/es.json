@@ -2309,6 +2309,7 @@
                     "turn_off": "Apagar",
                     "turned_on": "El",
                     "turned_off": "Apagado",
+                    "always_on": "Always on",
                     "refined_badge": "Refinado",
                     "not_refined_hint": "{group} es un bote. Selecciona un bote de los de abajo para dividirlo.",
                     "turn_on_effect": "El {share} % pasa de {main} a {pot}. El {group} se mantiene en el {percent} %.",
