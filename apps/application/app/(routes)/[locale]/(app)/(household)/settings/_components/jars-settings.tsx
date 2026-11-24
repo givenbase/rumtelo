@@ -20,7 +20,7 @@ import {
 } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
-import { Badge, Button, Input, Meter, StubNotice, Switch, VendorMark } from '@rumtelo/ui';
+import { Badge, Button, Input, StubNotice, VendorMark } from '@rumtelo/ui';
 import { cn, formatIban, formatPercent, sumMonthly } from '@rumtelo/utils';
 
 import { useApiError } from '@/app/_lib/api-error-messages';
@@ -38,9 +38,10 @@ import { sameShares } from '@/app/_lib/jar-group-split';
 import { isLiveData } from '@/app/_lib/preview';
 import { evaluateSplitCoach, orderSplitTips, pctByJarKey } from '@/app/_lib/split-coach';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
-import { useJarName } from '@/app/_lib/use-jar-name';
+import { useJarName, useJarPurpose } from '@/app/_lib/use-jar-name';
 import { HelperGate } from '@/components/features/helpers';
 import { BankAccountRow } from '@/components/features/money/bank-account-row';
+import { PotSplitCard } from '@/components/features/money/pot-split-card';
 import { usePotRefineControls } from '@/components/features/money/use-pot-refine-controls';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
@@ -59,6 +60,7 @@ export function JarsSettings() {
     const tGroups = useTranslations('features.money.groups');
     const tJars = useTranslations('features.money.jars');
     const jarName = useJarName();
+    const jarPurpose = useJarPurpose();
     const locale = useLocale();
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
@@ -456,134 +458,120 @@ export function JarsSettings() {
                                         {formatShare(groupShares[group], locale)}%
                                     </span>
                                 </header>
-                                {/* One list per group: every pot it can have. A pot that is on
-                                    shows its share and amount; an optional pot has its on/off
-                                    button on the same row; the main pot is always on. */}
-                                {JAR_ORDER_IN_GROUP[group].map((key, i, keys) => {
-                                    const jar = groupJars.find(row => row.key === key) ?? null;
-                                    const isMain = isMainJarKey(key);
-                                    const optionalKey = isMain ? null : (key as OptionalJarKey);
-                                    const name = jar ? jarName(jar) : tJars(`names.${key}`);
-                                    const groupTitle = tGroups(`${group}.title`);
-                                    const mainJar = groupJars.find(
-                                        row => row.key === JAR_MAIN_KEY_BY_GROUP[group]
-                                    );
-                                    const mainName = mainJar ? jarName(mainJar) : groupTitle;
-                                    const nameId = `pct-name-${key}`;
-                                    const value = jar ? (pct[jar.id] ?? jar.percentage) : 0;
-                                    const allocated = Math.round((monthlyNet * value) / 100);
-                                    // A switch per optional pot, in a fixed slot so the share
-                                    // fields line up; the main pot has none (it is always on).
-                                    const toggle = (
-                                        <span className="flex w-10 shrink-0 justify-end">
-                                            {optionalKey && canRefine ? (
-                                                <Switch
-                                                    checked={jar !== null}
-                                                    disabled={
-                                                        hasUnsavedShares || pendingKey !== null
-                                                    }
-                                                    aria-busy={pendingKey === key}
-                                                    aria-labelledby={nameId}
-                                                    onCheckedChange={() =>
-                                                        jar ? onTurnOff(jar) : onTurnOn(optionalKey)
-                                                    }
-                                                />
-                                            ) : null}
-                                        </span>
-                                    );
-                                    const nameLabel = (
-                                        <label
-                                            id={nameId}
-                                            htmlFor={jar ? `pct-${jar.id}` : undefined}
-                                            className={cn(
-                                                'min-w-0 text-sm break-words',
-                                                jar ? 'text-fg' : 'text-fg-muted'
-                                            )}>
-                                            {name}
-                                        </label>
-                                    );
-                                    const rowClass = cn(
-                                        'grid gap-1.5 py-2',
-                                        i < keys.length - 1 && 'border-b border-line'
-                                    );
-                                    if (!jar) {
-                                        // An optional pot that is off: its name and what turning it on does.
-                                        return (
-                                            <div key={key} className={rowClass}>
-                                                <div className="flex items-center gap-x-3">
-                                                    <span className="grid min-w-0 flex-1 gap-0.5">
-                                                        {nameLabel}
-                                                        {optionalKey ? (
-                                                            <span className="text-xs leading-snug text-fg-muted">
-                                                                {tGroups('refine.turn_on_effect', {
-                                                                    share: formatShare(
-                                                                        OPTIONAL_JAR_SHARE[
-                                                                            optionalKey
-                                                                        ],
-                                                                        locale
-                                                                    ),
-                                                                    main: mainName,
-                                                                    pot: name,
-                                                                    group: groupTitle,
-                                                                    percent: formatShare(
-                                                                        groupShares[group],
-                                                                        locale
-                                                                    ),
-                                                                })}
-                                                            </span>
-                                                        ) : null}
-                                                    </span>
-                                                    {toggle}
-                                                </div>
-                                            </div>
+                                {/* One list per group: every pot it can have, as a card. A pot
+                                    that is on shows its share and amount; an optional pot has
+                                    its on/off button; the main pot is always on. */}
+                                <ul className="grid gap-2 pb-2">
+                                    {JAR_ORDER_IN_GROUP[group].map(key => {
+                                        const jar = groupJars.find(row => row.key === key) ?? null;
+                                        const isMain = isMainJarKey(key);
+                                        const optionalKey = isMain ? null : (key as OptionalJarKey);
+                                        const name = jar ? jarName(jar) : tJars(`names.${key}`);
+                                        const groupTitle = tGroups(`${group}.title`);
+                                        const mainJar = groupJars.find(
+                                            row => row.key === JAR_MAIN_KEY_BY_GROUP[group]
                                         );
-                                    }
-                                    return (
-                                        <div key={key} className={rowClass}>
-                                            {/* Below sm the label gets its own line and wraps, so a long Dutch pot name is never clipped; the controls sit under it. */}
-                                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
-                                                <span className="flex min-w-0 basis-full items-center gap-2 sm:flex-1 sm:basis-0">
-                                                    <span
-                                                        className={cn(
-                                                            'size-1.5 shrink-0 rounded-sm',
-                                                            JAR_COLOR[jar.key] ?? 'bg-accent'
-                                                        )}
-                                                    />
-                                                    {nameLabel}
-                                                </span>
-                                                <Input
-                                                    id={`pct-${jar.id}`}
-                                                    type="number"
-                                                    min={0}
-                                                    max={100}
-                                                    step={0.5}
-                                                    value={value}
-                                                    onChange={event =>
-                                                        form.setValue(
-                                                            'pct',
-                                                            {
-                                                                ...pct,
-                                                                [jar.id]:
-                                                                    Number(event.target.value) || 0,
-                                                            },
-                                                            { shouldDirty: true }
-                                                        )
-                                                    }
-                                                    className="h-8 w-16 text-sm"
-                                                />
-                                                <span className="w-3 text-xs text-fg-muted">%</span>
-                                                <span className="ml-auto w-20 shrink-0 text-right text-xs whitespace-nowrap text-fg-muted tabular-nums sm:ml-0">
-                                                    {formatMoney(allocated)}
-                                                </span>
-                                                {toggle}
-                                            </div>
-                                            <Meter
-                                                value={value / 100}
-                                                tone={JAR_COLOR[jar.key] ?? 'accent'}
+                                        const mainName = mainJar ? jarName(mainJar) : groupTitle;
+                                        const working = pendingKey === key;
+                                        const value = jar ? (pct[jar.id] ?? jar.percentage) : 0;
+                                        const allocated = Math.round((monthlyNet * value) / 100);
+                                        const effect = !optionalKey
+                                            ? null
+                                            : jar
+                                              ? tGroups('refine.turn_off_effect', {
+                                                    share: formatShare(jar.percentage, locale),
+                                                    main: mainName,
+                                                })
+                                              : tGroups('refine.turn_on_effect', {
+                                                    share: formatShare(
+                                                        OPTIONAL_JAR_SHARE[optionalKey],
+                                                        locale
+                                                    ),
+                                                    main: mainName,
+                                                    pot: name,
+                                                    group: groupTitle,
+                                                    percent: formatShare(
+                                                        groupShares[group],
+                                                        locale
+                                                    ),
+                                                });
+                                        return (
+                                            <PotSplitCard
+                                                key={key}
+                                                nameId={`pct-name-${key}`}
+                                                inputId={jar ? `pct-${jar.id}` : undefined}
+                                                name={name}
+                                                badge={
+                                                    isMain
+                                                        ? tGroups('refine.always_on')
+                                                        : jar
+                                                          ? tGroups('refine.turned_on')
+                                                          : tGroups('refine.optional_label')
+                                                }
+                                                purpose={jarPurpose(key)}
+                                                effect={effect}
+                                                isOn={jar !== null}
+                                                share={
+                                                    jar ? (
+                                                        <span className="flex shrink-0 items-center gap-1.5">
+                                                            <Input
+                                                                id={`pct-${jar.id}`}
+                                                                type="number"
+                                                                min={0}
+                                                                max={100}
+                                                                step={0.5}
+                                                                value={value}
+                                                                onChange={event =>
+                                                                    form.setValue(
+                                                                        'pct',
+                                                                        {
+                                                                            ...pct,
+                                                                            [jar.id]:
+                                                                                Number(
+                                                                                    event.target
+                                                                                        .value
+                                                                                ) || 0,
+                                                                        },
+                                                                        { shouldDirty: true }
+                                                                    )
+                                                                }
+                                                                className="w-20 text-right tabular-nums"
+                                                            />
+                                                            <span
+                                                                aria-hidden
+                                                                className="w-4 text-sm text-fg-muted">
+                                                                %
+                                                            </span>
+                                                            <span className="w-20 shrink-0 text-right text-xs whitespace-nowrap text-fg-muted tabular-nums">
+                                                                {formatMoney(allocated)}
+                                                            </span>
+                                                        </span>
+                                                    ) : null
+                                                }
+                                                action={
+                                                    optionalKey && canRefine
+                                                        ? {
+                                                              id: `pct-action-${key}`,
+                                                              label: working
+                                                                  ? t('pages.settings.working')
+                                                                  : jar
+                                                                    ? tGroups('refine.turn_off')
+                                                                    : tGroups('refine.turn_on'),
+                                                              busy: working,
+                                                              disabled:
+                                                                  hasUnsavedShares ||
+                                                                  pendingKey !== null,
+                                                              onClick: () =>
+                                                                  jar
+                                                                      ? onTurnOff(jar)
+                                                                      : onTurnOn(optionalKey),
+                                                          }
+                                                        : null
+                                                }
                                             />
-                                        </div>
-                                    );
-                                })}
+                                        );
+                                    })}
+                                </ul>
                                 {canRefine && hasUnsavedShares ? (
                                     <p className="pb-1 text-xs leading-snug text-warning">
                                         {tGroups('refine.save_first')}

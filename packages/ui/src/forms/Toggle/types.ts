@@ -6,16 +6,5 @@ interface ToggleProps {
     disabled?: boolean;
 }
 
-interface SwitchProps {
-    checked: boolean;
-    onCheckedChange?: (next: boolean) => void;
-    disabled?: boolean;
-    className?: string;
-    'aria-label'?: string;
-    'aria-labelledby'?: string;
-    'aria-describedby'?: string;
-    'aria-busy'?: boolean;
-}
-
-export type { SwitchProps, ToggleProps };
+export type { ToggleProps };
 export default ToggleProps;

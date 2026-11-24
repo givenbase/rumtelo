@@ -14,7 +14,7 @@ import {
     type OptionalJarKey,
 } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
-import { Button, Input, Switch } from '@rumtelo/ui';
+import { Button, Input } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
 import { api } from '@/app/_lib/api';
@@ -34,6 +34,7 @@ import { useJarName, useJarPurpose } from '@/app/_lib/use-jar-name';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 
+import { PotSplitCard } from './pot-split-card';
 import { usePotRefineControls } from './use-pot-refine-controls';
 
 type GroupSplitValues = { pct: Record<string, number> };
@@ -148,87 +149,96 @@ export function PotsGroupSplit({ group }: { group: JarGroup }) {
 
             {/* One list: every pot this group can have. A pot that is on shows its share, the
                 main pot is always on, an optional pot has its on/off button next to it. */}
-            <ul className="grid">
+            <ul className="grid gap-2">
                 {JAR_ORDER_IN_GROUP[group].map(key => {
                     const jar = jars.find(row => row.key === key) ?? null;
-                    const optionalKey = isMainJarKey(key) ? null : (key as OptionalJarKey);
+                    const isMain = isMainJarKey(key);
+                    const optionalKey = isMain ? null : (key as OptionalJarKey);
                     const name = jar ? jarName(jar) : tJars(`names.${key}`);
                     const inputId = `pots-split-${key}`;
-                    const nameId = `pots-split-name-${key}`;
-                    // One quiet line: what the pot is for, or what turning it on does.
-                    const line =
-                        jar || !optionalKey
-                            ? jarPurpose(key)
-                            : t('refine.turn_on_effect', {
-                                  share: formatShare(OPTIONAL_JAR_SHARE[optionalKey], locale),
-                                  main: mainName,
-                                  pot: name,
-                                  group: title,
-                                  percent: staysPercent,
-                              });
+                    const working = pendingKey === key;
+                    const effect = !optionalKey
+                        ? null
+                        : jar
+                          ? t('refine.turn_off_effect', {
+                                share: formatShare(jar.percentage, locale),
+                                main: mainName,
+                            })
+                          : t('refine.turn_on_effect', {
+                                share: formatShare(OPTIONAL_JAR_SHARE[optionalKey], locale),
+                                main: mainName,
+                                pot: name,
+                                group: title,
+                                percent: staysPercent,
+                            });
                     return (
-                        <li
+                        <PotSplitCard
                             key={key}
-                            className="flex min-w-0 items-center gap-x-3 border-b border-line py-2.5 last:border-b-0">
-                            <div className="grid min-w-0 flex-1 gap-0.5">
-                                <label
-                                    id={nameId}
-                                    htmlFor={jar && canEdit ? inputId : undefined}
-                                    className={cn(
-                                        'min-w-0 text-sm font-medium break-words',
-                                        jar ? 'text-fg' : 'text-fg-muted'
-                                    )}>
-                                    {name}
-                                </label>
-                                <p className="text-xs leading-snug text-fg-muted">{line}</p>
-                            </div>
-                            {jar ? (
-                                <span className="flex shrink-0 items-center gap-1.5">
-                                    {canEdit ? (
-                                        <Input
-                                            id={inputId}
-                                            type="number"
-                                            min={0}
-                                            max={100}
-                                            step={0.5}
-                                            value={edits[jar.id] ?? jar.percentage}
-                                            disabled={saveSplit.isPending}
-                                            aria-describedby={introId}
-                                            onChange={event =>
-                                                form.setValue('pct', {
-                                                    ...edits,
-                                                    [jar.id]: parseShareInput(event.target.value),
-                                                })
-                                            }
-                                            className="w-20 text-right tabular-nums"
-                                        />
-                                    ) : (
-                                        // One pot holds the whole group: nothing to move yet.
-                                        <span className="text-sm font-semibold text-fg tabular-nums">
-                                            {formatShare(jar.percentage, locale)}
+                            nameId={`pots-split-name-${key}`}
+                            inputId={jar && canEdit ? inputId : undefined}
+                            name={name}
+                            badge={
+                                isMain
+                                    ? t('refine.always_on')
+                                    : jar
+                                      ? t('refine.turned_on')
+                                      : t('refine.optional_label')
+                            }
+                            purpose={jarPurpose(key)}
+                            effect={effect}
+                            isOn={jar !== null}
+                            share={
+                                jar ? (
+                                    <span className="flex shrink-0 items-center gap-1.5">
+                                        {canEdit ? (
+                                            <Input
+                                                id={inputId}
+                                                type="number"
+                                                min={0}
+                                                max={100}
+                                                step={0.5}
+                                                value={edits[jar.id] ?? jar.percentage}
+                                                disabled={saveSplit.isPending}
+                                                aria-describedby={introId}
+                                                onChange={event =>
+                                                    form.setValue('pct', {
+                                                        ...edits,
+                                                        [jar.id]: parseShareInput(
+                                                            event.target.value
+                                                        ),
+                                                    })
+                                                }
+                                                className="w-20 text-right tabular-nums"
+                                            />
+                                        ) : (
+                                            // One pot holds the whole group: nothing to move yet.
+                                            <span className="text-sm font-semibold text-fg tabular-nums">
+                                                {formatShare(jar.percentage, locale)}
+                                            </span>
+                                        )}
+                                        <span aria-hidden className="w-4 text-sm text-fg-muted">
+                                            %
                                         </span>
-                                    )}
-                                    <span aria-hidden className="w-4 text-sm text-fg-muted">
-                                        %
                                     </span>
-                                </span>
-                            ) : null}
-                            {/* A fixed slot so the share fields line up; the main pot has no
-                                switch, it is always on. */}
-                            <span className="flex w-10 shrink-0 justify-end">
-                                {optionalKey ? (
-                                    <Switch
-                                        checked={jar !== null}
-                                        disabled={blockedByEdits || pendingKey !== null}
-                                        aria-busy={pendingKey === key}
-                                        aria-labelledby={nameId}
-                                        onCheckedChange={() =>
-                                            jar ? onTurnOff(jar) : onTurnOn(optionalKey)
-                                        }
-                                    />
-                                ) : null}
-                            </span>
-                        </li>
+                                ) : null
+                            }
+                            action={
+                                optionalKey
+                                    ? {
+                                          id: `pots-split-action-${key}`,
+                                          label: working
+                                              ? tPage('working')
+                                              : jar
+                                                ? t('refine.turn_off')
+                                                : t('refine.turn_on'),
+                                          busy: working,
+                                          disabled: blockedByEdits || pendingKey !== null,
+                                          onClick: () =>
+                                              jar ? onTurnOff(jar) : onTurnOn(optionalKey),
+                                      }
+                                    : null
+                            }
+                        />
                     );
                 })}
             </ul>
