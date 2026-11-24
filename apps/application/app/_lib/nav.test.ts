@@ -194,7 +194,7 @@ test('"Go to practice" shows only for practice staff outside a preview', () => {
     assert.ok(!describeYou(buildNav(ctx({ isPracticeStaff: false }))).includes('practice'));
 });
 
-test('production never lists Energy or the Soul pages (You or search); staging lists Energy under Preview and Soul as a tab', () => {
+test('production never lists Energy or the Soul pages (You or search); staging lists Energy and the Soul pages under Preview', () => {
     env.NODE_ENV = 'production';
     const prod = buildNav(ctx());
     assert.ok(!describeYou(prod).includes('energy'));
@@ -211,20 +211,13 @@ test('production never lists Energy or the Soul pages (You or search); staging l
     );
     assert.deepEqual(
         preview.map(row => (row.kind === 'link' ? row.key : null)),
-        ['energy']
+        ['energy', 'soul']
     );
-    // Soul is a tab (Mindset) that opens its overview; Energy stays a preview row in You.
+    // The Mindset tab opens Learn only, here too; the other Soul pages are a preview row in You.
     assert.deepEqual(tabKeys(staging), ['home', 'money', 'growth', 'soul', 'you']);
-    assert.equal(staging.tabs.find(tab => tab.key === 'soul')?.href, '/product/soul');
-    assert.deepEqual(describeSubnav(staging.soulSubnav), [
-        'learn',
-        'stillness',
-        'gratitude',
-        'intent',
-        'giving',
-        'centers:locked',
-    ]);
-    assert.ok(staging.searchable.some(item => item.href === '/product/soul/stillness'));
+    assert.equal(staging.tabs.find(tab => tab.key === 'soul')?.href, '/product/growth/learn');
+    assert.deepEqual(describeSubnav(staging.soulSubnav), ['learn']);
+    assert.ok(!staging.searchable.some(item => item.href === '/product/soul/stillness'));
 });
 
 test('while the plan loads: Growth links to the redirect and nothing plan-dependent appears', () => {
@@ -530,14 +523,8 @@ test('the Soul tab: production Plus and Basic, staging Plus; from the first week
 
     env.NODE_ENV = 'development';
     const staging = buildNav(ctx({ plan: PlanKey.PLUS, stage: BoardStage.ROUTINE }));
-    assert.deepEqual(describeSubnav(staging.soulSubnav), [
-        'learn:later:month_close',
-        'stillness:later:month_close',
-        'gratitude:later:month_close',
-        'intent:later:month_close',
-        'giving:later:month_close',
-        'centers:locked',
-    ]);
+    // Outside production the tab is the same: Learn only.
+    assert.deepEqual(describeSubnav(staging.soulSubnav), ['learn:later:month_close']);
 });
 
 test('Growth shows one planner item named Course: Plus opens Course, Basic opens its goals list', () => {

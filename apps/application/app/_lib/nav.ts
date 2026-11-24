@@ -97,7 +97,7 @@ export type MoneySubnavItem = SubnavItem<MoneySubnavKey>;
 export type GrowthSubnavItem = SubnavItem<GrowthSubnavKey>;
 export type SoulSubnavItem = SubnavItem<SoulSubnavKey>;
 
-export type YouRowKey = 'coach' | 'why' | 'settings' | 'energy';
+export type YouRowKey = 'coach' | 'why' | 'settings' | 'energy' | 'soul';
 
 export type YouRow =
     | {
@@ -291,6 +291,13 @@ const GROWTH_DEFINITIONS: SubnavDefinition<GrowthSubnavKey>[] = [
 
 // Learn keeps its route, Growth role section and Growth capability (plan Plus and Max, from
 // the first closed month); only its tab changed. The Soul pages are staging-only.
+/**
+ * What the Mindset tab opens today: Learn only (Given, 2026-11-24). The other Soul pages keep
+ * their definitions below but stay out of the tab in every environment until he releases
+ * them one by one; where Soul is not launch-deferred they are reachable from You as a preview.
+ */
+const MINDSET_TAB_KEYS: ReadonlySet<SoulSubnavKey> = new Set<SoulSubnavKey>(['learn']);
+
 const SOUL_DEFINITIONS: SubnavDefinition<SoulSubnavKey>[] = [
     {
         key: 'learn',
@@ -409,9 +416,9 @@ function buildGrowthSubnav(ctx: NavContext): GrowthSubnavItem[] {
  * deferred Soul capability is never resolved (it would read as a plan lock).
  */
 function buildSoulSubnav(ctx: NavContext): SoulSubnavItem[] {
-    const soulLive = isProductEnabled('soul');
     return SOUL_DEFINITIONS.flatMap(definition => {
-        if (definition.key === 'learn' ? !growthAvailable(ctx) : !soulLive) return [];
+        if (!MINDSET_TAB_KEYS.has(definition.key)) return [];
+        if (!growthAvailable(ctx)) return [];
         return resolveSubnavItem(ctx, definition) ?? [];
     });
 }
@@ -477,6 +484,21 @@ function buildYouRows(ctx: NavContext, comingUp: YouRow | null): YouRow[] {
             href: productPath('energy'),
             labelKey: 'pages.nav.pills.energy',
             icon: 'zap',
+            badgeKey: 'preview',
+        });
+    }
+    // The Soul pages that are not in the Mindset tab yet: a preview row, never in production.
+    if (
+        atLeast(BoardStage.MONTH) &&
+        isProductEnabled('soul') &&
+        sees(HouseholdPermissionSection.SOUL)
+    ) {
+        rows.push({
+            kind: 'link',
+            key: 'soul',
+            href: productPath('soul'),
+            labelKey: 'pages.nav.pills.soul',
+            icon: 'sparkle',
             badgeKey: 'preview',
         });
     }
