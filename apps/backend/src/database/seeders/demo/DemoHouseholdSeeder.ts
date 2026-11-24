@@ -89,10 +89,13 @@ const JAR_SPLIT: Record<DemoPersona, Partial<Record<JarKey, number>>> = {
         PLAY: 20,
         GIVE: 10,
     },
+    // An owner who builds: Future 40. Basics stays at 45 because this persona's bills on
+    // Basics (mortgage, tax, insurance, groceries, hosting) come to about 40 % of its income;
+    // a lower share put the demo board in the red on day one.
     max: {
-        NECESSITIES: 35,
-        FINANCIAL_FREEDOM: 25,
-        EDUCATION: 10,
+        NECESSITIES: 45,
+        FINANCIAL_FREEDOM: 20,
+        EDUCATION: 5,
         LONG_TERM_SAVINGS: 15,
         PLAY: 10,
         GIVE: 5,
