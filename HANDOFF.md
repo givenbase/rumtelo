@@ -709,3 +709,26 @@ only, never production before staging passes. Queries return ids, never names or
 15. **Members card.** As OWNER at the seat limit the seat line links to Settings → Plan; as MEMBER
     it shows the "ask the owner" line and no link. (The upgrade buttons above it still link to
     Plan for a MEMBER: open item in `docs/BACKLOG.md`.)
+16. **Migration `Migration20261124100000_AccountDirection`** (unverified, hand-written): after the
+    push, `db-migrate.yml` adds `direction` and `direction_why` to `auth.account_settings`. Then
+    run `pnpm db:gen` once: it must propose nothing.
+17. **Names.** The top bar reads Home · Geld · Planning · Mindset · Jij; no "Groei" or "Ziel" as a
+    product name on the website, the tour, Settings or Practice. On a phone (360 px) the bottom
+    bar has five cells and nothing is cut off.
+18. **Mindset.** The tab opens "Waar je naartoe gaat"; Leren is the second item (locked on Basic,
+    "later" before the first closed month). No stillness, gratitude, intent, giving or centers.
+    The old Learn address still opens Learn.
+19. **Where you're going.** (a) "Waar je nu staat" shows this month's split, the Buffer and, with
+    debts, the debt-free date; (b) write a sentence, pick one of the four choices, save, reload:
+    it is still there; clear it and save: it is gone; (c) a second member of the same household
+    sees their own empty page, not yours; (d) the line shows once at the end of the week check
+    and once above the goals; (e) a coach in a Practice preview sees none of it.
+20. **Household dream.** As OWNER, Settings → Household has "Jouw droom"; after saving, Home shows
+    it and the week-1 checklist item is ticked. As MEMBER the text is read-only.
+21. **Restore.** As MEMBER, import an export that carries household settings: everything comes
+    in except those settings, and the warning list says so. An export that carries a "Where
+    you're going" text never writes it; the warning list says so.
+22. **Pots.** Money → Pots, one group open: one list of cards, share field on a pot that is on,
+    on/off button on an optional pot, "Altijd aan" on the main pot; save a new division and the
+    tiles show the new percentages. Settings → Pots looks the same. Every pot tile shows its
+    percentage of the income.
