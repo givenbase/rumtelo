@@ -1902,6 +1902,14 @@ export const TRANSLATION_OVERRIDES: Readonly<Record<string, Readonly<Record<stri
         'features.money.groups.refine.toast_turned_on': '{pot} staat aan',
         'features.money.groups.refine.toast_turned_off':
             '{pot} staat uit — het aandeel staat weer in {main}',
+        // Pots board: split a group between its own pots (2026-11-24). The group total stays.
+        'features.money.groups.split.title': 'Verdeling binnen {group}',
+        'features.money.groups.split.intro':
+            'Verschuif aandeel tussen de potjes van {group}. {group} zelf blijft {percent}% van je inkomen.',
+        'features.money.groups.split.stays': '{group} blijft {percent}%',
+        'features.money.groups.split.over': '{percent}% te veel. Haal het bij een ander potje weg.',
+        'features.money.groups.split.short': '{percent}% nog te verdelen. Geef het aan een potje.',
+        'features.money.groups.split.settings_link': 'Alle potjes en rekeningen in Instellingen',
         // EN jar → pot (2026-11-23). The Dutch already said potje(s); kept as it was so the
         // changed English does not send these back through machine translation.
         'features.auth.invite.sign_in_body':

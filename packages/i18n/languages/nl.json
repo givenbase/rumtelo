@@ -2320,6 +2320,14 @@
                     "toast_turned_on": "{pot} staat aan",
                     "toast_turned_off": "{pot} staat uit — het aandeel staat weer in {main}"
                 },
+                "split": {
+                    "title": "Verdeling binnen {group}",
+                    "intro": "Verschuif aandeel tussen de potjes van {group}. {group} zelf blijft {percent}% van je inkomen.",
+                    "stays": "{group} blijft {percent}%",
+                    "over": "{percent}% te veel. Haal het bij een ander potje weg.",
+                    "short": "{percent}% nog te verdelen. Geef het aan een potje.",
+                    "settings_link": "Alle potjes en rekeningen in Instellingen"
+                },
                 "order_hint": "Je geld stroomt in deze volgorde.",
                 "all_placed": "Alles heeft een plek",
                 "left_to_place": "Nog {amount} te verdelen",

@@ -82,6 +82,15 @@ const money = {
             toast_turned_on: '{pot} is on',
             toast_turned_off: '{pot} is off — its share is back in {main}',
         },
+        /** Pots board, one group open: move share between the pots of that group. The group total never changes. */
+        split: {
+            title: 'Split inside {group}',
+            intro: 'Move share between the pots of {group}. {group} itself stays {percent}% of your income.',
+            stays: '{group} stays {percent}%',
+            over: '{percent}% too much. Take it from another pot.',
+            short: '{percent}% left to place. Give it to a pot.',
+            settings_link: 'All pots and accounts in Settings',
+        },
         order_hint: 'Money flows in this order.',
         all_placed: 'Everything has a place',
         left_to_place: '{amount} left to place',
