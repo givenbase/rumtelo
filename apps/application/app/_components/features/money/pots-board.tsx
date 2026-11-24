@@ -48,10 +48,12 @@ function RefineGroupLink({ group, title, href }: { group: JarGroup; title: strin
             href={`${href}#${splitGroupAnchor(group)}`}
             aria-label={label}
             className={cn(
-                'inline-flex min-h-11 min-w-0 items-center justify-self-start rounded-md px-1 text-xs font-semibold text-accent underline-offset-2 hover:underline',
+                // A bordered button, not a bare text link: under a tile a link was easy to miss.
+                'inline-flex min-h-11 min-w-0 items-center gap-1.5 justify-self-start rounded-full border border-accent bg-accent-soft px-4 text-sm font-semibold text-accent transition-colors hover:bg-accent hover:text-on-accent',
                 focusRing
             )}>
             <span className="min-w-0 break-words">{label}</span>
+            <span aria-hidden>›</span>
         </Link>
     );
 }
