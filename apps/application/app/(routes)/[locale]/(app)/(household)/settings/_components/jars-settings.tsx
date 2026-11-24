@@ -20,7 +20,7 @@ import {
 } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
-import { Badge, Button, Input, Meter, StubNotice, VendorMark } from '@rumtelo/ui';
+import { Badge, Button, Input, Meter, StubNotice, Switch, VendorMark } from '@rumtelo/ui';
 import { cn, formatIban, formatPercent, sumMonthly } from '@rumtelo/utils';
 
 import { useApiError } from '@/app/_lib/api-error-messages';
@@ -38,7 +38,7 @@ import { sameShares } from '@/app/_lib/jar-group-split';
 import { isLiveData } from '@/app/_lib/preview';
 import { evaluateSplitCoach, orderSplitTips, pctByJarKey } from '@/app/_lib/split-coach';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
-import { useJarName, useJarPurpose } from '@/app/_lib/use-jar-name';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import { HelperGate } from '@/components/features/helpers';
 import { BankAccountRow } from '@/components/features/money/bank-account-row';
 import { usePotRefineControls } from '@/components/features/money/use-pot-refine-controls';
@@ -59,7 +59,6 @@ export function JarsSettings() {
     const tGroups = useTranslations('features.money.groups');
     const tJars = useTranslations('features.money.jars');
     const jarName = useJarName();
-    const jarPurpose = useJarPurpose();
     const locale = useLocale();
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
@@ -471,68 +470,51 @@ export function JarsSettings() {
                                     );
                                     const mainName = mainJar ? jarName(mainJar) : groupTitle;
                                     const nameId = `pct-name-${key}`;
-                                    const buttonId = `pct-action-${key}`;
-                                    const working = pendingKey === key;
                                     const value = jar ? (pct[jar.id] ?? jar.percentage) : 0;
                                     const allocated = Math.round((monthlyNet * value) / 100);
-                                    const badge = isMain
-                                        ? tGroups('refine.always_on')
-                                        : jar
-                                          ? tGroups('refine.turned_on')
-                                          : tGroups('refine.optional_label');
-                                    const toggle =
-                                        optionalKey && canRefine ? (
-                                            <Button
-                                                id={buttonId}
-                                                type="button"
-                                                variant={jar ? 'secondary' : 'primary'}
-                                                size="sm"
-                                                // The button's own text plus the pot name: "Turn off Daily".
-                                                aria-labelledby={`${buttonId} ${nameId}`}
-                                                disabled={hasUnsavedShares || pendingKey !== null}
-                                                aria-busy={working}
-                                                className="min-h-11 shrink-0"
-                                                onClick={() =>
-                                                    jar ? onTurnOff(jar) : onTurnOn(optionalKey)
-                                                }>
-                                                {working
-                                                    ? t('pages.settings.working')
-                                                    : jar
-                                                      ? tGroups('refine.turn_off')
-                                                      : tGroups('refine.turn_on')}
-                                            </Button>
-                                        ) : null;
-                                    const nameAndBadge = (
-                                        <>
-                                            <label
-                                                id={nameId}
-                                                htmlFor={jar ? `pct-${jar.id}` : undefined}
-                                                className="min-w-0 text-sm break-words text-fg">
-                                                {name}
-                                            </label>
-                                            <span className="rounded-full border border-line bg-raised px-2 py-0.5 font-mono text-[11px] leading-snug whitespace-nowrap text-fg-muted">
-                                                {badge}
-                                            </span>
-                                        </>
+                                    // A switch per optional pot, in a fixed slot so the share
+                                    // fields line up; the main pot has none (it is always on).
+                                    const toggle = (
+                                        <span className="flex w-10 shrink-0 justify-end">
+                                            {optionalKey && canRefine ? (
+                                                <Switch
+                                                    checked={jar !== null}
+                                                    disabled={
+                                                        hasUnsavedShares || pendingKey !== null
+                                                    }
+                                                    aria-busy={pendingKey === key}
+                                                    aria-labelledby={nameId}
+                                                    onCheckedChange={() =>
+                                                        jar ? onTurnOff(jar) : onTurnOn(optionalKey)
+                                                    }
+                                                />
+                                            ) : null}
+                                        </span>
+                                    );
+                                    const nameLabel = (
+                                        <label
+                                            id={nameId}
+                                            htmlFor={jar ? `pct-${jar.id}` : undefined}
+                                            className={cn(
+                                                'min-w-0 text-sm break-words',
+                                                jar ? 'text-fg' : 'text-fg-muted'
+                                            )}>
+                                            {name}
+                                        </label>
                                     );
                                     const rowClass = cn(
                                         'grid gap-1.5 py-2',
                                         i < keys.length - 1 && 'border-b border-line'
                                     );
                                     if (!jar) {
-                                        // An optional pot that is off: what it is for, what turning it on does.
+                                        // An optional pot that is off: its name and what turning it on does.
                                         return (
                                             <div key={key} className={rowClass}>
-                                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                                                    <span className="grid min-w-0 basis-full gap-0.5 sm:flex-1 sm:basis-0">
-                                                        <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-                                                            {nameAndBadge}
-                                                        </span>
-                                                        <span className="text-xs leading-snug text-fg-muted">
-                                                            {jarPurpose(key)}
-                                                        </span>
+                                                <div className="flex items-center gap-x-3">
+                                                    <span className="grid min-w-0 flex-1 gap-0.5">
+                                                        {nameLabel}
                                                         {optionalKey ? (
-                                                            <span className="text-xs leading-snug text-fg-secondary">
+                                                            <span className="text-xs leading-snug text-fg-muted">
                                                                 {tGroups('refine.turn_on_effect', {
                                                                     share: formatShare(
                                                                         OPTIONAL_JAR_SHARE[
@@ -560,14 +542,14 @@ export function JarsSettings() {
                                         <div key={key} className={rowClass}>
                                             {/* Below sm the label gets its own line and wraps, so a long Dutch pot name is never clipped; the controls sit under it. */}
                                             <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
-                                                <span className="flex min-w-0 basis-full flex-wrap items-center gap-x-2 gap-y-1 sm:flex-1 sm:basis-0">
+                                                <span className="flex min-w-0 basis-full items-center gap-2 sm:flex-1 sm:basis-0">
                                                     <span
                                                         className={cn(
                                                             'size-1.5 shrink-0 rounded-sm',
                                                             JAR_COLOR[jar.key] ?? 'bg-accent'
                                                         )}
                                                     />
-                                                    {nameAndBadge}
+                                                    {nameLabel}
                                                 </span>
                                                 <Input
                                                     id={`pct-${jar.id}`}
