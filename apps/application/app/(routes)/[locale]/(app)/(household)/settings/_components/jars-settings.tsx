@@ -10,26 +10,12 @@ import {
     JAR_GROUP_ORDER,
     JarGroup,
     jarGroupFor,
-    mainJarKeyFor,
     sumPercentageByGroup,
     type Jar,
 } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
-import {
-    Badge,
-    Button,
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    Input,
-    Meter,
-    StubNotice,
-    VendorMark,
-} from '@rumtelo/ui';
+import { Badge, Button, Input, Meter, StubNotice, VendorMark } from '@rumtelo/ui';
 import { cn, formatIban, formatPercent, sumMonthly } from '@rumtelo/utils';
 
 import { useApiError } from '@/app/_lib/api-error-messages';
@@ -43,19 +29,20 @@ import {
     orderJarsByGroup,
     splitGroupAnchor,
 } from '@/app/_lib/jar-group';
+import { sameShares } from '@/app/_lib/jar-group-split';
 import { isLiveData } from '@/app/_lib/preview';
 import { evaluateSplitCoach, orderSplitTips, pctByJarKey } from '@/app/_lib/split-coach';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarName } from '@/app/_lib/use-jar-name';
-import { usePotActivation } from '@/app/_lib/use-pot-activation';
 import { HelperGate } from '@/components/features/helpers';
 import { BankAccountRow } from '@/components/features/money/bank-account-row';
+import { JarsRefineGroup } from '@/components/features/money/jars-refine-group';
+import { usePotRefineControls } from '@/components/features/money/use-pot-refine-controls';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { accountBankMark, countryFromCurrency } from '../_utils/resolve-account-bank';
 import { JAR_COLOR, accountKindLabel } from '../_utils/settings-shared';
 import { JarsBasicsFit } from './jars-basics-fit';
-import { JarsRefineGroup } from './jars-refine-group';
 import { SettingsInkCard, SettingsPanel, SettingsPill, SettingsRow } from './settings-chrome';
 
 type JarsSettingsValues = {
@@ -63,18 +50,9 @@ type JarsSettingsValues = {
     jarSeats: Record<string, string>;
 };
 
-/** Two share maps are the same when every pot has the same value to the basis point. */
-function sameShares(left: Record<string, number>, right: Record<string, number>): boolean {
-    const ids = new Set([...Object.keys(left), ...Object.keys(right)]);
-    return [...ids].every(
-        id => Math.round((left[id] ?? NaN) * 100) === Math.round((right[id] ?? NaN) * 100)
-    );
-}
-
 export function JarsSettings() {
     const t = useTranslations();
     const tGroups = useTranslations('features.money.groups');
-    const tAction = useTranslations('ui.button.actions');
     const jarName = useJarName();
     const locale = useLocale();
     const queryClient = useQueryClient();
@@ -83,8 +61,7 @@ export function JarsSettings() {
     const apiError = useApiError();
     const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
-    const { canRefine, activate, deactivate } = usePotActivation();
-    const [turnOffJar, setTurnOffJar] = useState<Jar | null>(null);
+    const { canRefine, pendingKey, onTurnOn, onTurnOff, dialog } = usePotRefineControls();
 
     const jarsQuery = useLiveQuery(
         apiQuery.money.jars.list.queryOptions({ input: { householdId: householdId! } }),
@@ -539,15 +516,9 @@ export function JarsSettings() {
                                     jars={jars}
                                     canRefine={canRefine}
                                     blockedByEdits={hasUnsavedShares}
-                                    pendingKey={
-                                        activate.isPending
-                                            ? (activate.variables ?? null)
-                                            : deactivate.isPending
-                                              ? (deactivate.variables?.key ?? null)
-                                              : null
-                                    }
-                                    onTurnOn={key => activate.mutate(key)}
-                                    onTurnOff={setTurnOffJar}
+                                    pendingKey={pendingKey}
+                                    onTurnOn={onTurnOn}
+                                    onTurnOff={onTurnOff}
                                 />
                             </section>
                         );
@@ -622,53 +593,7 @@ export function JarsSettings() {
                 </div>
             </SettingsInkCard>
 
-            {/* Turning a pot off moves its share back; ask once, in the same dialog style as the rest of the app. */}
-            <Dialog
-                open={turnOffJar !== null}
-                onOpenChange={open => {
-                    if (!open && !deactivate.isPending) setTurnOffJar(null);
-                }}>
-                <DialogContent className="sm:max-w-md" closeLabel={tAction('close')}>
-                    {turnOffJar ? (
-                        <>
-                            <DialogHeader>
-                                <DialogTitle>{jarName(turnOffJar)}</DialogTitle>
-                                <DialogDescription>
-                                    {tGroups('refine.turn_off_effect', {
-                                        share: formatShare(turnOffJar.percentage, locale),
-                                        main: jarName(
-                                            jars.find(
-                                                jar => jar.key === mainJarKeyFor(turnOffJar.key)
-                                            ) ?? turnOffJar
-                                        ),
-                                    })}
-                                </DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter>
-                                <Button
-                                    type="button"
-                                    variant="secondary"
-                                    disabled={deactivate.isPending}
-                                    onClick={() => setTurnOffJar(null)}>
-                                    {tAction('cancel')}
-                                </Button>
-                                <Button
-                                    type="button"
-                                    disabled={deactivate.isPending}
-                                    onClick={() =>
-                                        deactivate.mutate(turnOffJar, {
-                                            onSettled: () => setTurnOffJar(null),
-                                        })
-                                    }>
-                                    {deactivate.isPending
-                                        ? t('pages.settings.working')
-                                        : tGroups('refine.turn_off')}
-                                </Button>
-                            </DialogFooter>
-                        </>
-                    ) : null}
-                </DialogContent>
-            </Dialog>
+            {dialog}
         </SettingsPanel>
     );
 }

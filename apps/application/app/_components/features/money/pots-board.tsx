@@ -19,10 +19,10 @@ import {
     sumGroupAmount,
 } from '@/app/_lib/jar-group';
 import { jarsMonthSummary } from '@/app/_lib/jar-tile';
-import { settingsHref } from '@/app/_lib/settings-tabs';
 import { useCanRefinePots } from '@/app/_lib/use-pot-activation';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 
+import { PotsGroupSplit } from './pots-group-split';
 import {
     GROUP_TILE_GRID,
     JarTile,
@@ -36,16 +36,16 @@ const focusRing =
     'outline-none focus-visible:ring-2 focus-visible:ring-accent/25 focus-visible:ring-offset-2 focus-visible:ring-offset-surface';
 
 /**
- * One quiet link per group to the split settings, anchored at that group, where its optional
- * pots are turned on and off. Only for people who may change pots (the settings screen is
- * closed to read-only roles). 44 px tall so it is easy to hit on a phone.
+ * One quiet link per group to the board's own view of that group (`?group=…`), landing on the
+ * block where its pots are split and its optional pots turned on and off. Only for people who
+ * may change pots. 44 px tall so it is easy to hit on a phone.
  */
-function RefineGroupLink({ group, title }: { group: JarGroup; title: string }) {
+function RefineGroupLink({ group, title, href }: { group: JarGroup; title: string; href: string }) {
     const t = useTranslations('features.money.groups');
     const label = t('refine.title', { group: title });
     return (
         <Link
-            href={`${settingsHref('jars')}#${splitGroupAnchor(group)}`}
+            href={`${href}#${splitGroupAnchor(group)}`}
             aria-label={label}
             className={cn(
                 'inline-flex min-h-11 min-w-0 items-center justify-self-start rounded-md px-1 text-xs font-semibold text-accent underline-offset-2 hover:underline',
@@ -245,11 +245,13 @@ export function PotsBoard({
                                 presentKeys={presentKeys}
                                 openByJar={openByJar}
                                 stacked={stacked}
+                                // With one group open, its split block follows right below.
                                 footer={view =>
-                                    canRefine ? (
+                                    canRefine && !selected ? (
                                         <RefineGroupLink
                                             group={view.group}
                                             title={t(`groups.${view.group}.title`)}
+                                            href={viewHref(view.group)}
                                         />
                                     ) : null
                                 }
@@ -336,11 +338,20 @@ export function PotsBoard({
                                     </li>
                                 ))}
                             </ul>
-                            {canRefine ? <RefineGroupLink group={group} title={title} /> : null}
+                            {canRefine && !selected ? (
+                                <RefineGroupLink
+                                    group={group}
+                                    title={title}
+                                    href={viewHref(group)}
+                                />
+                            ) : null}
                         </section>
                     );
                 })}
             </div>
+
+            {/* Key per group so switching groups starts the editor from that group's saved shares. */}
+            {selected && canRefine ? <PotsGroupSplit key={selected} group={selected} /> : null}
         </div>
     );
 }

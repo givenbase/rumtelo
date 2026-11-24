@@ -16,6 +16,9 @@ import { cn } from '@rumtelo/utils';
 import { formatShare } from '@/app/_lib/jar-group';
 import { useJarName, useJarPurpose } from '@/app/_lib/use-jar-name';
 
+/** What the refine block reads of a pot: enough for a name, a share and the turn-off request. */
+export type RefineJar = Pick<Jar, 'id' | 'key' | 'name' | 'percentage'>;
+
 /**
  * "Refine {group}": the optional pots of one group, each on or off. Turning one on takes its
  * share out of the group's main pot, so the group total never changes. The parent owns the
@@ -31,13 +34,14 @@ export function JarsRefineGroup({
     pendingKey,
     onTurnOn,
     onTurnOff,
+    className,
 }: {
     group: JarGroup;
     groupTitle: string;
     /** The group's total share as saved (integer or two decimals). */
     groupShare: number;
     /** Every pot the household has. */
-    jars: readonly Jar[];
+    jars: readonly RefineJar[];
     /** Read-only roles see the state but no buttons. */
     canRefine: boolean;
     /** Unsaved percentage edits: turning pots on or off would clash with them. */
@@ -45,7 +49,8 @@ export function JarsRefineGroup({
     /** The pot a request is running for, so only its button shows "working". */
     pendingKey: string | null;
     onTurnOn: (key: OptionalJarKey) => void;
-    onTurnOff: (jar: Jar) => void;
+    onTurnOff: (jar: RefineJar) => void;
+    className?: string;
 }) {
     const tGroups = useTranslations('features.money.groups');
     const tJars = useTranslations('features.money.jars');
@@ -71,7 +76,7 @@ export function JarsRefineGroup({
         blockedByEdits && tGroups.has('refine.save_first') ? tGroups('refine.save_first') : null;
 
     return (
-        <div className="grid gap-2 border-t border-line py-2.5">
+        <div className={cn('grid gap-2 border-t border-line py-2.5', className)}>
             <div className="grid gap-0.5">
                 <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
                     <h4 className="min-w-0 text-xs font-semibold text-fg">
