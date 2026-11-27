@@ -78,7 +78,9 @@ export const transactionBulkSort = oc
     .input(
         z.object({
             householdId: HouseholdId,
-            transactionIds: z.array(Id).min(1),
+            // The app sends no bulk sort today; 500 is far above a screen of Inbox rows and keeps
+            // the `$in` list and the single write bounded.
+            transactionIds: z.array(Id).min(1).max(500),
             jarId: Id,
             categoryId: Id.nullish(),
         })

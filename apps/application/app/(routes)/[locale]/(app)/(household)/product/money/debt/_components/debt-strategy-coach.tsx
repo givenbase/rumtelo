@@ -9,7 +9,6 @@ import { useLocale } from 'next-intl';
 
 import { orderDebtsByStrategy, payoffOrdersMatch, type RankedPayoff } from '@/app/_lib/debt-payoff';
 import { settingsHref } from '@/app/_lib/settings-tabs';
-import { CoachMark, HelperGate } from '@/components/features/helpers';
 
 type StrategyOption = {
     key: PayoffStrategy;
@@ -187,194 +186,186 @@ export function DebtStrategyCoach({
     })();
 
     return (
-        <HelperGate>
-            <section
-                className="grid gap-4 rounded-2xl border border-accent/20 bg-surface p-4 shadow-sm ring-1 ring-accent/10 lg:p-5"
-                data-coach-guide="debt-strategy"
-                aria-label={t('aria_label')}>
-                <div className="grid gap-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                        <CoachMark size="sm" />
-                        <span className="font-mono text-[10px] font-bold tracking-[0.14em] text-accent uppercase">
-                            {t('compare_methods')}
-                        </span>
-                    </div>
-
-                    <div className="rounded-xl border border-accent/25 bg-accent-soft/40 px-3.5 py-3">
-                        <p className="text-sm font-medium text-pretty text-fg">
-                            {verdict.headline}
-                        </p>
-                        <p className="mt-1 text-sm leading-relaxed text-pretty text-fg-secondary">
-                            {verdict.body}
-                        </p>
-                        <p className="mt-2 text-xs leading-relaxed text-fg-muted">
-                            {t('you_use', { strategy: strategyLabel(strategy, tDebt) })}{' '}
-                            <Link
-                                href={settingsHref('debt')}
-                                className="font-medium text-accent underline-offset-2 hover:underline">
-                                {t('change_settings')}
-                            </Link>
-                            . {t('explain_only')}
-                        </p>
-                    </div>
-
-                    {!hasExtra && debts.length > 1 ? (
-                        <p className="text-xs leading-relaxed text-pretty text-fg-muted">
-                            {t('no_extra_hint')}
-                        </p>
-                    ) : null}
+        <section
+            className="grid gap-4 rounded-2xl border border-line bg-surface p-4 lg:p-5"
+            aria-label={t('aria_label')}>
+            <div className="grid gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-mono text-[10px] font-bold tracking-[0.14em] text-accent uppercase">
+                        {t('compare_methods')}
+                    </span>
                 </div>
 
-                <div className="grid gap-2 sm:grid-cols-3">
-                    {comparisons.map(option => {
-                        const isYours = option.key === strategy;
-                        const isCoachPick = recommendKey !== null && option.key === recommendKey;
-                        const isPlan =
-                            option.key === PayoffStrategy.AVALANCHE ||
-                            option.key === PayoffStrategy.SNOWBALL;
-                        const firstTarget =
-                            option.key === PayoffStrategy.MINIMAL
-                                ? null
-                                : orderDebtsByStrategy(debts, option.key)[0];
+                <div className="rounded-xl border border-accent/25 bg-accent-soft/40 px-3.5 py-3">
+                    <p className="text-sm font-medium text-pretty text-fg">{verdict.headline}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-pretty text-fg-secondary">
+                        {verdict.body}
+                    </p>
+                    <p className="mt-2 text-xs leading-relaxed text-fg-muted">
+                        {t('you_use', { strategy: strategyLabel(strategy, tDebt) })}{' '}
+                        <Link
+                            href={settingsHref('debt')}
+                            className="font-medium text-accent underline-offset-2 hover:underline">
+                            {t('change_settings')}
+                        </Link>
+                        . {t('explain_only')}
+                    </p>
+                </div>
 
-                        const whenToPick =
-                            option.key === PayoffStrategy.AVALANCHE
-                                ? t('when_avalanche')
-                                : option.key === PayoffStrategy.SNOWBALL
-                                  ? t('when_snowball')
-                                  : t('when_minimal');
+                {!hasExtra && debts.length > 1 ? (
+                    <p className="text-xs leading-relaxed text-pretty text-fg-muted">
+                        {t('no_extra_hint')}
+                    </p>
+                ) : null}
+            </div>
 
-                        const howItWorks =
-                            option.key === PayoffStrategy.AVALANCHE
-                                ? t('how_avalanche')
-                                : option.key === PayoffStrategy.SNOWBALL
-                                  ? t('how_snowball')
-                                  : t('how_minimal');
+            <div className="grid gap-2 sm:grid-cols-3">
+                {comparisons.map(option => {
+                    const isYours = option.key === strategy;
+                    const isCoachPick = recommendKey !== null && option.key === recommendKey;
+                    const isPlan =
+                        option.key === PayoffStrategy.AVALANCHE ||
+                        option.key === PayoffStrategy.SNOWBALL;
+                    const firstTarget =
+                        option.key === PayoffStrategy.MINIMAL
+                            ? null
+                            : orderDebtsByStrategy(debts, option.key)[0];
 
-                        const plainOutcome = (() => {
-                            if (option.key === PayoffStrategy.MINIMAL) {
-                                if (saveVsMinimal > 0) {
-                                    return t('outcome_costs_more', {
-                                        amount: formatMoney(saveVsMinimal),
-                                    });
-                                }
-                                return t('outcome_slowest');
-                            }
-                            if (focusedMatch && isPlan) {
-                                if (isCoachPick && saveVsMinimal > 0) {
-                                    return t('outcome_same_snowball_saves', {
-                                        amount: formatMoney(saveVsMinimal),
-                                    });
-                                }
-                                if (option.key === PayoffStrategy.SNOWBALL) {
-                                    return t('outcome_same_different_debt');
-                                }
-                                return t('outcome_same_avalanche');
-                            }
-                            if (isCoachPick && saveVsMinimal > 0) {
-                                return t('outcome_saves', { amount: formatMoney(saveVsMinimal) });
-                            }
-                            if (option.winsInterest && option.winsTime) {
-                                return t('outcome_cheapest_soonest');
-                            }
-                            if (option.winsInterest) return t('outcome_least_interest');
-                            if (option.winsTime) return t('outcome_free_soonest');
-                            if (option.interestDelta > 0) {
-                                return t('outcome_more_interest', {
-                                    amount: formatMoney(option.interestDelta),
+                    const whenToPick =
+                        option.key === PayoffStrategy.AVALANCHE
+                            ? t('when_avalanche')
+                            : option.key === PayoffStrategy.SNOWBALL
+                              ? t('when_snowball')
+                              : t('when_minimal');
+
+                    const howItWorks =
+                        option.key === PayoffStrategy.AVALANCHE
+                            ? t('how_avalanche')
+                            : option.key === PayoffStrategy.SNOWBALL
+                              ? t('how_snowball')
+                              : t('how_minimal');
+
+                    const plainOutcome = (() => {
+                        if (option.key === PayoffStrategy.MINIMAL) {
+                            if (saveVsMinimal > 0) {
+                                return t('outcome_costs_more', {
+                                    amount: formatMoney(saveVsMinimal),
                                 });
                             }
-                            return t('outcome_solid');
-                        })();
+                            return t('outcome_slowest');
+                        }
+                        if (focusedMatch && isPlan) {
+                            if (isCoachPick && saveVsMinimal > 0) {
+                                return t('outcome_same_snowball_saves', {
+                                    amount: formatMoney(saveVsMinimal),
+                                });
+                            }
+                            if (option.key === PayoffStrategy.SNOWBALL) {
+                                return t('outcome_same_different_debt');
+                            }
+                            return t('outcome_same_avalanche');
+                        }
+                        if (isCoachPick && saveVsMinimal > 0) {
+                            return t('outcome_saves', { amount: formatMoney(saveVsMinimal) });
+                        }
+                        if (option.winsInterest && option.winsTime) {
+                            return t('outcome_cheapest_soonest');
+                        }
+                        if (option.winsInterest) return t('outcome_least_interest');
+                        if (option.winsTime) return t('outcome_free_soonest');
+                        if (option.interestDelta > 0) {
+                            return t('outcome_more_interest', {
+                                amount: formatMoney(option.interestDelta),
+                            });
+                        }
+                        return t('outcome_solid');
+                    })();
 
-                        return (
-                            <div
-                                key={option.key}
-                                className={cn(
-                                    'rounded-lg border border-l-4 bg-raised p-3.5 text-left',
-                                    isYours
-                                        ? 'border-accent border-l-accent ring-1 ring-accent/20'
-                                        : 'border-line border-l-fg-muted'
-                                )}>
-                                <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
-                                    <div className="grid gap-0.5">
-                                        <span
-                                            className={cn(
-                                                'font-mono text-[10px] font-medium tracking-wide uppercase',
-                                                isYours ? 'text-accent' : 'text-fg-muted'
-                                            )}>
-                                            {option.name}
-                                        </span>
-                                        <span className="text-sm font-medium text-pretty text-fg">
-                                            {whenToPick}
-                                        </span>
-                                    </div>
-                                    <div className="flex flex-col items-end gap-1">
-                                        {isYours ? (
-                                            <span className="rounded-md bg-accent-soft px-1.5 py-0.5 font-mono text-[9px] tracking-widest text-accent uppercase">
-                                                {t('badge_yours')}
-                                            </span>
-                                        ) : isCoachPick ? (
-                                            <span className="font-mono text-[9px] tracking-widest text-fg-secondary uppercase">
-                                                {t('badge_coach_pick')}
-                                            </span>
-                                        ) : null}
-                                    </div>
+                    return (
+                        <div
+                            key={option.key}
+                            className={cn(
+                                'rounded-lg border border-l-4 bg-raised p-3.5 text-left',
+                                isYours
+                                    ? 'border-accent border-l-accent ring-1 ring-accent/20'
+                                    : 'border-line border-l-fg-muted'
+                            )}>
+                            <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
+                                <div className="grid gap-0.5">
+                                    <span
+                                        className={cn(
+                                            'font-mono text-[10px] font-medium tracking-wide uppercase',
+                                            isYours ? 'text-accent' : 'text-fg-muted'
+                                        )}>
+                                        {option.name}
+                                    </span>
+                                    <span className="text-sm font-medium text-pretty text-fg">
+                                        {whenToPick}
+                                    </span>
                                 </div>
-
-                                <p className="mb-2 text-[12px] leading-snug text-pretty text-fg-muted">
-                                    {howItWorks}
-                                </p>
-
-                                {firstTarget ? (
-                                    <div className="mb-3 rounded-md bg-surface px-2.5 py-2">
-                                        <div className="text-[11px] text-fg-muted">
-                                            {t('attack_first')}
-                                        </div>
-                                        <div className="mt-0.5 text-sm text-fg">
-                                            {firstTarget.name}
-                                        </div>
-                                        <div className="mt-0.5 text-[11px] text-fg-faint">
-                                            {t('interest_left', {
-                                                rate: firstTarget.interestRate,
-                                                balance: formatMoney(firstTarget.balance),
-                                            })}
-                                        </div>
-                                    </div>
-                                ) : null}
-
-                                <div className="grid grid-cols-2 gap-2 border-t border-line pt-2.5">
-                                    <div>
-                                        <div className="text-[11px] text-fg-muted">
-                                            {t('interest_pay')}
-                                        </div>
-                                        <div className="mt-0.5 text-sm text-fg tabular-nums">
-                                            {formatMoney(option.interest)}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div className="text-[11px] text-fg-muted">
-                                            {t('debt_free_around')}
-                                        </div>
-                                        <div className="mt-0.5 text-sm text-fg tabular-nums">
-                                            {friendlyFreeDate(option.debtFreeOn, locale, t)}
-                                        </div>
-                                        {option.monthsDelta > 0 ? (
-                                            <div className="mt-0.5 text-[11px] text-fg-faint">
-                                                {delayInWords(option.monthsDelta, t)}
-                                            </div>
-                                        ) : null}
-                                    </div>
+                                <div className="flex flex-col items-end gap-1">
+                                    {isYours ? (
+                                        <span className="rounded-md bg-accent-soft px-1.5 py-0.5 font-mono text-[9px] tracking-widest text-accent uppercase">
+                                            {t('badge_yours')}
+                                        </span>
+                                    ) : isCoachPick ? (
+                                        <span className="font-mono text-[9px] tracking-widest text-fg-secondary uppercase">
+                                            {t('badge_coach_pick')}
+                                        </span>
+                                    ) : null}
                                 </div>
-
-                                <p className="mt-2.5 text-xs font-medium text-pretty text-fg-secondary">
-                                    {plainOutcome}
-                                </p>
                             </div>
-                        );
-                    })}
-                </div>
-            </section>
-        </HelperGate>
+
+                            <p className="mb-2 text-[12px] leading-snug text-pretty text-fg-muted">
+                                {howItWorks}
+                            </p>
+
+                            {firstTarget ? (
+                                <div className="mb-3 rounded-md bg-surface px-2.5 py-2">
+                                    <div className="text-[11px] text-fg-muted">
+                                        {t('attack_first')}
+                                    </div>
+                                    <div className="mt-0.5 text-sm text-fg">{firstTarget.name}</div>
+                                    <div className="mt-0.5 text-[11px] text-fg-faint">
+                                        {t('interest_left', {
+                                            rate: firstTarget.interestRate,
+                                            balance: formatMoney(firstTarget.balance),
+                                        })}
+                                    </div>
+                                </div>
+                            ) : null}
+
+                            <div className="grid grid-cols-2 gap-2 border-t border-line pt-2.5">
+                                <div>
+                                    <div className="text-[11px] text-fg-muted">
+                                        {t('interest_pay')}
+                                    </div>
+                                    <div className="mt-0.5 text-sm text-fg tabular-nums">
+                                        {formatMoney(option.interest)}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="text-[11px] text-fg-muted">
+                                        {t('debt_free_around')}
+                                    </div>
+                                    <div className="mt-0.5 text-sm text-fg tabular-nums">
+                                        {friendlyFreeDate(option.debtFreeOn, locale, t)}
+                                    </div>
+                                    {option.monthsDelta > 0 ? (
+                                        <div className="mt-0.5 text-[11px] text-fg-faint">
+                                            {delayInWords(option.monthsDelta, t)}
+                                        </div>
+                                    ) : null}
+                                </div>
+                            </div>
+
+                            <p className="mt-2.5 text-xs font-medium text-pretty text-fg-secondary">
+                                {plainOutcome}
+                            </p>
+                        </div>
+                    );
+                })}
+            </div>
+        </section>
     );
 }

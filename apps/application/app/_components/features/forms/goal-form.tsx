@@ -3,6 +3,8 @@
 import { api } from '@/app/_lib/api';
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { apiQuery } from '@/app/_lib/api-hooks';
+import { apiErrorKeyOf } from '@/app/_lib/api-error-key';
+import { giveNeedsPot, goalJarFor, goalPresetJarFor } from '@/app/_lib/goal-jar';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
@@ -33,14 +35,16 @@ import {
 
 import { GIVING_CAUSE_CATALOG, givingCauseCopy, givingCauseMeta } from '@/app/_lib/giving';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
+import { isProductEnabled } from '@/app/_lib/launch-products';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { CAR_BRAND_PREVIEW, carBrandMark, filterCarBrands } from '@/app/_lib/car-brands';
 import { soulPath } from '@/app/_lib/routes';
 import { useFormDismiss } from '@/app/_lib/use-form-dismiss';
 import { formRoute } from '@/app/_lib/form-route-meta';
-import { CoachTipCard } from '@/components/features/helpers';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import { GivingFinder } from '@/components/features/money/giving-finder';
+import { PotOffPrompt } from '@/components/features/money/pot-off-prompt';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
@@ -124,6 +128,7 @@ export function GoalForm({
     const tGoals = useTranslations('features.growth.goals');
     const tForm = useTranslations('features.growth.goals.form');
     const tUiForm = useTranslations('ui.form');
+    const jarName = useJarName();
     const queryClient = useQueryClient();
     const { householdId } = useAuth();
     const { symbol } = useHouseholdCurrency();
@@ -217,18 +222,29 @@ export function GoalForm({
     const isEarn = kind === GoalKind.EARN;
     const isGive = kind === GoalKind.GIVE;
 
+    // The Give pot is off (or the server just said so): a pledge cannot be saved until Giving is on.
+    // `giveRejectedAt` is the pot count when the server refused; a new pot (Giving turned on) clears it.
+    const [giveRejectedAt, setGiveRejectedAt] = useState<number | null>(null);
+    const jarsLoaded = live && !jarsQuery.isPending;
+    const giveOff =
+        isGive &&
+        jarsLoaded &&
+        (giveRejectedAt === jars.length || giveNeedsPot(jars, GoalKind.GIVE));
+
     useEffect(() => {
         if (isEarn) return;
         if (jars.length === 0) return;
         if (isGive) {
-            // A pledge always lives in the Give jar — no choice to make.
-            const give = jars.find(j => j.key === JarKey.GIVE);
-            if (give && form.getValues('jarId') !== give.id) form.setValue('jarId', give.id);
+            // A pledge lives in the Give pot only. With it off nothing is picked: the form shows
+            // the "turn on Giving" prompt, and once the pot exists this selects it.
+            const give = goalJarFor(jars, GoalKind.GIVE);
+            const wanted = give?.id ?? '';
+            if (form.getValues('jarId') !== wanted) form.setValue('jarId', wanted);
             return;
         }
         if (!form.getValues('jarId')) {
-            const lts = jars.find(j => j.key === JarKey.LONG_TERM_SAVINGS);
-            form.setValue('jarId', lts?.id ?? jars[0]!.id);
+            const lts = goalJarFor(jars, GoalKind.SAVE);
+            if (lts) form.setValue('jarId', lts.id);
         }
     }, [jars, form, isEarn, isGive]);
 
@@ -372,7 +388,16 @@ export function GoalForm({
             );
             dismiss();
         },
-        onError: (error: unknown) => showToast(apiError(error), 'error'),
+        onError: (error: unknown) => {
+            // The server's answer to a pledge on a non-Give pot is the same next move as the
+            // prompt: turn Giving on. No raw message.
+            if (apiErrorKeyOf(error) === 'goal_give_needs_give_jar') {
+                setGiveRejectedAt(jars.length);
+                void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.list.key() });
+                return;
+            }
+            showToast(apiError(error), 'error');
+        },
     });
 
     const removeMutation = useMutation({
@@ -396,6 +421,7 @@ export function GoalForm({
             showToast(t('common.message.entity.sign_in_goals'), 'error');
             return;
         }
+        if (giveOff) return;
         await saveMutation.mutateAsync(values);
     }
 
@@ -410,7 +436,7 @@ export function GoalForm({
             onSubmit={onSubmit}
             sidebar={
                 <div className="grid gap-2">
-                    <Button type="submit" className="w-full" disabled={busy}>
+                    <Button type="submit" className="w-full" disabled={busy || giveOff}>
                         {saveMutation.isPending || form.formState.isSubmitting
                             ? tUiForm('working')
                             : mode === 'edit'
@@ -482,315 +508,313 @@ export function GoalForm({
                 )}
             />
 
-            {isGive ? (
+            {giveOff ? (
+                <PotOffPrompt
+                    jarKey={JarKey.GIVE}
+                    title={t('features.soul.giving.pot_off_title')}
+                    body={t('features.soul.giving.pot_off_body')}
+                    ctaLabel={t('features.soul.giving.pot_off_cta')}
+                />
+            ) : (
                 <>
-                    <CoachTipCard
-                        title={tForm('pledge_tip_title')}
-                        meta={
-                            <a href={soulPath('giving')} className="hover:text-accent">
-                                {tForm('pledge_tip_link')}
-                            </a>
-                        }>
-                        {t('features.soul.giving.coach_tip_1')} {tForm('pledge_tip_body')}
-                    </CoachTipCard>
+                    {isGive ? (
+                        <>
+                            <p className="text-xs leading-relaxed text-pretty text-fg-muted">
+                                {t('features.soul.giving.coach_tip_1')} {tForm('pledge_tip_body')}
+                                {/* Soul is deferred in production — don't link to a route that redirects. */}
+                                {isProductEnabled('soul') ? (
+                                    <>
+                                        {' '}
+                                        <a
+                                            href={soulPath('giving')}
+                                            className="font-semibold text-accent underline-offset-2 hover:underline">
+                                            {tForm('pledge_tip_link')}
+                                        </a>
+                                    </>
+                                ) : null}
+                            </p>
+
+                            <FormField
+                                control={form.control}
+                                name="cause"
+                                render={() => (
+                                    <FormItem>
+                                        <FormLabel>{tForm('cause_label')}</FormLabel>
+                                        <FormControl>
+                                            <div
+                                                className="flex flex-wrap gap-2"
+                                                role="group"
+                                                aria-label={tForm('cause_aria')}>
+                                                <button
+                                                    type="button"
+                                                    disabled={busy}
+                                                    aria-pressed={!cause}
+                                                    onClick={() => selectCause(null)}
+                                                    className={
+                                                        !cause
+                                                            ? 'rounded-full border border-accent bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
+                                                            : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                                    }>
+                                                    {tForm('cause_any')}
+                                                </button>
+                                                {GIVING_CAUSE_CATALOG.map(meta => {
+                                                    const on = cause === meta.key;
+                                                    return (
+                                                        <button
+                                                            key={meta.key}
+                                                            type="button"
+                                                            disabled={busy}
+                                                            aria-pressed={on}
+                                                            onClick={() =>
+                                                                selectCause(on ? null : meta.key)
+                                                            }
+                                                            className={
+                                                                on
+                                                                    ? 'flex items-center gap-1.5 rounded-full border border-accent bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
+                                                                    : 'flex items-center gap-1.5 rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                                            }>
+                                                            <span aria-hidden>{meta.icon}</span>
+                                                            {givingCauseCopy(t, meta.key).name}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </FormControl>
+                                        {activeCause ? (
+                                            <p className="text-xs leading-relaxed text-fg-faint">
+                                                {activeCause.line}
+                                            </p>
+                                        ) : (
+                                            <p className="text-xs leading-relaxed text-fg-faint">
+                                                {tForm('cause_open_hint')}
+                                            </p>
+                                        )}
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <div className="grid gap-2">
+                                <p className="font-mono text-[10px] font-semibold tracking-widest text-fg-faint uppercase">
+                                    {tForm('organization')}
+                                </p>
+                                <div
+                                    className="flex flex-wrap gap-2"
+                                    role="group"
+                                    aria-label={tForm('give_mode_aria')}>
+                                    {GIVE_TARGET_MODES.map(option => {
+                                        const on = giveTargetMode === option.id;
+                                        return (
+                                            <button
+                                                key={option.id}
+                                                type="button"
+                                                disabled={busy}
+                                                aria-pressed={on}
+                                                onClick={() => selectGiveTargetMode(option.id)}
+                                                className={
+                                                    on
+                                                        ? 'rounded-full border border-accent bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
+                                                        : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
+                                                }>
+                                                {tForm(option.labelKey)}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                                <p className="text-xs leading-relaxed text-fg-faint">
+                                    {tForm('give_mode_hint')}
+                                </p>
+                            </div>
+
+                            {giveTargetMode === 'org' ? (
+                                <GivingFinder
+                                    defaultOpen
+                                    initialCause={cause ?? null}
+                                    selectedKey={givingOrganizationKey}
+                                    selectedName={name}
+                                    onPick={organization => {
+                                        form.setValue('givingOrganizationKey', organization.key, {
+                                            shouldDirty: true,
+                                        });
+                                        form.setValue('name', organization.name, {
+                                            shouldDirty: true,
+                                        });
+                                        const orgCause = organization.causes[0] ?? null;
+                                        if (orgCause && !cause) {
+                                            form.setValue('cause', orgCause, { shouldDirty: true });
+                                        }
+                                        selectedIcon.current = '💛';
+                                    }}
+                                />
+                            ) : null}
+                        </>
+                    ) : null}
 
                     <FormField
                         control={form.control}
-                        name="cause"
-                        render={() => (
+                        name="name"
+                        render={({ field }) => (
                             <FormItem>
-                                <FormLabel>{tForm('cause_label')}</FormLabel>
+                                <FormLabel>
+                                    {isGive
+                                        ? giveTargetMode === 'open'
+                                            ? tForm('pledge_name')
+                                            : tUiForm('fields.name')
+                                        : tUiForm('fields.name')}
+                                </FormLabel>
                                 <FormControl>
-                                    <div
-                                        className="flex flex-wrap gap-2"
-                                        role="group"
-                                        aria-label={tForm('cause_aria')}>
-                                        <button
-                                            type="button"
-                                            disabled={busy}
-                                            aria-pressed={!cause}
-                                            onClick={() => selectCause(null)}
-                                            className={
-                                                !cause
-                                                    ? 'rounded-full border border-accent bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
-                                                    : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
-                                            }>
-                                            {tForm('cause_any')}
-                                        </button>
-                                        {GIVING_CAUSE_CATALOG.map(meta => {
-                                            const on = cause === meta.key;
-                                            return (
-                                                <button
-                                                    key={meta.key}
-                                                    type="button"
-                                                    disabled={busy}
-                                                    aria-pressed={on}
-                                                    onClick={() =>
-                                                        selectCause(on ? null : meta.key)
-                                                    }
-                                                    className={
-                                                        on
-                                                            ? 'flex items-center gap-1.5 rounded-full border border-accent bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
-                                                            : 'flex items-center gap-1.5 rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
-                                                    }>
-                                                    <span aria-hidden>{meta.icon}</span>
-                                                    {givingCauseCopy(t, meta.key).name}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
+                                    {!isEarn && !isGive ? (
+                                        <PresetNameField
+                                            value={field.value}
+                                            placeholder={tForm('name_placeholder_save')}
+                                            freeTextPlaceholder={tForm('name_free_placeholder')}
+                                            options={presetOptions}
+                                            lockPresets
+                                            freeTextKeys={['OTHER']}
+                                            initialLockedKey={
+                                                goalPresetKey !== null && goalPresetKey !== 'OTHER'
+                                                    ? goalPresetKey
+                                                    : null
+                                            }
+                                            onChange={value => {
+                                                field.onChange(value);
+                                                if (
+                                                    value.trim() &&
+                                                    !presetOptions.some(
+                                                        preset =>
+                                                            preset.name.toLowerCase() ===
+                                                            value.trim().toLowerCase()
+                                                    )
+                                                ) {
+                                                    selectedIcon.current = null;
+                                                }
+                                            }}
+                                            onClear={() => {
+                                                selectedIcon.current = null;
+                                                setGoalPresetKey(null);
+                                            }}
+                                            onSelect={opt => {
+                                                const full = presetOptions.find(
+                                                    preset => preset.key === opt.key
+                                                );
+                                                if (!full) return;
+                                                setGoalPresetKey(full.key);
+                                                selectedIcon.current = full.icon;
+                                                // OTHER = custom name; keep current jar (don't force LTS).
+                                                if (full.key === 'OTHER') return;
+                                                const jar = goalPresetJarFor(jars, full.jarKey);
+                                                if (jar) form.setValue('jarId', jar.id);
+                                            }}
+                                        />
+                                    ) : isGive && giveTargetMode === 'org' ? (
+                                        <FormInput
+                                            readOnly
+                                            placeholder={tForm('pick_from_finder')}
+                                            {...field}
+                                        />
+                                    ) : (
+                                        <FormInput
+                                            placeholder={
+                                                isEarn
+                                                    ? tForm('name_placeholder_earn', { symbol })
+                                                    : isGive
+                                                      ? giveTargetMode === 'manual'
+                                                          ? tForm('pledge_placeholder_manual')
+                                                          : tForm('pledge_placeholder_open')
+                                                      : tForm('name_placeholder_save')
+                                            }
+                                            {...field}
+                                        />
+                                    )}
                                 </FormControl>
-                                {activeCause ? (
-                                    <p className="text-xs leading-relaxed text-fg-faint">
-                                        {activeCause.line}
-                                    </p>
-                                ) : (
-                                    <p className="text-xs leading-relaxed text-fg-faint">
-                                        {tForm('cause_open_hint')}
-                                    </p>
-                                )}
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
 
-                    <div className="grid gap-2">
-                        <p className="font-mono text-[10px] font-semibold tracking-widest text-fg-faint uppercase">
-                            {tForm('organization')}
-                        </p>
-                        <div
-                            className="flex flex-wrap gap-2"
-                            role="group"
-                            aria-label={tForm('give_mode_aria')}>
-                            {GIVE_TARGET_MODES.map(option => {
-                                const on = giveTargetMode === option.id;
-                                return (
-                                    <button
-                                        key={option.id}
-                                        type="button"
-                                        disabled={busy}
-                                        aria-pressed={on}
-                                        onClick={() => selectGiveTargetMode(option.id)}
-                                        className={
-                                            on
-                                                ? 'rounded-full border border-accent bg-accent-soft px-3 py-1.5 font-mono text-xs text-accent'
-                                                : 'rounded-full border border-line bg-raised px-3 py-1.5 font-mono text-xs text-fg-secondary hover:border-accent-hover hover:text-accent'
-                                        }>
-                                        {tForm(option.labelKey)}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                        <p className="text-xs leading-relaxed text-fg-faint">
-                            {tForm('give_mode_hint')}
-                        </p>
-                    </div>
-
-                    {giveTargetMode === 'org' ? (
-                        <GivingFinder
-                            defaultOpen
-                            initialCause={cause ?? null}
-                            selectedKey={givingOrganizationKey}
-                            selectedName={name}
-                            onPick={organization => {
-                                form.setValue('givingOrganizationKey', organization.key, {
-                                    shouldDirty: true,
-                                });
-                                form.setValue('name', organization.name, { shouldDirty: true });
-                                const orgCause = organization.causes[0] ?? null;
-                                if (orgCause && !cause) {
-                                    form.setValue('cause', orgCause, { shouldDirty: true });
+                    {carBrands.length > 0 &&
+                    (goalPresetKey === 'CAR' ||
+                        name.trim().toLowerCase() === 'car fund' ||
+                        carBrands.some(
+                            brand => brand.name.toLowerCase() === name.trim().toLowerCase()
+                        )) ? (
+                        <div className="grid gap-2">
+                            <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
+                                {tForm('which_car')}
+                            </p>
+                            <CatalogChipPicker
+                                query={carBrandQuery}
+                                onQueryChange={setCarBrandQuery}
+                                items={visibleCarBrands}
+                                placeholder={tForm('search_brand')}
+                                noMatchesLabel={tUiForm('no_matches_use_typed')}
+                                formatTypedLabel={typed =>
+                                    tUiForm('use_typed_name', { name: typed })
                                 }
-                                selectedIcon.current = '💛';
-                            }}
-                        />
-                    ) : null}
-                </>
-            ) : null}
-
-            <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>
-                            {isGive
-                                ? giveTargetMode === 'open'
-                                    ? tForm('pledge_name')
-                                    : tUiForm('fields.name')
-                                : tUiForm('fields.name')}
-                        </FormLabel>
-                        <FormControl>
-                            {!isEarn && !isGive ? (
-                                <PresetNameField
-                                    value={field.value}
-                                    placeholder={tForm('name_placeholder_save')}
-                                    freeTextPlaceholder={tForm('name_free_placeholder')}
-                                    options={presetOptions}
-                                    lockPresets
-                                    freeTextKeys={['OTHER']}
-                                    initialLockedKey={
-                                        goalPresetKey !== null && goalPresetKey !== 'OTHER'
-                                            ? goalPresetKey
-                                            : null
-                                    }
-                                    onChange={value => {
-                                        field.onChange(value);
-                                        if (
-                                            value.trim() &&
-                                            !presetOptions.some(
-                                                preset =>
-                                                    preset.name.toLowerCase() ===
-                                                    value.trim().toLowerCase()
-                                            )
-                                        ) {
-                                            selectedIcon.current = null;
-                                        }
-                                    }}
-                                    onClear={() => {
-                                        selectedIcon.current = null;
-                                        setGoalPresetKey(null);
-                                    }}
-                                    onSelect={opt => {
-                                        const full = presetOptions.find(
-                                            preset => preset.key === opt.key
-                                        );
-                                        if (!full) return;
-                                        setGoalPresetKey(full.key);
-                                        selectedIcon.current = full.icon;
-                                        // OTHER = custom name; keep current jar (don't force LTS).
-                                        if (full.key === 'OTHER') return;
-                                        const jar = jars.find(j => j.key === full.jarKey);
-                                        if (jar) form.setValue('jarId', jar.id);
-                                    }}
-                                />
-                            ) : isGive && giveTargetMode === 'org' ? (
-                                <FormInput
-                                    readOnly
-                                    placeholder={tForm('pick_from_finder')}
-                                    {...field}
-                                />
-                            ) : (
-                                <FormInput
-                                    placeholder={
-                                        isEarn
-                                            ? tForm('name_placeholder_earn', { symbol })
-                                            : isGive
-                                              ? giveTargetMode === 'manual'
-                                                  ? tForm('pledge_placeholder_manual')
-                                                  : tForm('pledge_placeholder_open')
-                                              : tForm('name_placeholder_save')
-                                    }
-                                    {...field}
-                                />
-                            )}
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-
-            {carBrands.length > 0 &&
-            (goalPresetKey === 'CAR' ||
-                name.trim().toLowerCase() === 'car fund' ||
-                carBrands.some(brand => brand.name.toLowerCase() === name.trim().toLowerCase())) ? (
-                <div className="grid gap-2">
-                    <p className="font-mono text-[10px] font-semibold tracking-wider text-fg-muted uppercase">
-                        {tForm('which_car')}
-                    </p>
-                    <CatalogChipPicker
-                        query={carBrandQuery}
-                        onQueryChange={setCarBrandQuery}
-                        items={visibleCarBrands}
-                        placeholder={tForm('search_brand')}
-                        noMatchesLabel={tUiForm('no_matches_use_typed')}
-                        formatTypedLabel={typed => tUiForm('use_typed_name', { name: typed })}
-                        onOther={typed => {
-                            const next = typed?.trim();
-                            if (!next) return;
-                            form.setValue('name', next, {
-                                shouldDirty: true,
-                                shouldValidate: true,
-                            });
-                            setCarBrandQuery('');
-                        }}
-                        trailing={
-                            !carBrandSearch && visibleCarBrands.length < carBrands.length ? (
-                                <button
-                                    type="button"
-                                    className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
-                                    onClick={() => setShowAllCarBrands(true)}>
-                                    {tForm('more')}
-                                </button>
-                            ) : null
-                        }
-                        renderChip={brand => {
-                            const selected = name.trim().toLowerCase() === brand.name.toLowerCase();
-                            const mark = carBrandMark(brand);
-                            return (
-                                <button
-                                    type="button"
-                                    className={
-                                        selected
-                                            ? 'inline-flex items-center gap-2 rounded-xl border border-accent bg-accent/15 px-2.5 py-1.5 text-sm text-accent'
-                                            : 'inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent'
-                                    }
-                                    onClick={() =>
-                                        form.setValue('name', brand.name, {
-                                            shouldDirty: true,
-                                            shouldValidate: true,
-                                        })
-                                    }>
-                                    <VendorMark
-                                        name={mark.name}
-                                        src={mark.src}
-                                        fallbackIcon={mark.fallbackIcon}
-                                        tone={mark.tone}
-                                        size={20}
-                                    />
-                                    {brand.name}
-                                </button>
-                            );
-                        }}
-                    />
-                </div>
-            ) : null}
-
-            <FormField
-                control={form.control}
-                name="target"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>
-                            {isEarn
-                                ? tForm('monthly_net', { symbol })
-                                : isGive
-                                  ? tForm('pledge_for_year', { symbol })
-                                  : tForm('target_amount', { symbol })}
-                        </FormLabel>
-                        <FormControl>
-                            <FormInput
-                                inputMode="decimal"
-                                placeholder={tUiForm('amount_zero')}
-                                {...field}
+                                onOther={typed => {
+                                    const next = typed?.trim();
+                                    if (!next) return;
+                                    form.setValue('name', next, {
+                                        shouldDirty: true,
+                                        shouldValidate: true,
+                                    });
+                                    setCarBrandQuery('');
+                                }}
+                                trailing={
+                                    !carBrandSearch &&
+                                    visibleCarBrands.length < carBrands.length ? (
+                                        <button
+                                            type="button"
+                                            className="inline-flex items-center rounded-xl border border-dashed border-line px-3 py-1.5 text-sm text-fg-muted hover:border-accent hover:text-accent"
+                                            onClick={() => setShowAllCarBrands(true)}>
+                                            {tForm('more')}
+                                        </button>
+                                    ) : null
+                                }
+                                renderChip={brand => {
+                                    const selected =
+                                        name.trim().toLowerCase() === brand.name.toLowerCase();
+                                    const mark = carBrandMark(brand);
+                                    return (
+                                        <button
+                                            type="button"
+                                            className={
+                                                selected
+                                                    ? 'inline-flex items-center gap-2 rounded-xl border border-accent bg-accent/15 px-2.5 py-1.5 text-sm text-accent'
+                                                    : 'inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-2.5 py-1.5 text-sm text-fg hover:border-accent hover:text-accent'
+                                            }
+                                            onClick={() =>
+                                                form.setValue('name', brand.name, {
+                                                    shouldDirty: true,
+                                                    shouldValidate: true,
+                                                })
+                                            }>
+                                            <VendorMark
+                                                name={mark.name}
+                                                src={mark.src}
+                                                fallbackIcon={mark.fallbackIcon}
+                                                tone={mark.tone}
+                                                size={20}
+                                            />
+                                            {brand.name}
+                                        </button>
+                                    );
+                                }}
                             />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
+                        </div>
+                    ) : null}
 
-            {!isEarn ? (
-                <>
                     <FormField
                         control={form.control}
-                        name="monthlyContribution"
+                        name="target"
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>
-                                    {isGive
-                                        ? tForm('planned_per_month', { symbol })
-                                        : tForm('monthly_contribution', { symbol })}
+                                    {isEarn
+                                        ? tForm('monthly_net', { symbol })
+                                        : isGive
+                                          ? tForm('pledge_for_year', { symbol })
+                                          : tForm('target_amount', { symbol })}
                                 </FormLabel>
                                 <FormControl>
                                     <FormInput
@@ -804,44 +828,70 @@ export function GoalForm({
                         )}
                     />
 
-                    {isGive ? null : (
-                        <FormField
-                            control={form.control}
-                            name="jarId"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>{tUiForm('jar')}</FormLabel>
-                                    <FormSelect
-                                        value={field.value ?? ''}
-                                        onValueChange={field.onChange}>
-                                        {jars.map(jar => (
-                                            <FormSelectItem key={jar.id} value={jar.id}>
-                                                {jar.icon ? `${jar.icon} ` : ''}
-                                                {jar.name}
-                                            </FormSelectItem>
-                                        ))}
-                                    </FormSelect>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    )}
-                </>
-            ) : null}
+                    {!isEarn ? (
+                        <>
+                            <FormField
+                                control={form.control}
+                                name="monthlyContribution"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            {isGive
+                                                ? tForm('planned_per_month', { symbol })
+                                                : tForm('monthly_contribution', { symbol })}
+                                        </FormLabel>
+                                        <FormControl>
+                                            <FormInput
+                                                inputMode="decimal"
+                                                placeholder={tUiForm('amount_zero')}
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
-            <FormField
-                control={form.control}
-                name="why"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>{tForm('why_label')}</FormLabel>
-                        <FormControl>
-                            <FormInput placeholder={tForm('why_placeholder')} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
+                            {isGive ? null : (
+                                <FormField
+                                    control={form.control}
+                                    name="jarId"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>{tUiForm('jar')}</FormLabel>
+                                            <FormSelect
+                                                value={field.value ?? ''}
+                                                onValueChange={field.onChange}>
+                                                {jars.map(jar => (
+                                                    <FormSelectItem key={jar.id} value={jar.id}>
+                                                        {jar.icon ? `${jar.icon} ` : ''}
+                                                        {jarName(jar)}
+                                                    </FormSelectItem>
+                                                ))}
+                                            </FormSelect>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            )}
+                        </>
+                    ) : null}
+
+                    <FormField
+                        control={form.control}
+                        name="why"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>{tForm('why_label')}</FormLabel>
+                                <FormControl>
+                                    <FormInput placeholder={tForm('why_placeholder')} {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </>
+            )}
         </FormCreateEditShell>
     );
 }

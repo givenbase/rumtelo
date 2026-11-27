@@ -79,23 +79,10 @@ export const MonthScore = z.object({
     priorOpenPeriod: PeriodKey.nullable(),
 });
 
-/** Stable unlock keys — client maps to `pages.dashboard.levels.unlocks.*`. */
-export const MonthScoreUnlockKey = z.enum([
-    'six_jars',
-    'inbox',
-    'week_check',
-    'goals',
-    'debts',
-    'energy_layer',
-    'coach',
-    'export',
-]);
-
 export const Level = z.object({
     index: z.int().min(1),
     /** Cumulative score needed to enter this level. */
     threshold: z.int(),
-    unlocks: z.array(MonthScoreUnlockKey),
 });
 
 export const PeriodRecapHeadlineKey = z.enum(['surplus', 'overspent']);
@@ -122,5 +109,4 @@ export type MonthCloseBillDisposition = z.infer<typeof MonthCloseBillDisposition
 export type MonthScore = z.infer<typeof MonthScore>;
 export type Level = z.infer<typeof Level>;
 export type PeriodRecap = z.infer<typeof PeriodRecap>;
-export type MonthScoreUnlockKey = z.infer<typeof MonthScoreUnlockKey>;
 export type PeriodRecapHeadlineKey = z.infer<typeof PeriodRecapHeadlineKey>;

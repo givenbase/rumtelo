@@ -98,7 +98,7 @@ Both BA and Rumtelo ids validate as `z.uuid()` and share uuidv7 minting going fo
 
 Frontend session field stays `activeOrganizationId` (BA SDK name); DB column is `active_household_id`.
 - Jar **instances** → `public/product/money/plan/jar` — **household** writes (table in `public`)
-- Jar **templates** → `backoffice/product/money/template/jar` — **we** write; onboard copies into household jars
+- Jar **templates** → `backoffice/product/money/template/jar` — **we** write; onboard copies the `isDefault` ones (three main pots) into household jars, `jars.activate` copies an optional one later
 - Product **tiers** → `backoffice/plan` — **we** write; not the same as `product/money/plan` (jars/income)
 - Outbound **email** → `backoffice/communication/email` — **we** send (invites; digests later)
 - Seed data for catalogs lives next to the aggregate (`…/seed/`); runners in `src/database/seeders/` mirroring backoffice (`product/money`, `product/growth`, `plan`)
@@ -189,6 +189,7 @@ Every entity, its base, table and relations: `apps/backend/docs/ENTITY_INVENTORY
 | `CatalogEntity` | company catalogs with `key` / `name` / `sortOrder` / `isActive` (templates, presets, catalogs, plan children) |
 | `HouseholdEntity` | household-owned product + settings rows |
 | `WeekCheckEntity` | the four portal week checks (`week`, `completedAt`) |
+| `PersonalHouseholdEntity` | person-attributed rows: maker (`account`, null = together) + `visibility` (`GrowthCourseItem`) |
 
 - Money → `MoneyType` (bigint eurocents, `number` at runtime); ratios stay `decimal`
 - Text → `name` / `description`; catalog defaults are plain nouns (`cadence`, not `defaultCadence`)
@@ -238,6 +239,15 @@ create() {
   see `public/product/money/dashboard`, which composes services rather than joining tables.
 - **Household-owned entities extend `HouseholdEntity`** and are read through
   `HouseholdScopedRepository`, never `em.find` directly on those entities.
+- **Ids from the client are resolved through the scoped repository, never `em.getReference`.**
+  A foreign key is on the id alone, so `em.getReference(Jar, idFromClient)` would attach a row
+  to another household's pot. Money services use `requireOwnJar` / `requireOwnCategory` /
+  `requireOwnDebt` / `requireOwnBankAccount` / `requireOwnJars` (`money/own-reference.util.ts`),
+  which refuse a foreign id like an unknown one (`*_not_found`) before anything is written.
+- **Person-attributed entities extend `PersonalHouseholdEntity`** and are read through
+  `PersonalScopedRepository` with their `VisibilityArea`. It filters what the viewer may
+  see; services never add their own `account = me` filter. Rules live in
+  `@rumtelo/contracts` (`visibility.ts`); see `docs/engineering/household-visibility-plan.md`.
 - **Money is integer minor units.** Never a float, never arithmetic on a
   decimal string. Splitting goes through `common/utils/money.util.ts`.
 
@@ -245,7 +255,7 @@ create() {
 
 No single-letter locals (`g`, `d`, `j`). Prefer domain words: `goal`, `debt`, `jar`, `row`, `preset`, `transaction` — not jargon shorthand (`tx`, `alloc`). Accumulators: `sum` / `total`. Enforced by Oxlint `id-length` in root `.oxlintrc.json` (min 2; only `_` excepted).
 
-### Persistence (MikroORM 6)
+### Persistence (MikroORM 7)
 
 Never use deprecated `persistAndFlush` / `removeAndFlush`:
 
@@ -267,7 +277,7 @@ Managed entities: mutate properties, then `await this.em.flush()`.
 - `auth/engine/` — Better Auth config; `auth/*/managed/` — better-auth owns writes; we map read entities
 - `auth/user/account/` — Rumtelo-owned person rows (`account`, `account-settings`)
 - Board prefs (currency, period, week-check, kind) → `auth/household/household-settings`
-- Person prefs (theme, locale) → `account-settings`
+- Person prefs (theme, locale) and the personal Mindset direction (`direction`, `directionWhy` — never shared with the household or a practice) → `account-settings`
 - better-auth credential store table is `provider`, not `account`
 
 ### Adding a product portal

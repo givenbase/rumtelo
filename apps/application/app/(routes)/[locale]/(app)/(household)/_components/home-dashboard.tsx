@@ -1,70 +1,72 @@
 'use client';
 
-import { api } from '@/app/_lib/api';
-import { useApiError } from '@/app/_lib/api-error-messages';
 import { apiQuery } from '@/app/_lib/api-hooks';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import {
+    CAPABILITIES,
     CoachKind,
     HouseholdRole,
+    MONEY_COACH_KEY_PREFIX,
     PracticeClientLinkStatus,
-    WeekCheckStage,
-    type MonthCloseBillDisposition,
     type MonthScore,
 } from '@rumtelo/contracts';
 import { useLiveQuery } from '@rumtelo/hooks';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { Eyebrow, Typography } from '@rumtelo/ui';
-import {
-    currentWeekKey,
-    formatPeriod,
-    toPeriodKey,
-    describePeriodTravel,
-    cn,
-} from '@rumtelo/utils';
+import { formatPeriod, toPeriodKey, describePeriodTravel } from '@rumtelo/utils';
 
-import type { CoachVerdictMessage } from '@/components/features/home/coach-verdict';
+import type { CoachLineCandidate } from '@/app/_lib/coach-line';
+import { feedLineCandidate } from '@/app/_lib/coach-line-feed';
+import { useCoachCopyContext } from '@/app/_lib/use-coach-copy-context';
 
-import { resolveJarSubtitle } from '@/app/_lib/jar-copy';
-import { monthScoreRecapHeadline } from '@/app/_lib/month-score-copy';
-import { jarChrome } from '@/app/_lib/jar-meta';
 import { buildPeriodTravelScoreNote } from '@/app/_lib/period-travel-score-note';
 import { formatPeriodTravelLabels } from '@/app/_lib/period-travel-i18n';
 import { isProductEnabled } from '@/app/_lib/launch-products';
-import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
-import { jarKeyToSlug } from '@/app/_lib/jar-slug';
+import { BoardStage, stageAtLeast } from '@/app/_lib/board-stage';
+import { useShellNav } from '@/app/_lib/use-shell-nav';
+import { buildHomeTodo } from '@/app/_lib/home-todo';
+import type { Weekday } from '@/app/_lib/next-move';
+import { moneyPath } from '@/app/_lib/routes';
 import { settingsHref } from '@/app/_lib/settings-tabs';
+import { useWeekCheckStatus } from '@/app/_lib/use-week-check-status';
+import { todayIso } from '@/app/_lib/week-key';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
-import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
-import { CoachVerdict } from '@/components/features/home/coach-verdict';
 import { HeroKluis } from '@/components/features/home/hero-kluis';
 import { PortalWidget } from '@/components/features/home/portal-widget';
+import { TodayCard } from '@/components/features/home/today-card';
+import { CloseMonthFlow } from '@/components/features/home/close-month-flow';
 import { MonthScoreLog } from '@/components/features/home/month-score-log';
-import { JarDrilldownTable } from '@/components/features/money/jar-drilldown-table';
-import type { JarDrilldownItem } from '@/components/features/money/jar-drilldown-parts';
-import { useHelpersEnabled } from '@/components/features/helpers';
+import { NextMoveCardError, NextMoveCardSkeleton } from '@/components/features/home/next-move-card';
+import { TodoCard } from '@/components/features/home/todo-card';
+import { Week1Checklist } from '@/components/features/home/week1-checklist';
+import { orderJarsByGroup } from '@/app/_lib/jar-group';
+import { JarTileGrid } from '@/components/features/money/jar-tile-grid';
+import { useCoachLine } from '@/components/features/helpers';
 import { HouseholdPermissionSection, roleCanSee } from '@/app/_lib/role-permissions';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
 
 export function HomeDashboardClient() {
     const t = useTranslations();
     const tDashboard = useTranslations('pages.dashboard');
-    const tJars = useTranslations('features.money.jars');
     const tShell = useTranslations('pages.shell');
+    const tCoach = useTranslations('features.coach');
+    const jarName = useJarName();
+    const copyContext = useCoachCopyContext();
     const locale = useLocale();
-    const queryClient = useQueryClient();
     const { householdId, session } = useAuth();
-    const { period, showToast } = useHouseholdShell();
-    const { canMutate, role } = useBoardWriteAccess();
-    const helpersEnabled = useHelpersEnabled();
+    const { period } = useHouseholdShell();
+    const { role, practicePreview } = useBoardWriteAccess();
+    const { hasCapability } = usePlanCapabilities();
+    const canSeeHome = roleCanSee(role, HouseholdPermissionSection.HOME);
     const canSeeGrowth = roleCanSee(role, HouseholdPermissionSection.GROWTH);
     const canSeeEnergy = roleCanSee(role, HouseholdPermissionSection.ENERGY);
     const canSeeSoul = roleCanSee(role, HouseholdPermissionSection.SOUL);
-    const apiError = useApiError();
-    const { formatMoney } = useHouseholdCurrency();
+    const { currency, formatMoney } = useHouseholdCurrency();
 
     const periodKey = toPeriodKey(period.year, period.month);
     const live = isLiveData(householdId);
@@ -110,44 +112,11 @@ export function HomeDashboardClient() {
         priorOpenPeriod: null,
     };
 
-    const { byKey: catalogByKey } = useJarCatalog();
-    const categoryTemplatesQuery = useCategoryTemplates(live);
-
     const dashboardQuery = useLiveQuery(
         apiQuery.money.dashboard.get.queryOptions({
             input: { householdId: householdId!, period: periodKey },
         }),
         emptyDashboard as never,
-        live
-    );
-
-    const byJarQuery = useLiveQuery(
-        apiQuery.money.fixedCosts.byJar.queryOptions({ input: { householdId: householdId! } }),
-        [] as never,
-        live
-    );
-
-    const periodTxQuery = useLiveQuery(
-        apiQuery.money.transactions.list.queryOptions({
-            input: { householdId: householdId!, period: periodKey, limit: 200 },
-        }),
-        { items: [], nextCursor: null },
-        live
-    );
-
-    const merchantsQuery = useLiveQuery(
-        apiQuery.money.catalogs.merchantPresets.list.queryOptions({
-            input: { householdId: householdId! },
-        }),
-        [] as never,
-        live
-    );
-
-    const givingOrgsQuery = useLiveQuery(
-        apiQuery.money.catalogs.givingOrganizations.list.queryOptions({
-            input: { householdId: householdId! },
-        }),
-        [] as never,
         live
     );
 
@@ -169,78 +138,23 @@ export function HomeDashboardClient() {
         link => link.status === PracticeClientLinkStatus.INVITED
     ).length;
 
-    const weekKey = currentWeekKey();
-    const weekCheckQuery = useLiveQuery(
-        apiQuery.money.weekCheck.current.queryOptions({
-            input: { householdId: householdId!, week: weekKey },
-        }),
-        {
-            id: '',
-            householdId: householdId ?? '',
-            week: weekKey,
-            stage: WeekCheckStage.LOOK,
-            surplus: 0,
-            allocations: [],
-            intention: null,
-            completedAt: null,
-        },
-        live
-    );
-    const weekCheckDone =
-        Boolean(weekCheckQuery.data?.completedAt) ||
-        weekCheckQuery.data?.stage === WeekCheckStage.DONE;
+    const weekCheck = useWeekCheckStatus();
 
-    const closeMonthScoreMutation = useMutation({
-        mutationFn: async (billDispositions?: MonthCloseBillDisposition[]) => {
-            if (!householdId) throw new Error('No household');
-            return api.money.monthScore.close({
-                householdId,
-                period: periodKey,
-                billDispositions,
-            });
-        },
-        onSuccess: recap => {
-            void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
-            void queryClient.invalidateQueries({
-                queryKey: apiQuery.money.fixedCosts.listSettlements.key(),
-            });
-            void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.list.key() });
-            const recapLine = monthScoreRecapHeadline(
-                tDashboard,
-                recap.headlineKey,
-                formatMoney,
-                recap.leftOver
-            );
-            showToast(tDashboard('month_closed_toast', { recap: recapLine }), 'success');
-        },
-        onError: (error: unknown) => showToast(apiError(error), 'error'),
+    // One close flow, one door: the To do card's next move (the month score only reports).
+    const [closeFlow, setCloseFlow] = useState<{ open: boolean; target: string | null }>({
+        open: false,
+        target: null,
     });
+    const startClose = (target: string) => setCloseFlow({ open: true, target });
 
     const liveData = dashboardQuery.data;
     const dashboard = liveData ?? emptyDashboard;
     const baselineById = new Map(
         (liveData?.baselineJars ?? []).map(jar => [jar.id, jar.allocated] as const)
     );
-    const jars: JarDrilldownItem[] = (liveData?.jars ?? []).map(jar => {
-        const catalog = catalogByKey.get(jar.key);
-        return {
-            id: jar.id,
-            key: jar.key,
-            name: jar.name,
-            subtitle: resolveJarSubtitle(tJars, jar.key, jar.subtitle, catalog?.subtitle),
-            icon: jar.icon ?? catalog?.icon ?? '◇',
-            color: jarChrome(jar.key).color,
-            allocated: jar.allocated,
-            available: jar.available,
-            spent: jar.spent,
-            committedOut: jar.committedOut,
-            potBalance: jar.potBalance,
-            overspent: jar.overspent,
-            categories: jar.categories ?? [],
-            href: `/product/money/jars/${jarKeyToSlug(jar.key)}`,
-            baselineAllocated: baselineById.get(jar.id) ?? null,
-        };
-    });
+    const jars = liveData?.jars ?? [];
+    // The dream from onboarding; shown on every launch surface (Soul is hidden in production).
+    const dreamLine = dashboard.why?.trim() || null;
     const monthScore = liveData?.monthScore ?? emptyMonthScore;
     const periodLabel = formatPeriod(dashboard.period ?? periodKey, locale);
     const travelMeta = liveData?.travel ?? emptyDashboard.travel;
@@ -256,88 +170,95 @@ export function HomeDashboardClient() {
               monthsHorizon: travelMeta.monthsHorizon,
               stackedTotal: dashboard.allocatedTotal ?? 0,
               formatMoney,
-              jarHighlights: (liveData?.jars ?? []).slice(0, 2).map(jar => ({
-                  name: jar.name,
-                  from: baselineById.get(jar.id) ?? jar.allocated,
-                  to: jar.allocated,
-              })),
+              // Group order (Basics, Future, Free), never the API's sortOrder: old households keep 0–5.
+              jarHighlights: orderJarsByGroup(jars)
+                  .slice(0, 2)
+                  .map(jar => ({
+                      name: jarName(jar),
+                      from: baselineById.get(jar.id) ?? jar.allocated,
+                      to: jar.allocated,
+                  })),
               tDashboard,
           })
         : null;
-    const coach: readonly CoachVerdictMessage[] = (() => {
-        const practiceNudge: CoachVerdictMessage | null =
+    // The Coach's top tip is a row of the To do card. It never repeats what the card already
+    // says (inbox, bills, week check); Practice invites stay, because the card does not cover
+    // them. `useCoachLine` drops everything when tips are off.
+    const coachCandidates: CoachLineCandidate[] = (() => {
+        const practiceNudge: CoachLineCandidate | null =
             live && canManagePractice && pendingPracticeCount > 0
                 ? {
                       id: 'practice-pending',
-                      key: null,
-                      kind: CoachKind.NUDGE,
                       text:
                           pendingPracticeCount === 1
                               ? tDashboard('coach.practice_pending_one')
                               : tDashboard('coach.practice_pending_many', {
                                     count: pendingPracticeCount,
                                 }),
-                      ctaLabel: tDashboard('coach.practice_pending_cta'),
-                      ctaHref: settingsHref('practice'),
+                      cta: {
+                          label: tDashboard('coach.practice_pending_cta'),
+                          href: settingsHref('practice'),
+                      },
+                      dismiss: { kind: 'local', fingerprint: String(pendingPracticeCount) },
                   }
                 : null;
-
-        const moneyCoach: readonly CoachVerdictMessage[] = (() => {
-            if (live && liveData?.coach?.length) return liveData.coach;
-
-            if (dashboard.inboxCount) {
-                return [
-                    {
-                        id: 'fallback-inbox',
-                        key: null,
-                        kind: CoachKind.NUDGE,
-                        text: t(
-                            dashboard.inboxCount === 1
-                                ? 'pages.dashboard.coach.inbox_one'
-                                : 'pages.dashboard.coach.inbox_many',
-                            { count: dashboard.inboxCount }
-                        ),
-                        ctaLabel: t('pages.dashboard.coach.sort_inbox'),
-                        ctaHref: '/product/money/transactions',
-                    },
-                ];
-            }
-
-            // Inbox clear — only nudge the week check when it is still open.
-            // When that is done too, stay quiet (month-score slide still covers close work).
-            if (!weekCheckDone) {
-                return [
-                    {
-                        id: 'fallback-week-check',
-                        key: null,
-                        kind: CoachKind.WEEK_CHECK,
-                        text: t('pages.dashboard.coach.all_sorted'),
-                        ctaLabel: t('pages.dashboard.coach.week_check'),
-                        ctaHref: '/product/money/week-check',
-                    },
-                ];
-            }
-
-            return [];
-        })();
-
-        return practiceNudge ? [practiceNudge, ...moneyCoach] : moneyCoach;
+        const repeatsCard = (message: { key: string | null; kind: CoachKind }) =>
+            message.kind === CoachKind.WEEK_CHECK ||
+            (message.key !== null &&
+                (message.key.startsWith(`${MONEY_COACH_KEY_PREFIX}inbox_unsorted`) ||
+                    message.key.startsWith(`${MONEY_COACH_KEY_PREFIX}due_bills`)));
+        const feedCandidates = (live ? (liveData?.coach ?? []) : [])
+            .filter(message => !repeatsCard(message))
+            .flatMap(message => {
+                const candidate = feedLineCandidate(message, tCoach, t, copyContext);
+                return candidate ? [candidate] : [];
+            });
+        return practiceNudge ? [practiceNudge, ...feedCandidates] : feedCandidates;
     })();
+    const coachLine = useCoachLine(coachCandidates);
 
-    const monthScoreNeedsAttention =
-        !monthScore.isClosed &&
-        (Boolean(monthScore.priorOpenPeriod) ||
-            (monthScore.closeBlockers?.inboxCount ?? 0) > 0 ||
-            (monthScore.closeBlockers?.dueBillCount ?? 0) > 0);
+    // The month score waits until there is something to score (S-5.3 #1); levels wait for a close.
+    const progress = liveData?.progress;
+    const showMonthScore = Boolean(
+        progress &&
+        (progress.hasCompletedWeekCheck ||
+            monthScore.daysLeft <= 6 ||
+            monthScore.priorOpenPeriod ||
+            progress.hasClosedMonth)
+    );
+    // The board ladder: Growth, Today and the full tips list wait for the first week check.
+    // While the stage loads nothing appears, so a new board never sees a card come and go.
+    const { stage, stageReady } = useShellNav();
+    const fromRoutine = stageReady && stageAtLeast(stage, BoardStage.ROUTINE);
 
-    const coachHasAttention =
-        coach.some(
-            message =>
-                message.kind === CoachKind.WARNING ||
-                message.kind === CoachKind.NUDGE ||
-                message.kind === CoachKind.WEEK_CHECK
-        ) || monthScoreNeedsAttention;
-
+    // The To do card is about now, whatever period Home is showing.
+    const nowDashboard = weekCheck.dashboard;
+    const canAct = !practicePreview && role !== HouseholdRole.VIEWER;
+    const todo = nowDashboard
+        ? buildHomeTodo({
+              today: todayIso(),
+              reminderDay: weekCheck.reminderDay,
+              weekCheckGraceOpen: weekCheck.graceOpen,
+              inboxCount: nowDashboard.inboxCount ?? 0,
+              incomeTotal: nowDashboard.incomeTotal ?? 0,
+              monthScore: {
+                  period: nowDashboard.monthScore.period,
+                  isClosed: nowDashboard.monthScore.isClosed,
+                  daysLeft: nowDashboard.monthScore.daysLeft,
+                  priorOpenPeriod: nowDashboard.monthScore.priorOpenPeriod,
+              },
+              progress: nowDashboard.progress,
+              canAct,
+              closeBlockers: nowDashboard.monthScore.closeBlockers ?? null,
+              hasCoachTip: coachLine.candidate !== null || coachLine.undoing,
+          })
+        : null;
+    const formatMonth = (key: string) => formatPeriod(key, locale);
+    const formatWeekday = (weekday: Weekday) =>
+        // 2024-01-01 is a Monday: ISO weekday n lands on January n.
+        new Intl.DateTimeFormat(locale, { weekday: 'long', timeZone: 'UTC' }).format(
+            new Date(Date.UTC(2024, 0, weekday))
+        );
     const horizon = travelMeta.monthsHorizon;
     const baselineTotal = dashboard.baselineAllocatedTotal;
     const selectedTotal = dashboard.allocatedTotal ?? 0;
@@ -411,9 +332,14 @@ export function HomeDashboardClient() {
           ? t('pages.dashboard.hero.income_month_one_jar')
           : t('pages.dashboard.hero.income_month', { jars: jars.length });
 
+    const showGrowthWidget = canSeeGrowth && fromRoutine;
+    const showEnergyWidget = canSeeEnergy && isProductEnabled('energy');
+    const showSoulWidget = canSeeSoul && isProductEnabled('soul');
+    const showPortals = showGrowthWidget || showEnergyWidget || showSoulWidget;
+
     return (
-        <div className="grid gap-6">
-            <div>
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+            <div className="order-1 min-w-0 lg:col-start-1">
                 <Eyebrow>
                     ✦ {formatPeriod(dashboard.period ?? periodKey, locale)}
                     {travel.direction !== 'current' ? ` · ${travelLabels.relativeLabel}` : ''}
@@ -426,183 +352,189 @@ export function HomeDashboardClient() {
                         {travelStrip}
                     </Typography>
                 ) : null}
-            </div>
-
-            {/* Coach + month-score advice share one slider when helpers are on. */}
-            <div data-tour="home-coach">
-                <CoachVerdict
-                    messages={coach}
-                    hasAttention={coachHasAttention}
-                    scoreSlide={
-                        <MonthScoreLog
-                            embedded
-                            score={monthScore.score}
-                            daysLeft={monthScore.daysLeft}
-                            level={monthScore.level}
-                            events={monthScore.events}
-                            isClosed={liveData?.monthScore?.isClosed}
-                            closeBlockers={monthScore.closeBlockers}
-                            priorOpenPeriod={monthScore.priorOpenPeriod}
-                            periodNote={periodScoreNote}
-                            canCloseMonth={
-                                live &&
-                                canMutate &&
-                                liveData?.monthScore !== undefined &&
-                                !liveData.monthScore.isClosed
-                            }
-                            closeMonthPending={closeMonthScoreMutation.isPending}
-                            formatMoney={formatMoney}
-                            onCloseMonth={dispositions =>
-                                closeMonthScoreMutation.mutate(dispositions)
-                            }
-                        />
-                    }
-                />
-
-                {/* Helpers off: CoachVerdict is null — keep month-score advice visible. */}
-                {!helpersEnabled ? (
-                    <MonthScoreLog
-                        score={monthScore.score}
-                        daysLeft={monthScore.daysLeft}
-                        level={monthScore.level}
-                        events={monthScore.events}
-                        isClosed={liveData?.monthScore?.isClosed}
-                        closeBlockers={monthScore.closeBlockers}
-                        priorOpenPeriod={monthScore.priorOpenPeriod}
-                        periodNote={periodScoreNote}
-                        canCloseMonth={
-                            live &&
-                            canMutate &&
-                            liveData?.monthScore !== undefined &&
-                            !liveData.monthScore.isClosed
-                        }
-                        closeMonthPending={closeMonthScoreMutation.isPending}
-                        formatMoney={formatMoney}
-                        onCloseMonth={dispositions => closeMonthScoreMutation.mutate(dispositions)}
-                    />
+                {dreamLine ? (
+                    <p className="mt-3 flex min-w-0 flex-wrap items-baseline gap-x-2.5 gap-y-0.5 text-sm text-fg-secondary">
+                        <span className="font-mono text-[10px] font-medium tracking-[0.14em] text-accent uppercase">
+                            {tDashboard('why.label')}
+                        </span>
+                        <span className="min-w-0 text-pretty wrap-anywhere italic">
+                            {dreamLine}
+                        </span>
+                    </p>
                 ) : null}
             </div>
 
-            <div data-tour="home-hero">
+            <div className="order-2 min-w-0 lg:col-start-1" data-tour="home-todo">
+                {!live ? null : todo ? (
+                    <TodoCard
+                        todo={todo}
+                        canAct={canAct}
+                        canImport={hasCapability(CAPABILITIES.moneyImport)}
+                        isEuro={currency === 'EUR'}
+                        formatMonth={formatMonth}
+                        formatWeekday={formatWeekday}
+                        onCloseMonth={startClose}
+                        coach={coachLine}
+                        allTipsCount={
+                            coachCandidates.length > 1 && fromRoutine
+                                ? coachCandidates.length
+                                : null
+                        }
+                        travelNote={
+                            travel.direction !== 'current'
+                                ? tDashboard('next_move.travel_note', {
+                                      period: formatPeriod(periodKey, locale),
+                                  })
+                                : null
+                        }
+                    />
+                ) : weekCheck.isError ? (
+                    <NextMoveCardError onRetry={weekCheck.refetch} />
+                ) : (
+                    <NextMoveCardSkeleton />
+                )}
+            </div>
+
+            {/* The right column on lg. On phones `contents` hands each child back to the single
+                column, where its own `order` keeps the card first and the checklist right after. */}
+            <div className="contents lg:col-start-2 lg:row-span-4 lg:row-start-1 lg:grid lg:content-start lg:gap-6">
+                <div className="order-3 empty:hidden lg:order-none">
+                    <Week1Checklist />
+                </div>
+
+                {canSeeHome && fromRoutine ? (
+                    <div className="order-7 lg:order-none">
+                        <TodayCard />
+                    </div>
+                ) : null}
+
+                {showPortals ? (
+                    <div
+                        data-tour="home-portals"
+                        className="order-8 grid grid-cols-1 gap-4 lg:order-none">
+                        {showGrowthWidget ? (
+                            <PortalWidget
+                                tint="var(--color-jar-lts)"
+                                icon="trending-up"
+                                title={t('pages.nav.pills.growth')}
+                                href="/product/growth"
+                                stats={[
+                                    {
+                                        label: stacked
+                                            ? t('pages.dashboard.widgets.growth.income_span')
+                                            : t('pages.dashboard.widgets.growth.income_month'),
+                                        value: formatMoney(dashboard.incomeTotal ?? 0),
+                                    },
+                                    {
+                                        label: t('pages.dashboard.widgets.growth.inbox'),
+                                        value: String(dashboard.inboxCount ?? 0),
+                                    },
+                                ]}
+                                tagline={t('pages.dashboard.widgets.growth.tagline')}
+                            />
+                        ) : null}
+                        {showEnergyWidget ? (
+                            <PortalWidget
+                                tint="var(--color-jar-play)"
+                                icon={'✳\uFE0E'}
+                                title={t('pages.nav.pills.energy')}
+                                href="/product/energy"
+                                stats={[
+                                    {
+                                        label: t('pages.dashboard.widgets.energy.trained'),
+                                        value: '—',
+                                    },
+                                    {
+                                        label: t('pages.dashboard.widgets.energy.sleep'),
+                                        value: '—',
+                                    },
+                                ]}
+                                tagline={t('pages.dashboard.widgets.energy.tagline')}
+                            />
+                        ) : null}
+                        {showSoulWidget ? (
+                            <PortalWidget
+                                tint="var(--color-portal-soul)"
+                                icon="sparkles"
+                                title={t('pages.nav.pills.soul')}
+                                href="/product/soul"
+                                stats={[
+                                    {
+                                        label: t('pages.dashboard.widgets.soul.stillness'),
+                                        value: '—',
+                                    },
+                                    {
+                                        label: t('pages.dashboard.widgets.soul.why'),
+                                        value: dashboard.why ? '✓' : '—',
+                                    },
+                                ]}
+                                tagline={t('pages.dashboard.widgets.soul.tagline')}
+                            />
+                        ) : null}
+                    </div>
+                ) : (
+                    <Typography as="p" size="sm" color="muted" className="sr-only">
+                        {t(
+                            isProductEnabled('energy') || isProductEnabled('soul')
+                                ? 'features.tour.pages.home.steps.portals.content'
+                                : 'features.tour.pages.home.steps.portals_core.content'
+                        )}
+                    </Typography>
+                )}
+            </div>
+
+            <div
+                id="jars"
+                data-tour="home-hero"
+                className="order-4 min-w-0 scroll-mt-20 lg:col-start-1">
                 <HeroKluis
                     eyebrow={heroEyebrow}
                     total={formatMoney(dashboard.allocatedTotal ?? 0)}
                     potTotal={formatMoney(jars.reduce((sum, jar) => sum + jar.potBalance, 0))}
                     totalDelta={totalDelta}
                     incomeBreakdown={incomeBreakdown}
-                    stats={[
-                        {
-                            label: t('pages.dashboard.stats.avg_left'),
-                            value: formatMoney(dashboard.avgLeftOver ?? 0),
-                            tone: 'accent',
-                        },
-                        {
-                            label: t('pages.dashboard.stats.safe_per_day'),
-                            value: formatMoney(dashboard.safePerDay ?? 0),
-                            tone: 'accent',
-                        },
-                        {
-                            label: t('pages.dashboard.stats.play_left'),
-                            value: formatMoney(dashboard.playLeft ?? 0),
-                            href: `/product/money/jars/${jarKeyToSlug('PLAY')}`,
-                        },
-                    ]}>
-                    <JarDrilldownTable
+                    incomeHref={moneyPath('income')}
+                    // The stat row waits for the first spending (S-5.3 #4). "Left over" and "In
+                    // Play" are not repeated here: the jar grid below already shows both.
+                    stats={
+                        progress?.hasTransactions
+                            ? [
+                                  {
+                                      label: t('pages.dashboard.stats.safe_per_day'),
+                                      value: formatMoney(dashboard.safePerDay ?? 0),
+                                      tone: 'accent',
+                                  },
+                              ]
+                            : []
+                    }>
+                    <JarTileGrid
                         jars={jars}
-                        extras={
-                            live
-                                ? {
-                                      period,
-                                      fixedCosts: (byJarQuery.data ?? []).flatMap(
-                                          group => group.items
-                                      ),
-                                      transactions: periodTxQuery.data?.items ?? [],
-                                      categoryTemplates: categoryTemplatesQuery.data ?? [],
-                                      merchants: merchantsQuery.data ?? [],
-                                      givingOrgs: givingOrgsQuery.data ?? [],
-                                      jarByKey: catalogByKey,
-                                  }
-                                : undefined
-                        }
+                        period={period}
+                        stacked={stacked}
+                        loading={live && dashboardQuery.isPending}
                     />
                 </HeroKluis>
             </div>
 
-            <div
-                data-tour="home-portals"
-                className={cn(
-                    'grid grid-cols-1 gap-4',
-                    canSeeGrowth || canSeeEnergy || canSeeSoul
-                        ? (canSeeEnergy && isProductEnabled('energy')) ||
-                          (canSeeSoul && isProductEnabled('soul'))
-                            ? 'lg:grid-cols-3'
-                            : 'lg:grid-cols-1'
-                        : undefined
-                )}>
-                {canSeeGrowth ? (
-                    <PortalWidget
-                        tint="var(--color-jar-lts)"
-                        icon="trending-up"
-                        title={t('pages.nav.pills.growth')}
-                        href="/product/growth"
-                        stats={[
-                            {
-                                label: stacked
-                                    ? t('pages.dashboard.widgets.growth.income_span')
-                                    : t('pages.dashboard.widgets.growth.income_month'),
-                                value: formatMoney(dashboard.incomeTotal ?? 0),
-                            },
-                            {
-                                label: t('pages.dashboard.widgets.growth.inbox'),
-                                value: String(dashboard.inboxCount ?? 0),
-                            },
-                        ]}
-                        tagline={t('pages.dashboard.widgets.growth.tagline')}
+            {showMonthScore ? (
+                <div id="month-score" className="order-5 min-w-0 scroll-mt-20 lg:col-start-1">
+                    <MonthScoreLog
+                        compact
+                        score={monthScore.score}
+                        daysLeft={monthScore.daysLeft}
+                        level={monthScore.level}
+                        showLevel={Boolean(progress?.hasClosedMonth)}
+                        isClosed={liveData?.monthScore?.isClosed}
+                        periodNote={periodScoreNote}
                     />
-                ) : null}
-                {canSeeEnergy && isProductEnabled('energy') ? (
-                    <PortalWidget
-                        tint="var(--color-jar-play)"
-                        icon={'✳\uFE0E'}
-                        title={t('pages.nav.pills.energy')}
-                        href="/product/energy"
-                        stats={[
-                            {
-                                label: t('pages.dashboard.widgets.energy.trained'),
-                                value: '—',
-                            },
-                            { label: t('pages.dashboard.widgets.energy.sleep'), value: '—' },
-                        ]}
-                        tagline={t('pages.dashboard.widgets.energy.tagline')}
-                    />
-                ) : null}
-                {canSeeSoul && isProductEnabled('soul') ? (
-                    <PortalWidget
-                        tint="var(--color-portal-soul)"
-                        icon="sparkles"
-                        title={t('pages.nav.pills.soul')}
-                        href="/product/soul"
-                        stats={[
-                            {
-                                label: t('pages.dashboard.widgets.soul.stillness'),
-                                value: '—',
-                            },
-                            {
-                                label: t('pages.dashboard.widgets.soul.why'),
-                                value: dashboard.why ? '✓' : '—',
-                            },
-                        ]}
-                        tagline={t('pages.dashboard.widgets.soul.tagline')}
-                    />
-                ) : null}
-                {!canSeeGrowth &&
-                !(canSeeEnergy && isProductEnabled('energy')) &&
-                !(canSeeSoul && isProductEnabled('soul')) ? (
-                    <Typography as="p" size="sm" color="muted" className="sr-only">
-                        {t('features.tour.pages.home.steps.portals.content')}
-                    </Typography>
-                ) : null}
-            </div>
+                </div>
+            ) : null}
+
+            <CloseMonthFlow
+                open={closeFlow.open}
+                onOpenChange={open => setCloseFlow(previous => ({ ...previous, open }))}
+                target={closeFlow.target}
+            />
         </div>
     );
 }

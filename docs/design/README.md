@@ -1,48 +1,36 @@
 # Design
 
-Visual source of truth lives in the repo’s [`design/`](../../design/) folder (Claude Design / `.dc.html` exports and design-system assets).
-
-This doc explains **how to use it** so product UI stays aligned with the real artboards.
-
----
-
-## Critical rule
-
-**The ~32 screens in `apps/application` were a reconstruction, not the design.**
-
-Domain is correct (six jars, inbox, week check, month score, four portals). Layouts and visual language must be rebuilt against the real design — not against guessed tag names.
-
-Full story and unblock steps: [`HANDOFF.md`](../../HANDOFF.md) §8.
+Visual source lives in the repo’s [`design/`](../../design/) folder: `Kluis Finance App.dc.html`,
+`Kluis Landing.dc.html` (Claude Design exports) and design-system assets under `_ds/`.
 
 ---
 
-## Unblock `design/` on macOS (if EPERM)
+## Honest state
 
-```bash
-xattr -cr "/Users/givenloyiso/Desktop/DEV/rumtelo/design" && ls design
-```
+**The screens in `apps/application` are a partial port, not a full rebuild.**
 
-Or re-copy without attributes:
-
-```bash
-ditto --norsrc --noextattr --noacl \
-  "/path/to/Finance app with Monopoly concept" \
-  "/Users/givenloyiso/Desktop/DEV/rumtelo/design"
-```
+- Some components follow an artboard and cite it in their doc comment, e.g.
+  `Kluis Finance App.dc.html:689-839` (jars), `:1236-1357` (net worth), `:2942` (nav), portal hub/widget.
+- Most other screens were built from the domain (pots, inbox, week check, month score, portals) without an artboard.
+- The app has outgrown the design: Kluis is money-only. Growth (Course, learn, net worth), Energy, Soul,
+  Practice, billing and settings have no artboard.
 
 ---
 
-## Rebuild order
+## Porting rules
 
-1. Read the complete `.dc.html` (all sections, including truncated tails).
-2. Serve `design/` locally and **screenshot every artboard** — build against what is on screen.
-3. Transform inline styles → Tailwind (4px scale, `--radius-*`, tokens from `@theme`).
-4. Port `Button` from the design-system bundle as a Tailwind component.
-5. Rebuild screens against real layouts.
+1. Screenshot the artboard and build against what is on screen, not tag names.
+2. Transform inline styles into Tailwind (4px scale, `rounded-*`, `ease-*` / `duration-*`, `@theme` tokens). Never copy inline styles.
+3. Cite the source range (`Kluis Finance App.dc.html:<from>-<to>`) in the component doc comment.
+4. Surfaces without an artboard follow already-ported screens and `@rumtelo/ui`.
 
-**Tokens:** single source of truth is `packages/config/tailwind/theme.css` (deep teal accent, cool greys). Do not invent a second palette in app CSS.
+**Tokens:** single source of truth is `packages/config/tailwind/theme.css` (deep teal accent, cool greys). Apps import
+`@rumtelo/config/tailwind/globals.css`; do not invent a second palette in app CSS.
 
 What stays design-independent: monorepo, contracts, backend hierarchy, household scoping, DB schema, build pipeline.
+
+If `design/` ever returns `EPERM` on macOS (a `com.apple.macl` attribute copied from `Downloads`), clear it with
+`xattr -cr design` — see [traps](../engineering/traps.md).
 
 ---
 

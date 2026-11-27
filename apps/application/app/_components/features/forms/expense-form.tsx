@@ -29,6 +29,7 @@ import { JarKey, defaultGiveCategoryTemplate, jarCapabilitiesFor } from '@rumtel
 import { useTranslations } from '@rumtelo/i18n';
 import { findByNameOrAlias } from '@rumtelo/utils';
 
+import { jarForKey, jarKeysCoveredBy } from '@/app/_lib/jar-for-key';
 import { parseAmountToMinorUnits } from '@/app/_lib/money-input';
 import { viewedPeriodDefaultIso } from '@/app/_lib/viewed-period-date';
 import { isLiveData } from '@/app/_lib/preview';
@@ -41,6 +42,7 @@ import { useHouseholdShell } from '@/components/features/shell/household-shell-c
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { FormCreateEditShell } from '@/components/layout/form-create-edit-shell';
 import { CREATE_HREF } from '@/app/_lib/create-routes';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import Link from 'next/link';
 import { ConfirmActionButton } from './confirm-action-button';
 import { resolveCategoryId, useCategoryTemplates } from './catalog-helpers';
@@ -264,6 +266,7 @@ export function ExpenseForm({
     const tExpense = useTranslations('features.money.expense_form');
     const tForm = useTranslations('ui.form');
     const tBtn = useTranslations('ui.button.actions');
+    const jarName = useJarName();
     const coachGuidesEnabled = useHelpersEnabled();
     const givePayeeModes: ReadonlyArray<{ id: GivePayeeMode; label: string }> = [
         { id: 'known', label: tFixed('give_known') },
@@ -418,12 +421,18 @@ export function ExpenseForm({
     );
     const selectedJarKey = useMemo(() => selectedJar?.key ?? null, [selectedJar]);
     const isGive = selectedJarKey === JarKey.GIVE;
+    // The pot the intent's catalog key lands in: itself, or its group's main pot when that pot is off.
+    const intentJarKey = intent.jarKey ? (jarForKey(jars, intent.jarKey)?.key ?? null) : null;
+    const coveredJarKeys = useMemo(
+        () => (selectedJarKey ? jarKeysCoveredBy(jars, selectedJarKey) : undefined),
+        [jars, selectedJarKey]
+    );
 
     // Drop intent when it belongs to another jar (adjust during render).
     const [seenJarKey, setSeenJarKey] = useState<JarKey | null>(selectedJarKey);
     if (selectedJarKey !== seenJarKey) {
         setSeenJarKey(selectedJarKey);
-        if (intent.jarKey && selectedJarKey && intent.jarKey !== selectedJarKey && intentOverride) {
+        if (intentJarKey && selectedJarKey && intentJarKey !== selectedJarKey && intentOverride) {
             setIntentOverride(null);
         }
     }
@@ -453,10 +462,10 @@ export function ExpenseForm({
     }
 
     // Leaving Give clears the special payee path (adjust during render).
-    if (!isGive && (giveOrgKey || givePayeeMode !== 'known' || intent.jarKey === JarKey.GIVE)) {
+    if (!isGive && (giveOrgKey || givePayeeMode !== 'known' || intentJarKey === JarKey.GIVE)) {
         if (giveOrgKey) setGiveOrgKey(null);
         if (givePayeeMode !== 'known') setGivePayeeMode('known');
-        if (intent.jarKey === JarKey.GIVE && intentOverride) {
+        if (intentJarKey === JarKey.GIVE && intentOverride) {
             setIntentOverride(null);
         }
     }
@@ -508,7 +517,8 @@ export function ExpenseForm({
         // Locked jar context wins — don't let merchant intent switch jars.
         if (lockJar) return;
         if (!intent.jarKey) return;
-        const jar = jarChoices.find(candidate => candidate.key === intent.jarKey);
+        // A merchant or type whose pot is off lands in that group's main pot.
+        const jar = jarForKey(jarChoices, intent.jarKey);
         if (jar) form.setValue('jarId', jar.id);
     }, [intent.jarKey, jarChoices, form, lockJar]);
 
@@ -580,6 +590,11 @@ export function ExpenseForm({
             }
 
             if (mode === 'edit' && entityId) {
+                // `update` never carries the category: the server checks a category against the
+                // row's CURRENT pot, and this edit may move the row to another pot. `sort` below
+                // sets pot and category together (and always runs, so an Inbox row ends up sorted).
+                // The fields go first on purpose: `sort` links the debt with the row's amount and
+                // learns the payee hint from its vendor, so both must already be the edited values.
                 await api.money.transactions.update({
                     id: entityId,
                     householdId,
@@ -590,7 +605,6 @@ export function ExpenseForm({
                     merchantKey,
                     partyId,
                     saveParty,
-                    categoryId,
                     inflowKey: isIn ? inflowKey : null,
                     assetId: values.assetId ?? null,
                 });
@@ -632,6 +646,7 @@ export function ExpenseForm({
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.parties.list.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.progress.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.debts.key() });
             showToast(
                 mode === 'edit'
@@ -643,7 +658,19 @@ export function ExpenseForm({
             );
             dismiss();
         },
-        onError: (error: unknown) => showToast(apiError(error), 'error'),
+        onError: (error: unknown) => {
+            // Edit is two calls (fields, then pot + category). If the second one is refused the
+            // first is already saved, so refresh the lists instead of leaving them stale.
+            if (mode === 'edit') {
+                void queryClient.invalidateQueries({
+                    queryKey: apiQuery.money.transactions.list.key(),
+                });
+                void queryClient.invalidateQueries({
+                    queryKey: apiQuery.money.transactions.inbox.key(),
+                });
+            }
+            showToast(apiError(error), 'error');
+        },
     });
 
     const removeMutation = useMutation({
@@ -660,6 +687,7 @@ export function ExpenseForm({
             });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.jars.balances.key() });
             void queryClient.invalidateQueries({ queryKey: apiQuery.money.dashboard.get.key() });
+            void queryClient.invalidateQueries({ queryKey: apiQuery.money.progress.key() });
             showToast(t('common.message.entity.transaction_deleted'), 'success');
             dismissAfterRemove();
         },
@@ -770,7 +798,7 @@ export function ExpenseForm({
                             {selectedJar.icon ?? '◇'}
                         </span>
                         <div className="min-w-0 flex-1">
-                            <p className="text-sm font-semibold text-fg">{selectedJar.name}</p>
+                            <p className="text-sm font-semibold text-fg">{jarName(selectedJar)}</p>
                             <p className="font-mono text-[10px] tracking-wide text-fg-muted uppercase">
                                 {tExpense('this_jar')}
                             </p>
@@ -795,7 +823,7 @@ export function ExpenseForm({
                                     jarChoices.map(jar => (
                                         <FormSelectItem key={jar.id} value={jar.id}>
                                             {jar.icon ? `${jar.icon} ` : ''}
-                                            {jar.name}
+                                            {jarName(jar)}
                                         </FormSelectItem>
                                     ))
                                 )}
@@ -853,9 +881,7 @@ export function ExpenseForm({
                                             candidate => candidate.key === preset.key
                                         );
                                         if (!full?.jarKey) return;
-                                        const jar = jars.find(
-                                            candidate => candidate.key === full.jarKey
-                                        );
+                                        const jar = jarForKey(jars, full.jarKey);
                                         if (jar) form.setValue('jarId', jar.id);
                                     }}
                                 />
@@ -951,6 +977,7 @@ export function ExpenseForm({
                         parties={parties}
                         categoryIconByKey={categoryIconByKey}
                         jarKey={selectedJarKey}
+                        coveredJarKeys={coveredJarKeys}
                         disabled={busy}
                     />
                 </div>
@@ -1018,7 +1045,9 @@ export function ExpenseForm({
                                 {selectedJar.icon ?? '◇'}
                             </span>
                             <div className="min-w-0 flex-1">
-                                <p className="text-sm font-semibold text-fg">{selectedJar.name}</p>
+                                <p className="text-sm font-semibold text-fg">
+                                    {jarName(selectedJar)}
+                                </p>
                                 <p className="font-mono text-[10px] tracking-wide text-fg-muted uppercase">
                                     {tExpense('this_jar')}
                                 </p>
@@ -1043,7 +1072,7 @@ export function ExpenseForm({
                                         jarChoices.map(jar => (
                                             <FormSelectItem key={jar.id} value={jar.id}>
                                                 {jar.icon ? `${jar.icon} ` : ''}
-                                                {jar.name}
+                                                {jarName(jar)}
                                             </FormSelectItem>
                                         ))
                                     )}

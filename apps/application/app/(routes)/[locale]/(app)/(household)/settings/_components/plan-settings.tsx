@@ -15,6 +15,7 @@ import { clearPlanIntent, cn, formatPlanPrice } from '@rumtelo/utils';
 import { useApiError } from '@/app/_lib/api-error-messages';
 import { env } from '@/app/_utils/get-env';
 import { diffPlans, memberLimitLabel, planLabel, PLAN_RANK, PlanKey } from '@/app/_lib/plan';
+import { isProductEnabled } from '@/app/_lib/launch-products';
 import { PREVIEW_MODE } from '@/app/_lib/preview';
 import { SEAT_ADDON_UNIT_CENTS, SeatAddonKind } from '@rumtelo/contracts';
 import { isDemoAccountEmail } from '@rumtelo/contracts/platform';
@@ -254,6 +255,9 @@ export function PlanSettings() {
     const hasActiveSubscription = billingStatus.data?.hasActiveSubscription;
     const seatAddons = billingStatus.data?.seatAddons ?? { extraContributor: 0, extraViewer: 0 };
 
+    // Energy/Soul are held back in production — don't sell them on the plan cards.
+    const energyOn = isProductEnabled('energy') || isProductEnabled('soul');
+
     const cards: {
         key: PlanKey;
         /** Fallback major units when Stripe catalog is unavailable. */
@@ -280,16 +284,29 @@ export function PlanSettings() {
             priceM: 9,
             priceY: 90,
             tag: t('pages.settings.panels.plan.card_plus_tag'),
-            line: t('pages.settings.panels.plan.card_plus_line'),
-            feats: t('pages.settings.panels.plan.card_plus_feats', {
-                members: memberLimitLabel(PlanKey.PLUS, t),
-            }),
+            line: t(
+                energyOn
+                    ? 'pages.settings.panels.plan.card_plus_line'
+                    : 'pages.settings.panels.plan.card_plus_line_core'
+            ),
+            feats: t(
+                energyOn
+                    ? 'pages.settings.panels.plan.card_plus_feats'
+                    : 'pages.settings.panels.plan.card_plus_feats_core',
+                {
+                    members: memberLimitLabel(PlanKey.PLUS, t),
+                }
+            ),
         },
         {
             key: PlanKey.MAX,
             priceM: 19,
             priceY: 190,
-            tag: t('pages.settings.panels.plan.card_max_tag'),
+            tag: t(
+                energyOn
+                    ? 'pages.settings.panels.plan.card_max_tag'
+                    : 'pages.settings.panels.plan.card_max_tag_core'
+            ),
             line: t('pages.settings.panels.plan.card_max_line'),
             feats: t('pages.settings.panels.plan.card_max_feats', {
                 members: memberLimitLabel(PlanKey.MAX, t),

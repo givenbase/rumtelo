@@ -1,6 +1,11 @@
 import { getTranslations } from '@rumtelo/i18n';
 
-import { HouseholdSettings } from '../../_components/settings-panels';
+import { SettingsPanel } from '../../_components/settings-chrome';
+import {
+    HouseholdDreamSettings,
+    HouseholdSettings,
+    SharingSettings,
+} from '../../_components/settings-panels';
 
 export async function generateMetadata() {
     const t = await getTranslations('pages.meta');
@@ -8,5 +13,11 @@ export async function generateMetadata() {
 }
 
 export default function HouseholdSettingsPage() {
-    return <HouseholdSettings />;
+    return (
+        <SettingsPanel>
+            <HouseholdDreamSettings />
+            <HouseholdSettings />
+            <SharingSettings />
+        </SettingsPanel>
+    );
 }

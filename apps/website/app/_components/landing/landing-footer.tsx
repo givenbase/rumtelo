@@ -19,18 +19,19 @@ const FOOT_COL_DEFS = [
     {
         headKey: 'product' as const,
         links: [
-            { textKey: 'portals' as const, href: '#portals' },
-            { textKey: 'jars' as const, href: '#jars' },
-            { textKey: 'coach' as const, href: '#coach' },
-            { textKey: 'pricing' as const, href: '#pricing' },
+            { textKey: 'portals' as const, href: '/#portals' },
+            { textKey: 'jars' as const, href: '/#jars' },
+            { textKey: 'coach' as const, href: '/#coach' },
+            { textKey: 'pricing' as const, href: '/#pricing' },
+            { textKey: 'practices' as const, href: '/practices' },
         ],
     },
     {
         headKey: 'company' as const,
         links: [
-            { textKey: 'why' as const, href: '#why' },
-            { textKey: 'principles' as const, href: '#principles' },
-            { textKey: 'questions' as const, href: '#faq' },
+            { textKey: 'why' as const, href: '/#why' },
+            { textKey: 'principles' as const, href: '/#principles' },
+            { textKey: 'questions' as const, href: '/#faq' },
         ],
     },
     {

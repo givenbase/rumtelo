@@ -1,12 +1,4 @@
-import {
-    DEFAULT_JAR_SPLIT,
-    SpendingStyle,
-    SPLIT_SOFT_CEILING,
-    SPLIT_SOFT_FLOOR,
-    type JarKey,
-} from '@rumtelo/contracts';
-
-export { SpendingStyle };
+import { GROUP_SOFT_CEILING, GROUP_SOFT_FLOOR, type JarKey } from '@rumtelo/contracts';
 
 export type SplitTipSeverity = 'info' | 'warn';
 
@@ -17,7 +9,8 @@ export type SplitTip = {
     jars?: JarKey[];
 };
 
+/** Share per pot the household has. A pot that is not in the map is absent (0 %), never a default. */
 export type SplitPctByKey = Partial<Record<JarKey, number>>;
 
-/** Soft floors/ceilings live in contracts so the server money coach uses the same numbers. */
-export { DEFAULT_JAR_SPLIT, SPLIT_SOFT_CEILING, SPLIT_SOFT_FLOOR };
+/** Group-level soft limits live in contracts so the server money coach uses the same numbers. */
+export { GROUP_SOFT_CEILING, GROUP_SOFT_FLOOR };

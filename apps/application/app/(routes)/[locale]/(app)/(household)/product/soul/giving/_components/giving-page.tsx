@@ -35,8 +35,9 @@ import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { findPartyVendor, partyMark } from '@/app/_lib/vendor-brands';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
-import { CoachMark, CoachTipCard, HelperGate } from '@/components/features/helpers';
+import { CoachMark, HelperGate } from '@/components/features/helpers';
 import { GivingFinder } from '@/components/features/money/giving-finder';
+import { PotOffPrompt } from '@/components/features/money/pot-off-prompt';
 import { MetaChip, formatDueDay } from '@/components/features/money/jar-badge';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
@@ -244,6 +245,27 @@ export function GivingPageClient() {
         pledge && monthsLeft
             ? Math.max(0, Math.ceil((pledge.target - pledge.saved) / monthsLeft))
             : null;
+
+    // Giving is an optional pot inside Free. While it is off there is nothing to count or link
+    // to, so say so and offer to turn it on (for roles that may) instead of an empty page. Only
+    // once the pot list has loaded, so a household that has Giving never sees this flash by.
+    if (live && !jarsQuery.isPending && !giveJar) {
+        return (
+            <div className="grid animate-rise gap-6">
+                <Section eyebrow={t('eyebrow')} title={t('headline')}>
+                    <Typography as="p" variant="lead" size="default">
+                        {t('lead')}
+                    </Typography>
+                </Section>
+                <PotOffPrompt
+                    jarKey={JarKey.GIVE}
+                    title={t('pot_off_title')}
+                    body={t('pot_off_body')}
+                    ctaLabel={t('pot_off_cta')}
+                />
+            </div>
+        );
+    }
 
     return (
         <div className="grid animate-rise gap-6">
@@ -562,9 +584,10 @@ export function GivingPageClient() {
                 </section>
             </HelperGate>
 
-            <CoachTipCard title={t('coach_tip_title')}>
+            {/* A static explanation has no next move, so it is a plain note, not a Coach line. */}
+            <p className="text-sm leading-relaxed text-pretty text-fg-muted">
                 {t('coach_tip_1')} {t('coach_tip_2')}
-            </CoachTipCard>
+            </p>
         </div>
     );
 }

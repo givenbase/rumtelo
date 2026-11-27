@@ -5,6 +5,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { LedgerModule } from './ledger/ledger.module';
 import { MonthScoreModule } from './month-score/month-score.module';
 import { PlanModule } from './plan/plan.module';
+import { ProgressModule } from './progress/progress.module';
 import { TargetsModule } from './targets/targets.module';
 import { WeekCheckModule } from './week-check/week-check.module';
 
@@ -17,6 +18,7 @@ import { WeekCheckModule } from './week-check/week-check.module';
  *   archive/      JSON export restore across plan / ledger / targets
  *   month-score/  monthly close — points, level, event log
  *   week-check/   weekly ten-minute practice and surplus allocations
+ *   progress/     board stage (SPLIT → MONTH), derived on read from the above
  *   dashboard/    the composition layer reading across all of the above
  */
 @Module({
@@ -27,6 +29,7 @@ import { WeekCheckModule } from './week-check/week-check.module';
         ArchiveModule,
         MonthScoreModule,
         WeekCheckModule,
+        ProgressModule,
         DashboardModule,
     ],
     exports: [
@@ -36,6 +39,7 @@ import { WeekCheckModule } from './week-check/week-check.module';
         ArchiveModule,
         MonthScoreModule,
         WeekCheckModule,
+        ProgressModule,
         DashboardModule,
     ],
 })

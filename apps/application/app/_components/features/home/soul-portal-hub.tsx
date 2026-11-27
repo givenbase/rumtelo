@@ -14,7 +14,6 @@ import { useMemo } from 'react';
 import { useTranslations } from '@rumtelo/i18n';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
-import { pickPortalCoach } from '@/app/_lib/portal-coach';
 import { isLiveData } from '@/app/_lib/preview';
 import { soulPortalShell } from '@/app/_lib/portal-hubs';
 import { PortalHub, type PortalHubProps } from '@/components/features/home/portal-hub';
@@ -37,7 +36,6 @@ type PledgeGoal = Pick<
 
 export function SoulPortalHubClient() {
     const t = useTranslations();
-    const tCoach = useTranslations('features.coach');
     const tc = useTranslations('features.soul.hub.cards');
     const shell = soulPortalShell(t);
     const { householdId } = useAuth();
@@ -112,7 +110,6 @@ export function SoulPortalHubClient() {
 
     const props: PortalHubProps = {
         ...shell,
-        coach: pickPortalCoach(data?.coach ?? [], shell.fallbackCoach, tCoach, t),
         cards: [
             {
                 name: tc('stillness.name'),

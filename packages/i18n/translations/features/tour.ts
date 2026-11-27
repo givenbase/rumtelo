@@ -4,7 +4,7 @@ const tour = {
     offer: {
         eyebrow: 'Quick tour',
         title: 'Want a walkthrough of Rumtelo?',
-        body: 'A short guided tour from Home through jars, fixed costs, and income. You can skip anytime — or open Help later to replay.',
+        body: 'A short guided tour from Home through pots, fixed costs, and income. You can skip anytime — or open Help later to replay.',
         accept: 'Start the tour',
         dismiss: 'Not now',
     },
@@ -17,14 +17,14 @@ const tour = {
         take_tour: 'Take a tour',
         replay_tour: 'Replay tour',
         take_full_tour_prompt:
-            'Want the full walkthrough? Home first, then jars, fixed costs, and income.',
+            'Want the full walkthrough? Home first, then pots, fixed costs, and income.',
         replay_full_tour_prompt: 'Replay the full walkthrough from Home?',
         take_full_tour: 'Start full tour',
         replay_full_tour: 'Replay full tour',
         no_tour: 'No guided tour on this screen yet — the brief above covers the basics.',
         helpers_label: 'Show The Coach on screens',
         helpers_hint:
-            'Why-lines and jar cards from The Coach (✦ The Coach). Same as Settings → Preferences. On by default for beginners.',
+            'Why-lines and pot cards from The Coach (✦ The Coach). Same as Settings → Preferences. On by default for beginners.',
         helpers_on: 'On',
         helpers_off: 'Off',
         videos_eyebrow: 'Explain videos',
@@ -34,7 +34,7 @@ const tour = {
         video_level_feature: 'This feature',
         settings: {
             eyebrow: 'Guided tour',
-            blurb: 'Walk through Home, jars, fixed costs, and income again anytime.',
+            blurb: 'Walk through Home, pots, fixed costs, and income again anytime.',
             row_title: 'Product tour',
             row_sub: 'Same walkthrough as after setup — starts on Home',
             restart: 'Start full tour',
@@ -54,11 +54,11 @@ const tour = {
             url: '',
         },
         money: {
-            title: 'Money — six jars',
+            title: 'Money — Rumtelo Pots',
             url: '',
         },
         growth: {
-            title: 'Growth — grow in more than one direction',
+            title: 'Planning — grow in more than one direction',
             url: '',
         },
         energy: {
@@ -66,11 +66,11 @@ const tour = {
             url: '',
         },
         soul: {
-            title: 'Soul — the why',
+            title: 'Mindset — the why',
             url: '',
         },
         jars: {
-            title: 'Jars — how the split works',
+            title: 'Pots — how the split works',
             url: '',
         },
         fixed: {
@@ -88,7 +88,7 @@ const tour = {
             sections: {
                 looking_at: {
                     heading: 'What you’re looking at',
-                    body: 'This page is part of your household money and growth setup. Use Period (top right) to switch months. Numbers follow the jars split you set in Settings.',
+                    body: 'This page is part of your household money and planning setup. Use Period (top right) to switch months. Numbers follow the pots split you set in Settings.',
                 },
             },
         },
@@ -97,28 +97,41 @@ const tour = {
             sections: {
                 what_for: {
                     heading: 'What you’re looking at',
-                    body: 'Your grip snapshot for this month — The Coach, the money picture, and doors into Growth, Energy, and Soul. Start the full tour from Help to walk through Home, then jars, fixed costs, and income.',
+                    body: 'Your grip snapshot for this month — The Coach, the money picture, and doors into Planning, Energy, and Mindset. Start the full tour from Help to walk through Home, then pots, fixed costs, and income.',
+                },
+                what_for_core: {
+                    heading: 'What you’re looking at',
+                    body: 'Your grip snapshot for this month — The Coach, the money picture, and the door into Planning. Start the full tour from Help to walk through Home, then pots, fixed costs, and income.',
                 },
                 how: {
                     heading: 'How to use it',
                     body: 'Use Period (top right) to switch months. Open a portal when you want that tool. Tap Help anytime to replay this walkthrough.',
                 },
+                score: {
+                    heading: 'Your month score and level',
+                    body: 'Each month you close adds to your score. Your level grows with it: a record of your routine, not a key. Nothing opens or closes with a level.',
+                },
             },
             steps: {
-                coach: {
-                    title: 'The Coach',
+                todo: {
+                    title: 'To do',
                     content:
-                        'One tip on where you stand and one move you can make. Tips — you choose. Turn the Coach on or off in Help or Settings.',
+                        'Your next move and what else is waiting, in one place. The Coach adds one tip when it has one — you choose. Turn the Coach on or off in Help or Settings.',
                 },
                 hero: {
                     title: 'This month’s money',
                     content:
-                        'What landed in the jars, what’s left, and safe-to-spend for the period you’re viewing.',
+                        'What landed in the pots, what’s left, and safe-to-spend for the period you’re viewing.',
                 },
                 portals: {
                     title: 'Your products',
                     content:
-                        'Money lives in the top nav. Growth, Energy, and Soul open from here when you want that next tool — one product at a time.',
+                        'Money lives in the top nav. Planning, Energy, and Mindset open from here when you want that next tool — one product at a time.',
+                },
+                portals_core: {
+                    title: 'Your products',
+                    content:
+                        'Money lives in the top nav. Planning opens from here when you want that next tool.',
                 },
             },
         },
@@ -127,12 +140,12 @@ const tour = {
                 brand: {
                     title: 'Home',
                     content:
-                        'Tap the wordmark anytime to return home. Money and Growth live in the portals along the top (or bottom on mobile).',
+                        'Tap the wordmark anytime to return home. Money and Planning live in the portals along the top (or bottom on mobile).',
                 },
                 period: {
                     title: 'Period',
                     content:
-                        'Switch the month you’re looking at. Jar totals and spends follow this period.',
+                        'Switch the month you’re looking at. Pot totals and spends follow this period.',
                 },
                 help: {
                     title: 'Help',
@@ -154,7 +167,7 @@ const tour = {
                 },
                 simulator: {
                     heading: 'What a raise does',
-                    body: 'Drag the monthly net. The jar split stays; each jar amount moves with it. Pick a goal to see its date. A projection — not money moved yet.',
+                    body: 'Drag the monthly net. The pot split stays; each pot amount moves with it. Pick a goal to see its date. A projection — not money moved yet.',
                 },
                 sources: {
                     heading: 'Income sources',
@@ -174,7 +187,7 @@ const tour = {
                 simulator: {
                     title: 'What a raise does',
                     content:
-                        'Drag income up or down. Same split, different amounts per jar — and what that buys for a goal.',
+                        'Drag income up or down. Same split, different amounts per pot — and what that buys for a goal.',
                 },
                 sources: {
                     title: 'Income sources',
@@ -188,15 +201,15 @@ const tour = {
             sections: {
                 what_for: {
                     heading: 'What this page is for',
-                    body: 'OUT is recurring bills linked to jars. IN is the same income sources that feed the split. Set them once; jar coverage and leftover update automatically.',
+                    body: 'OUT is recurring bills linked to pots. IN is the same income sources that feed the split. Set them once; pot coverage and leftover update automatically.',
                 },
                 out_vs_in: {
-                    heading: 'OUT vs IN',
-                    body: 'OUT lists active fixed costs (rent, insurance, subscriptions). IN lists pay that lands every period. Leftover after costs is monthly net minus fixed OUT.',
+                    heading: 'What goes out',
+                    body: 'This list holds your active fixed costs (rent, insurance, subscriptions). Income has its own page: Money → Income. Leftover after costs is monthly net minus fixed costs.',
                 },
                 jars_use: {
-                    heading: 'How jars use this',
-                    body: 'Fixed OUT reduces available in that jar. Income is split by percentage into jars when money arrives — this screen is the plan, not the ledger.',
+                    heading: 'How pots use this',
+                    body: 'Fixed OUT reduces available in that pot. Income is split by percentage into pots when money arrives — this screen is the plan, not the ledger.',
                 },
                 mark_paid: {
                     heading: 'Planned → Paid',
@@ -205,14 +218,13 @@ const tour = {
             },
             steps: {
                 tabs: {
-                    title: 'Out vs In',
+                    title: 'Add and leftover',
                     content:
-                        'Switch between monthly bills (Out) and income sources (In). Leftover after costs shows next to + Add fixed cost / + Add income.',
+                        'Add a fixed cost here. Leftover after costs shows next to it. Your income lives under Money → Income.',
                 },
                 list: {
                     title: 'The list',
-                    content:
-                        'Out: fixed costs by jar. In: pay that funds the split. Tap a row to edit.',
+                    content: 'Your fixed costs by pot. Tap a row to open it.',
                 },
                 status: {
                     title: 'Mark paid',
@@ -222,27 +234,27 @@ const tour = {
             },
         },
         jars: {
-            title: 'My money jars',
+            title: 'My money pots',
             sections: {
                 what_for: {
-                    heading: 'What the jars are for',
-                    body: 'Six jars give your income a destination. Each jar has a job and a set percentage. Together the percentages are 100% of your income.',
+                    heading: 'What the pots are for',
+                    body: 'Rumtelo Pots give your income a destination: three pots — Basics, Future, Free. Each has a job and a percentage you set; together they make 100% of your income. Want more detail? Refine a pot into smaller ones — its percentage stays the same.',
                 },
                 how: {
                     heading: 'How it works',
-                    body: 'You enter income yourself. From your fixed percentages you see how much belongs in each jar — what you can spend or set aside for that purpose. Then work the Money pills left to right: Fixed costs → Transactions → Debt → Net worth. Rumtelo never moves money at your bank.',
+                    body: 'You enter income yourself. From the percentages you set you see how much belongs in each pot — what you can spend or set aside for that purpose. Then work the Money pills left to right: Fixed costs → Transactions → Debt → Net worth. Rumtelo never moves money at your bank.',
                 },
             },
             steps: {
                 list: {
-                    title: 'Your six jars',
+                    title: 'Your pots',
                     content:
-                        'Each row is one job for money. Tap a jar for fixed costs, spends, and what’s left this month.',
+                        'Each row is one job for money. Tap a pot for fixed costs, spends, and what’s left this month.',
                 },
                 toolbar: {
                     title: 'Add · Move',
                     content:
-                        'Log a transaction in or out, or move money between jars when a month needs it. Bank transfers stay at your bank.',
+                        'Log a transaction in or out, or move money between pots when a month needs it. Bank transfers stay at your bank.',
                 },
                 bank: {
                     title: 'You move the money',
@@ -256,7 +268,7 @@ const tour = {
             sections: {
                 what_for: {
                     heading: 'What this is for',
-                    body: 'A snapshot of the current period: jars, inbox, what you already own, and how the month is tracking.',
+                    body: 'A snapshot of the current period: pots, transactions to sort, what you already own, and how the month is tracking.',
                 },
                 how: {
                     heading: 'How it works',
@@ -269,7 +281,7 @@ const tour = {
             sections: {
                 save_vs_earn: {
                     heading: 'Save vs Earn',
-                    body: 'Save goals fill a jar toward a pile of money. Earn goals track household monthly net — when net hits the target, the goal marks itself reached.',
+                    body: 'Save goals fill a pot toward a pile of money. Earn goals track household monthly net — when net hits the target, the goal marks itself reached.',
                 },
                 pace: {
                     heading: 'Pace',
@@ -278,11 +290,11 @@ const tour = {
             },
         },
         growth: {
-            title: 'Growth',
+            title: 'Planning',
             sections: {
                 what_for: {
                     heading: 'What this area is for',
-                    body: 'Start on Overview, then go left to right: Income → Goals. Raise net, aim with one goal on Basic. Learn unlocks on Plus — books, courses, skills.',
+                    body: 'Course is your week: the three things that move your goals, set in your week check. On Basic you keep one goal; Course and Learn are in Plus.',
                 },
             },
         },
@@ -291,11 +303,11 @@ const tour = {
             sections: {
                 what_for: {
                     heading: 'What this is for',
-                    body: 'The ledger for money that already moved — Out for spend, In for gifts, refunds, and jar top-ups. Sorting here keeps each jar honest.',
+                    body: 'The ledger for money that already moved — Out for spend, In for gifts, refunds, and pot top-ups. Sorting here keeps each pot honest.',
                 },
                 how: {
                     heading: 'How it works',
-                    body: 'Pick Out or In, say what it was, choose a jar, and save. Inbox items wait until you sort them. Edits update the same period’s available balance.',
+                    body: 'Pick Out or In, say what it was, choose a pot, and save. Transactions to sort wait until you sort them. Edits update the same period’s available balance.',
                 },
             },
         },
@@ -304,11 +316,11 @@ const tour = {
             sections: {
                 what_for: {
                     heading: 'What this is for',
-                    body: 'Track what you still owe and the monthly bite it takes. Debt instalments usually leave from Necessity — this page keeps the balance in view.',
+                    body: 'Track what you still owe and the monthly bite it takes. Debt instalments usually leave from Basics — this page keeps the balance in view.',
                 },
                 how: {
                     heading: 'How it works',
-                    body: 'Add each debt with balance and payment. Review them like fixed costs: if the payment hurts the jar, the jar plan needs a rethink.',
+                    body: 'Add each debt with balance and payment. Review them like fixed costs: if the payment hurts the pot, the pot plan needs a rethink.',
                 },
             },
         },

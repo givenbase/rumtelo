@@ -181,7 +181,7 @@ When you have a real quote (“NL, AIS only, ~N households, no PIS”), replace 
 
 ## Moving money — PIS, licenses, bunq vs Revolut
 
-Everything above is **AIS** (read). "Salary lands → six jars fill *in the bank*" is **PIS** (payment initiation). This section records what we verified in Sep 2026 so we do not re-research it.
+Everything above is **AIS** (read). "Salary lands → the pots fill *in the bank*" is **PIS** (payment initiation). This section records what we verified in Sep 2026 so we do not re-research it.
 
 ### The regulatory wall
 
@@ -197,7 +197,7 @@ A PISP license is a full payment-institution application at DNB: minimum own fun
 
 - **Revolut Bank UAB** (the EU entity, NL branch) is in **Enable Banking production: AISP + PISP, SEPA**. No Revolut partnership is needed to *read* a Revolut account.
 - Revolut's own Open Banking API is for regulated TPPs only (eIDAS QWAC + QSeal). There is a "Revolut Partners — contact us" path for non-regulated parties; treat it as a long shot.
-- **Pockets are not exposed.** `GET /accounts` returns currency sub-accounts (shared IBAN, unique `AccountId`) and `UK.Revolut.InternalAccountId` entries that *cannot receive funds*. Six Rumtelo jars ≠ six Revolut Pockets. Do not promise it.
+- **Pockets are not exposed.** `GET /accounts` returns currency sub-accounts (shared IBAN, unique `AccountId`) and `UK.Revolut.InternalAccountId` entries that *cannot receive funds*. Rumtelo's pots (3 to 8 per household) ≠ Revolut Pockets. Do not promise it.
 - Every PIS payment from Revolut needs SCA in the Revolut app. No webhooks for third parties.
 
 **Conclusion:** Revolut is a fine *source* of transactions and a fine *destination IBAN*. It is not a partner for real-money jars.

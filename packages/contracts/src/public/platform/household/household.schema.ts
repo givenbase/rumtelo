@@ -7,10 +7,17 @@
 import { z } from 'zod';
 
 import { Currency, Locale } from '../../../common/common.enums';
-import { HouseholdId, Id, MemberId, UserId } from '../../../common/common.schema';
+import { HouseholdId, Id, Money, MemberId, UserId } from '../../../common/common.schema';
 import { PlanKey } from '../../../enums';
-import { HouseholdRelation, HouseholdRole, IncomeStability, SpendingStyle } from '../enums';
-import { PayoffStrategy } from '../../product/money/enums';
+import {
+    BoardStage,
+    HouseholdRelation,
+    HouseholdRole,
+    IncomeStability,
+    SpendingStyle,
+} from '../enums';
+import { JarKey, PayoffStrategy } from '../../product/money/enums';
+import { HouseholdVisibilitySettings } from './visibility';
 
 export {
     HouseholdRelation,
@@ -28,6 +35,8 @@ export const HouseholdAnswerKey = {
     JAR_EXPERIENCE: 'jar_experience',
     /** True when the post-onboard bank + jar placement wizard finished or was skipped. */
     JAR_BANK_SETUP_DONE: 'jar_bank_setup_done',
+    /** True once an OWNER hid the week-1 checklist on Home (hidden for every member). */
+    WEEK1_CHECKLIST_DISMISSED: 'week1_checklist_dismissed',
 } as const;
 
 export type HouseholdAnswerKey = (typeof HouseholdAnswerKey)[keyof typeof HouseholdAnswerKey];
@@ -95,6 +104,10 @@ export const HouseholdWeekCheckSettings = z.object({
 export const HouseholdFeatureSettings = z.object({
     isBankSyncEnabled: z.boolean(),
     isCoachEnabled: z.boolean(),
+    /** Growth Course: show the quarter layer between goals and month. */
+    isCourseQuartersEnabled: z.boolean(),
+    /** Growth Course: show the day layer under the week. */
+    isCourseDaysEnabled: z.boolean(),
 });
 
 /**
@@ -126,6 +139,8 @@ export const HouseholdSettings = z.object({
     money: HouseholdMoneySettings,
     weekCheck: HouseholdWeekCheckSettings,
     features: HouseholdFeatureSettings,
+    /** Who may see person-attributed rows (OWNER writes; Plus+ applies it). */
+    visibility: HouseholdVisibilitySettings,
     answers: HouseholdAnswers,
     /**
      * Lifestyle tags (student, renter, homeowner, …) — `Audience.key` catalog
@@ -137,6 +152,11 @@ export const HouseholdSettings = z.object({
     createdAt: z.iso.datetime(),
     /** When household board setup completed; null = incomplete. */
     onboardedAt: z.iso.datetime().nullable(),
+    /**
+     * Lowest board stage this household shows, whatever its data says. Server-written only
+     * (never in {@link HouseholdSettingsPatch}); null = derived from board data only.
+     */
+    boardStageFloor: z.enum(BoardStage).nullable(),
 });
 
 /** Partial nested patch for updateSettings (deep-merge on the server). */
@@ -148,14 +168,50 @@ export const HouseholdSettingsPatch = z.object({
     money: HouseholdMoneySettings.partial().optional(),
     weekCheck: HouseholdWeekCheckSettings.partial().optional(),
     features: HouseholdFeatureSettings.partial().optional(),
+    /** `mode` merges; `areas` replaces the whole map so "back to default" can drop keys. */
+    visibility: HouseholdVisibilitySettings.partial().optional(),
     answers: HouseholdAnswers.optional(),
     /** Whole-array replace — the picker always sends the full selection. */
     audienceKeys: z.array(z.string()).optional(),
 });
 
-/** Onboarding writes income + split + prefs in one transaction. */
+/**
+ * Seat use as the server counts it for invites: members plus pending, unexpired invitations.
+ * Counts only: no e-mails, no names.
+ */
+export const HouseholdSeatUsage = z.object({
+    /** Seats held by members (the owner counts as one). */
+    members: z.int().min(1),
+    /** Pending invitations that have not expired. */
+    pendingInvites: z.int().min(0),
+    /** Members plus pending invites in OWNER / MEMBER roles. */
+    writableUsed: z.int().min(0),
+    /** Members plus pending invites in the VIEWER role. */
+    viewerUsed: z.int().min(0),
+    /** Effective caps after seat add-ons; null = unlimited. */
+    maxMembers: z.int().nullable(),
+    maxWritable: z.int().nullable(),
+    maxViewer: z.int().nullable(),
+});
+
+/** A household has one main pot per group (3) and at most every JarKey. */
+const MIN_JARS = 3;
+const MAX_JARS = Object.values(JarKey).length;
+
+/** One jar's share in a custom split (percent, at most 2 decimals). */
+export const JarSplitShare = z.object({
+    key: z.enum(JarKey),
+    /** Percent with at most 2 decimals (e.g. 55, 12.5). */
+    percentage: z.number().min(0).max(100).multipleOf(0.01),
+});
+
+/**
+ * Onboarding writes household + income + the pots (three by default) + prefs + one "Main account"
+ * (no bank, no IBAN, every jar placed on it) in one transaction.
+ */
 export const OnboardingInput = z.object({
-    householdName: z.string().min(1).max(120),
+    /** Optional: blank / omitted falls back to a localized "My household" on the server. */
+    householdName: z.string().max(120).optional(),
     currency: z.enum(Currency).default(Currency.EUR),
     /** Creator's language — stored on their AccountSettings, not the board. */
     locale: z.enum(Locale).default(Locale.NL),
@@ -165,9 +221,34 @@ export const OnboardingInput = z.object({
     incomeStability: z.enum(IncomeStability).default(IncomeStability.STABLE),
     /** Board debt payoff default (optional at onboard). */
     payoffStrategy: z.enum(PayoffStrategy).default(PayoffStrategy.AVALANCHE),
-    monthlyNetIncome: z.int().min(0),
-    split: z.array(z.object({ key: z.string(), percentage: z.number().min(0).max(100) })),
+    /** Net monthly income in integer minor units; 0 = no income yet (no income source is made). */
+    monthlyNetIncome: z.int().min(0).max(100_000_000),
+    /**
+     * Optional custom split: 3 to every JarKey, each at most once, total exactly 100.00.
+     * Omitted = the three default pots (`defaultJarSplitFor`), the same split `previewSplit` shows.
+     */
+    split: z.array(JarSplitShare).min(MIN_JARS).max(MAX_JARS).optional(),
     why: z.string().max(500).nullable().default(null),
+});
+
+/** Input for the onboarding split preview — nothing is written, no household needed. */
+export const OnboardingSplitPreviewInput = z.object({
+    currency: z.enum(Currency),
+    /** Net monthly income in integer minor units. 0 is allowed (no income yet). */
+    monthlyNetIncome: z.int().min(0).max(100_000_000),
+    /** Optional custom split: 3 to every JarKey, each at most once, total exactly 100. Omitted = the three default pots. */
+    split: z.array(JarSplitShare).min(MIN_JARS).max(MAX_JARS).optional(),
+});
+
+/** Income split into the household's pots (3 to 8), in jar template `sortOrder`. */
+export const OnboardingSplitPreview = z.object({
+    currency: z.enum(Currency),
+    monthlyNetIncome: Money,
+    /** The sum of `amount` always equals `monthlyNetIncome`. */
+    jars: z
+        .array(z.object({ key: z.enum(JarKey), percentage: z.number(), amount: Money }))
+        .min(MIN_JARS)
+        .max(MAX_JARS),
 });
 
 // Inferred types (same-module merge for consumers)
@@ -179,4 +260,8 @@ export type HouseholdFeatureSettings = z.infer<typeof HouseholdFeatureSettings>;
 export type HouseholdAnswers = z.infer<typeof HouseholdAnswers>;
 export type HouseholdSettings = z.infer<typeof HouseholdSettings>;
 export type HouseholdSettingsPatch = z.infer<typeof HouseholdSettingsPatch>;
+export type HouseholdSeatUsage = z.infer<typeof HouseholdSeatUsage>;
+export type JarSplitShare = z.infer<typeof JarSplitShare>;
 export type OnboardingInput = z.infer<typeof OnboardingInput>;
+export type OnboardingSplitPreviewInput = z.infer<typeof OnboardingSplitPreviewInput>;
+export type OnboardingSplitPreview = z.infer<typeof OnboardingSplitPreview>;

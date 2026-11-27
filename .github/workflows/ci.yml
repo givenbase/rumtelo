@@ -1,0 +1,86 @@
+name: ✅ Rumtelo CI - Lint, types, tests, build
+
+# The static gate: no secrets, no GitHub environment, no database.
+# Runs what agents run by hand before a commit, so a red type check or test is
+# visible on the pull request and on every push to dev (staging) / main (production).
+#
+# It does not block the Railway deploy by itself — Railway builds from the branch.
+# To make it blocking: branch protection (required check) or Railway "Wait for CI".
+
+on:
+    pull_request:
+    push:
+        branches: [dev, main]
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: ci-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    ci:
+        name: Lint, types, tests, build
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+
+        env:
+            # Placeholders, not secrets: the Next apps validate these public origins at
+            # build time (apps/application/app/_utils/get-env.ts, apps/website/lib/get-env.ts)
+            # when NODE_ENV=production. Same values as the local dev defaults; nothing is
+            # deployed from this job. DOMAIN_BACK falls back to NEXT_PUBLIC_DOMAIN_BACK.
+            NEXT_PUBLIC_DOMAIN_APP: http://localhost:3000
+            NEXT_PUBLIC_DOMAIN_WEB: http://localhost:3001
+            NEXT_PUBLIC_DOMAIN_BACK: http://localhost:3002
+            NEXT_TELEMETRY_DISABLED: '1'
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v5
+              with:
+                  # The job only reads the repo; don't leave the token in .git/config.
+                  persist-credentials: false
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v6
+
+            - name: Setup Node
+              uses: actions/setup-node@v5
+              with:
+                  node-version: '22.22.2'
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            # Every consumer resolves @rumtelo/contracts to dist/ (package exports).
+            - name: Build contracts
+              run: pnpm --filter @rumtelo/contracts build
+
+            # oxlint + oxfmt --check + backend entity lint + `pnpm check-types` (all packages).
+            - name: Lint, format, entity lint, type check
+              run: pnpm lint:check
+
+            # Backend Vitest + utils and i18n node:test. Root `pnpm test` is `turbo run test`,
+            # which also picks up @rumtelo/e2e (Playwright, needs browsers and a running
+            # target) — left out here; e2e-smoke.yml owns it.
+            - name: Unit tests
+              run: pnpm test --filter='!@rumtelo/e2e'
+
+            # contracts and application have no `test` script; same commands as run by hand
+            # (tsx comes from the backend's devDependencies).
+            - name: Contracts node tests
+              working-directory: packages/contracts
+              run: ../../apps/backend/node_modules/.bin/tsx --test 'src/**/*.test.ts'
+
+            - name: Application node tests
+              working-directory: apps/application
+              run: ../backend/node_modules/.bin/tsx --test 'app/**/*.test.ts'
+
+            - name: Build application
+              run: pnpm --filter @rumtelo/application build
+
+            - name: Build website
+              run: pnpm --filter @rumtelo/website build

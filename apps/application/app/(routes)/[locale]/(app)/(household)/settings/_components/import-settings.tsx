@@ -8,6 +8,13 @@ import { Button, StubNotice } from '@rumtelo/ui';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { api } from '@/app/_lib/api';
+import { apiErrorKeyOf } from '@/app/_lib/api-error-key';
+import { useApiError } from '@/app/_lib/api-error-messages';
+import {
+    archiveRestoreErrorCopyKey,
+    archiveWarningLines,
+    capArchiveWarningLines,
+} from '@/app/_lib/archive-warning-copy';
 import {
     archivePayloadFromFile,
     type ArchiveImportFound,
@@ -122,6 +129,7 @@ export function ImportSettings() {
     const { householdId } = useAuth();
     const { showToast } = useHouseholdShell();
     const { planReady } = usePlanCapabilities();
+    const apiError = useApiError();
     const live = isLiveData(householdId);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [busy, setBusy] = useState<Busy>(null);
@@ -201,8 +209,19 @@ export function ImportSettings() {
                 ),
                 'success'
             );
-        } catch {
-            showToast(t('pages.settings.toasts.import_failed'), 'error');
+        } catch (error) {
+            // A refused file names its own problem (a bad IBAN, a missing month): say it, with
+            // the next move for a file. An error with no key is the generic import failure.
+            const apiKey = apiErrorKeyOf(error);
+            const restoreCopyKey = archiveRestoreErrorCopyKey(apiKey);
+            showToast(
+                restoreCopyKey
+                    ? t(restoreCopyKey)
+                    : apiKey
+                      ? apiError(error)
+                      : t('pages.settings.toasts.import_failed'),
+                'error'
+            );
         } finally {
             setBusy(null);
         }
@@ -210,6 +229,7 @@ export function ImportSettings() {
 
     const canAct = live && planReady && busy === null && payload !== null;
     const detected = found ? foundParts(t, found) : [];
+    const warnings = capArchiveWarningLines(preview ? archiveWarningLines(preview.warnings) : []);
 
     return (
         <SettingsPanel>
@@ -341,6 +361,35 @@ export function ImportSettings() {
                                     {line}
                                 </p>
                             ))}
+                            {warnings.shown.length > 0 ? (
+                                <div
+                                    role="status"
+                                    className="mt-1 grid min-w-0 gap-1.5 border-t border-line pt-2.5">
+                                    <p className="text-[13px] font-semibold text-fg">
+                                        {t(
+                                            preview.dryRun
+                                                ? 'pages.settings.panels.import.warnings.title_preview'
+                                                : 'pages.settings.panels.import.warnings.title_done'
+                                        )}
+                                    </p>
+                                    <ul className="grid min-w-0 list-disc gap-1.5 pl-4 marker:text-accent">
+                                        {warnings.shown.map(line => (
+                                            <li
+                                                key={`${line.key}|${JSON.stringify(line.values)}`}
+                                                className="min-w-0 text-xs leading-snug text-pretty break-words text-fg-muted">
+                                                {t(line.key, line.values)}
+                                            </li>
+                                        ))}
+                                        {warnings.hidden > 0 ? (
+                                            <li className="min-w-0 text-xs leading-snug text-fg-muted">
+                                                {t('pages.settings.panels.import.warnings_more', {
+                                                    count: String(warnings.hidden),
+                                                })}
+                                            </li>
+                                        ) : null}
+                                    </ul>
+                                </div>
+                            ) : null}
                             {preview.dryRun ? (
                                 <div className="flex flex-wrap gap-2.5 pt-1">
                                     <Button

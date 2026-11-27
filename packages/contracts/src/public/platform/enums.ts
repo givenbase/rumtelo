@@ -35,6 +35,60 @@ export enum HouseholdRelation {
     EXTERNAL = 'EXTERNAL',
 }
 
+/**
+ * Who may see a person-attributed row besides its maker.
+ * Ordered PRIVATE < OWNER < HOUSEHOLD; a row with no maker (`account = null`) is "together".
+ */
+export enum Visibility {
+    /** Only the maker. */
+    PRIVATE = 'PRIVATE',
+    /** The maker and the household OWNER. */
+    OWNER = 'OWNER',
+    /** The maker and every participant (OWNER / MEMBER, never EXTERNAL). */
+    HOUSEHOLD = 'HOUSEHOLD',
+}
+
+/**
+ * The choice offered in forms — {@link Visibility} plus SHARED ("together":
+ * no maker, every participant may edit).
+ */
+export enum VisibilityChoice {
+    PRIVATE = 'PRIVATE',
+    OWNER = 'OWNER',
+    HOUSEHOLD = 'HOUSEHOLD',
+    SHARED = 'SHARED',
+}
+
+/** Household rule (OWNER-set) for what members may share. */
+export enum HouseholdSharingMode {
+    /** Everyone keeps everything to themselves — the owner too. */
+    SEPARATE = 'SEPARATE',
+    /** Members: only me or share with the owner. Owner: every option. */
+    OWNER_SEES = 'OWNER_SEES',
+    /** Everyone has every option. */
+    TOGETHER = 'TOGETHER',
+}
+
+/**
+ * A kind of person-attributed data. Each table with personal rows belongs to
+ * exactly one area; the household may set a {@link HouseholdSharingMode} per area.
+ */
+export enum VisibilityArea {
+    GROWTH_COURSE = 'growth.course',
+    GROWTH_LEARN = 'growth.learn',
+    ENERGY_LOG = 'energy.log',
+    ENERGY_TIME = 'energy.time',
+    SOUL_GRATITUDE = 'soul.gratitude',
+    MONEY_INCOME = 'money.income',
+    MONEY_PERSONAL = 'money.personal',
+}
+
+/** How the viewer reached the household — a seat, or a Practice coach preview. */
+export enum HouseholdAccessSource {
+    SEAT = 'SEAT',
+    PRACTICE = 'PRACTICE',
+}
+
 export enum CoachKind {
     NUDGE = 'NUDGE',
     WIN = 'WIN',
@@ -55,6 +109,35 @@ export enum SpendingStyle {
 }
 
 /**
+ * How a person earns their living right now — person-scoped, self-declared and optional.
+ * Used only to order goal presets (see `presetsFor` in the Growth Course leaf).
+ */
+export enum WorkSituation {
+    EMPLOYED = 'EMPLOYED',
+    SELF_EMPLOYED = 'SELF_EMPLOYED',
+    /** A job and a business side by side. */
+    BOTH = 'BOTH',
+    STUDENT = 'STUDENT',
+    /** Looking for work or a next step. */
+    SEEKING = 'SEEKING',
+}
+
+/**
+ * What a person wants from the coming year — person-scoped, self-declared and optional.
+ * Sets the tone of the "Plan your year" intake, never a rule.
+ */
+export enum YearIntention {
+    /** Keep things steady, protect what works. */
+    CALM = 'CALM',
+    /** Stretch a little further in what is already running. */
+    GROW = 'GROW',
+    /** Start something new. */
+    BUILD = 'BUILD',
+    /** Catch their breath after a hard stretch. */
+    RECOVER = 'RECOVER',
+}
+
+/**
  * Board-level income volatility — shared cash-flow picture for coaching.
  * NONE = no recurring inflow right now (same coaching case as ~€0 net).
  */
@@ -65,7 +148,7 @@ export enum IncomeStability {
 }
 
 /**
- * How familiar the household is with the six-jar method — drives bank-setup coaching.
+ * How familiar the household is with splitting income into pots — drives bank-setup coaching.
  * Stored in `HouseholdAnswers` under {@link HouseholdAnswerKey.JAR_EXPERIENCE}.
  */
 export enum JarExperience {
@@ -164,4 +247,21 @@ export enum DeviceCapability {
     HEART_RATE = 'HEART_RATE',
     ALARM = 'ALARM',
     MIND = 'MIND',
+}
+
+/**
+ * How far a household board has come, in the order it is walked (a higher stage includes
+ * everything below). Guidance for what the shell shows first — never an access control:
+ * plan decides whether a surface exists, role decides who may use it. Compare with
+ * `BOARD_STAGE_ORDER`.
+ */
+export enum BoardStage {
+    /** Onboarded: the split exists. Day 1. */
+    SPLIT = 'SPLIT',
+    /** Five lines sorted, or five days old. Week 1. */
+    SORTING = 'SORTING',
+    /** A money week check was completed (or the plan is paid). Weeks 2-4. */
+    ROUTINE = 'ROUTINE',
+    /** A month was closed. */
+    MONTH = 'MONTH',
 }

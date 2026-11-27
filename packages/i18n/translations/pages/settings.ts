@@ -7,9 +7,9 @@ const settings = {
     sections: {
         general: 'General',
         money: 'Money',
-        growth: 'Growth',
+        growth: 'Planning',
         energy: 'Energy',
-        soul: 'Soul',
+        soul: 'Mindset',
         data: 'Data',
     },
     tabs: {
@@ -20,7 +20,7 @@ const settings = {
         security: { label: 'Security', sub: 'Password and sign-in' },
         practice: { label: 'Practice coaches', sub: 'Accept or unlink coaches' },
         plan: { label: 'Plan', sub: 'What you use and pay' },
-        jars: { label: 'Jars', sub: 'Split, accounts, coach' },
+        jars: { label: 'Pots', sub: 'Split, accounts, coach' },
         debt: { label: 'Debt', sub: 'Payoff method' },
         parties: { label: 'Parties', sub: 'Saved names across money' },
         bank: { label: 'Bank', sub: 'Accounts and PSD2' },
@@ -70,7 +70,7 @@ const settings = {
         },
     },
     delete: {
-        body: 'Your household, jars, and full transaction history will be deleted. This cannot be undone — export your data first.',
+        body: 'Your household, pots, and full transaction history will be deleted. This cannot be undone — export your data first.',
     },
     plan: {
         members_unlimited: 'Unlimited members',
@@ -131,9 +131,10 @@ const settings = {
         upgrade_overlay_body:
             'You chose {plan} ({interval}) on the website. Account setup is done — next is Stripe Checkout to activate the plan. You can skip and stay on Basic, then upgrade anytime in Settings → Plan.',
         stay_on_basic: 'Stay on Basic',
-        add_seat_cta: 'Add a seat (€2.50 / month)',
+        add_seat_cta: 'Add a seat under Plan',
+        add_seat_owner: 'Ask the owner to add a seat.',
         add_seat_stub:
-            'Extra seats are coming soon — you can still use the seats included in your plan.',
+            'Need more people on the board? A paid plan can add extra seats — the price is shown under Plan.',
     },
     saved: 'Settings saved',
     save_failed: 'Could not save settings',
@@ -146,6 +147,11 @@ const settings = {
     legal_name: 'Legal name',
     born: 'Born {date}',
     panels: {
+        /** Account tab: the "Show everything now" switch (labels reuse `pages.nav.show_all.*`). */
+        start: {
+            eyebrow: 'Your start',
+            blurb: 'New boards start with pots, transactions and the week check. The rest joins your menu after your first week check and your first closed month.',
+        },
         profile: {
             eyebrow: 'Profile',
             blurb: 'Greeting name starts from your legal name at signup — change it anytime. Legal name, phone, and birthday live on your account.',
@@ -158,9 +164,21 @@ const settings = {
             date_of_birth: 'Date of birth',
             add_details: 'Add name, phone, and date of birth',
         },
+        dream: {
+            eyebrow: 'Your dream',
+            blurb: 'What this household works towards, in a sentence. It shows on Home for everyone in the household.',
+            label: 'Your dream',
+            hint: 'Optional. Leave it empty to clear it.',
+            owner_only: 'Only the owner can change this.',
+            empty: 'Not written yet.',
+            counter: '{count} of {max}',
+            save: 'Save dream',
+            saving: 'Saving…',
+            saved: 'Dream saved',
+        },
         money_style: {
             eyebrow: 'How you handle money',
-            blurb: 'Personal style — partners can differ. Tips on the jar split use this. Debt payoff order lives under Debt settings for the whole board.',
+            blurb: 'Personal style — partners can differ. Tips on the pot split use this. Debt payoff order lives under Debt settings for the whole board.',
             spender: 'Spender',
             spender_sub: 'Joy first',
             saver: 'Saver',
@@ -183,7 +201,7 @@ const settings = {
         },
         household: {
             eyebrow: 'Household',
-            blurb_suffix: 'Members share jars, rules, and transaction history.',
+            blurb_suffix: 'Members share pots, rules, and transaction history.',
             members_stub: 'Members appear here once you have a household.',
             last_seen: 'Last seen {when}',
             last_seen_never: 'Not signed in yet',
@@ -195,6 +213,8 @@ const settings = {
             invite_email: 'Invite (email)',
             invite_placeholder: 'partner@example.com',
             invite_role: 'Access',
+            remove_member: 'Remove',
+            remove_member_confirm: 'Click again to remove',
             role_owner: 'Owner',
             role_member: 'Member',
             role_viewer: 'Viewer',
@@ -281,14 +301,17 @@ const settings = {
         },
         coach: {
             eyebrow: 'The Coach',
-            blurb: 'The Coach never scolds — only clear next moves. On-screen tips (why-lines, jar cards) stay on while you learn; the inbox at Home → The Coach holds tip cards across money, growth, energy, and soul.',
+            blurb: 'The Coach never scolds — only clear next moves. On-screen tips (why-lines, pot cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money, planning, energy, and mindset.',
+            blurb_core:
+                'The Coach never scolds — only clear next moves. On-screen tips (why-lines, pot cards) stay on while you learn; the tip list at Home → The Coach holds tip cards across money and planning.',
             toggle: 'Show The Coach on screens',
-            hint_on: 'On — look for the ✦ The Coach mark. Inbox stays at Home → The Coach.',
-            hint_off: 'Off — on-screen tips hidden. The Coach inbox still available anytime.',
+            hint_on: 'On — look for the ✦ The Coach mark. Your tips stay at Home → The Coach.',
+            hint_off:
+                'Off — on-screen tips hidden. Your tips are still at Home → The Coach anytime.',
         },
         jars_placement: {
-            eyebrow: 'Where each jar sits',
-            blurb: 'Mix freely — Necessity on your current account, the rest as pots, Financial Freedom on a real savings account.',
+            eyebrow: 'Where each pot sits',
+            blurb: 'Mix freely — Basics on your current account, the rest as savings pots at your bank. Investing can sit on its own account.',
             accounts_one: '{count} account',
             accounts_other: '{count} accounts',
             no_accounts: 'No accounts',
@@ -323,6 +346,9 @@ const settings = {
             eyebrow: 'Your parties',
             blurb: 'Names you saved for next time — employers, landlords, lenders, shops. Edit style here; deleting keeps the text on old rows.',
             empty: 'No saved parties yet. Tick “Save for next time” when you type a free name on income, bills, or loans.',
+            search_placeholder: 'Search saved parties…',
+            search_aria: 'Search parties',
+            empty_search: 'No parties match that search.',
             field_name: 'Name',
             field_note: 'Note',
             field_icon: 'Icon',
@@ -346,7 +372,7 @@ const settings = {
             linked_count: '{count} linked',
             none_linked: 'None linked',
             empty_linked_title: 'No live bank links yet.',
-            empty_linked_body: 'Connect a bank to pull transactions into the Inbox automatically.',
+            empty_linked_body: 'Connect a bank to pull transactions in automatically.',
             connect_bank: 'Connect a bank',
             capacity_usage_aria: '{used} of {max} bank links',
             wizard_step_institution: '1 · Choose bank',
@@ -368,7 +394,7 @@ const settings = {
                 'No {bank} accounts yet. Create one below — it will be labelled for that bank.',
             wizard_authorize: 'Continue to bank',
             wizard_authorize_hint:
-                'Next you leave Rumtelo briefly, sign in at the bank, and approve read-only access. We never move money. When you return, transactions sync into your Inbox.',
+                'Next you leave Rumtelo briefly, sign in at the bank, and approve read-only access. We never move money. When you return, your transactions sync and wait under To sort.',
             wizard_authorize_what_1: 'Read-only: balances and transactions only.',
             wizard_authorize_what_2: 'You can disconnect this link any time in Settings.',
             wizard_authorize_what_3: 'After approval we sync once, then return you here.',
@@ -405,10 +431,10 @@ const settings = {
                 'CSV import and seats without live sync. These are separate from Open Banking links above.',
             import_eyebrow: 'Statement file import',
             import_blurb:
-                'Prefer CAMT.053 from your bank. MT940 or CSV work too. After import, sort the Inbox and link matching fixed costs.',
+                'Prefer CAMT.053 from your bank. MT940 or CSV work too. After import, sort what waits under To sort and link matching fixed costs.',
             account_label: 'Account label',
             account_label_hint:
-                'Shown in jars and CSV — e.g. Operating checking, or Creditcard · t.n.v. Avery Chen.',
+                'Shown in pots and CSV — e.g. Operating checking, or Creditcard · t.n.v. Avery Chen.',
             type: 'Type',
             search_bank: 'Search bank — e.g. ING, Bunq',
             type_bank_name: 'Type a bank name…',
@@ -447,7 +473,97 @@ const settings = {
             blurb: 'How far ahead the goal and freedom calculations look. Shorter feels urgent, longer shows the compounding.',
             horizon_aria: 'Planning horizon in months',
             months: '{count} months',
-            stub: 'Horizon persists with growth settings when that API lands.',
+            stub: 'Horizon persists with planning settings when that API lands.',
+        },
+        course_calendar: {
+            eyebrow: 'Your calendar',
+            blurb: 'Mirror Course into Google, Apple or Outlook. One way: tick off in Rumtelo, your calendar shows it.',
+            off_lead: 'Off. Switch it on to get your own secret calendar address.',
+            enable: 'Switch on',
+            enabled: 'Calendar feed on',
+            saved: 'Calendar saved',
+            rotated: 'New address made. The old one stopped working.',
+            disabled: 'Calendar feed off',
+            url_label: 'Your secret address',
+            copy: 'Copy',
+            copied: 'Address copied',
+            copied_short: 'Copied',
+            copy_failed: 'Could not copy. Select the address and copy it yourself.',
+            url_secret:
+                'Anyone with this address sees what it shows. Make a new one if you shared it by mistake.',
+            add_google: 'Add to Google',
+            add_apple: 'Add to Apple Calendar',
+            add_outlook: 'Add to Outlook',
+            refresh_note:
+                'Google refreshes a subscribed calendar slowly (hours, sometimes a day) and skips reminders. Apple and Outlook refresh sooner and show them.',
+            source_focus_week_title: 'Your 3 for the week',
+            source_focus_week_sub: 'One all-day row from Monday to Sunday.',
+            source_focus_day_title: 'Your 3 for today',
+            source_focus_day_sub: 'Only when the day layer is on.',
+            source_rhythm_title: 'Routines',
+            source_rhythm_sub: 'On the days of their pattern.',
+            source_rituals_title: 'Week checks and month close',
+            source_rituals_sub: 'With reminders.',
+            source_sleep_title: 'Sleep advice',
+            source_sleep_sub: 'From your Energy template.',
+            source_partner_title: 'Others in the household',
+            source_partner_sub: 'Only what they share with you.',
+            lead_label: 'Month close reminder',
+            lead_same_day: 'On the last day',
+            lead_days: '{count} days before',
+            lead_hint:
+                '"Not now" moves it to the last day. After that it stays until the month is closed.',
+            last_fetched: 'Last fetched {when, date, short} {when, time, short}',
+            rotate: 'New address',
+            disable: 'Switch off',
+        },
+        course_layers: {
+            eyebrow: 'Course layers',
+            blurb: 'Course shows goals, month and week. Switch on more steps if you like to plan that way. Switching off only hides; nothing is deleted.',
+            quarters_title: 'Quarter step',
+            quarters_sub: 'A step between your goals and the month.',
+            days_title: 'Day planning',
+            days_sub: 'A top 3 for each day under your week.',
+            saved: 'Course layers saved',
+        },
+        sharing: {
+            eyebrow: 'Privacy and sharing',
+            blurb: 'What members may share in Planning, Energy, Mindset and Money. Only the owner changes this. Keeping something to yourself is always possible.',
+            blurb_core:
+                'What members may share in Planning and Money. Only the owner changes this. Keeping something to yourself is always possible.',
+            owner_only: 'Only the owner of the household can change this.',
+            mode_label: 'What may members share?',
+            modes: {
+                SEPARATE: {
+                    name: 'Each on their own',
+                    desc: 'Everyone keeps everything to themselves, you too. No shared goals.',
+                },
+                OWNER_SEES: {
+                    name: 'Owner looks along',
+                    desc: 'Members choose: only me, or share with you. You can share with everyone and make shared goals.',
+                },
+                TOGETHER: {
+                    name: 'Together',
+                    desc: 'Everyone has the same choices as you, including shared goals.',
+                },
+            },
+            areas_title: 'Per part',
+            areas_reset: 'Back to default',
+            area_default: 'Default',
+            area_sensitive: 'Sensitive',
+            area_custom: 'Custom',
+            areas: {
+                growth_course: 'Course goals',
+                growth_learn: 'Learning',
+                energy_log: 'Energy readings (sleep, training, food)',
+                energy_time: 'Time use',
+                soul_gratitude: 'Gratitude',
+                money_income: 'Income per person',
+                money_personal: 'Personal accounts and spending',
+            },
+            private_always:
+                'Only me is always possible. What someone keeps to themselves, you never see, not even as owner.',
+            saved: 'Sharing saved',
         },
         energy: {
             eyebrow: 'Your baseline',
@@ -462,7 +578,7 @@ const settings = {
         },
         stillness: {
             eyebrow: 'Your daily stillness',
-            blurb: 'How long you sit. Short and daily beats long and occasional — this is the one practice that costs nothing and protects every jar.',
+            blurb: 'How long you sit. Short and daily beats long and occasional — this is the one routine that costs nothing and protects every pot.',
             minutes_aria: 'Daily stillness minutes',
             minutes: '{count} min',
             stub: 'Intention templates and reminders — coming soon.',
@@ -477,15 +593,15 @@ const settings = {
             rules: {
                 split: {
                     name: 'Auto-split on income',
-                    desc: 'Everything that arrives goes straight into the jars, 55/10/10/10/10/5.',
+                    desc: 'Everything that arrives goes straight into the pots, by the split you set.',
                 },
                 guard: {
-                    name: 'Jar guard',
-                    desc: 'Warn as soon as a jar passes 90% of its allocation.',
+                    name: 'Pot guard',
+                    desc: 'Warn as soon as a pot passes 90% of its allocation.',
                 },
                 sweep: {
                     name: 'Sweep surplus',
-                    desc: 'Whatever is left in Necessity on the 1st moves to Financial Freedom.',
+                    desc: 'Whatever is left in Basics on the 1st moves to Investing if that pot is on, otherwise to Future.',
                 },
             },
         },
@@ -493,14 +609,17 @@ const settings = {
             eyebrow: 'What you use and pay',
             blurb: 'Three plans: Basic, Plus, and Max. Start on Basic — nothing you have entered is ever locked away.',
             card_basic_tag: 'From {price}',
-            card_basic_line:
-                'Solo board — the six jars and the practice underneath. No bank needed.',
-            card_basic_feats: '{members} · Solo only · MONEY jars · 1 goal · Coach',
+            card_basic_line: 'Solo board — your pots and the routine underneath. No bank needed.',
+            card_basic_feats: '{members} · Solo only · MONEY pots · 1 goal · Coach',
             card_plus_tag: 'Most chosen',
             card_plus_line:
                 'Share the board with family or friends — debt, Learn, energy week, and more goals.',
             card_plus_feats: '{members} · Debt · Learn · ENERGY · Goals',
+            card_plus_line_core:
+                'Share the board with family or friends — debt, Learn, Course, and more goals.',
+            card_plus_feats_core: '{members} · Debt · Learn · Course · Goals',
             card_max_tag: 'All four portals',
+            card_max_tag_core: 'Everything, no limits',
             card_max_line: 'Unlimited household, income curve, Learn, and net worth.',
             card_max_feats: '{members} · MONEY · Masterclass Learn · Net worth',
             monthly: 'Monthly',
@@ -531,6 +650,14 @@ const settings = {
                 'Stripe not configured — paid upgrades are locked. Households stay on Basic until billing is enabled.',
             stub_billing:
                 'Upgrades charge now. Downgrades keep your current plan until the paid period ends. Manage card & invoices via Stripe Portal.',
+            /** Extra seats on an active subscription; `{price}` comes from `SEAT_ADDON_UNIT_CENTS`. */
+            seat_addon_eyebrow: 'Extra seats',
+            seat_addon_blurb:
+                'Room for one more person on the board: €{price} a month per seat, billed with your plan.',
+            seat_contributor: 'Member seat (can edit)',
+            seat_viewer: 'Viewer seat (looks along)',
+            seat_count_active: '{count, plural, one {# extra seat} other {# extra seats}}',
+            seat_count_none: 'No extra seats',
         },
         export: {
             eyebrow: 'Everything to CSV or JSON',
@@ -551,20 +678,20 @@ const settings = {
             sheet_parties_cols: 'name · aliases · branding',
             sheet_accounts: 'Bank accounts',
             sheet_accounts_cols: 'name · bank · IBAN · reconnect',
-            sheet_jars: 'Jars',
+            sheet_jars: 'Pots',
             sheet_jars_cols: 'key · name · % · allocated',
             sheet_income: 'Income',
             sheet_income_cols: 'label · amount · kind',
             sheet_fixed: 'Fixed costs',
-            sheet_fixed_cols: 'name · amount · jar',
+            sheet_fixed_cols: 'name · amount · pot',
             sheet_transactions: 'Transactions',
             sheet_transactions_cols: 'date · amount · description · payee',
             sheet_debts: 'Debts',
             sheet_debts_cols: 'name · rate · balance',
             sheet_goals: 'Goals',
-            sheet_goals_cols: 'name · target · jar',
+            sheet_goals_cols: 'name · target · pot',
             sheet_rules: 'Rules',
-            sheet_rules_cols: 'match · jar · priority',
+            sheet_rules_cols: 'match · pot · priority',
             sheet_rows_one: '{count} row',
             sheet_rows_other: '{count} rows',
             sheet_rows_loading: '…',
@@ -573,12 +700,12 @@ const settings = {
             download_json: 'Download JSON',
             download_csv: 'Download CSV',
             format_note:
-                'Everything downloads a zip with one real CSV file per subject (settings, jars, income, transactions, …). Transactions-only and this month are a single CSV with portable columns (date, amount, description, payee, jar, note). JSON is the full Rumtelo archive — use Import to restore it later.',
+                'Everything downloads a zip with one real CSV file per subject (settings, pots, income, transactions, …). Transactions-only and this month are a single CSV with portable columns (date, amount, description, payee, pot, note). JSON is the full Rumtelo archive — use Import to restore it later.',
             sign_in_stub: 'Sign in to download exports.',
         },
         import: {
             eyebrow: 'Restore a Rumtelo file',
-            blurb: 'Choose a JSON archive, a CSV zip, or a single CSV sheet from Export. Board and account settings apply when present; jars remap by key; duplicates are skipped. Debts and goals follow your plan.',
+            blurb: 'Choose a JSON archive, a CSV zip, or a single CSV sheet from Export. Board and account settings apply when present; pots remap by key; duplicates are skipped. Debts and goals follow your plan.',
             choose: 'Choose JSON, CSV, or zip',
             preview: 'Preview import',
             confirm: 'Import into this household',
@@ -593,8 +720,8 @@ const settings = {
             found_parties_other: '{count} parties',
             found_accounts_one: '{count} bank account',
             found_accounts_other: '{count} bank accounts',
-            found_jars_one: '{count} jar',
-            found_jars_other: '{count} jars',
+            found_jars_one: '{count} pot',
+            found_jars_other: '{count} pots',
             found_income_one: '{count} income',
             found_income_other: '{count} income',
             found_fixed_one: '{count} fixed cost',
@@ -613,11 +740,56 @@ const settings = {
             will: '{count} will import',
             skipped: '{count} skipped',
             skipped_plan: '{count} skipped (plan)',
-            split_ok: 'Jar split will be applied',
-            split_skip: 'Jar split unchanged',
+            split_ok: 'Pot split will be applied',
+            split_skip: 'Pot split unchanged',
             format_note:
                 'Accepts Rumtelo JSON, the CSV zip from Export, or one sheet (settings.csv, jars.csv, transactions.csv, …). We detect the sheet from the file name or columns. Bank statement CSVs still go under Bank.',
             sign_in_stub: 'Sign in to import data.',
+            /** Restore errors whose standard copy points at a form this screen does not have. */
+            errors: {
+                invalid_iban:
+                    'An IBAN in the file is not valid. Fix that row in the CSV, or export again, then import again. What is already in is skipped.',
+                due_month_required:
+                    'A quarterly or yearly fixed cost in the file has no month it is charged in. Add the month to that row in the CSV, or export again, then import again.',
+                settlement_account_invalid:
+                    'A row in the file names an account to pay from that is not valid. Fix that row in the CSV, or export again, then import again.',
+            },
+            warnings_more: 'and {count} more',
+            /** Restore warnings (`ArchiveRestoreResult.warnings`): what happened, then one next move. */
+            warnings: {
+                title_preview: 'Check before you import',
+                title_done: 'Imported, with a few things to look at',
+                generic:
+                    'Part of this file could not be applied. Check the counts above, then add what is missing by hand.',
+                jar_split_incomplete:
+                    'The pot split in the file does not match the pots you have on, so your split stays as it is. Set it under Pots.',
+                jar_split_not_100:
+                    'The pot split in the file does not add up to 100%, so your split stays as it is. Set it under Pots.',
+                bank_unknown_key:
+                    'The bank "{bank}" from the file is not available here, so its accounts are skipped. Add them by hand under Bank.',
+                bank_unknown:
+                    'A bank from the file is not available here, so its accounts are skipped. Add them by hand under Bank.',
+                account_reconnect_needed:
+                    'Accounts that were linked to a bank come in unlinked. Link them again under Bank.',
+                settlement_account_missing:
+                    'A credit account could not be tied to the account that pays it off. Choose the paying account on the credit account.',
+                asset_link_unmapped:
+                    'Some items pointed to an asset this household does not have, so that link is empty. Add the asset, then link it again.',
+                debts_skipped_plan:
+                    'Your plan does not include debts, so they are skipped. Look under Plan to bring them in.',
+                goals_skipped_plan:
+                    'Your plan does not include goals, so they are skipped. Look under Plan to bring them in.',
+                goals_limit_reached:
+                    'You have reached the goal limit of your plan, so the other goals are skipped. Finish a goal or look under Plan.',
+                fixed_cost_jar_unmapped:
+                    'Some fixed costs have no pot here that takes bills, so they are skipped. Turn that pot on under Pots, or add the cost by hand.',
+                goal_give_pot_missing:
+                    'Giving goals need the Giving pot, which is off in this household, so they are skipped. Turn it on under Pots, then import again.',
+                household_settings_skipped_role:
+                    'Household settings in the file are skipped, because only the owner can change them. Ask the owner to import the file.',
+                personal_direction_skipped:
+                    'The file holds a personal "Where you\'re going" text. That is never imported; write your own under Mindset.',
+            },
         },
         sign_out_sub: 'You stay signed in for 30 days on this device',
     },
@@ -627,6 +799,8 @@ const settings = {
         password_failed: 'Password change failed',
         invitation_sent: 'Invitation sent',
         invitation_failed: 'Invitation failed',
+        member_removed: 'Member removed',
+        member_remove_failed: 'Could not remove member',
         language_saved: 'Language saved',
         language_failed: 'Language save failed',
         currency_saved: 'Currency saved',

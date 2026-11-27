@@ -7,6 +7,7 @@ import {
     PLAN_CAPABILITY_GRANTS,
     PLAN_LIMITS,
     PLAN_RANK,
+    PLAN_RETAIL_CENTS,
     PlanKey,
     capabilitiesFor,
     featuresForProduct,
@@ -25,7 +26,7 @@ import {
     type PlanLimitKey,
 } from '@rumtelo/contracts';
 import type { TranslateFn } from '@rumtelo/i18n';
-import { formatPlanPrice, toMinorUnits } from '@rumtelo/utils';
+import { formatPlanPrice } from '@rumtelo/utils';
 
 /**
  * Plan gating — plan → product → feature (`{product}-{feature}`).
@@ -43,6 +44,7 @@ export {
     PLAN_CAPABILITY_GRANTS,
     PLAN_LIMITS,
     PLAN_RANK,
+    PLAN_RETAIL_CENTS,
     PlanKey,
     capabilitiesFor,
     featuresForProduct,
@@ -80,32 +82,82 @@ export function planLabel(key: PlanKey, t?: TranslateFn): string {
     return t?.(`pages.landing.plans.${planSlug(key)}.name`) ?? PLAN_LABELS[key];
 }
 
-/** List price shown on upgrade CTAs — Stripe catalog currency (EUR), not board money. */
+/**
+ * Monthly retail amount of a paid plan, formatted in EUR (Stripe catalog currency, never the
+ * household board currency). Reads `PLAN_RETAIL_CENTS`, so a price change is one edit there.
+ * Basic has no price: returns `null`.
+ */
+export function planAmountLabel(plan: PlanKey, locale?: string): string | null {
+    if (plan === PlanKey.BASIC) return null;
+    return formatPlanPrice(PLAN_RETAIL_CENTS[plan].month, { locale });
+}
+
+/** List price shown on upgrade CTAs and plan cards: "Free" or "{amount} / month". */
 export function planPriceLabel(plan: PlanKey, t?: TranslateFn): string {
-    if (plan === PlanKey.BASIC) {
+    const amount = planAmountLabel(plan);
+    if (amount === null) {
         return t?.('pages.settings.plan.price_free') ?? formatPlanPrice(0);
     }
-    const cents = plan === PlanKey.PLUS ? toMinorUnits(9) : toMinorUnits(19);
-    const amount = formatPlanPrice(cents);
     return t?.('pages.settings.plan.price_per_month', { amount }) ?? `${amount} / month`;
 }
 
 /** Fallback when household settings have not loaded yet. */
 export const DEFAULT_PLAN: PlanKey = PlanKey.BASIC;
 
+/**
+ * Capabilities with a written "gain" line ("what you get"). Other capabilities fall back
+ * to their catalog description.
+ */
+export const GAIN_CAPABILITIES: readonly CapabilityKey[] = [
+    CAPABILITIES.moneyDebt,
+    CAPABILITIES.growthCourse,
+    CAPABILITIES.moneyImport,
+    CAPABILITIES.growthLearn,
+    CAPABILITIES.growthNetWorth,
+];
+
+/** What "More with Plus" lists, in order: gained on Plus, not on Basic. */
+export const PLUS_GAIN_CAPABILITIES: readonly CapabilityKey[] = [
+    CAPABILITIES.growthCourse,
+    CAPABILITIES.moneyDebt,
+    CAPABILITIES.moneyImport,
+    CAPABILITIES.growthLearn,
+];
+
+/** What "More with Max" lists first, before the higher limits. */
+export const MAX_GAIN_CAPABILITIES: readonly CapabilityKey[] = [CAPABILITIES.growthNetWorth];
+
 export type LockCopy = {
+    /** Catalog description (used by settings blurbs). */
     line: string;
+    /** One-line outcome for the lock card; falls back to `line`. */
+    gain: string;
     planName: string;
+    /** "{amount} / month" or "Free". */
     price: string;
+    /** Settings-style "Upgrade to {plan}" (invite / capacity prompts). */
     cta: string;
+    /** Lock-card CTA "Switch to {plan}" (no trial exists, so never "Try"). */
+    switchCta: string;
 };
+
+/** Localized feature name for a lock title ("Debt", "Course"). */
+export function capabilityName(
+    capabilityKey: string | null | undefined,
+    t?: TranslateFn
+): string | null {
+    if (!capabilityKey || !isCapabilityKey(capabilityKey)) return null;
+    return (
+        t?.(`features.capabilities.${capabilityKey}.name`) ?? CAPABILITY_CATALOG[capabilityKey].name
+    );
+}
 
 const DEFAULT_LOCK_LINE =
     'Everything you have already entered stays yours — you only unlock what you need.';
 
 /**
- * Upgrade wall copy — plan name / price / CTA from `requiredPlan`;
- * body line from CAPABILITY_CATALOG (single source with seed metadata).
+ * Lock copy — plan name / price / CTA from `requiredPlan`; gain line per capability,
+ * falling back to the CAPABILITY_CATALOG description (single source with seed metadata).
  */
 export function lockCopyFor(
     capabilityKey: string | null | undefined,
@@ -119,11 +171,19 @@ export function lockCopyFor(
               CAPABILITY_CATALOG[capabilityKey].description)
             : (t?.('pages.shell.gates.locked_body') ?? DEFAULT_LOCK_LINE);
 
+    const gain =
+        capabilityKey && GAIN_CAPABILITIES.includes(capabilityKey as CapabilityKey)
+            ? (t?.(`features.capabilities.${capabilityKey as CapabilityKey}.gain`) ?? line)
+            : line;
+
     return {
         line,
+        gain,
         planName,
         price: planPriceLabel(requiredPlan, t),
         cta: t?.('pages.shell.gates.upgrade_cta', { plan: planName }) ?? `Upgrade to ${planName}`,
+        switchCta:
+            t?.('pages.shell.gates.lock.switch_cta', { plan: planName }) ?? `Switch to ${planName}`,
     };
 }
 

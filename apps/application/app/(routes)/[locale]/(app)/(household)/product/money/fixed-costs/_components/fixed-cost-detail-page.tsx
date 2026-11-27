@@ -50,6 +50,7 @@ import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { findPartyVendor, partyMark } from '@/app/_lib/vendor-brands';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import { EntityNotFoundState } from '@/components/features/helpers/entity-not-found-state';
 import { HoldingChip } from '@/components/features/money/holding-chip';
@@ -86,6 +87,7 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
     const tForm = useTranslations('ui.form');
     const tAction = useTranslations('common.action');
     const tChips = useTranslations('features.money.chips');
+    const jarName = useJarName();
     const { period, showToast } = useHouseholdShell();
     const { canMutate, showCreateFlows } = useBoardWriteAccess();
     const apiError = useApiError();
@@ -636,14 +638,14 @@ export function FixedCostDetailPageClient({ fixedCostId }: { fixedCostId: string
                             </span>
                             <JarBadge
                                 jarKey={jar.key}
-                                name={jar.name}
+                                name={jarName(jar)}
                                 icon={jar.icon}
                                 showIcon={false}
                                 className="border-0 bg-transparent p-0"
                             />
                         </Link>
                     ) : jar ? (
-                        <JarBadge jarKey={jar.key} name={jar.name} icon={jar.icon} />
+                        <JarBadge jarKey={jar.key} name={jarName(jar)} icon={jar.icon} />
                     ) : null}
                     <HoldingChip assetId={item.assetId} link />
                 </div>

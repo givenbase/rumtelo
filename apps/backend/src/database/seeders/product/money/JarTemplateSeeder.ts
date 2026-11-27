@@ -17,6 +17,7 @@ export class JarTemplateSeeder extends Seeder {
                 existing.subtitle = row.subtitle;
                 existing.icon = row.icon;
                 existing.percentage = row.percentage;
+                existing.isDefault = row.isDefault;
                 existing.capabilities = { ...row.capabilities };
                 existing.guide = structuredClone(row.guide);
                 existing.sortOrder = sortOrder;
@@ -29,6 +30,7 @@ export class JarTemplateSeeder extends Seeder {
                 subtitle: row.subtitle,
                 icon: row.icon,
                 percentage: row.percentage,
+                isDefault: row.isDefault,
                 capabilities: { ...row.capabilities },
                 guide: structuredClone(row.guide),
                 sortOrder,

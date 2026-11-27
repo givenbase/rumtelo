@@ -1,13 +1,54 @@
-/** Soul portal — page headings and empty states. */
+/** Mindset portal (code key `soul`) — page headings and empty states. */
 const soul = {
+    /**
+     * "Where you're going" (route `/product/direction`): the signed-in person's own direction.
+     * Personal, so no sentence names a household or a housemate. Never "north star": that is
+     * the brand slogan's name.
+     */
+    direction: {
+        eyebrow: 'Mindset',
+        title: "Where you're going",
+        lead: 'A year from now, in your own words. Then the goals that get you there.',
+        private_note: 'Only you see this, in every household you are in.',
+        load_error: 'This did not load. Try again in a moment.',
+        now: {
+            title: 'Where you are now',
+            lead: 'Read from your board. Nothing to fill in.',
+            split_title: 'This month, split',
+            buffer_row: 'Saved in {pot}',
+            debt_free_row: 'Debt-free by {date}',
+            no_income_writer: 'Add your income to see how it splits.',
+            no_income_cta: 'Add income',
+            no_income_viewer: 'No income has been added to this board yet.',
+            you_told_us: 'You told us: {summary}',
+        },
+        form: {
+            direction_label: 'Where do you want to be a year from now?',
+            direction_hint:
+                'Optional. One or two sentences are enough. Leave it empty to clear it.',
+            why_title: 'What is it for?',
+            why_lead: 'Optional. Pick one if it fits.',
+            why_words_label: 'In your own words',
+            why_words_hint: 'Optional. No need to share health or religion details.',
+            counter: '{count} of {max}',
+            save: 'Save',
+            saving: 'Saving…',
+            saved: 'Saved',
+        },
+        goals: {
+            title: 'The goals that get you there',
+            first_step: 'First step: {step}',
+            empty: 'No goal yet. Turn this into one, with a first step.',
+            make_goal: 'Make this a goal',
+            see_all: 'See all goals',
+        },
+        line: "Where you're going: {direction}",
+        line_open: 'Open',
+    },
     hub: {
-        eyebrow: 'Soul · the why',
+        eyebrow: 'Mindset · the why',
         title: 'The why under the numbers.',
         line: 'Grip on your why — stillness, gratitude, intention.',
-        fallback_coach_kind: 'START SMALL',
-        fallback_coach_text:
-            'One minute of stillness or one line of gratitude — both protect the jars.',
-        fallback_coach_cta: 'Open stillness',
         cards: {
             stillness: {
                 name: 'Stillness',
@@ -38,7 +79,7 @@ const soul = {
     stillness: {
         eyebrow: 'Stillness',
         title: 'Control is a rhythm, not a mood.',
-        lead: 'The only practice here that costs nothing and protects everything else.',
+        lead: 'The only routine here that costs nothing and protects everything else.',
         minutes_per_day: 'Minutes per day',
         streak_label: 'In a row',
         mark_done: 'Mark as done',
@@ -49,8 +90,8 @@ const soul = {
         why_title: '✦ Why this is in a money app',
         mind_tie:
             'A restless mind does not steer money — it spends it and calls that a decision. Stillness ' +
-            'is not meditative, it is strategic: the only practice here that costs nothing and protects ' +
-            'everything else. Every coin you do not spend impulsively is a coin that chooses a jar.',
+            'is not meditative, it is strategic: the only routine here that costs nothing and protects ' +
+            'everything else. Every coin you do not spend impulsively is a coin that chooses a pot.',
         practices: {
             breathing: {
                 meta: '2–5 min',
@@ -95,7 +136,7 @@ const soul = {
         example: 'Ten minutes of stillness before I open my inbox.',
         my_intention: 'My intention',
         set_for_week: '✦ Set for this week',
-        tip: 'A good intention is small, concrete, and about behavior — not an outcome. "I check my jars every Sunday" works better than "I am more financially aware."',
+        tip: 'A good intention is small, concrete, and about behavior — not an outcome. "I check my pots every Sunday" works better than "I am more financially aware."',
         stillness_link: 'Go to stillness →',
     },
     centers: {
@@ -144,15 +185,15 @@ const soul = {
     giving: {
         eyebrow: 'Giving',
         headline: 'Giving keeps money a tool and not a master.',
-        lead: 'The Give jar is the smallest of the six and the one that does the most to your relationship with money. When a fixed share leaves before you can spend it, money stops being something to hold on to.',
+        lead: 'The Giving pot is often the smallest, and the one that does the most for your relationship with money. When a fixed share leaves before you can spend it, money stops being something to hold on to.',
         add_recurring: '+ Add a recurring gift',
-        open_jar: 'Open the Give jar',
+        open_jar: 'Open the Giving pot',
         this_year: 'This year',
-        jar_pct: 'Give jar · {pct}%',
+        jar_pct: 'Giving pot · {pct}%',
         pledged_of: 'of {amount} pledged',
-        reached_by: 'Reached {when}. The jar keeps flowing — that was the point.',
+        reached_by: 'Reached {when}. The pot keeps flowing — that was the point.',
         reached_by_fallback: 'by then',
-        pledge_met: 'Pledge met. The jar keeps flowing — that was the point.',
+        pledge_met: 'Pledge met. The pot keeps flowing — that was the point.',
         pledge_on_track:
             '{planned} leaves every month — enough to land the pledge with {months} month to go.',
         pledge_on_track_plural:
@@ -163,14 +204,19 @@ const soul = {
         open_pledge: 'Open pledge ›',
         given_so_far: 'given so far',
         pledge_pitch:
-            'A pledge gives the jar a finish line for the year. Every sorted amount that leaves Give counts toward it — nothing to move by hand.',
+            'A pledge gives the pot a finish line for the year. Every sorted amount that leaves Giving counts toward it — nothing to move by hand.',
         set_pledge: 'Set a pledge for this year',
         where_goes: 'Where it goes',
         planned_mo: '{amount}/mo planned',
-        empty_auto_title: 'Nothing leaves Give automatically yet.',
-        empty_auto_body: 'Add a fixed cost on the Give jar to plan monthly gifts.',
+        empty_auto_title: 'Nothing leaves Giving automatically yet.',
+        empty_auto_body: 'Add a fixed cost on the Giving pot to plan monthly gifts.',
         empty_ledger_title: 'No sorted giving this year.',
-        empty_ledger_body: 'Gifts that leave Give show up here once sorted.',
+        empty_ledger_body: 'Gifts that leave Giving show up here once sorted.',
+        /** The household has not turned on the optional Giving pot inside Free. */
+        pot_off_title: 'Giving is off',
+        pot_off_body:
+            'Giving is an optional pot inside Free. Turn it on and a share of Free goes to gifts and causes before you spend it — Free itself stays the same.',
+        pot_off_cta: 'Turn on Giving',
         no_org: 'No organization named yet',
         received_year: 'Received this year',
         to_whom: 'To whom',
@@ -194,9 +240,8 @@ const soul = {
         check_4_title: 'Room for more',
         check_4_body:
             'A clear answer to “what would an extra amount do?” If they cannot say, the money sits.',
-        coach_tip_title: 'Why this is in a money app',
         coach_tip_1:
-            'It does not have to be much. Five percent, transferred automatically, to a place you chose on purpose. The amount is not the point — the habit is.',
+            'It does not have to be much. A small share, transferred automatically, to a place you chose on purpose. The amount is not the point — the habit is.',
         coach_tip_2:
             'Choose where it goes the way you choose everything else here: with evidence, not with a logo. An organization that publishes what it spends and what changed is one you can keep giving to for years.',
         causes: {

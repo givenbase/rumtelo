@@ -28,6 +28,12 @@ export const WeekCheck = z.object({
     /** The single sentence the user commits to for the coming week. */
     intention: z.string().max(280).nullable(),
     completedAt: z.iso.datetime().nullable(),
+    /**
+     * Whether the Course stages follow the Money stages for this caller: the plan has
+     * `growthCourse` and the caller is a writable seat (not VIEWER, not a Practice
+     * preview). The client never infers this from the plan alone.
+     */
+    courseApplies: z.boolean(),
 });
 
 // Inferred types (same-module merge for consumers)

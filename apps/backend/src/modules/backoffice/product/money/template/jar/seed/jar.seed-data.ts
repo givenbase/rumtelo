@@ -1,9 +1,28 @@
-import { JarKey, JAR_CAPABILITIES, type JarGuide } from '@rumtelo/contracts';
+import {
+    DEFAULT_GROUP_SPLIT,
+    JarKey,
+    JAR_CAPABILITIES,
+    jarGroupFor,
+    OPTIONAL_JAR_SHARE,
+    type JarGuide,
+} from '@rumtelo/contracts';
 
 /**
  * Canonical jar catalog seed data — Rumtelo-owned defaults.
  * Loaded into backoffice.reference_money_jar_template by JarTemplateSeeder.
- * Capabilities mirror contracts JAR_CAPABILITIES.
+ * Capabilities mirror contracts JAR_CAPABILITIES; percentages mirror DEFAULT_GROUP_SPLIT
+ * (main pots) and OPTIONAL_JAR_SHARE (optional pots), so the numbers live in one place.
+ *
+ * Rows are in group order (Basics, Future, Free; main pot first) — sortOrder = array index,
+ * and onboarding copies it onto the household's jars.
+ *
+ * Names are not renamed in place: the app swaps a stored name for the translated pot name only
+ * while it matches a default it knows (`LEGACY_DEFAULT_JAR_NAMES` in the application's
+ * `jar-copy.ts`, `JarTemplateService.englishDefaultsFor`). Renaming here would freeze new
+ * households on a hard-coded English name.
+ *
+ * The same rows are written on staging/production by
+ * `Migration20261123100100_JarTemplateMainPots` — keep both in step.
  */
 
 type Seed = {
@@ -12,9 +31,21 @@ type Seed = {
     subtitle: string;
     icon: string;
     percentage: string;
+    /** One of the three main pots a new household starts with. */
+    isDefault: boolean;
     capabilities: (typeof JAR_CAPABILITIES)[JarKey];
     guide: JarGuide;
 };
+
+/** Default share of a main pot: its whole group, before any optional pot is carved out. */
+function mainPercentage(key: JarKey): string {
+    return DEFAULT_GROUP_SPLIT[jarGroupFor(key)].toFixed(2);
+}
+
+/** Share an optional pot takes out of its group's main pot when it is turned on. */
+function optionalPercentage(key: keyof typeof OPTIONAL_JAR_SHARE): string {
+    return OPTIONAL_JAR_SHARE[key].toFixed(2);
+}
 
 export const JAR_TEMPLATE_SEED: readonly Seed[] = [
     {
@@ -22,7 +53,8 @@ export const JAR_TEMPLATE_SEED: readonly Seed[] = [
         name: 'Necessity',
         subtitle: 'Must-pays',
         icon: '🏠',
-        percentage: '55.00',
+        percentage: mainPercentage(JarKey.NECESSITIES),
+        isDefault: true,
         capabilities: JAR_CAPABILITIES[JarKey.NECESSITIES],
         guide: {
             note: 'Rent, energy, insurance, groceries, transport. Staying under 55% is the whole game.',
@@ -44,11 +76,80 @@ export const JAR_TEMPLATE_SEED: readonly Seed[] = [
         },
     },
     {
+        key: JarKey.DAILY,
+        name: 'Daily',
+        subtitle: 'Groceries and getting around',
+        icon: '🛒',
+        percentage: optionalPercentage(JarKey.DAILY),
+        isDefault: false,
+        capabilities: JAR_CAPABILITIES[JarKey.DAILY],
+        guide: {
+            note: 'Everyday spending, split off Necessity so bills and the weekly shop stop hiding in one pot. Its share comes out of Necessity.',
+            allowed: [
+                { label: 'Groceries', icon: '🛒' },
+                { label: 'Drugstore & pharmacy', icon: '🧴' },
+                { label: 'Household supplies', icon: '🧹' },
+                { label: 'Transport & fuel', icon: '🚗' },
+            ],
+            notAllowed: 'No bills here — rent, energy and insurance stay in Necessity.',
+            links: [{ href: '/product/money/transactions', label: 'Transactions', icon: '↔' }],
+        },
+    },
+    {
+        key: JarKey.LONG_TERM_SAVINGS,
+        name: 'Long Term Savings',
+        subtitle: 'Big things',
+        icon: '🛟',
+        percentage: mainPercentage(JarKey.LONG_TERM_SAVINGS),
+        isDefault: true,
+        capabilities: JAR_CAPABILITIES[JarKey.LONG_TERM_SAVINGS],
+        guide: {
+            note: 'Emergency fund, car, down payment. Known, planned, not urgent.',
+            allowed: [
+                { label: 'Emergency fund', icon: '🛟' },
+                { label: 'Car or big purchase', icon: '🚗' },
+                { label: 'Down payment', icon: '🏡' },
+                { label: 'Renovation', icon: '🔨' },
+                { label: 'Tax bill', icon: '🧾' },
+            ],
+            notAllowed:
+                'Known, planned, not urgent. Urgent and unexpected? That is exactly what the emergency fund is for.',
+            links: [
+                { href: '/product/growth/goals', label: 'Goals', icon: '🎯' },
+                { href: '/product/money/transactions', label: 'Transactions', icon: '↔' },
+            ],
+        },
+    },
+    {
+        key: JarKey.GOALS,
+        name: 'Goals',
+        subtitle: 'What you save for',
+        icon: '🎯',
+        percentage: optionalPercentage(JarKey.GOALS),
+        isDefault: false,
+        capabilities: JAR_CAPABILITIES[JarKey.GOALS],
+        guide: {
+            note: 'Named goals with a date: a car, a deposit, a renovation. Its share comes out of Long Term Savings, which stays your buffer.',
+            allowed: [
+                { label: 'Car or big purchase', icon: '🚗' },
+                { label: 'Down payment', icon: '🏡' },
+                { label: 'Renovation', icon: '🔨' },
+                { label: 'A planned trip', icon: '🧳' },
+            ],
+            notAllowed: 'Not the emergency fund — that buffer stays in Long Term Savings.',
+            links: [
+                { href: '/product/growth/goals', label: 'Goals', icon: '🎯' },
+                { href: '/product/money/transactions', label: 'Transactions', icon: '↔' },
+            ],
+        },
+    },
+    {
         key: JarKey.FINANCIAL_FREEDOM,
         name: 'Financial Freedom',
         subtitle: 'Never spend',
         icon: '🔒',
-        percentage: '10.00',
+        percentage: optionalPercentage(JarKey.FINANCIAL_FREEDOM),
+        isDefault: false,
         capabilities: JAR_CAPABILITIES[JarKey.FINANCIAL_FREEDOM],
         guide: {
             note: 'This jar buys assets. Money goes in and never comes out — only returns do.',
@@ -75,35 +176,12 @@ export const JAR_TEMPLATE_SEED: readonly Seed[] = [
         },
     },
     {
-        key: JarKey.LONG_TERM_SAVINGS,
-        name: 'Long Term Savings',
-        subtitle: 'Big things',
-        icon: '🎯',
-        percentage: '10.00',
-        capabilities: JAR_CAPABILITIES[JarKey.LONG_TERM_SAVINGS],
-        guide: {
-            note: 'Emergency fund, car, down payment. Known, planned, not urgent.',
-            allowed: [
-                { label: 'Emergency fund', icon: '🛟' },
-                { label: 'Car or big purchase', icon: '🚗' },
-                { label: 'Down payment', icon: '🏡' },
-                { label: 'Renovation', icon: '🔨' },
-                { label: 'Tax bill', icon: '🧾' },
-            ],
-            notAllowed:
-                'Known, planned, not urgent. Urgent and unexpected? That is exactly what the emergency fund is for.',
-            links: [
-                { href: '/product/growth/goals', label: 'Goals', icon: '🎯' },
-                { href: '/product/money/transactions', label: 'Transactions', icon: '↔' },
-            ],
-        },
-    },
-    {
         key: JarKey.EDUCATION,
         name: 'Education',
         subtitle: 'Grow yourself',
         icon: '📚',
-        percentage: '10.00',
+        percentage: optionalPercentage(JarKey.EDUCATION),
+        isDefault: false,
         capabilities: JAR_CAPABILITIES[JarKey.EDUCATION],
         guide: {
             note: 'Books, courses, mentors, tools. The only spend that raises your earning power. Use Learn for what you are working through, browse the library for inspiration, and put a goal on this jar when you are ready to claim it.',
@@ -129,7 +207,8 @@ export const JAR_TEMPLATE_SEED: readonly Seed[] = [
         name: 'Play',
         subtitle: 'Guilt-free',
         icon: '✨',
-        percentage: '10.00',
+        percentage: mainPercentage(JarKey.PLAY),
+        isDefault: true,
         capabilities: JAR_CAPABILITIES[JarKey.PLAY],
         guide: {
             note: 'Spend it every month. A plan with no joy in it does not survive.',
@@ -150,7 +229,8 @@ export const JAR_TEMPLATE_SEED: readonly Seed[] = [
         name: 'Give / foundation',
         subtitle: 'Pass it on',
         icon: '🤲',
-        percentage: '5.00',
+        percentage: optionalPercentage(JarKey.GIVE),
+        isDefault: false,
         capabilities: JAR_CAPABILITIES[JarKey.GIVE],
         guide: {
             note: 'Giving keeps money a tool and not a master. Transferred automatically — the Coach helps you choose where.',

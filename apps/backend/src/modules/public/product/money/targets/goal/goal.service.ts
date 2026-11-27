@@ -2,13 +2,14 @@ import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
 import { apiBadRequest } from '../../../../../../common/errors/api-user-error';
-import { CAPABILITIES, type GivingCause, GoalKind, GoalStatus } from '@rumtelo/contracts';
+import { CAPABILITIES, type GivingCause, GoalKind, GoalStatus, JarKey } from '@rumtelo/contracts';
 import { earnGoalProgress } from '@rumtelo/utils';
 
 import { PlanAccessService } from '../../../../../../common/capability';
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
 import { TransactionService } from '../../ledger/transaction/transaction.service';
+import { requireOwnJar } from '../../own-reference.util';
 import { Jar } from '../../plan/jar/jar.entity';
 import { JarService } from '../../plan/jar/jar.service';
 
@@ -22,6 +23,7 @@ function todayIso(): string {
 export class GoalService {
     private readonly logger = new Logger(GoalService.name);
     private readonly repo: HouseholdScopedRepository<Goal>;
+    private readonly jarRepo: HouseholdScopedRepository<Jar>;
     constructor(
         @Inject(EntityManager) private readonly em: EntityManager,
         @Inject(PlanAccessService) private readonly planAccess: PlanAccessService,
@@ -29,6 +31,7 @@ export class GoalService {
         @Inject(TransactionService) private readonly transactions: TransactionService
     ) {
         this.repo = new HouseholdScopedRepository(em, Goal);
+        this.jarRepo = new HouseholdScopedRepository(em, Jar);
     }
 
     // ====================================================================
@@ -56,12 +59,19 @@ export class GoalService {
         const isGive = kind === GoalKind.GIVE;
         const isSave = kind === GoalKind.SAVE;
         const jarId = kind === GoalKind.EARN ? null : (input.jarId ?? null);
+        // The pot comes from the client: a GIVE pledge is checked against the household's Give
+        // pot, anything else must at least be one of the household's own pots.
+        const jar = isGive
+            ? await this.assertGiveJar(jarId)
+            : jarId
+              ? await requireOwnJar(this.em, jarId)
+              : null;
         const sortOrder = isSave && jarId ? await this.nextSortOrder(jarId) : 0;
 
         const entity = this.em.create(Goal, {
             household: currentHouseholdId(),
             kind,
-            jar: jarId ? this.em.getReference(Jar, jarId) : null,
+            jar,
             name: input.name,
             icon: input.icon ?? null,
             target: input.target,
@@ -194,7 +204,10 @@ export class GoalService {
         const householdId = currentHouseholdId();
         const totals = await Promise.all(
             giveGoals.map(async goal => {
-                if (!goal.jar) return null;
+                // A pledge only counts spending out of the Give pot. One filed on another pot
+                // (older rows: Play, when Give was off) would count every outflow of that pot
+                // as giving, so it is left alone, `saved` untouched.
+                if (goal.jar?.key !== JarKey.GIVE) return null;
                 const { start, end } = pledgeWindow(goal.targetOn);
                 const rows = await this.em.getConnection().execute<{ total: string }[]>(
                     `SELECT COALESCE(SUM(-amount), 0)::text AS total
@@ -222,6 +235,17 @@ export class GoalService {
             }
         }
         if (changed) await this.em.flush();
+    }
+
+    /**
+     * A GIVE goal measures spending out of its own pot, so it must point at the household's
+     * Give pot (looked up through the scoped repository, so another household's pot is simply
+     * not found). With the Give pot off there is no pledge to make: turn the pot on first.
+     */
+    private async assertGiveJar(jarId: string | null): Promise<Jar> {
+        const jar = jarId ? await this.jarRepo.findOne({ id: jarId }) : null;
+        if (jar?.key !== JarKey.GIVE) throw apiBadRequest('goal_give_needs_give_jar');
+        return jar;
     }
 
     /**
@@ -270,8 +294,16 @@ export class GoalService {
                 entity.kind === GoalKind.EARN
                     ? null
                     : patch.jarId
-                      ? this.em.getReference(Jar, patch.jarId)
+                      ? await requireOwnJar(this.em, patch.jarId)
                       : null;
+        }
+        // Only when the edit can change where a pledge points (its kind or its pot): a plain
+        // rename of an older, misfiled pledge still goes through.
+        if (
+            entity.kind === GoalKind.GIVE &&
+            (patch.kind !== undefined || patch.jarId !== undefined)
+        ) {
+            await this.assertGiveJar(entity.jar?.id ?? null);
         }
         if (patch.name !== undefined) entity.name = patch.name;
         if (patch.icon !== undefined) entity.icon = patch.icon;

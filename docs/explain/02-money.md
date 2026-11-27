@@ -10,7 +10,7 @@ Money is the tool for grip on your money.
 
 Simple question: where does this month go?  
 
-You split your income into six jars. Each jar has a job. Together they are 100%.  
+You split your income into pots: Basics, Future and Free. Each pot has a job. Together they are 100%.  
 
 You type what comes in and what goes out. Bills sit on a jar.  
 Rumtelo does not move money at your bank. You do. We show the overview.  
@@ -26,7 +26,7 @@ Geld is de tool voor grip op je geld.
 
 Eenvoudige vraag: waar gaat deze maand naartoe?  
 
-Je verdeelt je inkomen over zes potjes. Elk potje heeft een doel. Samen zijn ze 100%.  
+Je verdeelt je inkomen over potjes: Basis, Toekomst en Vrij. Elk potje heeft een doel. Samen zijn ze 100%.  
 
 Jij typt wat binnenkomt en eruit gaat. Rekeningen zitten op een potje.  
 Rumtelo verplaatst geen geld op je bank. Dat doe jij. Wij tonen het overzicht.  

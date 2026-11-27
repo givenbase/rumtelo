@@ -24,7 +24,7 @@ const auth = {
     },
     sign_up: {
         title: 'Create your account',
-        subtitle: 'Six jars. One calm overview.',
+        subtitle: 'Three groups. One calm overview.',
         subtitle_practice: 'One desk for every client.',
         submit: 'Create account',
         have_account: 'Already have an account?',
@@ -36,7 +36,7 @@ const auth = {
         /** Sign-up direction — pre-picked from the pricing tab (`?as=`). */
         audience_label: 'I’m signing up as',
         audience_individual: 'Individual or household',
-        audience_individual_hint: 'Your own money, growth, energy and soul',
+        audience_individual_hint: 'Your own money, planning, energy and mindset',
         audience_practice: 'Practice',
         audience_practice_hint: 'A coach or advisor helping clients',
         practice_note: 'After you confirm your email, you’ll set up your practice desk.',
@@ -95,11 +95,11 @@ const auth = {
     invite: {
         title: 'Join this household',
         sign_in_body:
-            'Use the invited email — we send a one-time code. No password. You will not set up income or jars.',
+            'Use the invited email — we send a one-time code. No password. You will not set up income or pots.',
         create_account: 'Create an account',
         body: 'Accept to open this household as a member. You will not go through personal money onboarding.',
         body_named:
-            'Accept to join {name}. You will not set up income or jars — the household already has those.',
+            'Accept to join {name}. You will not set up income or pots — the household already has those.',
         no_onboarding: 'Viewers and members skip the creator questionnaire.',
         accept: 'Join household',
         go_home: 'Back to Rumtelo',

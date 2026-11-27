@@ -12,16 +12,20 @@ export const JAR_CHROME: Record<JarKey, { color: string; text: string }> = {
     [JarKey.EDUCATION]: { color: 'bg-jar-edu', text: 'text-jar-edu' },
     [JarKey.PLAY]: { color: 'bg-jar-play', text: 'text-jar-play' },
     [JarKey.GIVE]: { color: 'bg-jar-give', text: 'text-jar-give' },
+    [JarKey.DAILY]: { color: 'bg-jar-daily', text: 'text-jar-daily' },
+    [JarKey.GOALS]: { color: 'bg-jar-goals', text: 'text-jar-goals' },
 };
 
 /** Same emoji as `JAR_TEMPLATE_SEED` — keep in sync with the catalog seed. */
 export const JAR_ICONS: Record<JarKey, string> = {
     [JarKey.NECESSITIES]: '🏠',
     [JarKey.FINANCIAL_FREEDOM]: '🔒',
-    [JarKey.LONG_TERM_SAVINGS]: '🎯',
+    [JarKey.LONG_TERM_SAVINGS]: '🛟',
     [JarKey.EDUCATION]: '📚',
     [JarKey.PLAY]: '✨',
     [JarKey.GIVE]: '🤲',
+    [JarKey.DAILY]: '🛒',
+    [JarKey.GOALS]: '🎯',
 };
 
 export function jarIcon(key: string | null | undefined, catalogIcon?: string | null): string {

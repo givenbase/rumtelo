@@ -146,11 +146,20 @@ function portableHouseholdSettings(settings: HouseholdSettings): ArchiveHousehol
     };
 }
 
-function portableAccountSettings(settings: AccountSettings): ArchiveAccountSettings {
+/**
+ * The person's own prefs and answers, for their own export. `workSituation`, `yearIntention`,
+ * `direction` and `directionWhy` are personal data (the last two are free text) and belong in
+ * the export they can take with them; null stays null, so "not answered" is explicit.
+ */
+export function portableAccountSettings(settings: AccountSettings): ArchiveAccountSettings {
     return {
         locale: settings.locale,
         theme: settings.theme,
         spendingStyle: settings.spendingStyle,
+        workSituation: settings.workSituation,
+        yearIntention: settings.yearIntention,
+        direction: settings.direction,
+        directionWhy: settings.directionWhy,
     };
 }
 
@@ -162,8 +171,10 @@ function portableBankAccounts(
     const nameById = new Map(accounts.map(account => [account.id, account.name]));
     const rows: ArchiveBankAccount[] = [];
     for (const account of accounts) {
-        const bankKey = bankKeyById.get(account.bankId);
-        if (!bankKey) continue;
+        // The onboarding Main account has no bank yet: it travels with a null key.
+        const bankKey = account.bankId ? (bankKeyById.get(account.bankId) ?? null) : null;
+        // A bank that left the catalog cannot be remapped on restore; skip only that case.
+        if (account.bankId && !bankKey) continue;
         rows.push({
             name: account.name,
             kind: account.kind,
@@ -270,6 +281,10 @@ export function buildExportSheets(bundle: HouseholdExportBundle): ExportSheet[] 
                     locale: bundle.accountSettings.locale ?? '',
                     theme: bundle.accountSettings.theme ?? '',
                     spendingStyle: bundle.accountSettings.spendingStyle ?? '',
+                    workSituation: bundle.accountSettings.workSituation ?? '',
+                    yearIntention: bundle.accountSettings.yearIntention ?? '',
+                    direction: bundle.accountSettings.direction ?? '',
+                    directionWhy: bundle.accountSettings.directionWhy ?? '',
                 },
             ],
         },
@@ -324,7 +339,7 @@ export function buildExportSheets(bundle: HouseholdExportBundle): ExportSheet[] 
             rows: bundle.accounts.map(account => ({
                 name: account.name,
                 kind: account.kind,
-                bankKey: account.bankKey,
+                bankKey: account.bankKey ?? '',
                 iban: account.iban ?? '',
                 balanceCents: account.balance ?? 0,
                 isPrimary: account.isPrimary ?? false,

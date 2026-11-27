@@ -10,15 +10,15 @@ const capabilities = {
     },
     'home-why': {
         name: 'Why',
-        description: 'Why this practice matters.',
+        description: 'Why this routine matters.',
     },
     'money-overview': {
         name: 'Overview',
-        description: 'Money overview and jar pulse.',
+        description: 'Money overview and pot pulse.',
     },
     'money-jars': {
-        name: 'Jars',
-        description: 'The six jars — core money model.',
+        name: 'Pots',
+        description: 'Rumtelo Pots — the core money model.',
     },
     'money-spending': {
         name: 'Transactions',
@@ -31,6 +31,7 @@ const capabilities = {
     'money-debt': {
         name: 'Debt',
         description: 'Debt plan with interest, payoff order, and freedom date.',
+        gain: 'See the date you’re debt-free and what one extra payment changes.',
     },
     'money-bank': {
         name: 'Bank',
@@ -39,14 +40,15 @@ const capabilities = {
     'money-import': {
         name: 'Import',
         description: 'Upload bank statements (CSV import).',
+        gain: 'Bring in a bank statement instead of typing every amount.',
     },
     'growth-overview': {
         name: 'Overview',
-        description: 'Growth overview.',
+        description: 'Planning overview.',
     },
     'growth-goals': {
         name: 'Goals',
-        description: 'Goals with a date, jar, and progress.',
+        description: 'Goals with a date, pot, and progress.',
     },
     'growth-income': {
         name: 'Income',
@@ -56,10 +58,12 @@ const capabilities = {
         name: 'Learn',
         description:
             'Skills to work, and books, courses, seminars, and events we recommend — not host. Plus and Max.',
+        gain: 'Pick one skill a quarter and keep track of what you learn.',
     },
     'growth-net-worth': {
         name: 'Net worth',
         description: 'Net worth, returns, and your freedom number.',
+        gain: 'See what you own minus what you owe, in one number, every month.',
     },
     'energy-overview': {
         name: 'Overview',
@@ -83,19 +87,19 @@ const capabilities = {
     },
     'soul-overview': {
         name: 'Overview',
-        description: 'Soul overview.',
+        description: 'Mindset overview.',
     },
     'soul-stillness': {
         name: 'Stillness',
-        description: 'Stillness practice and presence.',
+        description: 'Stillness routine and presence.',
     },
     'soul-gratitude': {
         name: 'Gratitude',
-        description: 'Gratitude practice.',
+        description: 'Gratitude routine.',
     },
     'soul-giving': {
         name: 'Giving',
-        description: 'Why the Give jar exists, where it goes, and how to choose well.',
+        description: 'Why the Giving pot exists, where it goes, and how to choose well.',
     },
     'soul-intent': {
         name: 'Intent',
@@ -108,6 +112,17 @@ const capabilities = {
     'platform-invite': {
         name: 'Invite',
         description: 'Invite a partner, family, friend, or coach (viewer) to the household.',
+    },
+    'platform-sharing': {
+        name: 'Sharing',
+        description:
+            'Choose per item who sees it, set what members may share, and see whose money is whose. Plus and Max.',
+    },
+    'growth-course': {
+        name: 'Course',
+        description:
+            'Your 3 for this week, linked to the month and the goal they serve. Plus and Max.',
+        gain: 'Plan your week around the three things that move your goals.',
     },
 } as const;
 

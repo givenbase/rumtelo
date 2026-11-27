@@ -1,6 +1,7 @@
 import { getTranslations } from '@rumtelo/i18n';
 
 import { PracticeLinksSettings } from '../../_components/settings-panels';
+import { StartPracticeCard } from '../../_components/start-practice-card';
 
 export async function generateMetadata() {
     const t = await getTranslations('pages.meta');
@@ -8,5 +9,10 @@ export async function generateMetadata() {
 }
 
 export default function PracticeSettingsPage() {
-    return <PracticeLinksSettings />;
+    return (
+        <>
+            <PracticeLinksSettings />
+            <StartPracticeCard />
+        </>
+    );
 }

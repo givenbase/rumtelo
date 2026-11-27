@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { useTranslations } from '@rumtelo/i18n';
 import { StubNotice, Typography } from '@rumtelo/ui';
 
+import { CourseCalendarSettings } from './course-calendar-settings';
+import { CourseLayersSettings } from './course-layers-settings';
 import { SettingsInkCard, SettingsPanel } from './settings-chrome';
 
 export function GrowthSettings() {
@@ -13,6 +15,8 @@ export function GrowthSettings() {
 
     return (
         <SettingsPanel>
+            <CourseLayersSettings />
+            <CourseCalendarSettings />
             <SettingsInkCard
                 eyebrow={t('pages.settings.panels.growth.eyebrow')}
                 blurb={t('pages.settings.panels.growth.blurb')}>

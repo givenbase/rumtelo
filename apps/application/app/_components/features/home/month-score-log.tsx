@@ -1,21 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-
-import type {
-    MonthCloseBillDisposition,
-    MonthCloseBlockers,
-    MonthScoreEvent,
-} from '@rumtelo/contracts';
+import type { MonthCloseBlockers, MonthScoreEvent } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
-import { Eyebrow } from '@rumtelo/ui';
-import { cn, formatPeriod, parsePeriodKey } from '@rumtelo/utils';
+import { Button, Eyebrow } from '@rumtelo/ui';
+import { cn, formatPeriod } from '@rumtelo/utils';
 
 import { monthCloseUrgency, monthScoreLevelLabel } from '@/app/_lib/month-score-copy';
-import { ConfirmActionButton } from '@/components/features/forms/confirm-action-button';
-import { CloseMonthDialog } from '@/components/features/home/close-month-dialog';
-import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 
 export type { MonthScoreEvent };
 
@@ -30,8 +20,9 @@ function inboxReady(blockers: MonthCloseBlockers | null | undefined): boolean {
 }
 
 /**
- * Month score log — score, close gate, optional period-travel note, event log.
- * On home, embeds as the last CoachVerdict slide (`embedded`); coach page keeps the card.
+ * Month score log — score, close door, optional period-travel note, event log.
+ * "Close month" opens the shared close flow (`CloseMonthFlow`) for `period`; this card only
+ * says what is still open, the flow does the work.
  * Close-blocker / prior-month nudges only when `canCloseMonth` (VIEWER look-along: score only).
  */
 export function MonthScoreLog({
@@ -43,14 +34,13 @@ export function MonthScoreLog({
     closeBlockers = null,
     priorOpenPeriod = null,
     periodNote = null,
-    onCloseMonth,
-    closeMonthPending = false,
+    period,
+    onStartClose,
     canCloseMonth = false,
-    formatMoney,
     /** Coach quiet-state: score + close gate, no event log. */
     compact = false,
-    /** Inside CoachVerdict — no outer card chrome / duplicate eyebrow. */
-    embedded = false,
+    /** Level names show only once a month has been closed (Home, week 1). */
+    showLevel = true,
 }: {
     score: number;
     /** Signed: positive left · 0 last day · negative overdue. */
@@ -63,25 +53,21 @@ export function MonthScoreLog({
     priorOpenPeriod?: string | null;
     /** Compact looking-back / looking-ahead line for stacked periods. */
     periodNote?: string | null;
-    /** Close the open month score — shown in the header when available. */
-    onCloseMonth?: (dispositions?: MonthCloseBillDisposition[]) => void;
-    closeMonthPending?: boolean;
+    /** The month this score is for (`YYYY-MM`). */
+    period?: string;
+    /** Open the close flow for `period` — shown in the header when available. */
+    onStartClose?: (period: string) => void;
     canCloseMonth?: boolean;
-    formatMoney?: (cents: number) => string;
     compact?: boolean;
-    embedded?: boolean;
+    showLevel?: boolean;
 }) {
     const t = useTranslations('pages.dashboard.month_score');
     const tDashboard = useTranslations('pages.dashboard');
     const locale = useLocale();
-    const { setPeriod } = useHouseholdShell();
-    const [billDialogOpen, setBillDialogOpen] = useState(false);
     const levelLabel = monthScoreLevelLabel(tDashboard, level);
     const inboxOk = inboxReady(closeBlockers);
-    const chainReady = !priorOpenPeriod;
     const dueBills = closeBlockers?.dueBills ?? [];
     const hasDueBills = dueBills.length > 0;
-    const ready = inboxOk && chainReady;
     const urgency = monthCloseUrgency(daysLeft, isClosed);
     const priorLabel = priorOpenPeriod ? formatPeriod(priorOpenPeriod, locale) : null;
     const blockerLines: string[] = [];
@@ -131,40 +117,22 @@ export function MonthScoreLog({
                 ? t('close_explain_soon')
                 : t('close_explain');
 
-    function goToPriorPeriod() {
-        if (!priorOpenPeriod) return;
-        setPeriod(parsePeriodKey(priorOpenPeriod));
-    }
-
-    function startClose() {
-        if (!onCloseMonth) return;
-        if (hasDueBills) {
-            setBillDialogOpen(true);
-            return;
-        }
-        onCloseMonth();
-    }
-
     return (
         <div
             className={cn(
-                embedded
-                    ? 'min-w-0'
-                    : cn(
-                          'rounded-2xl border bg-surface p-6 shadow-md',
-                          isClosed
-                              ? 'border-success ring-1 ring-success/20'
-                              : urgency === 'overdue'
-                                ? 'border-danger ring-1 ring-danger/20'
-                                : urgency === 'today' || urgency === 'soon'
-                                  ? 'border-warning ring-1 ring-warning/20'
-                                  : 'border-line'
-                      )
+                'rounded-2xl border bg-surface p-6 shadow-md',
+                isClosed
+                    ? 'border-success ring-1 ring-success/20'
+                    : urgency === 'overdue'
+                      ? 'border-danger ring-1 ring-danger/20'
+                      : urgency === 'today' || urgency === 'soon'
+                        ? 'border-warning ring-1 ring-warning/20'
+                        : 'border-line'
             )}>
             {/* Header */}
             <div className="flex flex-wrap items-center justify-between gap-3.5">
                 <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
-                    {embedded ? null : <Eyebrow>{t('eyebrow')}</Eyebrow>}
+                    <Eyebrow>{t('eyebrow')}</Eyebrow>
                     <span className="flex flex-wrap items-baseline gap-2">
                         <span className="font-mono text-xs font-medium tracking-widest text-fg-faint uppercase">
                             {t('label')}
@@ -172,9 +140,14 @@ export function MonthScoreLog({
                         <span className="font-display text-2xl font-semibold tracking-tight text-accent">
                             {score}
                         </span>
-                        <span className="font-mono text-xs font-medium tracking-wide text-fg-muted uppercase">
-                            {levelLabel}
-                        </span>
+                        {showLevel ? (
+                            <span className="font-mono text-xs font-medium tracking-wide text-fg-muted uppercase">
+                                <span className="sr-only">
+                                    {t('level_sr', { level: levelLabel })}
+                                </span>
+                                <span aria-hidden>{levelLabel}</span>
+                            </span>
+                        ) : null}
                         {isClosed ? (
                             <span className="rounded-full bg-success/15 px-2.5 py-0.5 font-mono text-[10px] font-bold tracking-[0.12em] text-success uppercase">
                                 {t('closed_badge')}
@@ -194,28 +167,14 @@ export function MonthScoreLog({
                         ) : null}
                     </span>
                 </div>
-                {canCloseMonth && onCloseMonth ? (
-                    hasDueBills ? (
-                        <ConfirmActionButton
-                            size="sm"
-                            label={tDashboard('close_month')}
-                            confirmLabel={tDashboard('close_month_review_bills')}
-                            pendingLabel={tDashboard('closing')}
-                            pending={closeMonthPending}
-                            disabled={!ready}
-                            onConfirm={startClose}
-                        />
-                    ) : (
-                        <ConfirmActionButton
-                            size="sm"
-                            label={tDashboard('close_month')}
-                            confirmLabel={tDashboard('close_month_confirm')}
-                            pendingLabel={tDashboard('closing')}
-                            pending={closeMonthPending}
-                            disabled={!ready}
-                            onConfirm={startClose}
-                        />
-                    )
+                {canCloseMonth && onStartClose && period ? (
+                    <Button
+                        type="button"
+                        size="sm"
+                        className="min-h-11"
+                        onClick={() => onStartClose(period)}>
+                        {tDashboard('close_month')}
+                    </Button>
                 ) : null}
             </div>
 
@@ -255,12 +214,6 @@ export function MonthScoreLog({
                     <p className="mt-2 text-sm text-pretty text-fg-secondary">
                         {tDashboard('prior_open_body', { period: priorLabel })}
                     </p>
-                    <button
-                        type="button"
-                        onClick={goToPriorPeriod}
-                        className="mt-2.5 rounded-sm font-mono text-xs font-medium tracking-wide text-accent uppercase transition-colors outline-none hover:text-accent-hover focus-visible:ring-2 focus-visible:ring-accent/35">
-                        {tDashboard('prior_open_cta', { period: priorLabel })}
-                    </button>
                 </div>
             ) : null}
 
@@ -274,22 +227,6 @@ export function MonthScoreLog({
                             <li key={line}>· {line}</li>
                         ))}
                     </ul>
-                    <div className="mt-2.5 flex flex-wrap gap-3 font-mono text-xs font-medium tracking-wide uppercase">
-                        {closeBlockers && closeBlockers.inboxCount > 0 ? (
-                            <Link
-                                href="/product/money/transactions"
-                                className="rounded-sm text-accent transition-colors outline-none hover:text-accent-hover focus-visible:ring-2 focus-visible:ring-accent/35">
-                                {tDashboard('coach.sort_inbox')} ▸
-                            </Link>
-                        ) : null}
-                        {hasDueBills ? (
-                            <Link
-                                href="/product/money/fixed-costs"
-                                className="rounded-sm text-accent transition-colors outline-none hover:text-accent-hover focus-visible:ring-2 focus-visible:ring-accent/35">
-                                {tDashboard('close_blocked_open_bills')}
-                            </Link>
-                        ) : null}
-                    </div>
                 </div>
             ) : null}
 
@@ -315,20 +252,6 @@ export function MonthScoreLog({
                         </div>
                     ))}
                 </div>
-            ) : null}
-
-            {formatMoney && hasDueBills && onCloseMonth ? (
-                <CloseMonthDialog
-                    open={billDialogOpen}
-                    onOpenChange={setBillDialogOpen}
-                    dueBills={dueBills}
-                    pending={closeMonthPending}
-                    formatMoney={formatMoney}
-                    onConfirm={dispositions => {
-                        onCloseMonth(dispositions);
-                        setBillDialogOpen(false);
-                    }}
-                />
             ) : null}
         </div>
     );

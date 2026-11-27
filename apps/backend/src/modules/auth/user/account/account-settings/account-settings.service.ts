@@ -1,24 +1,22 @@
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
-import type {
-    AccountSettings as AccountSettingsDto,
-    AccountTourProgress,
-} from '@rumtelo/contracts';
-
 import {
+    type AccountSettings as AccountSettingsDto,
+    type AccountTourProgress,
     DEFAULT_ACCOUNT_TOUR_PROGRESS,
-    HouseholdAnswerKey,
     Locale,
     SpendingStyle,
     Theme,
+    type WorkSituation,
+    type YearIntention,
 } from '@rumtelo/contracts';
+
 import { apiNotFound } from '../../../../../common/errors/api-user-error';
 import { currentUserId, householdStorage } from '../../../../../common/household/household.context';
 import { PracticeMember } from '../../../../public/platform/practice/practice-member/practice-member.entity';
 import { AuthInvitation } from '../../../household/managed/invitation/auth-invitation.entity';
 import { AuthMember } from '../../../household/managed/member/auth-member.entity';
-import { HouseholdSettings } from '../../../household/household-settings/household-settings.entity';
 import { AuthUser } from '../../../user/managed/user/auth-user.entity';
 import { Account } from '../account.entity';
 import { AccountSettings } from './account-settings.entity';
@@ -27,7 +25,16 @@ export type AccountSettingsPatch = {
     locale?: Locale;
     theme?: Theme;
     spendingStyle?: SpendingStyle;
+    /** `null` clears the answer. */
+    workSituation?: WorkSituation | null;
+    /** `null` clears the answer. */
+    yearIntention?: YearIntention | null;
+    /** `null` (or empty after trim) clears it. Personal text — never log it. */
+    direction?: string | null;
+    /** `null` (or empty after trim) clears it. Personal text — never log it. */
+    directionWhy?: string | null;
     tour?: AccountTourProgress;
+    showAllSurfaces?: boolean;
 };
 
 /**
@@ -76,7 +83,22 @@ export class AccountSettingsService {
             if (defaults.spendingStyle !== undefined) {
                 existing.spendingStyle = defaults.spendingStyle;
             }
+            if (defaults.workSituation !== undefined) {
+                existing.workSituation = defaults.workSituation;
+            }
+            if (defaults.yearIntention !== undefined) {
+                existing.yearIntention = defaults.yearIntention;
+            }
+            if (defaults.direction !== undefined) {
+                existing.direction = normalizeDirection(defaults.direction);
+            }
+            if (defaults.directionWhy !== undefined) {
+                existing.directionWhy = normalizeDirection(defaults.directionWhy);
+            }
             if (defaults.tour !== undefined) existing.tour = normalizeTour(defaults.tour);
+            if (defaults.showAllSurfaces !== undefined) {
+                existing.isShowingAllSurfaces = defaults.showAllSurfaces;
+            }
             await this.em.flush();
             return existing;
         }
@@ -126,7 +148,8 @@ export class AccountSettingsService {
      * Invitees (VIEWER / MEMBER) must never run creator onboarding.
      * Personal `onboardedAt` is a pass for them once they have a household seat.
      * Pending email invites route to `/invite/{id}` — never the income/jars questionnaire.
-     * Incomplete jar-bank setup only blocks the OWNER.
+     * Bank and jar placement no longer block anyone: onboarding creates a Main account with every
+     * jar on it, and the bank is named later in Settings.
      */
     async boardReady(): Promise<{
         ready: boolean;
@@ -178,12 +201,6 @@ export class AccountSettingsService {
             return { ready: true, home: '/', invitePath: null };
         }
 
-        const board = await this.em.findOne(HouseholdSettings, { household: householdId });
-        if (board?.answers?.[HouseholdAnswerKey.JAR_BANK_SETUP_DONE] === false) {
-            // Only the founding OWNER finishes bank ↔ jar setup for the board.
-            const role = ctx?.role ?? null;
-            if (role === 'OWNER') return { ready: false, home: '/', invitePath: null };
-        }
         return { ready: true, home: '/', invitePath: null };
     }
 
@@ -205,8 +222,13 @@ export class AccountSettingsService {
         return pending ? `/invite/${pending.id}` : null;
     }
 
+    /** One settings row by id — only the signed-in person's own; any other id is "not found". */
     async findOne(id: string): Promise<AccountSettingsDto> {
-        const row = await this.em.findOne(AccountSettings, { id }, { populate: ['account'] });
+        const row = await this.em.findOne(
+            AccountSettings,
+            { id, account: { user: currentUserId() } },
+            { populate: ['account'] }
+        );
         if (!row) throw apiNotFound('account_settings_not_found');
         return toDto(row);
     }
@@ -223,7 +245,14 @@ export class AccountSettingsService {
         if (patch.locale !== undefined) row.locale = patch.locale;
         if (patch.theme !== undefined) row.theme = patch.theme;
         if (patch.spendingStyle !== undefined) row.spendingStyle = patch.spendingStyle;
+        if (patch.workSituation !== undefined) row.workSituation = patch.workSituation;
+        if (patch.yearIntention !== undefined) row.yearIntention = patch.yearIntention;
+        if (patch.direction !== undefined) row.direction = normalizeDirection(patch.direction);
+        if (patch.directionWhy !== undefined) {
+            row.directionWhy = normalizeDirection(patch.directionWhy);
+        }
         if (patch.tour !== undefined) row.tour = normalizeTour(patch.tour);
+        if (patch.showAllSurfaces !== undefined) row.isShowingAllSurfaces = patch.showAllSurfaces;
         await this.em.flush();
         this.logger.debug(`Updated account settings ${row.id}`);
         return toDto(row);
@@ -234,10 +263,14 @@ export class AccountSettingsService {
     // ====================================================================
 
     /**
-     * Delete settings by id. The Account row is left intact.
+     * Delete the signed-in person's settings row by id. The Account row is left intact.
+     * Another person's id is "not found": a row is never reachable across people.
      */
     async delete(id: string): Promise<{ ok: true }> {
-        const row = await this.em.findOne(AccountSettings, { id });
+        const row = await this.em.findOne(AccountSettings, {
+            id,
+            account: { user: currentUserId() },
+        });
         if (!row) throw apiNotFound('account_settings_not_found');
         await this.em.remove(row).flush();
         return { ok: true };
@@ -271,11 +304,22 @@ export class AccountSettingsService {
             locale: defaults.locale ?? Locale.NL,
             theme: defaults.theme ?? Theme.LIGHT,
             spendingStyle: defaults.spendingStyle ?? SpendingStyle.UNKNOWN,
+            workSituation: defaults.workSituation ?? null,
+            yearIntention: defaults.yearIntention ?? null,
+            direction: normalizeDirection(defaults.direction),
+            directionWhy: normalizeDirection(defaults.directionWhy),
             tour: normalizeTour(defaults.tour ?? DEFAULT_ACCOUNT_TOUR_PROGRESS),
+            isShowingAllSurfaces: defaults.showAllSurfaces ?? false,
         } as never);
         await this.em.persist(settings).flush();
         return settings;
     }
+}
+
+/** Trim a personal sentence; empty after trim (or null/undefined) is stored as null. */
+function normalizeDirection(value: string | null | undefined): string | null {
+    const trimmed = value?.trim();
+    return trimmed ? trimmed : null;
 }
 
 function normalizeTour(tour: AccountTourProgress): AccountTourProgress {
@@ -293,7 +337,12 @@ function toDto(row: AccountSettings): AccountSettingsDto {
         locale: row.locale,
         theme: row.theme,
         spendingStyle: row.spendingStyle,
+        workSituation: row.workSituation,
+        yearIntention: row.yearIntention,
+        direction: row.direction,
+        directionWhy: row.directionWhy,
         tour: normalizeTour(row.tour ?? DEFAULT_ACCOUNT_TOUR_PROGRESS),
+        showAllSurfaces: row.isShowingAllSurfaces,
         onboardedAt: row.onboardedAt ? row.onboardedAt.toISOString() : null,
     };
 }

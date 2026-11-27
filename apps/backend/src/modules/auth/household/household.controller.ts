@@ -23,7 +23,7 @@ export class HouseholdController {
     // ? CREATE Operations
     // ====================================================================
 
-    /** Provision a new household and seed jars + settings. */
+    /** Provision a new household: jars, settings, income and one "Main account" in one call. */
     @Implement(contract.household.onboard)
     onboard() {
         return implement(contract.household.onboard).handler(({ input }) =>
@@ -44,6 +44,14 @@ export class HouseholdController {
     // ? READ Operations
     // ====================================================================
 
+    /** Split preview for onboarding: signed-in only, no household, nothing written. */
+    @Implement(contract.household.previewSplit)
+    previewSplit() {
+        return implement(contract.household.previewSplit).handler(({ input }) =>
+            this.households.previewSplit(input)
+        );
+    }
+
     /** List all households the current user belongs to. */
     @Implement(contract.household.list)
     list() {
@@ -55,6 +63,14 @@ export class HouseholdController {
     members() {
         return implement(contract.household.members).handler(({ input }) =>
             this.households.members(input.householdId)
+        );
+    }
+
+    /** Seat use (members + pending invites vs the plan's caps) for invite UIs. Counts only. */
+    @Implement(contract.household.seats)
+    seats() {
+        return implement(contract.household.seats).handler(({ input }) =>
+            this.households.seats(input.householdId)
         );
     }
 
@@ -99,6 +115,18 @@ export class HouseholdController {
     practiceLinksUnlink() {
         return implement(contract.household.practiceLinks.unlink).handler(({ input }) =>
             this.practice.unlinkHouseholdPracticeLink(input.householdId, input.linkId)
+        );
+    }
+
+    // ====================================================================
+    // ? DELETE Operations
+    // ====================================================================
+
+    /** Owner removes a MEMBER or VIEWER from the household. */
+    @Implement(contract.household.removeMember)
+    removeMember() {
+        return implement(contract.household.removeMember).handler(({ input }) =>
+            this.households.removeMember(input.householdId, input.memberId)
         );
     }
 }

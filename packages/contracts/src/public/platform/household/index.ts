@@ -4,3 +4,4 @@
 export * from './household.schema';
 export * from './household.contract';
 export * from './role-permissions';
+export * from './visibility';

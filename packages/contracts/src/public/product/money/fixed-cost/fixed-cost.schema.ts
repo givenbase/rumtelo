@@ -58,6 +58,15 @@ export const FixedCost = z.object({
     startedOn: IsoDate.nullable(),
     endsOn: IsoDate.nullable(),
     note: z.string().max(500).nullable(),
+    /**
+     * Read-only. True when the bill is an optional recurring cost the household could cancel or
+     * lower: a non-essential subscription (streaming, software, news, VPN, cloud storage, meal
+     * kits, gaming), a sport or hobby membership, or a bill paid to a media, gaming, sport,
+     * eating-out or coffee merchant. Derived server-side from `presetKey` / `merchantKey` against
+     * the preset catalogs, never from the name. Internet, phone, rent, insurance and similar
+     * essentials are never flagged. Drives the neutral "Could cancel?" chip; not a warning.
+     */
+    isCancellable: z.boolean().default(false),
 });
 
 /** Q/Y create/update must pick dueMonth in range; W/M clear it. */

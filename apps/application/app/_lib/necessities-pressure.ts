@@ -1,15 +1,16 @@
 import type { JarBalance } from '@rumtelo/contracts';
-import { DEFAULT_JAR_SPLIT, JarKey } from '@rumtelo/contracts';
+import { DEFAULT_GROUP_SPLIT, JarGroup, JarKey, jarGroupFor } from '@rumtelo/contracts';
 
 /**
- * When fixed costs / Necessities blow past the Eker envelope.
+ * When fixed costs / Necessities blow past the Basics envelope.
  *
  * Why we coach simplify + earn more (never raid FF):
  * `apps/backend/src/modules/public/product/money/README.md`
  * → “When Necessities can’t fit in 55%”
  */
 
-export const NECESSITIES_TARGET_PCT = DEFAULT_JAR_SPLIT[JarKey.NECESSITIES];
+/** What the Basics group gets by default (Necessities, plus Daily when it is turned on). */
+export const NECESSITIES_TARGET_PCT = DEFAULT_GROUP_SPLIT[JarGroup.BASIS];
 
 export type NecessitiesPressureInput = {
     /** Monthly-normalised active income (cents). */
@@ -18,7 +19,7 @@ export type NecessitiesPressureInput = {
     fixedOutMonthlyCents: number;
     /** Fixed OUT on the Necessities jar only (cents). */
     necessitiesFixedMonthlyCents: number;
-    /** Household Necessities split % (defaults to Eker 55). */
+    /** Household Necessities split % (group default 55). */
     necessitiesPct?: number;
 };
 
@@ -52,31 +53,40 @@ export function evaluateNecessitiesPressure(input: NecessitiesPressureInput): Ne
     };
 }
 
-/** From jar balances — overspent Necessities (fixed + spend ate the envelope). */
-export function necessitiesPressureFromJar(
-    jar: Pick<
-        JarBalance,
-        'key' | 'percentage' | 'allocated' | 'committedOut' | 'available' | 'overspent'
-    >
+type PressureJar = Pick<
+    JarBalance,
+    'key' | 'percentage' | 'allocated' | 'committedOut' | 'available'
+>;
+
+/**
+ * From jar balances — is Basics overspent (fixed costs + spend ate the envelope)? Measured over
+ * the whole Basics group: Necessities, plus Daily when the household turned it on, because Daily
+ * is carved out of the same envelope and its spend comes out of the same money. Null when the
+ * household has no Necessities pot in the list.
+ */
+export function necessitiesPressureFromJars(
+    jars: readonly PressureJar[]
 ): NecessitiesPressure | null {
-    if (jar.key !== JarKey.NECESSITIES) return null;
-    const shortfallCents = Math.max(0, -jar.available);
-    const active = jar.overspent || jar.committedOut > jar.allocated;
-    if (!active && shortfallCents <= 0) {
-        return {
-            active: false,
-            necessitiesPct: jar.percentage,
-            commitmentRatio: 0,
-            envelopeCents: jar.allocated,
-            shortfallCents: 0,
-        };
-    }
+    if (!jars.some(jar => jar.key === JarKey.NECESSITIES)) return null;
+    const basics = jars.filter(jar => jarGroupFor(jar.key) === JarGroup.BASIS);
+    const sum = (pick: (jar: PressureJar) => number) =>
+        basics.reduce((total, jar) => total + pick(jar), 0);
+    const allocated = sum(jar => jar.allocated);
+    const committedOut = sum(jar => jar.committedOut);
+    const available = sum(jar => jar.available);
+    // Share in basis points so 55 − 20 + 20 never drifts.
+    const necessitiesPct = sum(jar => Math.round(jar.percentage * 100)) / 100;
+    const shortfallCents = Math.max(0, -available);
+    const active = available < 0 || committedOut > allocated;
     return {
-        active: true,
-        necessitiesPct: jar.percentage,
+        active,
+        necessitiesPct,
         commitmentRatio: 0,
-        envelopeCents: jar.allocated,
-        shortfallCents:
-            shortfallCents > 0 ? shortfallCents : Math.max(0, jar.committedOut - jar.allocated),
+        envelopeCents: allocated,
+        shortfallCents: !active
+            ? 0
+            : shortfallCents > 0
+              ? shortfallCents
+              : Math.max(0, committedOut - allocated),
     };
 }

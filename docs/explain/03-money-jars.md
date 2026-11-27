@@ -5,19 +5,19 @@
 
 ## Spoken — EN
 
-Six jars. Together 100% of your income. Each jar has one job.  
+Three pots to start: Basics, Future and Free. Together 100% of your income. Each pot has one job. Want more detail? Turn on extra pots inside a group.  
 
-You enter your income. Rumtelo shows how much goes in each jar.  
+You enter your income. Rumtelo shows how much goes in each pot.  
 That’s what you can spend or save for that job.  
 
 We never move money between bank accounts. Using savings pots or sub-accounts? You move the money at your bank. We only show the plan.  
 
-Tap a jar to see bills, spending, and what’s left.  
+Tap a pot to see bills, spending, and what’s left.  
 Want a click-through? Start the short tour in Help.
 
 ## Spoken — NL
 
-Zes potjes. Samen 100% van je inkomen. Elk potje heeft één doel.  
+Je begint met drie potjes: Basis, Toekomst en Vrij. Samen 100% van je inkomen. Elk potje heeft één doel. Meer detail nodig? Zet extra potjes aan binnen een groep.  
 
 Jij vult je inkomen in. Rumtelo toont hoeveel er in elk potje gaat.  
 Dat is wat je voor dat doel kunt uitgeven of opzijzetten.  

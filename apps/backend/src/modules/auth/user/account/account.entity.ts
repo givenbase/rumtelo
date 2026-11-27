@@ -17,7 +17,7 @@ import { AuthUser } from '../managed/user/auth-user.entity';
  *
  *   user/managed/*            auth machinery (library-owned tables)
  *   auth.account              personal information for the application
- *   auth.account_settings     UI prefs (locale, theme, spending style)
+ *   auth.account_settings     person prefs (locale, theme, spending style, direction)
  *   household/household-settings   shared money board
  *
  * Display name stays on Better Auth `user.name` and is synced when the profile

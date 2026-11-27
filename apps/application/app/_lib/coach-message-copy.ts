@@ -6,6 +6,14 @@ import { formatMinutes } from '@/app/_lib/time-meta';
 
 type CoachCopySource = Pick<CoachMessage, 'key' | 'text' | 'ctaLabel'>;
 
+/** What a rule needs to say its numbers in the household's language and currency. */
+export type CoachCopyContext = {
+    /** Integer minor units → money string (household currency, active locale via `Intl`). */
+    formatMoney: (cents: number) => string;
+    /** The household's own name for the Necessities jar; null while the catalog loads. */
+    necessitiesJarName: string | null;
+};
+
 type TranslateCoach = (key: string, values?: Record<string, string | number | Date>) => string;
 
 function parsePrefixedCoachKey(
@@ -37,14 +45,20 @@ export function resolveCoachMessage(
     message: CoachCopySource,
     t: TranslateCoach,
     /** Root translator — `useTranslations()` — for {@link formatMinutes} in coach copy. */
-    tDuration?: TranslateFn
+    tDuration?: TranslateFn,
+    /** Needed for rules whose sentence carries money or a jar name (fixed-costs rules). */
+    context?: CoachCopyContext
 ): { text: string; ctaLabel: string | null } {
     const formatTime = (minutes: number) => formatMinutes(minutes, tDuration);
     const moneyParsed = message.key ? parseMoneyCoachKey(message.key) : null;
     if (moneyParsed) {
-        const localized = resolveMoneyCoachMessage(moneyParsed.rule, moneyParsed.parts, t);
-        if (localized.text) return localized;
-        return { text: message.text, ctaLabel: message.ctaLabel };
+        const localized = resolveMoneyCoachMessage(moneyParsed.rule, moneyParsed.parts, t, context);
+        // A sentence that cannot be built (unknown rule, unparsable key, no context) falls back
+        // to the server text; the move is still localized by rule.
+        return {
+            text: localized.text || message.text,
+            ctaLabel: localized.ctaLabel ?? message.ctaLabel,
+        };
     }
     const parsed = message.key ? parseTimeCoachKey(message.key) : null;
     if (!parsed) {
@@ -155,7 +169,8 @@ export function resolveCoachMessage(
 function resolveMoneyCoachMessage(
     rule: string,
     parts: string[],
-    t: TranslateCoach
+    t: TranslateCoach,
+    context?: CoachCopyContext
 ): { text: string; ctaLabel: string | null } {
     switch (rule) {
         case 'due_bills': {
@@ -182,9 +197,69 @@ function resolveMoneyCoachMessage(
                 ctaLabel: t('money_coach.necessities_share.cta'),
             };
         }
+        // Keys carry the numbers: `over_necessities:<period>:<shortfallCents>`,
+        // `business_leak:<period>:<monthlyOutCents>:<billCount>`,
+        // `subscription_review:<quarter>:<count>:<monthlyCents>`.
+        case 'fixed_costs.over_necessities': {
+            const shortfall = numberAt(parts, 1);
+            return {
+                text:
+                    context?.necessitiesJarName && shortfall !== null
+                        ? t('money_coach.fixed_costs.over_necessities.text', {
+                              jar: context.necessitiesJarName,
+                              amount: context.formatMoney(shortfall),
+                          })
+                        : '',
+                ctaLabel: t('money_coach.fixed_costs.over_necessities.cta'),
+            };
+        }
+        case 'fixed_costs.business_leak': {
+            const monthlyOut = numberAt(parts, 1);
+            return {
+                text:
+                    context && monthlyOut !== null
+                        ? t('money_coach.fixed_costs.business_leak.text', {
+                              amount: context.formatMoney(monthlyOut),
+                          })
+                        : '',
+                ctaLabel: t('money_coach.fixed_costs.business_leak.cta'),
+            };
+        }
+        case 'fixed_costs.subscription_review': {
+            const count = numberAt(parts, 1);
+            const monthly = numberAt(parts, 2);
+            return {
+                text:
+                    context && count !== null && monthly !== null
+                        ? t(
+                              count === 1
+                                  ? 'money_coach.fixed_costs.subscription_review.text_one'
+                                  : 'money_coach.fixed_costs.subscription_review.text_other',
+                              { count, amount: context.formatMoney(monthly) }
+                          )
+                        : '',
+                ctaLabel: t('money_coach.fixed_costs.subscription_review.cta'),
+            };
+        }
         default:
             return { text: '', ctaLabel: null };
     }
+}
+
+/**
+ * Localized label for a feed row's optional second move. Only the fixed-costs over-split rule
+ * has one today; other rules keep the server label.
+ */
+export function resolveCoachSecondaryCtaLabel(
+    message: Pick<CoachMessage, 'key'>,
+    serverLabel: string,
+    t: TranslateCoach
+): string {
+    const parsed = message.key ? parseMoneyCoachKey(message.key) : null;
+    if (parsed?.rule === 'fixed_costs.over_necessities') {
+        return t('money_coach.fixed_costs.over_necessities.cta_secondary');
+    }
+    return serverLabel;
 }
 
 function parseHoursFromText(text: string, pattern: RegExp): number | null {

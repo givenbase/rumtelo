@@ -9,7 +9,8 @@ import { NativeEnum } from '../../../../../../common/database/native-enum.util';
 /**
  * Jar Template Entity
  *
- * Rumtelo-owned catalog for the six jars (name, subtitle, icon, default %, capabilities).
+ * Rumtelo-owned catalog for the jars: three main pots plus optional ones (name, subtitle, icon,
+ * default %, capabilities).
  * We write these rows; households only copy them into money.jar on onboard.
  *
  * Stays on BaseEntity (not CatalogEntity) because its key is the `JarKey` enum.
@@ -62,6 +63,10 @@ export class JarTemplate extends BaseEntity {
     /** Soft-disable without deleting historical household jars that used this key. */
     @Property({ default: true })
     isActive = true;
+
+    /** True for the three main pots a new household starts with; optional pots are opt-in. */
+    @Property({ default: false })
+    isDefault = false;
 
     // ? ENUMS
     /** Stable key — copied onto household jars; never renamed in place. */

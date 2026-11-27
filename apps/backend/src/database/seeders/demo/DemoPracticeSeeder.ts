@@ -132,7 +132,12 @@ export class DemoPracticeSeeder extends Seeder {
                     incomeStability: IncomeStability.STABLE,
                     payoffStrategy: PayoffStrategy.AVALANCHE,
                 },
-                features: { isBankSyncEnabled: false, isCoachEnabled: true },
+                features: {
+                    isBankSyncEnabled: false,
+                    isCoachEnabled: true,
+                    isCourseQuartersEnabled: false,
+                    isCourseDaysEnabled: false,
+                },
                 weekCheck: { reminderDay: 7, reminderAt: '19:00' },
                 answers: {},
                 onboardedAt: new Date(),

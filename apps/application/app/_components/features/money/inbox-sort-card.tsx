@@ -18,6 +18,7 @@ import {
 } from '@rumtelo/ui';
 import { cn } from '@rumtelo/utils';
 
+import { jarForKey } from '@/app/_lib/jar-for-key';
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
@@ -27,6 +28,7 @@ import { useCategoryTemplates } from '@/components/features/forms/catalog-helper
 import { formatBookedDate, JarMark } from '@/components/features/money/jar-badge';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
+import { useJarName } from '@/app/_lib/use-jar-name';
 
 type InboxJarOption = Pick<Jar, 'id' | 'key' | 'name' | 'subtitle' | 'icon'>;
 type InboxDebtOption = Pick<Debt, 'id' | 'name'>;
@@ -50,8 +52,8 @@ function resolveInitialJarId(
     amount: number
 ): string {
     if (suggestedJarId && jars.some(j => j.id === suggestedJarId)) return suggestedJarId;
-    const byKey = jars.find(j => j.key === suggestJarKey(amount));
-    return byKey?.id ?? jars[0]?.id ?? '';
+    // The soft guess may name a pot the household has not turned on: its group's main pot takes it.
+    return jarForKey(jars, suggestJarKey(amount))?.id ?? '';
 }
 
 export function InboxSortCard({
@@ -93,6 +95,7 @@ export function InboxSortCard({
     const tTx = useTranslations('features.money.transactions');
     const tSort = useTranslations('features.money.transactions.inbox_sort');
     const tExpense = useTranslations('features.money.expense_form');
+    const jarName = useJarName();
     const { householdId } = useAuth();
     const { canMutate } = useBoardWriteAccess();
     const { byKey: catalogByKey } = useJarCatalog();
@@ -111,7 +114,7 @@ export function InboxSortCard({
     const [done, setDone] = useState(false);
     const [pending, setPending] = useState<'sort' | 'rule' | null>(null);
 
-    const selected = jars.find(j => j.id === jarId) ?? jars[0];
+    const selected = jars.find(j => j.id === jarId);
     const suggestedKey = selected?.key ?? suggestJarKey(transaction.amount);
     const catalog = catalogByKey.get(suggestedKey);
     const title = transaction.counterparty?.trim() || transaction.description;
@@ -245,7 +248,11 @@ export function InboxSortCard({
                     </span>
                     <JarMark jarKey={suggestedKey} icon={selected?.icon ?? catalog?.icon} />
                     <span className="text-sm text-fg">
-                        {selected?.name ?? catalog?.name ?? tTx('jar_fallback')}
+                        {selected
+                            ? jarName(selected)
+                            : catalog
+                              ? jarName(catalog)
+                              : tTx('jar_fallback')}
                     </span>
                     {selected?.subtitle ? (
                         <span className="text-sm text-fg-muted">· {selected.subtitle}</span>
@@ -278,7 +285,7 @@ export function InboxSortCard({
                                             : 'border-line-strong bg-surface text-fg-secondary hover:border-accent hover:text-accent'
                                     )}>
                                     <JarMark jarKey={jar.key} icon={jar.icon} />
-                                    {jar.name}
+                                    {jarName(jar)}
                                 </button>
                             );
                         })}

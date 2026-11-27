@@ -4,6 +4,9 @@ set -e
 # Auto-fix + format + entity style. Non-zero exit aborts the commit.
 pnpm lint
 
+# Every used message key exists in every locale (no MISSING_MESSAGE in the browser).
+pnpm --filter @rumtelo/i18n test >/dev/null 2>&1 || pnpm --filter @rumtelo/i18n test
+
 # Re-stage previously staged paths so autofixes land in this commit
 # (does not pick up unrelated unstaged work).
 staged="$(git diff --cached --name-only --diff-filter=ACMR)"

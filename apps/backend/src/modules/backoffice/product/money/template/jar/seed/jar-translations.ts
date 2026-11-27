@@ -18,6 +18,8 @@ export const JAR_TEMPLATE_TRANSLATIONS: Partial<
         [JarKey.EDUCATION]: { name: 'Opleiding', subtitle: 'Investeer in jezelf' },
         [JarKey.PLAY]: { name: 'Plezier', subtitle: 'Zonder schuldgevoel' },
         [JarKey.GIVE]: { name: 'Geven / stichting', subtitle: 'Geef door' },
+        [JarKey.DAILY]: { name: 'Dagelijks', subtitle: 'Boodschappen en onderweg' },
+        [JarKey.GOALS]: { name: 'Doelen', subtitle: 'Waar je voor spaart' },
     },
     es: {
         [JarKey.NECESSITIES]: { name: 'Necesidades', subtitle: 'Gastos fijos' },
@@ -26,6 +28,8 @@ export const JAR_TEMPLATE_TRANSLATIONS: Partial<
         [JarKey.EDUCATION]: { name: 'Educación', subtitle: 'Invierte en ti' },
         [JarKey.PLAY]: { name: 'Ocio', subtitle: 'Sin culpa' },
         [JarKey.GIVE]: { name: 'Dar / fundación', subtitle: 'Hazlo circular' },
+        [JarKey.DAILY]: { name: 'Diario', subtitle: 'Compras y desplazamientos' },
+        [JarKey.GOALS]: { name: 'Metas', subtitle: 'Para lo que ahorras' },
     },
     fr: {
         [JarKey.NECESSITIES]: { name: 'Nécessités', subtitle: 'Charges fixes' },
@@ -34,5 +38,7 @@ export const JAR_TEMPLATE_TRANSLATIONS: Partial<
         [JarKey.EDUCATION]: { name: 'Éducation', subtitle: 'Investis en toi' },
         [JarKey.PLAY]: { name: 'Plaisir', subtitle: 'Sans culpabilité' },
         [JarKey.GIVE]: { name: 'Donner / fondation', subtitle: 'Fais circuler' },
+        [JarKey.DAILY]: { name: 'Quotidien', subtitle: 'Courses et déplacements' },
+        [JarKey.GOALS]: { name: 'Objectifs', subtitle: 'Ce pour quoi tu épargnes' },
     },
 };

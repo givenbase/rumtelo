@@ -16,6 +16,14 @@ export class JarController {
     // ? CREATE Operations
     // ====================================================================
 
+    /** Turn on an optional pot; its share comes out of the group's main pot. */
+    @Implement(contract.money.jars.activate)
+    activate() {
+        return implement(contract.money.jars.activate).handler(({ input }) =>
+            this.jars.activate(input.key)
+        );
+    }
+
     /** Add a new spending category to an existing jar. */
     @Implement(contract.money.jars.createCategory)
     createCategory() {
@@ -89,6 +97,15 @@ export class JarController {
     // ====================================================================
     // ? DELETE Operations
     // ====================================================================
+
+    /** Turn off an optional pot; its share returns to the group's main pot. */
+    @Implement(contract.money.jars.deactivate)
+    deactivate() {
+        return implement(contract.money.jars.deactivate).handler(async ({ input }) => {
+            await this.jars.deactivate(input.jarId);
+            return { ok: true as const };
+        });
+    }
 
     /** Permanently remove a category from a jar. */
     @Implement(contract.money.jars.deleteCategory)

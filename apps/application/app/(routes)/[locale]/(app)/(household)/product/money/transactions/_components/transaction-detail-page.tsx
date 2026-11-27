@@ -36,6 +36,7 @@ import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { findCatalogVendorFromFeed, partyMark } from '@/app/_lib/vendor-brands';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import { EntityNotFoundState } from '@/components/features/helpers/entity-not-found-state';
 import { HoldingChip } from '@/components/features/money/holding-chip';
@@ -176,6 +177,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
     const tTx = useTranslations('features.money.transactions.detail');
     const tTransactions = useTranslations('features.money.transactions');
     const tJars = useTranslations('features.money.jars');
+    const jarName = useJarName();
     const tAction = useTranslations('common.action');
     const { householdId } = useAuth();
     const { period } = useHouseholdShell();
@@ -314,7 +316,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
             <RelatedRow
                 key="jar"
                 label={tTransactions('jar_fallback')}
-                value={jar.name}
+                value={jarName(jar)}
                 hint={
                     resolveJarSubtitle(
                         tJars,
@@ -336,7 +338,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                 label={tTx('category')}
                 value={category.name}
                 hint={tTx('hint_on_jar_planned', {
-                    jar: jar?.name ?? tTransactions('jar_fallback'),
+                    jar: jar ? jarName(jar) : tTransactions('jar_fallback'),
                     amount: formatMoney(category.budgeted),
                 })}
                 leading={{ icon: categoryIcon, tone: jarTone }}
@@ -520,7 +522,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                             </span>
                             <JarBadge
                                 jarKey={jar.key}
-                                name={jar.name}
+                                name={jarName(jar)}
                                 icon={jar.icon}
                                 className="border-0 bg-transparent p-0"
                             />
@@ -539,7 +541,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                             </span>
                             <JarBadge
                                 jarKey={jar.key}
-                                name={jar.name}
+                                name={jarName(jar)}
                                 icon={jar.icon}
                                 className="border-0 bg-transparent p-0"
                             />
@@ -681,7 +683,7 @@ export function TransactionDetailPageClient({ transactionId }: { transactionId: 
                                                     {rowJar ? (
                                                         <JarBadge
                                                             jarKey={rowJar.key}
-                                                            name={rowJar.name}
+                                                            name={jarName(rowJar)}
                                                             icon={rowJar.icon}
                                                         />
                                                     ) : null}

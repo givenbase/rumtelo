@@ -67,11 +67,41 @@ describe('isCoachFeatureEnabledAtLaunch', () => {
             false
         );
         assert.equal(
-            isCoachFeatureEnabledAtLaunch(CoachFeatureId.GROWTH_TIP_PRODUCERS, {
+            isCoachFeatureEnabledAtLaunch(CoachFeatureId.SOUL_TIP_PRODUCERS, {
                 nodeEnv: 'staging',
             }),
             false
         );
+    });
+});
+
+describe('backlog features, whole catalog', () => {
+    it('are never enabled, in any environment, whatever else the catalog holds', () => {
+        const backlog = COACH_FEATURES.filter(
+            feature => feature.status === CoachFeatureStatus.BACKLOG
+        );
+        // A catalog without backlog rows would make this test pass for nothing.
+        assert.ok(backlog.length > 0);
+        for (const feature of backlog) {
+            for (const nodeEnv of ['production', 'staging', 'development', 'test', undefined]) {
+                assert.equal(
+                    isCoachFeatureEnabledAtLaunch(feature.id, { nodeEnv }),
+                    false,
+                    `${feature.id} enabled in ${String(nodeEnv)}`
+                );
+            }
+        }
+    });
+
+    it('ship features are on everywhere, so a status flip is caught by the other tests', () => {
+        for (const feature of COACH_FEATURES.filter(
+            row => row.status === CoachFeatureStatus.SHIP
+        )) {
+            assert.equal(
+                isCoachFeatureEnabledAtLaunch(feature.id, { nodeEnv: 'production' }),
+                true
+            );
+        }
     });
 });
 

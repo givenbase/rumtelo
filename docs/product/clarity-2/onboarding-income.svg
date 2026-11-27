@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 700" width="375" height="700" font-family="Archivo, Helvetica, Arial, sans-serif">
+  <title>Mockup — onboarding screen 1, Your income (375 px)</title>
+  <!-- Proposal only. Brand tokens as in clarity-audit mockups. -->
+  <rect width="375" height="700" fill="#EEF1F5"/>
+  <text x="20" y="40" font-size="17" font-weight="700" fill="#06656C">R</text><text x="33" y="40" font-size="15" fill="#1A202D">umtelo</text>
+  <rect x="16" y="72" width="343" height="560" rx="18" fill="#FFFFFF" stroke="#D5DBE3"/>
+  <rect x="295" y="92" width="48" height="22" rx="11" fill="#DDEFEF"/><text x="319" y="107" font-size="10" font-weight="600" fill="#06656C" text-anchor="middle">1 OF 2</text>
+  <text x="36" y="140" font-size="22" font-weight="700" fill="#1A202D">Your income</text>
+  <text x="36" y="164" font-size="12" fill="#5B6472">Type what lands in your account each month.</text>
+  <text x="36" y="180" font-size="12" fill="#5B6472">Next you'll see it split into six jars.</text>
+  <text x="36" y="216" font-size="10" letter-spacing="1.2" fill="#5B6472">CURRENCY</text>
+  <rect x="36" y="226" width="96" height="52" rx="12" fill="#DDEFEF" stroke="#06656C"/><text x="84" y="250" font-size="12" font-weight="700" fill="#06656C" text-anchor="middle">EUR</text><text x="84" y="266" font-size="11" fill="#5B6472" text-anchor="middle">€</text>
+  <rect x="140" y="226" width="96" height="52" rx="12" fill="#FFFFFF" stroke="#D5DBE3"/><text x="188" y="250" font-size="12" font-weight="700" fill="#1A202D" text-anchor="middle">USD</text><text x="188" y="266" font-size="11" fill="#5B6472" text-anchor="middle">$</text>
+  <rect x="244" y="226" width="96" height="52" rx="12" fill="#FFFFFF" stroke="#D5DBE3"/><text x="292" y="250" font-size="12" font-weight="700" fill="#1A202D" text-anchor="middle">GBP</text><text x="292" y="266" font-size="11" fill="#5B6472" text-anchor="middle">£</text>
+  <text x="36" y="314" font-size="13" font-weight="600" fill="#1A202D">Net monthly income</text>
+  <rect x="36" y="324" width="304" height="52" rx="12" fill="#FFFFFF" stroke="#06656C" stroke-width="2"/>
+  <text x="54" y="356" font-size="16" fill="#5B6472">€</text><line x1="72" y1="334" x2="72" y2="366" stroke="#D5DBE3"/>
+  <text x="84" y="356" font-size="16" fill="#1A202D">2.850</text>
+  <text x="36" y="398" font-size="12" fill="#5B6472">After tax — what lands in your account.</text>
+  <text x="36" y="418" font-size="12" fill="#06656C">That's €2,850.00 a month.</text>
+  <line x1="16" y1="560" x2="359" y2="560" stroke="#D5DBE3"/>
+  <rect x="36" y="572" width="304" height="48" rx="24" fill="#06656C"/><text x="188" y="601" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">Next  →</text>
+  <text x="188" y="664" font-size="11" fill="#5B6472" text-anchor="middle">Screen 2 = clarity-audit/onboarding-split.svg + split bar, main-account line, Back</text>
+</svg>

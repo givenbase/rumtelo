@@ -30,7 +30,9 @@ const ok = z.object({ ok: z.literal(true) });
 
 export const fixedCostCreate = oc
     .input(
-        FixedCost.omit({ id: true }).extend(SaveParty.shape).superRefine(refineFixedCostDueMonth)
+        FixedCost.omit({ id: true, isCancellable: true })
+            .extend(SaveParty.shape)
+            .superRefine(refineFixedCostDueMonth)
     )
     .output(FixedCost);
 
@@ -67,7 +69,8 @@ export const fixedCostListSettlements = oc
 
 export const fixedCostUpdate = oc
     .input(
-        FixedCost.partial()
+        FixedCost.omit({ isCancellable: true })
+            .partial()
             .extend({ ...SaveParty.shape, id: Id, householdId: HouseholdId })
             .superRefine((value, ctx) => {
                 // Only when cadence is present on the patch (create-like); else service checks final row.

@@ -1,11 +1,11 @@
 'use client';
 
 import { GoalCreatePage, GoalUpdatePage } from '@/product/growth/goals/_components/goal-pages';
-import type { IncomeCreatePrefill } from '@/product/growth/income/_components/income-pages';
+import type { IncomeCreatePrefill } from '@/product/money/income/_components/income-pages';
 import {
     IncomeCreatePage,
     IncomeUpdatePage,
-} from '@/product/growth/income/_components/income-pages';
+} from '@/product/money/income/_components/income-pages';
 import { AssetUpdatePage } from '@/product/money/net-worth/_components/asset-pages';
 import { DebtCreatePage, DebtUpdatePage } from '@/product/money/debt/_components/debt-pages';
 import type { FixedCostCreatePrefill } from '@/product/money/fixed-costs/_components/fixed-cost-pages';
@@ -18,7 +18,7 @@ import {
     ExpenseCreatePage,
     ExpenseUpdatePage,
 } from '@/product/money/transactions/_components/expense-pages';
-import type { GoalKind } from '@rumtelo/contracts';
+import { FlowDirection, type GoalKind } from '@rumtelo/contracts';
 
 import { formRoute, moveCreateMeta } from '@/app/_lib/form-route-meta';
 import { MoveMoneyForm } from '@/components/features/forms/move-money-form';
@@ -76,7 +76,9 @@ export function FixedCostCreateModalShell({
     closeHref,
     defaultValues,
 }: ShellProps & { defaultValues?: FixedCostCreatePrefill }) {
-    const meta = formRoute('fixedCreate');
+    const meta = formRoute(
+        defaultValues?.direction === FlowDirection.IN ? 'fixedIncomeCreate' : 'fixedCreate'
+    );
     return (
         <RouteModalShell closeHref={closeHref} meta={meta}>
             <FixedCostCreatePage embedded defaultValues={defaultValues} />

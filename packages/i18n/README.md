@@ -19,6 +19,16 @@ pnpm i18n:gen
 
 That rebuilds every `languages/*.json` from the TypeScript source. Unchanged English sentences are reused from [`cache/`](./cache/) (hash of the English text + locale). A changed English sentence misses the cache and is translated again with DeepL (`DEEPL_API_KEY` in `packages/i18n/.env`).
 
+## Guard: no `MISSING_MESSAGE`
+
+`pnpm --filter @rumtelo/i18n test` (pre-commit hook and `.github/workflows/i18n-keys.yml`) fails when:
+
+- `languages/en.json` does not match `translations/` — you edited copy without regenerating. Fix: `DEEPL_API_KEY= pnpm i18n:gen` (keyless; es/fr keep EN until DeepL runs), then `git checkout -- packages/i18n/cache`;
+- a locale lacks an EN message, or an override in `translations/overrides.ts` has no EN source or changes `{placeholders}` (`src/catalog-sync.test.ts`);
+- code in `apps/application`, `apps/website` or `packages/ui` uses a key that is not in every `languages/*.json` (`src/key-usage.test.ts`, scanner in `src/key-usage.ts`).
+
+The scanner reads the TypeScript AST: `useTranslations('ns')` / `getTranslations('ns')` + `t('key')`, `t.rich` / `t.markup` / `t.raw`, ternaries of literals, template literals whose holes are ternaries of literals (`text_${n === 1 ? 'one' : 'other'}`), and `*Key: '…'` constants. A translator passed as an untyped `(key: string) => string` is checked loosely (the key must end some message path) unless it has an entry in `NAMESPACE_HINTS` in the test. Other template literals (`layer_${layer}`) only need one matching message; keys from variables are printed as "unchecked". `t.has(…)` probes are skipped.
+
 ## Usage
 
 ```tsx

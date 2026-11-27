@@ -4,13 +4,20 @@ import { createHash } from 'node:crypto';
 
 import { containsWord, endOfPeriodIso } from '@rumtelo/utils';
 import { PlanAccessService } from '../../../../../../common/capability';
-import { apiBadRequest } from '../../../../../../common/errors/api-user-error';
+import { apiBadRequest, apiNotFound } from '../../../../../../common/errors/api-user-error';
 import { HouseholdScopedRepository } from '../../../../../../common/household/household-scoped.repository';
 import { currentHouseholdId } from '../../../../../../common/household/household.context';
 import { MerchantPresetService } from '../../../../../backoffice/product/money/preset/merchant/merchant.service';
 import { resolveAssetLink } from '../../asset-link.util';
-import { Category } from '../../plan/jar/category.entity';
-import { Jar } from '../../plan/jar/jar.entity';
+import {
+    assertCategoryInJar,
+    requireOwnBankAccount,
+    requireOwnCategory,
+    requireOwnDebt,
+    requireOwnFixedCost,
+    requireOwnJar,
+} from '../../own-reference.util';
+import { type Jar } from '../../plan/jar/jar.entity';
 import { type CounterpartyPatch, PartyService } from '../../plan/party/party.service';
 import { applyDebtLinkChange } from '../../targets/debt/debt-link.util';
 import {
@@ -69,17 +76,28 @@ export class TransactionService {
                 'Link either a debt or a fixed cost on one transaction, not both.'
             );
         }
-        if (input.jarId) {
-            await assertJarAllowsOutflow(this.em, input.jarId, input.amount);
-        }
+        // Ids from the client are resolved inside this household before anything is written;
+        // a foreign id is refused like an unknown one.
+        const jar = input.jarId ? await requireOwnJar(this.em, input.jarId) : null;
+        if (jar) assertJarAllowsOutflow(jar, input.amount);
+        const category = input.categoryId
+            ? await requireOwnCategory(this.em, input.categoryId)
+            : null;
+        assertCategoryInJar(category, jar);
+        const account = input.accountId
+            ? await requireOwnBankAccount(this.em, input.accountId)
+            : null;
+        // The links are applied after the row is flushed; resolve them first so a bad id is a
+        // clean 404 and never leaves an unlinked transaction behind.
+        await assertOwnLinks(this.em, input.debtId, input.fixedCostId);
         await assertBookedOnPeriodOpen(this.em, input.bookedOn);
         const other = await this.parties.resolveCounterparty(input);
         const asset = (await resolveAssetLink(this.em, this.planAccess, input.assetId)) ?? null;
         const entity = this.em.create(Transaction, {
             household: currentHouseholdId(),
-            account: input.accountId ? this.em.getReference(BankAccount, input.accountId) : null,
-            jar: input.jarId ? this.em.getReference(Jar, input.jarId) : null,
-            category: input.categoryId ? this.em.getReference(Category, input.categoryId) : null,
+            account,
+            jar,
+            category,
             debt: null,
             fixedCost: null,
             asset,
@@ -91,7 +109,7 @@ export class TransactionService {
             party: other.party,
             inflowKey: input.amount > 0 ? input.inflowKey?.trim() || null : null,
             note: input.note ?? null,
-            status: input.jarId ? TransactionStatus.SORTED : TransactionStatus.INBOX,
+            status: jar ? TransactionStatus.SORTED : TransactionStatus.INBOX,
             source: TransactionSource.MANUAL,
             // Manual rows are never de-duplicated: two identical coffees on one day are
             // both real. UNIQUE(household, dedupeKey) is for imports only.
@@ -122,19 +140,17 @@ export class TransactionService {
         format: StatementFormat | 'auto' = 'auto',
         fileName?: string | null
     ) {
-        const account = await this.em.findOne(
-            BankAccount,
-            { id: accountId },
-            { populate: ['bank'] }
-        );
-        if (!account) throw apiBadRequest('bank_not_found');
+        // Scoped: a statement can only be imported into this household's own account.
+        const account = await requireOwnBankAccount(this.em, accountId);
+        await this.em.populate(account, ['bank']);
 
         const {
             rows: parsed,
             format: resolvedFormat,
             csvDialect,
         } = parseStatement(content, format, fileName);
-        const accountMismatch = csvDialectMismatchesBank(csvDialect, account.bank.key);
+        // A bankless account (onboarding "Main account") has nothing to compare against yet.
+        const accountMismatch = csvDialectMismatchesBank(csvDialect, account.bank?.key);
         if (accountMismatch && !dryRun) {
             throw apiBadRequest('statement_bank_mismatch');
         }
@@ -190,7 +206,7 @@ export class TransactionService {
             const created = incoming.map(row =>
                 this.em.create(Transaction, {
                     household: currentHouseholdId(),
-                    account: this.em.getReference(BankAccount, accountId),
+                    account,
                     amount: row.amount,
                     bookedOn: row.bookedOn,
                     description: row.description,
@@ -271,6 +287,7 @@ export class TransactionService {
         const created = openIncoming.map(row =>
             this.em.create(Transaction, {
                 household: currentHouseholdId(),
+                // Callers pass an account they loaded through the scoped repository (bank sync).
                 account: this.em.getReference(BankAccount, accountId),
                 amount: row.amount,
                 bookedOn: row.bookedOn,
@@ -349,6 +366,21 @@ export class TransactionService {
         return this.transactions.count({ status: TransactionStatus.INBOX });
     }
 
+    /** Whether this household has any transaction at all. One row at most is read. */
+    async hasAny(): Promise<boolean> {
+        const rows = await this.transactions.find({}, { limit: 1 });
+        return rows.length > 0;
+    }
+
+    /**
+     * SORTED transactions of this household (by hand or by rule), counted up to `limit`.
+     * A bounded read, never a full count: the board ladder only needs "at least five".
+     */
+    async sortedCount(limit: number): Promise<number> {
+        const rows = await this.transactions.find({ status: TransactionStatus.SORTED }, { limit });
+        return rows.length;
+    }
+
     // ====================================================================
     // ? UPDATE Operations
     // ====================================================================
@@ -366,12 +398,16 @@ export class TransactionService {
                 'Link either a debt or a fixed cost on one transaction, not both.'
             );
         }
-        const entity = await this.transactions.findOneOrFail({ id: transactionId });
+        const entity = await this.requireTransaction(transactionId);
         await this.em.populate(entity, ['debt', 'fixedCost']);
         await assertBookedOnPeriodOpen(this.em, entity.bookedOn);
-        await assertJarAllowsOutflow(this.em, jarId, entity.amount);
-        entity.jar = this.em.getReference(Jar, jarId);
-        entity.category = categoryId ? this.em.getReference(Category, categoryId) : null;
+        const jar = await requireOwnJar(this.em, jarId);
+        const category = categoryId ? await requireOwnCategory(this.em, categoryId) : null;
+        assertCategoryInJar(category, jar);
+        await assertOwnLinks(this.em, debtId, fixedCostId);
+        assertJarAllowsOutflow(jar, entity.amount);
+        entity.jar = jar;
+        entity.category = category;
         entity.status = TransactionStatus.SORTED;
         entity.appliedMerchantKey = null;
 
@@ -425,17 +461,23 @@ export class TransactionService {
     }
 
     async bulkSort(ids: string[], jarId: string, categoryId?: string | null) {
+        // One scoped query for the whole set. A transaction id that is not this household's, or
+        // that another member just deleted, is skipped and never touched; the pot and category
+        // are strict and resolved before any write.
         const rows = await this.transactions.find({ id: { $in: ids } });
+        const jar = await requireOwnJar(this.em, jarId);
+        const category = categoryId ? await requireOwnCategory(this.em, categoryId) : null;
+        assertCategoryInJar(category, jar);
         await assertOpenPeriodsForBookedOns(
             this.em,
             rows.map(row => row.bookedOn)
         );
         if (rows.some(row => row.amount < 0)) {
-            await assertJarAllowsOutflow(this.em, jarId, -1);
+            assertJarAllowsOutflow(jar, -1);
         }
         for (const row of rows) {
-            row.jar = this.em.getReference(Jar, jarId);
-            row.category = categoryId ? this.em.getReference(Category, categoryId) : null;
+            row.jar = jar;
+            row.category = category;
             row.status = TransactionStatus.SORTED;
             row.appliedMerchantKey = null;
         }
@@ -456,8 +498,8 @@ export class TransactionService {
                 assetId?: string | null;
             }
     ) {
-        const entity = await this.transactions.findOneOrFail({ id });
-        await this.em.populate(entity, ['debt', 'fixedCost']);
+        const entity = await this.requireTransaction(id);
+        await this.em.populate(entity, ['debt', 'fixedCost', 'jar']);
         await assertBookedOnPeriodOpen(this.em, entity.bookedOn);
         const {
             categoryId,
@@ -478,6 +520,16 @@ export class TransactionService {
             );
         }
 
+        const category = categoryId ? await requireOwnCategory(this.em, categoryId) : null;
+        // The row keeps its pot here (only `sort` moves it), so a category sent with an edit must
+        // sit in the pot the row is in now. An Inbox row has no pot and nothing to compare to.
+        assertCategoryInJar(category, entity.jar);
+        await assertOwnLinks(this.em, debtId, fixedCostId);
+        // A new outflow on a row already sorted into a pot must pass the same rule as sorting it.
+        if (entity.jar && fields.amount !== undefined) {
+            assertJarAllowsOutflow(entity.jar, fields.amount);
+        }
+
         Object.assign(entity, fields);
         if (
             counterparty !== undefined ||
@@ -495,9 +547,7 @@ export class TransactionService {
         }
         const asset = await resolveAssetLink(this.em, this.planAccess, assetId);
         if (asset !== undefined) entity.asset = asset;
-        if (categoryId !== undefined) {
-            entity.category = categoryId ? this.em.getReference(Category, categoryId) : null;
-        }
+        if (categoryId !== undefined) entity.category = category;
         if (entity.amount <= 0) {
             entity.inflowKey = null;
         } else if (inflowKey !== undefined) {
@@ -527,7 +577,7 @@ export class TransactionService {
     // ====================================================================
 
     async remove(id: string) {
-        const entity = await this.transactions.findOneOrFail({ id });
+        const entity = await this.requireTransaction(id);
         await this.em.populate(entity, ['debt', 'fixedCost']);
         await assertBookedOnPeriodOpen(this.em, entity.bookedOn);
         if (entity.debt) {
@@ -538,11 +588,29 @@ export class TransactionService {
         }
         await this.em.remove(entity).flush();
     }
+
+    // Private
+
+    /** A foreign id and an unknown id are the same clean 404, never a plain Error (500). */
+    private async requireTransaction(id: string): Promise<Transaction> {
+        const entity = await this.transactions.findOne({ id });
+        if (!entity) throw apiNotFound('transaction_not_found');
+        return entity;
+    }
 }
 
-async function assertJarAllowsOutflow(em: EntityManager, jarId: string, amount: number) {
+/** A debt or fixed cost named by the client must be this household's, before any write. */
+async function assertOwnLinks(
+    em: EntityManager,
+    debtId: string | null | undefined,
+    fixedCostId: string | null | undefined
+) {
+    if (debtId) await requireOwnDebt(em, debtId);
+    if (fixedCostId) await requireOwnFixedCost(em, fixedCostId);
+}
+
+function assertJarAllowsOutflow(jar: Jar, amount: number) {
     if (amount >= 0) return;
-    const jar = await em.findOneOrFail(Jar, jarId);
     if (!jarCapabilitiesFor(jar.key).canSpend) {
         throw new BadRequestException(
             'Day-to-day spend cannot land on Financial Freedom. Move money or invest instead.'

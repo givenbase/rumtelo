@@ -58,7 +58,7 @@ export class TimeCoachService implements OnModuleInit {
     private readonly templates: HouseholdScopedRepository<TimeTemplate>;
 
     constructor(
-        @Inject(EntityManager) em: EntityManager,
+        @Inject(EntityManager) private readonly em: EntityManager,
         @Inject(AccountService) private readonly accounts: AccountService,
         @Inject(CoachService) private readonly coach: CoachService,
         @Inject(PlanAccessService) private readonly planAccess: PlanAccessService
@@ -78,6 +78,9 @@ export class TimeCoachService implements OnModuleInit {
     /** Evaluate the current person's week and upsert the inbox. */
     async refresh(): Promise<void> {
         if (isLaunchProductsDeferred()) return;
+        // Energy entities are excluded from MikroORM discovery (`mikro-orm.config.ts`) until the
+        // portal ships, in every NODE_ENV. Without them a find throws "Metadata … not found".
+        if (!this.em.getMetadata().find(TimeTemplate)) return;
         if (
             !isCoachFeatureEnabledAtLaunch(CoachFeatureId.TIME_COACH, {
                 nodeEnv: process.env.NODE_ENV,

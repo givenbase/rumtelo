@@ -16,11 +16,14 @@ import {
     IncomeStability,
     JarKey,
     Locale,
+    mainJarKeyFor,
     PayoffStrategy,
     RuleField,
     RuleMatcher,
     SpendingStyle,
     Theme,
+    WorkSituation,
+    YearIntention,
     type ArchiveAccountSettings,
     type ArchiveBankAccount,
     type ArchiveHouseholdSettings,
@@ -198,6 +201,11 @@ function resolveJarId(
         if (byName) return byName;
         if (maps.byKey.has(jarName)) return maps.byKey.get(jarName)!;
     }
+    // A row naming an optional pot the archive's household did not have rides with the main pot of its group.
+    if (jarKey && (Object.values(JarKey) as string[]).includes(jarKey)) {
+        const mainId = maps.byKey.get(mainJarKeyFor(jarKey as JarKey));
+        if (mainId) return mainId;
+    }
     return null;
 }
 
@@ -231,7 +239,7 @@ export function archivePayloadFromCsvSheets(files: Map<string, string>): Payload
 
     const accounts = sheet(files, 'accounts.csv')
         .map(row => {
-            if (!row.name || !row.bankKey || !row.kind) return null;
+            if (!row.name || !row.kind) return null;
             if (!(Object.values(AccountKind) as string[]).includes(row.kind)) return null;
             const balance =
                 row.balanceCents !== undefined && row.balanceCents !== ''
@@ -242,7 +250,7 @@ export function archivePayloadFromCsvSheets(files: Map<string, string>): Payload
             return {
                 name: row.name,
                 kind: row.kind as AccountKind,
-                bankKey: row.bankKey,
+                bankKey: row.bankKey || null,
                 iban: row.iban || null,
                 balance: balance ?? 0,
                 isPrimary: asBool(row.isPrimary, false),
@@ -497,6 +505,17 @@ function parseAccountSettingsSheet(row: Row | undefined): ArchiveAccountSettings
         (Object.values(SpendingStyle) as string[]).includes(row.spendingStyle)
             ? { spendingStyle: row.spendingStyle as SpendingStyle }
             : {}),
+        ...(row.workSituation &&
+        (Object.values(WorkSituation) as string[]).includes(row.workSituation)
+            ? { workSituation: row.workSituation as WorkSituation }
+            : {}),
+        ...(row.yearIntention &&
+        (Object.values(YearIntention) as string[]).includes(row.yearIntention)
+            ? { yearIntention: row.yearIntention as YearIntention }
+            : {}),
+        // Free text: the contract trims and caps it (280); empty means "not written".
+        ...(row.direction?.trim() ? { direction: row.direction.trim() } : {}),
+        ...(row.directionWhy?.trim() ? { directionWhy: row.directionWhy.trim() } : {}),
     };
     return Object.keys(settings).length > 0 ? settings : undefined;
 }

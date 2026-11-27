@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 770 760" width="770" height="760" font-family="Archivo, Helvetica, Arial, sans-serif">
+  <title>Mockup — More sheet at SPLIT with the Coming up row, and the Coming up sheet (375 px, Basic owner)</title>
+  <!-- Proposal only. Brand tokens: ink #1A202D, muted #5B6472, line #D5DBE3, accent #06656C, accent-soft #DDEFEF. -->
+  <!-- Panel 1: More sheet -->
+  <g>
+    <rect width="375" height="760" fill="#EEF1F5"/>
+    <rect width="375" height="760" fill="#1A202D" fill-opacity="0.45"/>
+    <rect x="0" y="300" width="375" height="460" rx="20" fill="#FFFFFF"/>
+    <rect x="167" y="310" width="40" height="4" rx="2" fill="#D5DBE3"/>
+    <text x="20" y="352" font-size="18" font-weight="700" fill="#1A202D">More</text>
+    <circle cx="341" cy="346" r="22" fill="#EEF1F5"/><text x="341" y="351" font-size="14" fill="#1A202D" text-anchor="middle">×</text>
+    <g font-size="14" fill="#1A202D">
+      <text x="32" y="400">Why Rumtelo</text><text x="343" y="400" text-anchor="end" fill="#5B6472">›</text>
+      <line x1="16" y1="420" x2="359" y2="420" stroke="#D5DBE3"/>
+      <text x="32" y="450">Settings</text><text x="343" y="450" text-anchor="end" fill="#5B6472">›</text>
+      <line x1="16" y1="470" x2="359" y2="470" stroke="#D5DBE3"/>
+      <text x="32" y="500">Help</text><text x="343" y="500" text-anchor="end" fill="#5B6472">›</text>
+      <line x1="16" y1="520" x2="359" y2="520" stroke="#D5DBE3"/>
+    </g>
+    <!-- Coming up: plain row, two lines, no lock, no fade -->
+    <text x="32" y="552" font-size="14" font-weight="600" fill="#1A202D">Coming up</text>
+    <text x="32" y="572" font-size="12" fill="#5B6472">After your first week check</text>
+    <text x="343" y="562" text-anchor="end" font-size="14" fill="#5B6472">›</text>
+    <line x1="16" y1="590" x2="359" y2="590" stroke="#D5DBE3"/>
+    <text x="20" y="626" font-size="11" fill="#5B6472">SPLIT / SORTING on Basic. Rows ≥ 48 px. Coming up is the last</text>
+    <text x="20" y="642" font-size="11" fill="#5B6472">row, one row only. Gone at MONTH, with show-all, for VIEWER</text>
+    <text x="20" y="658" font-size="11" fill="#5B6472">and in Practice preview.</text>
+    <rect x="0" y="696" width="375" height="64" fill="#FFFFFF"/><line x1="0" y1="696" x2="375" y2="696" stroke="#D5DBE3"/>
+    <g font-size="11" text-anchor="middle" fill="#5B6472">
+      <text x="62" y="740">Home</text><text x="187" y="740">Money</text>
+      <rect x="250" y="696" width="125" height="2" fill="#06656C"/><text x="312" y="740" fill="#06656C" font-weight="600">More</text>
+    </g>
+  </g>
+  <!-- Panel 2: Coming up sheet -->
+  <g transform="translate(395 0)">
+    <rect width="375" height="760" fill="#EEF1F5"/>
+    <rect width="375" height="760" fill="#1A202D" fill-opacity="0.45"/>
+    <rect x="0" y="150" width="375" height="610" rx="20" fill="#FFFFFF"/>
+    <rect x="167" y="160" width="40" height="4" rx="2" fill="#D5DBE3"/>
+    <text x="20" y="202" font-size="18" font-weight="700" fill="#1A202D">Coming up</text>
+    <circle cx="341" cy="196" r="22" fill="#EEF1F5"/><text x="341" y="201" font-size="14" fill="#1A202D" text-anchor="middle">×</text>
+    <text x="20" y="232" font-size="13" fill="#5B6472">Rumtelo starts with your jars, Inbox and week</text>
+    <text x="20" y="250" font-size="13" fill="#5B6472">check. More joins your menu as your board fills in.</text>
+    <text x="20" y="290" font-size="10" font-weight="700" letter-spacing="1.5" fill="#06656C">NEXT</text>
+    <text x="20" y="314" font-size="15" font-weight="600" fill="#1A202D">Do your first week check — ten minutes.</text>
+    <rect x="20" y="330" width="335" height="48" rx="10" fill="#06656C"/>
+    <text x="187" y="359" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">Start week check</text>
+    <text x="20" y="414" font-size="10" font-weight="700" letter-spacing="1.5" fill="#5B6472">THEN YOUR MENU SHOWS</text>
+    <g font-size="14" fill="#1A202D">
+      <text x="20" y="442">↗  Goals</text>
+      <text x="20" y="470">✦  The Coach</text>
+    </g>
+    <line x1="20" y1="492" x2="355" y2="492" stroke="#D5DBE3"/>
+    <text x="20" y="522" font-size="14" font-weight="600" fill="#1A202D">Show everything now</text>
+    <text x="20" y="542" font-size="12" fill="#5B6472">Skip the step-by-step start. You can switch</text>
+    <text x="20" y="558" font-size="12" fill="#5B6472">back any time.</text>
+    <rect x="307" y="508" width="48" height="28" rx="14" fill="#D5DBE3"/><circle cx="321" cy="522" r="11" fill="#FFFFFF"/>
+    <line x1="20" y1="580" x2="355" y2="580" stroke="#D5DBE3"/>
+    <text x="20" y="608" font-size="12" fill="#5B6472">Every page is already open: search for it in Quick add.</text>
+    <text x="20" y="650" font-size="11" fill="#5B6472">One primary (the trigger move). "More with Plus" is never</text>
+    <text x="20" y="666" font-size="11" fill="#5B6472">listed here. Phone: bottom sheet; md+: right panel.</text>
+  </g>
+</svg>

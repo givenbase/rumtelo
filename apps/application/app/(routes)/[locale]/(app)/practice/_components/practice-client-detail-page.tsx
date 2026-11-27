@@ -107,7 +107,11 @@ export function PracticeClientDetailPage({ linkId }: { linkId: string }) {
 
     const isManaged = client.access === PracticeClientAccess.MANAGE && isActive;
     const progressNote = isManaged
-        ? t('pages.practice.clients.progress_blurb')
+        ? t(
+              isProductEnabled('energy') || isProductEnabled('soul')
+                  ? 'pages.practice.clients.progress_blurb'
+                  : 'pages.practice.clients.progress_blurb_core'
+          )
         : t('pages.practice.clients.progress_view_only');
 
     const snapshotPending = snapshotEnabled && snapshotQuery.isPending;

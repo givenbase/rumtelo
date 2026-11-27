@@ -7,6 +7,8 @@ import { z } from 'zod';
 
 import { Cadence, Currency, FlowDirection, Locale, Theme } from '../../../../common/common.enums';
 import { HouseholdScoped, Id, IsoDate, Money } from '../../../../common/common.schema';
+import { AccountDirectionText } from '../../../platform/account/account.schema';
+import { WorkSituation, YearIntention } from '../../../platform/enums';
 import {
     HouseholdAnswers,
     HouseholdFeatureSettings,
@@ -42,11 +44,21 @@ export const ArchiveHouseholdSettings = z.object({
 
 /**
  * Portable person prefs for the importing user only — no tour / onboardedAt.
+ * `workSituation`, `yearIntention`, `direction` and `directionWhy` are the person's own
+ * answers: optional so older exports still validate. `workSituation` and `yearIntention`
+ * are restored onto the account of whoever runs the restore. `direction` and `directionWhy`
+ * are the exporter's private words: they are exported (for that person's own copy) but never
+ * imported, because a file can come from anyone and would otherwise write text onto the
+ * restoring person. A file that carries them gets the warning `personal_direction_skipped`.
  */
 export const ArchiveAccountSettings = z.object({
     locale: z.enum(Locale).optional(),
     theme: z.enum(Theme).optional(),
     spendingStyle: z.enum(SpendingStyle).optional(),
+    workSituation: z.enum(WorkSituation).nullish(),
+    yearIntention: z.enum(YearIntention).nullish(),
+    direction: AccountDirectionText.nullish(),
+    directionWhy: AccountDirectionText.nullish(),
 });
 
 /** Household-saved counterparty — restore by name (ids differ per household). */
@@ -68,8 +80,11 @@ export const ArchiveParty = z.looseObject({
 export const ArchiveBankAccount = z.looseObject({
     name: z.string().min(1).max(120),
     kind: z.enum(AccountKind),
-    /** Catalog Bank.key — remapped to local bankId on restore. */
-    bankKey: z.string().min(1).max(64),
+    /**
+     * Catalog Bank.key — remapped to local bankId on restore. Null/absent for an
+     * account without a bank (the onboarding "Main account"); it restores bankless.
+     */
+    bankKey: z.string().min(1).max(64).nullish(),
     /** Full electronic IBAN when known. */
     iban: z.string().max(42).nullish(),
     balance: Money.optional(),
@@ -196,7 +211,7 @@ export const ArchiveRestorePayload = z.object({
     householdId: z.string().optional(),
     /** Board prefs (currency, debt strategy, audiences, …). */
     settings: ArchiveHouseholdSettings.optional(),
-    /** Importer’s own locale / theme / spending style. */
+    /** Importer’s own locale / theme / spending style / work answers (not direction text). */
     accountSettings: ArchiveAccountSettings.optional(),
     parties: z.array(ArchiveParty).default([]),
     accounts: z.array(ArchiveBankAccount).default([]),

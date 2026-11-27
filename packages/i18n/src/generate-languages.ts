@@ -14,7 +14,7 @@ const SECTIONS = ['common', 'ui', 'features', 'pages'] as const;
 
 export type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
 
-export async function loadEnglishTranslations(): Promise<Json> {
+export async function loadEnglishTranslations(options: { quiet?: boolean } = {}): Promise<Json> {
     const out: Record<string, Json> = {};
 
     for (const section of SECTIONS) {
@@ -38,7 +38,7 @@ export async function loadEnglishTranslations(): Promise<Json> {
                     console.warn(`No default export: ${section}/${file}`);
                     return null;
                 }
-                console.log(`Loaded ${section}.${moduleName}`);
+                if (!options.quiet) console.log(`Loaded ${section}.${moduleName}`);
                 return { moduleName, value: mod.default as Json };
             })
         );

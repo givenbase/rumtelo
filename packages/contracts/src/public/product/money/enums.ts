@@ -7,6 +7,24 @@ export enum JarKey {
     LONG_TERM_SAVINGS = 'LONG_TERM_SAVINGS',
     PLAY = 'PLAY',
     GIVE = 'GIVE',
+    /** Optional pot in Basics: everyday spending, taken out of NECESSITIES when turned on. */
+    DAILY = 'DAILY',
+    /** Optional pot in Future: named goals, taken out of LONG_TERM_SAVINGS when turned on. */
+    GOALS = 'GOALS',
+}
+
+/**
+ * Display group a jar belongs to (NL Basis · Toekomst · Vrij). Presentation only:
+ * the jars stay the stored unit, a group is derived from the key via
+ * `JAR_GROUP_BY_KEY` and never persisted or sent on the wire.
+ */
+export enum JarGroup {
+    /** What must be paid. */
+    BASIS = 'BASIS',
+    /** What you build. */
+    FUTURE = 'FUTURE',
+    /** What you choose. */
+    FREE = 'FREE',
 }
 
 export enum DebtKind {

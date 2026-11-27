@@ -4,7 +4,6 @@ import { useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
-import { pickPortalCoach } from '@/app/_lib/portal-coach';
 import { isLiveData } from '@/app/_lib/preview';
 import { energyPortalShell } from '@/app/_lib/portal-hubs';
 import { PortalHub, type PortalHubProps } from '@/components/features/home/portal-hub';
@@ -17,7 +16,6 @@ function scoreLabel(score: number | null | undefined): string {
 
 export function EnergyPortalHubClient() {
     const t = useTranslations();
-    const tCoach = useTranslations('features.coach');
     const tc = useTranslations('features.energy.hub.cards');
     const shell = energyPortalShell(t);
     const { householdId } = useAuth();
@@ -39,7 +37,6 @@ export function EnergyPortalHubClient() {
 
     const props: PortalHubProps = {
         ...shell,
-        coach: pickPortalCoach(data?.coach ?? [], shell.fallbackCoach, tCoach, t),
         cards: [
             {
                 name: tc('week.name'),

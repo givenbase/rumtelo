@@ -12,9 +12,12 @@ const BACKEND_ROOT = resolve(fileURLToPath(new URL('.', import.meta.url)), '..',
 
 async function main() {
     const orm = await MikroORM.init({ ...config, connect: false, debug: false });
-    const metas = Object.values(orm.getMetadata().getAll()).filter(
-        m => !m.abstract && !m.pivotTable
-    );
+    // MikroORM 7 returns a Map here; 6 returned a plain object.
+    const all = orm.getMetadata().getAll() as unknown;
+    const allMetas = (
+        all instanceof Map ? [...all.values()] : Object.values(all as Record<string, unknown>)
+    ).map(meta => meta as ReturnType<ReturnType<typeof orm.getMetadata>['get']>);
+    const metas = allMetas.filter(m => !m.abstract && !m.pivotTable);
     const root = join(BACKEND_ROOT, 'src') + '/';
     type Row = {
         name: string;
@@ -83,7 +86,7 @@ async function main() {
         'backoffice · plan',
         'other',
     ];
-    const pivots = Object.values(orm.getMetadata().getAll())
+    const pivots = allMetas
         .filter(m => m.pivotTable)
         .map(m => `${m.schema}.${m.tableName}`)
         .sort();
@@ -120,7 +123,7 @@ async function main() {
         '| From → to | Storage |',
         '|---|---|',
         '| backoffice → backoffice | relation (id FK / pivot entity) |',
-        '| household → backoffice | `*Key` snapshot string (`Jar.templateKey`, `Goal.givingOrganizationKey`, `Transaction.inflowKey`, `FixedCost.presetKey`) |',
+        '| household → backoffice | natural-key FK via `CatalogKey` (`FixedCost` / `IncomeSource` / `Debt` / `Asset`.`presetKey`, `IncomeSource.merchantKey`, `Goal.givingOrganizationKey`, `Transaction.inflowKey`, …) |',
         '| household → household | relation with explicit `deleteRule` |',
         ''
     );

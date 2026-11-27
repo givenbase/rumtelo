@@ -1,16 +1,22 @@
 /**
  * Restore a Rumtelo JSON household export into the current household.
- * Remaps jars by JarKey; skips plan-gated / duplicate rows; dry-run by default.
+ * Remaps jars by JarKey (a pot this household has not turned on goes to its group's main pot); skips plan-gated / duplicate rows; dry-run by default.
+ * The real run is one database transaction: every section is written or none is.
+ * Household settings are applied only for a role that may update them (OWNER); anyone else's
+ * restore skips that section with `household_settings_skipped_role`. The exporter's private
+ * `direction` / `directionWhy` are never imported (`personal_direction_skipped`).
  */
 
 import { createHash } from 'node:crypto';
 
+import { isValidIban, normalizeIban } from '@rumtelo/utils';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Inject, Injectable } from '@nestjs/common';
 
 import {
     AccountKind,
     CAPABILITIES,
+    GoalKind,
     GoalStatus,
     TransactionSource,
     TransactionStatus,
@@ -18,11 +24,21 @@ import {
     type ArchiveRestorePayload,
     type ArchiveRestoreResult,
     type ArchiveSectionCounts,
-    type JarKey,
+    HouseholdPermissionAction,
+    HouseholdPermissionSection,
+    type HouseholdRole,
+    JarKey,
+    resolveJarKeyForHousehold,
+    roleCan,
 } from '@rumtelo/contracts';
 
 import { PlanAccessService } from '../../../../../common/capability';
-import { currentHouseholdId } from '../../../../../common/household/household.context';
+import { apiBadRequest } from '../../../../../common/errors/api-user-error';
+import { checkJarSplit } from '../../../../../common/utils/jar-split.util';
+import {
+    currentHouseholdContext,
+    currentHouseholdId,
+} from '../../../../../common/household/household.context';
 import { HouseholdScopedRepository } from '../../../../../common/household/household-scoped.repository';
 import { HouseholdSettingsService } from '../../../../auth/household/household-settings/household-settings.service';
 import { AccountSettingsService } from '../../../../auth/user/account/account-settings/account-settings.service';
@@ -38,6 +54,11 @@ import { JarService } from '../plan/jar/jar.service';
 import { PartyService } from '../plan/party/party.service';
 import { SortRuleService } from '../ledger/sort-rule/sort-rule.service';
 import { Transaction } from '../ledger/transaction/transaction.entity';
+import {
+    assertDueMonthFits,
+    assertSettlementTarget,
+    normalizeArchiveName,
+} from './archive-rules.util';
 
 const emptySection = (): ArchiveSectionCounts => ({
     willImport: 0,
@@ -48,6 +69,7 @@ const emptySection = (): ArchiveSectionCounts => ({
 @Injectable()
 export class ArchiveService {
     private readonly transactions: HouseholdScopedRepository<Transaction>;
+    private readonly assets: HouseholdScopedRepository<Asset>;
 
     constructor(
         @Inject(EntityManager) private readonly em: EntityManager,
@@ -65,13 +87,37 @@ export class ArchiveService {
         @Inject(AccountSettingsService) private readonly accountSettings: AccountSettingsService
     ) {
         this.transactions = new HouseholdScopedRepository(em, Transaction);
+        this.assets = new HouseholdScopedRepository(em, Asset);
     }
 
     // ====================================================================
     // ? CREATE Operations
     // ====================================================================
 
-    async restore(input: {
+    /**
+     * Preview (`dryRun`) or apply an archive. Both modes walk the same pass, so the preview
+     * refuses what the real run refuses; only the writes differ. The real run is one
+     * transaction: a service that rejects a row in a late section (income, debts, bills,
+     * goals) rolls back everything written before it, instead of leaving a half-restored
+     * board. Services called from it open their own `em.transactional` (the pot split's row
+     * lock); MikroORM turns those into savepoints inside this transaction.
+     */
+    restore(input: {
+        payload: ArchiveRestorePayload;
+        dryRun: boolean;
+        applyJarSplit: boolean;
+        applySettings: boolean;
+    }): Promise<ArchiveRestoreResult> {
+        if (input.dryRun) return this.restorePass(input);
+        return this.em.transactional(() => this.restorePass(input));
+    }
+
+    // ====================================================================
+    // ? Helpers
+    // ====================================================================
+
+    /** The whole restore: validates and counts every section, and writes unless `dryRun`. */
+    private async restorePass(input: {
         payload: ArchiveRestorePayload;
         dryRun: boolean;
         applyJarSplit: boolean;
@@ -84,6 +130,42 @@ export class ArchiveService {
         const canDebt = hasCapability(CAPABILITIES.moneyDebt, planKey);
         const canGoals = hasCapability(CAPABILITIES.growthGoals, planKey);
         const householdId = currentHouseholdId();
+        // Same helper and matrix `RolePermissionInterceptor` uses, with the role the scope
+        // interceptor stored for this request (never a hard-coded OWNER).
+        const canUpdateHouseholdSettings = roleCan(
+            currentHouseholdContext().role as HouseholdRole,
+            HouseholdPermissionSection.HOUSEHOLD_SETTINGS,
+            HouseholdPermissionAction.UPDATE
+        );
+
+        // Decide the jar split before anything is written: the same rule `updateSplit`
+        // enforces (`checkJarSplit`) runs here, in the dry run too, and a bad split is skipped
+        // with a warning instead of aborting the import.
+        const localJars = await this.jars.list();
+        const localKeyToId = new Map(localJars.map(jar => [jar.key, jar.id]));
+        const localKeys = new Set(localKeyToId.keys());
+        const billJarIds = new Set(
+            localJars.filter(jar => jar.capabilities.allowsFixedCosts).map(jar => jar.id)
+        );
+        let splitRows: Array<{ jarId: string; percentage: number }> | null = null;
+        if (applyJarSplit && payload.jars.length > 0) {
+            const checked = checkJarSplit(
+                localJars,
+                payload.jars.map(jar => ({ key: jar.key, percentage: jar.percentage }))
+            );
+            if (checked.ok) {
+                splitRows = checked.shares.map(share => ({
+                    jarId: localKeyToId.get(share.key)!,
+                    percentage: share.percentage,
+                }));
+            } else {
+                warnings.push(
+                    checked.reason === 'jar_split_keys'
+                        ? 'jar_split_incomplete'
+                        : 'jar_split_not_100'
+                );
+            }
+        }
 
         const settingsCounts = emptySection();
         const accountSettingsCounts = emptySection();
@@ -97,7 +179,14 @@ export class ArchiveService {
                 patch.features !== undefined ||
                 patch.answers !== undefined ||
                 patch.audienceKeys !== undefined;
-            if (hasPatch) {
+            if (hasPatch && !canUpdateHouseholdSettings) {
+                // `money/archive/restore` is gated as MONEY, which a MEMBER may call, but board
+                // settings are OWNER-only (`HOUSEHOLD_SETTINGS` UPDATE). Skip the section instead
+                // of letting a restore change what the settings screen would refuse. Dry run and
+                // real run take the same branch, so the preview tells the truth.
+                settingsCounts.skipped = 1;
+                warnings.push('household_settings_skipped_role');
+            } else if (hasPatch) {
                 settingsCounts.willImport = 1;
                 if (!dryRun) {
                     await this.householdSettings.update(householdId, patch);
@@ -108,13 +197,38 @@ export class ArchiveService {
         }
 
         if (applySettings && payload.accountSettings) {
+            // Person prefs and the person's own answers land on the account of whoever runs the
+            // restore (`update` resolves it from the session) — never on another account.
             const { locale, theme, spendingStyle } = payload.accountSettings;
+            // An export written by a person who had not answered carries null: that must not
+            // wipe what the restoring person has now, so null means "leave" here.
+            const workSituation = payload.accountSettings.workSituation ?? undefined;
+            const yearIntention = payload.accountSettings.yearIntention ?? undefined;
+            // `direction` / `directionWhy` are the exporter's private words: they stay in the
+            // file for that person's own copy but are never written onto whoever restores it
+            // (a file can come from anyone), so they are not part of the patch below.
+            if (
+                payload.accountSettings.direction?.trim() ||
+                payload.accountSettings.directionWhy?.trim()
+            ) {
+                warnings.push('personal_direction_skipped');
+            }
             const hasPatch =
-                locale !== undefined || theme !== undefined || spendingStyle !== undefined;
+                locale !== undefined ||
+                theme !== undefined ||
+                spendingStyle !== undefined ||
+                workSituation !== undefined ||
+                yearIntention !== undefined;
             if (hasPatch) {
                 accountSettingsCounts.willImport = 1;
                 if (!dryRun) {
-                    await this.accountSettings.update({ locale, theme, spendingStyle });
+                    await this.accountSettings.update({
+                        locale,
+                        theme,
+                        spendingStyle,
+                        workSituation,
+                        yearIntention,
+                    });
                 }
             } else {
                 accountSettingsCounts.skipped = 1;
@@ -123,9 +237,12 @@ export class ArchiveService {
 
         const partyCounts = emptySection();
         const existingParties = await this.parties.list();
-        const partyNames = new Set(existingParties.map(row => row.name.toLowerCase()));
+        const partyNames = new Set(
+            existingParties.map(row => normalizeArchiveName(row.name).toLowerCase())
+        );
         for (const row of payload.parties) {
-            const name = row.name.trim();
+            // The same form `PartyService` stores, so a name it would call taken is skipped here.
+            const name = normalizeArchiveName(row.name);
             if (!name || partyNames.has(name.toLowerCase())) {
                 partyCounts.skipped += 1;
                 continue;
@@ -147,17 +264,26 @@ export class ArchiveService {
         }
 
         const accountCounts = emptySection();
+        const settlementLinks: Array<{ accountName: string; settlementName: string }> = [];
         const pendingSettlements: Array<{ accountId: string; settlementName: string }> = [];
         if (payload.accounts.length > 0) {
             const existingAccounts = await this.accounts.list();
             const accountNames = new Set(existingAccounts.map(row => row.name.toLowerCase()));
+            // Kind by name, for the settlement check: the accounts already there plus the ones imported.
+            const accountKinds = new Map(
+                existingAccounts.map(row => [row.name.trim().toLowerCase(), row.kind])
+            );
             const accountIbans = new Set(
                 existingAccounts
                     .map(row => row.iban)
                     .filter((iban): iban is string => Boolean(iban))
             );
             const bankKeys = [
-                ...new Set(payload.accounts.map(row => row.bankKey.trim()).filter(Boolean)),
+                ...new Set(
+                    payload.accounts
+                        .map(row => row.bankKey?.trim())
+                        .filter((key): key is string => Boolean(key))
+                ),
             ];
             const banks = bankKeys.length
                 ? await this.em.find(Bank, { key: { $in: bankKeys }, isActive: true })
@@ -166,25 +292,35 @@ export class ArchiveService {
 
             for (const row of payload.accounts) {
                 const name = row.name.trim();
-                const bankId = bankIdByKey.get(row.bankKey.trim());
-                if (!bankId) {
+                const bankKey = row.bankKey?.trim() || null;
+                // No key = a bankless account (Main account): restore it as is.
+                const bankId = bankKey ? (bankIdByKey.get(bankKey) ?? null) : null;
+                if (bankKey && !bankId) {
                     accountCounts.skipped += 1;
-                    warnings.push(`bank_unknown_key:${row.bankKey}`);
+                    warnings.push(`bank_unknown_key:${bankKey}`);
                     continue;
                 }
                 const iban = row.iban?.trim() || null;
+                // Stored IBANs are in electronic form; compare in that form, as the service does.
+                const ibanKey = iban ? normalizeIban(iban) : null;
                 if (
                     !name ||
                     accountNames.has(name.toLowerCase()) ||
-                    (iban && accountIbans.has(iban))
+                    (ibanKey && accountIbans.has(ibanKey))
                 ) {
                     accountCounts.skipped += 1;
                     continue;
                 }
+                if (iban && !isValidIban(iban)) throw apiBadRequest('invalid_iban');
                 accountCounts.willImport += 1;
                 accountNames.add(name.toLowerCase());
-                if (iban) accountIbans.add(iban);
+                accountKinds.set(name.toLowerCase(), row.kind);
+                if (ibanKey) accountIbans.add(ibanKey);
                 if (row.wasConnected) warnings.push('account_reconnect_needed');
+                const settlementName = row.settlementAccountName?.trim();
+                if (row.kind === AccountKind.CREDIT && settlementName) {
+                    settlementLinks.push({ accountName: name, settlementName });
+                }
                 if (!dryRun) {
                     const created = await this.accounts.create({
                         name,
@@ -194,7 +330,6 @@ export class ArchiveService {
                         bankId,
                         isPrimary: row.isPrimary,
                     });
-                    const settlementName = row.settlementAccountName?.trim();
                     if (row.kind === AccountKind.CREDIT && settlementName) {
                         pendingSettlements.push({
                             accountId: created.id,
@@ -202,6 +337,20 @@ export class ArchiveService {
                         });
                     }
                 }
+            }
+
+            // Checked in the dry run too: `BankAccountService.update` refuses a settlement
+            // account that is the card itself or not a checking / savings account.
+            for (const link of settlementLinks) {
+                const targetKind = accountKinds.get(link.settlementName.toLowerCase());
+                if (!targetKind) {
+                    warnings.push('settlement_account_missing');
+                    continue;
+                }
+                assertSettlementTarget(link.accountName, {
+                    name: link.settlementName,
+                    kind: targetKind,
+                });
             }
 
             if (!dryRun && pendingSettlements.length > 0) {
@@ -221,45 +370,37 @@ export class ArchiveService {
             }
         }
 
-        const localJars = await this.jars.list();
-        const localKeyToId = new Map(localJars.map(jar => [jar.key, jar.id]));
         const exportIdToKey = new Map<string, JarKey>();
         for (const jar of payload.jars) {
             if (jar.id) exportIdToKey.set(jar.id, jar.key);
         }
 
-        const remapJarId = (exportJarId: string | null | undefined): string | null => {
+        // A pot the household has not turned on lands in its group's main pot, except with
+        // `exact`: a Give pledge measures spending out of its own pot, and on Play it would
+        // count every Play euro as given.
+        const remapJarId = (
+            exportJarId: string | null | undefined,
+            exact = false
+        ): string | null => {
             if (!exportJarId) return null;
             const key = exportIdToKey.get(exportJarId);
             if (!key) return null;
-            return localKeyToId.get(key) ?? null;
+            return (
+                localKeyToId.get(exact ? key : resolveJarKeyForHousehold(key, localKeys)) ?? null
+            );
         };
 
-        let jarsSplitUpdated = false;
-        if (applyJarSplit && payload.jars.length > 0) {
-            const total = payload.jars.reduce((sum, jar) => sum + jar.percentage, 0);
-            if (Math.abs(total - 100) <= 0.01) {
-                const split = payload.jars
-                    .map(jar => {
-                        const jarId = localKeyToId.get(jar.key);
-                        return jarId ? { jarId, percentage: jar.percentage } : null;
-                    })
-                    .filter((row): row is { jarId: string; percentage: number } => row !== null);
-                if (split.length === localJars.length) {
-                    if (!dryRun) await this.jars.updateSplit(split);
-                    jarsSplitUpdated = true;
-                } else {
-                    warnings.push('jar_split_incomplete');
-                }
-            } else {
-                warnings.push('jar_split_not_100');
-            }
-        }
+        // Decided here (the dry run reports it), written last: `updateSplit` row-locks every pot
+        // until the outer transaction commits, so it goes after the long sections to keep other
+        // members' pot writes waiting only briefly. Nothing between here and the end reads the
+        // stored percentages or the share history (bills and goals attach to a pot, never to
+        // its share), so the order does not change what lands.
+        const jarsSplitUpdated = splitRows !== null;
 
         // Holdings are not restored by the money archive; income / bills relink by
         // name to a holding this household already has (Max plan only).
         const canAssets = hasCapability(CAPABILITIES.growthNetWorth, planKey);
-        const localAssets = canAssets ? await this.em.find(Asset, { household: householdId }) : [];
+        const localAssets = canAssets ? await this.assets.find({}) : [];
         const localAssetByName = new Map(
             localAssets.map(asset => [asset.name.trim().toLowerCase(), asset.id])
         );
@@ -290,6 +431,7 @@ export class ArchiveService {
             }
             incomeCounts.willImport += 1;
             incomeNames.add(row.name.toLowerCase());
+            const incomeAssetId = remapAssetId(row);
             if (!dryRun) {
                 await this.income.create({
                     name: row.name,
@@ -298,7 +440,7 @@ export class ArchiveService {
                     merchantKey: row.merchantKey ?? null,
                     // Relink by name when the export marked a saved party.
                     saveParty: Boolean(row.partyName?.trim()),
-                    assetId: remapAssetId(row),
+                    assetId: incomeAssetId,
                     kind: row.kind,
                     amount: row.amount,
                     cadence: row.cadence,
@@ -327,6 +469,8 @@ export class ArchiveService {
                     if (row.id && match) debtIdMap.set(row.id, match.id);
                     continue;
                 }
+                // `DebtService.create` refuses a quarterly / yearly debt without a due month.
+                assertDueMonthFits(row.paymentCadence, row.dueMonth);
                 debtCounts.willImport += 1;
                 debtNames.add(row.name.toLowerCase());
                 if (!dryRun) {
@@ -362,7 +506,10 @@ export class ArchiveService {
         );
         for (const row of payload.fixedCosts) {
             const jarId = remapJarId(row.jarId);
-            if (!jarId) {
+            // A bill that fell back to a main pot which takes no bills (Education -> Long-term
+            // savings) would be refused by `FixedCostService.create`, so it is skipped here like
+            // an unmapped jar.
+            if (!jarId || !billJarIds.has(jarId)) {
                 fixedCounts.skipped += 1;
                 warnings.push('fixed_cost_jar_unmapped');
                 continue;
@@ -372,8 +519,11 @@ export class ArchiveService {
                 fixedCounts.skipped += 1;
                 continue;
             }
+            // `FixedCostService.create` refuses a quarterly / yearly bill without a due month.
+            assertDueMonthFits(row.cadence, row.dueMonth);
             fixedCounts.willImport += 1;
             fixedKeys.add(key);
+            const fixedAssetId = remapAssetId(row);
             if (!dryRun) {
                 await this.fixedCosts.create({
                     jarId,
@@ -383,7 +533,7 @@ export class ArchiveService {
                     cadence: row.cadence,
                     direction: row.direction,
                     debtId: row.debtId ? (debtIdMap.get(row.debtId) ?? null) : null,
-                    assetId: remapAssetId(row),
+                    assetId: fixedAssetId,
                     counterparty: row.counterparty ?? null,
                     dueDay: row.dueDay ?? null,
                     dueMonth: row.dueMonth ?? null,
@@ -415,13 +565,22 @@ export class ArchiveService {
                     warnings.push('goals_limit_reached');
                     continue;
                 }
+                // A Give pledge needs the household's own Give pot (`GoalService.create` refuses
+                // anything else): skip it.
+                const isGive = row.kind === GoalKind.GIVE;
+                const goalJarId = remapJarId(row.jarId ?? null, isGive);
+                if (isGive && localJars.find(jar => jar.id === goalJarId)?.key !== JarKey.GIVE) {
+                    goalCounts.skipped += 1;
+                    warnings.push('goal_give_pot_missing');
+                    continue;
+                }
                 goalCounts.willImport += 1;
                 goalNames.add(row.name.toLowerCase());
                 occupied += 1;
                 if (!dryRun) {
                     await this.goals.create({
                         kind: row.kind,
-                        jarId: remapJarId(row.jarId ?? null),
+                        jarId: goalJarId,
                         name: row.name,
                         icon: row.icon ?? null,
                         target: row.target,
@@ -532,6 +691,9 @@ export class ArchiveService {
         if (!dryRun && txCounts.willImport > 0) {
             await this.em.flush();
         }
+
+        // Last write: the pot locks are taken here and released a moment later at commit.
+        if (!dryRun && splitRows) await this.jars.updateSplit(splitRows);
 
         return {
             dryRun,

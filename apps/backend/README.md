@@ -1,6 +1,6 @@
 # @rumtelo/backend
 
-NestJS 11 + Fastify + oRPC + MikroORM 6 + better-auth. **ESM** — every `@orpc/*`
+NestJS 11 + Fastify + oRPC + MikroORM 7 + better-auth. **ESM** — every `@orpc/*`
 package ships ESM only, so CommonJS is not an option here.
 
 ```bash
@@ -46,7 +46,7 @@ Also avoid cryptic abbreviations that pass the rule (`tx`, `alloc`, `str`) — p
 
 ### MikroORM persistence — no `*AndFlush`
 
-MikroORM 6 deprecates `em.persistAndFlush` / `em.removeAndFlush`. Always chain:
+MikroORM 7 deprecates `em.persistAndFlush` / `em.removeAndFlush`. Always chain:
 
 ```ts
 // ✅
@@ -85,7 +85,7 @@ See `docs/ENTITY_STYLE.md`. Enforced by `pnpm lint:entities`:
 
 ## Households: the isolation model
 
-A **household** is one shared money unit — one board of jars, one week check, one
+A **household** is one shared money unit — one board of pots (`jar` in code), one week check, one
 pot of money to steer. It is a better-auth organization stored as `auth.household`
 (`modelName: 'household'`). A solo user is a
 household of one; a couple, family or friends-investing-together group are

@@ -1,6 +1,7 @@
 import {
     jarCapabilitiesFor,
     type JarKey,
+    resolveJarKeyForHousehold,
     RuleField,
     RuleMatcher,
     TransactionStatus,
@@ -42,8 +43,9 @@ export const PAYEE_MEMORY_RULE_PRIORITY = 900;
 
 /**
  * Place inbox rows: household rules first (priority order, first match wins),
- * then the merchant catalog (outflows only). A merchant whose jar cannot take an
- * outflow (Financial Freedom) is skipped — the row stays in the inbox.
+ * then the merchant catalog (outflows only). A merchant whose pot the household has not
+ * turned on sorts into that group's main pot instead (`resolveJarKeyForHousehold`). A merchant
+ * whose pot cannot take an outflow (Financial Freedom) is skipped — the row stays in the inbox.
  *
  * Mutates the rows. Increments `rule.hitCount` only when `countHits` is set,
  * so a dry-run preview does not teach the rules they fired.
@@ -54,6 +56,7 @@ export function autoSortRows(
     options?: { countHits?: boolean }
 ): number {
     let sorted = 0;
+    const presentKeys = new Set(context.jarsByKey.keys());
     for (const row of rows) {
         if (row.status !== TransactionStatus.INBOX || row.jar) continue;
 
@@ -78,7 +81,7 @@ export function autoSortRows(
             text: `${row.counterparty ?? ''} ${row.description}`,
         });
         if (!merchant) continue;
-        const jarKey = merchant.jarTemplate.key;
+        const jarKey = resolveJarKeyForHousehold(merchant.jarTemplate.key, presentKeys);
         const jar = context.jarsByKey.get(jarKey);
         if (!jar) continue;
         if (!jarCapabilitiesFor(jarKey).canSpend) continue;

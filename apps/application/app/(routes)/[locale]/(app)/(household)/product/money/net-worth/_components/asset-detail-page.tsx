@@ -27,6 +27,7 @@ import {
     createTxHref,
     assetDetailHref,
     fixedCostsForAssetHref,
+    incomeForAssetHref,
     fixedDetailHref,
     transactionsForAssetHref,
     txDetailHref,
@@ -40,6 +41,7 @@ import { useHoldings } from '@/app/_lib/use-holdings';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { findCatalogMerchantFromFeed, findPartyVendor, partyMark } from '@/app/_lib/vendor-brands';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import {
     JarBadge,
@@ -49,7 +51,7 @@ import {
 } from '@/components/features/money/jar-badge';
 import { MetricStrip } from '@/components/features/money/metric-strip';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
-import { CoachTipCard } from '@/components/features/helpers';
+import { CoachLine } from '@/components/features/helpers';
 import { EntityNotFoundState } from '@/components/features/helpers/entity-not-found-state';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
@@ -134,7 +136,9 @@ function LinkedSection({
 export function AssetDetailPageClient({ assetId }: { assetId: string }) {
     const t = useTranslations('features.growth.net_worth');
     const tChips = useTranslations('features.money.chips');
+    const tLeak = useTranslations('features.money.business_household_leak');
     const tAction = useTranslations('common.action');
+    const jarName = useJarName();
     const appLocale = useLocale();
     const searchParams = useSearchParams();
     const setupParam = searchParams.get('setup');
@@ -420,7 +424,7 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
                         count={linkedIncome.length}
                         addHref={createIncomeHref({ assetId: asset.id })}
                         addLabel={t('detail.add_income')}
-                        openHref={fixedCostsForAssetHref(asset.id, 'in')}
+                        openHref={incomeForAssetHref(asset.id)}
                         openLabel={t('detail.open_in_money')}
                         empty={t('detail.linked_empty_income')}>
                         {linkedIncome.map(source => {
@@ -471,7 +475,7 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
                         count={linkedBills.length}
                         addHref={createFixedHref({ assetId: asset.id })}
                         addLabel={t('detail.add_bill')}
-                        openHref={fixedCostsForAssetHref(asset.id, 'out')}
+                        openHref={fixedCostsForAssetHref(asset.id)}
                         openLabel={t('detail.open_in_money')}
                         empty={t('detail.linked_empty_bills')}>
                         {linkedBills.map(bill => {
@@ -509,7 +513,7 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
                                             {jar ? (
                                                 <JarBadge
                                                     jarKey={jar.key}
-                                                    name={jar.name}
+                                                    name={jarName(jar)}
                                                     icon={jar.icon}
                                                 />
                                             ) : null}
@@ -571,7 +575,7 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
                                             {jar ? (
                                                 <JarBadge
                                                     jarKey={jar.key}
-                                                    name={jar.name}
+                                                    name={jarName(jar)}
                                                     icon={jar.icon}
                                                 />
                                             ) : null}
@@ -587,12 +591,24 @@ export function AssetDetailPageClient({ assetId }: { assetId: string }) {
                         {t('detail.money_note')}
                     </Typography>
 
+                    {/* Same wording as the Fixed costs feed tip; scoped to this holding's bills. */}
                     {asset.kindKey === 'BUSINESS' && flow.monthlyOut > 0 ? (
-                        <CoachTipCard title={t('detail.coach_business_title')} tone="warning">
-                            {t('detail.coach_business_body', {
-                                amount: formatMoney(flow.monthlyOut),
-                            })}
-                        </CoachTipCard>
+                        <CoachLine
+                            candidates={[
+                                {
+                                    id: `holding.business_costs:${asset.id}`,
+                                    text: tLeak('line', { amount: formatMoney(flow.monthlyOut) }),
+                                    cta: {
+                                        label: tLeak('review_bills'),
+                                        href: fixedCostsForAssetHref(asset.id),
+                                    },
+                                    dismiss: {
+                                        kind: 'local',
+                                        fingerprint: String(flow.monthlyOut),
+                                    },
+                                },
+                            ]}
+                        />
                     ) : null}
                 </>
             ) : null}

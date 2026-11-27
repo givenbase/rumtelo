@@ -1,13 +1,24 @@
 import type { z } from 'zod';
 
 import {
+    AccountKind,
     Currency,
+    HouseholdAnswerKey,
     HouseholdRelation,
     HouseholdRole,
     IncomeKind,
     IncomeStability,
+    JarExperience,
+    type HouseholdSeatUsage,
+    HouseholdPermissionAction,
+    HouseholdPermissionSection,
+    JAR_MAIN_KEY_BY_GROUP,
+    type JarKey,
+    type Locale,
     PlanKey,
     type OnboardingInput,
+    type OnboardingSplitPreview,
+    type OnboardingSplitPreviewInput,
     PayoffStrategy,
     canAddHouseholdMember,
     canInviteOnPlan,
@@ -15,6 +26,7 @@ import {
     isWritableHouseholdRole,
     localeToIntl,
     planAllowsInviteRole,
+    roleCan,
 } from '@rumtelo/contracts';
 
 import { EntityManager } from '@mikro-orm/postgresql';
@@ -23,19 +35,34 @@ import { AuthService } from '@thallesp/nestjs-better-auth';
 
 import type { Auth } from '../engine/auth.config';
 
-import { apiBadRequest } from '../../../common/errors/api-user-error';
-import { currentUserId, currentAuthHeaders } from '../../../common/household/household.context';
-import { mapToOrpcClientError } from '../../../common/utils/database-constraint-error.util';
+import { apiBadRequest, apiForbidden } from '../../../common/errors/api-user-error';
+import {
+    currentAuthHeaders,
+    currentHouseholdContext,
+    currentUserId,
+} from '../../../common/household/household.context';
+import {
+    mapToOrpcClientError,
+    parseUniqueConstraint,
+} from '../../../common/utils/database-constraint-error.util';
 import { EmailService } from '../../backoffice/communication/email';
 import { JarTemplateService } from '../../backoffice/product/money/template/jar/jar.service';
+import { BankAccount } from '../../public/product/money/ledger/bank-account/bank-account.entity';
 import { IncomeAmountPeriod } from '../../public/product/money/plan/income/income-amount-period.entity';
 import { IncomeSource } from '../../public/product/money/plan/income/income-source.entity';
 import { Jar } from '../../public/product/money/plan/jar/jar.entity';
+import {
+    JAR_SHARE_BASELINE_PERIOD,
+    JarShare,
+} from '../../public/product/money/plan/jar/jar-share.entity';
 import { AccountSettingsService } from '../user/account/account-settings/account-settings.service';
 import { AccountService } from '../user/account/account.service';
 import { personDisplayName } from '../user/account/person-display-name.util';
 import { HouseholdBillingService } from './household-billing/household-billing.service';
+import { HouseholdSettings } from './household-settings/household-settings.entity';
 import { HouseholdSettingsService } from './household-settings/household-settings.service';
+import { resolveJarSplit, splitIncomeByJar } from '../../../common/utils/jar-split.util';
+import { defaultHouseholdName, mainAccountName } from './onboarding-defaults.util';
 import { AuthHousehold } from './managed/household/auth-household.entity';
 import { AuthInvitation } from './managed/invitation/auth-invitation.entity';
 import { AuthSession } from '../user/managed/session/auth-session.entity';
@@ -108,10 +135,10 @@ export class HouseholdService {
             );
         }
 
-        const seats = await this.seatOccupation(householdId);
+        const seats = await this.seatOccupation(householdId, new Date());
         if (
             !canAddHouseholdMember(planKey, {
-                occupiedSeats: seats.occupied,
+                occupiedSeats: seats.members + seats.pendingInvites,
                 writableCount: seats.writableCount,
                 viewerCount: seats.viewerCount,
                 role,
@@ -158,8 +185,55 @@ export class HouseholdService {
     }
 
     // ====================================================================
+    // ? DELETE Operations
+    // ====================================================================
+
+    /** Owner removes a MEMBER or VIEWER. The owner seat stays. */
+    async removeMember(householdId: string, memberId: string) {
+        const target = await this.em.findOne(AuthMember, {
+            id: memberId,
+            household: householdId,
+        });
+        if (!target) throw apiBadRequest('member_not_found');
+        if (mapRole(target.role) === HouseholdRole.OWNER) {
+            throw apiBadRequest('cannot_remove_owner');
+        }
+
+        const headers = currentAuthHeaders();
+        try {
+            await this.authService.api.removeMember({
+                body: {
+                    memberIdOrEmail: memberId,
+                    organizationId: householdId,
+                },
+                headers,
+            });
+        } catch (error) {
+            throw mapToOrpcClientError(error);
+        }
+
+        return { ok: true as const };
+    }
+
+    // ====================================================================
     // ? READ Operations
     // ====================================================================
+
+    /**
+     * Onboarding split preview: income into the default pots (three) in minor units, nothing written.
+     * Needs a signed-in session only (no household), and never reads one.
+     */
+    async previewSplit(
+        input: z.infer<typeof OnboardingSplitPreviewInput>
+    ): Promise<OnboardingSplitPreview> {
+        const templates = await this.requireJarTemplates();
+        const shares = resolveJarSplit(templates, input.split);
+        return {
+            currency: input.currency,
+            monthlyNetIncome: input.monthlyNetIncome,
+            jars: splitIncomeByJar(input.monthlyNetIncome, shares),
+        };
+    }
 
     async listHouseholds() {
         const userId = currentUserId();
@@ -207,6 +281,43 @@ export class HouseholdService {
         );
     }
 
+    /**
+     * Seat use as `invite` counts it: members plus pending, unexpired invitations, against
+     * the plan's effective caps. Counts only (no e-mails). Inviting is what this answers, so
+     * it follows the invite permission: OWNER and MEMBER, never VIEWER.
+     */
+    async seats(householdId: string, now = new Date()): Promise<HouseholdSeatUsage> {
+        const role = HouseholdRole[currentHouseholdContext().role];
+        if (
+            !roleCan(
+                role,
+                HouseholdPermissionSection.HOUSEHOLD_MEMBERS,
+                HouseholdPermissionAction.CREATE
+            )
+        ) {
+            throw apiForbidden('role_permission_denied');
+        }
+
+        const [settings, snap, seats] = await Promise.all([
+            this.householdSettings.get(householdId),
+            this.householdBilling.getSnapshot(householdId),
+            this.seatOccupation(householdId, now),
+        ]);
+        const caps = effectiveSeatCaps(settings.planKey, {
+            extraContributor: snap.extraContributorSeats,
+            extraViewer: snap.extraViewerSeats,
+        });
+        return {
+            members: seats.members,
+            pendingInvites: seats.pendingInvites,
+            writableUsed: seats.writableCount,
+            viewerUsed: seats.viewerCount,
+            maxMembers: caps.maxMembers,
+            maxWritable: caps.maxWritable,
+            maxViewer: caps.maxViewer,
+        };
+    }
+
     /** Max `session.updated_at` per user — proxy for last signed-in activity. */
     private async lastSeenByUserIds(userIds: string[]): Promise<Map<string, Date>> {
         const map = new Map<string, Date>();
@@ -242,9 +353,17 @@ export class HouseholdService {
     // Private helpers
     // ====================================================================
 
-    /** Members + pending invites by role bucket against effective seat caps. */
-    private async seatOccupation(householdId: string): Promise<{
-        occupied: number;
+    /**
+     * Members + pending invites by role bucket: the single source for `invite` and `seats`.
+     * An invitation past `expiresAt` holds no seat (better-auth keeps the row as 'pending'
+     * until someone cancels it).
+     */
+    private async seatOccupation(
+        householdId: string,
+        now: Date
+    ): Promise<{
+        members: number;
+        pendingInvites: number;
         writableCount: number;
         viewerCount: number;
     }> {
@@ -252,6 +371,7 @@ export class HouseholdService {
         const pending = await this.em.find(AuthInvitation, {
             household: householdId,
             status: 'pending',
+            expiresAt: { $gt: now },
         });
 
         let writableCount = 0;
@@ -267,7 +387,8 @@ export class HouseholdService {
         }
 
         return {
-            occupied: memberships.length + pending.length,
+            members: memberships.length,
+            pendingInvites: pending.length,
             writableCount,
             viewerCount,
         };
@@ -284,6 +405,42 @@ export class HouseholdService {
         return `${base.slice(0, 72)}-${crypto.randomUUID().slice(0, 8)}`;
     }
 
+    /**
+     * The default jar templates (`isDefault`: one main pot per group) in display order. A
+     * catalog without all three main pots is a setup error (the seed has not run), never a
+     * split: it must not quietly create zero jars, or every optional pot as well.
+     */
+    private async requireJarTemplates() {
+        const templates = await this.jarTemplates.listDefault();
+        const present = new Set(templates.map(template => template.key));
+        if (!Object.values(JAR_MAIN_KEY_BY_GROUP).every(mainKey => present.has(mainKey))) {
+            throw new BadRequestException(
+                'Jar catalog has no default pots — seed backoffice.reference_money_jar_template with isDefault on the three main pots'
+            );
+        }
+        return templates;
+    }
+
+    /**
+     * An organization this person owns that never finished onboarding (no settings row):
+     * the leftover of a failed `onboard`. Reused on retry so a second call never makes a
+     * second organization.
+     */
+    private async findUnfinishedOwnedHousehold(
+        seats: AuthMember[]
+    ): Promise<{ id: string; name: string; slug: string } | null> {
+        const ownedIds = seats
+            .filter(seat => mapRole(seat.role) === HouseholdRole.OWNER)
+            .map(seat => seat.household.id);
+        if (ownedIds.length === 0) return null;
+        const finished = await this.em.find(HouseholdSettings, { household: { $in: ownedIds } });
+        const finishedIds = new Set(finished.map(settings => settings.household));
+        const unfinishedId = ownedIds.find(householdId => !finishedIds.has(householdId));
+        if (!unfinishedId) return null;
+        const org = await this.em.findOne(AuthHousehold, { id: unfinishedId });
+        return org ? { id: org.id, name: org.name, slug: org.slug } : null;
+    }
+
     private async onboardInternal(input: z.infer<typeof OnboardingInput>, headers: Headers) {
         const userId = currentUserId();
         // Fail fast on ghost sessions (Redis cookie after DB wipe) before BA org create.
@@ -291,35 +448,42 @@ export class HouseholdService {
 
         // Writable seats already own a board — block a second creator onboard.
         // VIEWER-only seats may still start their own household (soft upgrade).
+        // An owner seat whose organization never got settings is a failed earlier attempt:
+        // it does not count, and is reused below.
         const existingSeats = await this.em.find(AuthMember, { user: userId });
+        const unfinished = await this.findUnfinishedOwnedHousehold(existingSeats);
         const hasWritableSeat = existingSeats.some(
             seat => mapRole(seat.role) !== HouseholdRole.VIEWER
         );
-        if (hasWritableSeat) {
+        if (hasWritableSeat && !unfinished) {
             throw apiBadRequest('already_household_member');
         }
 
         const planKey = PlanKey.BASIC;
+        const locale = input.locale;
 
-        const splitTotal = input.split.reduce(
-            (sum: number, share: { percentage: number }) => sum + share.percentage,
-            0
-        );
-        if (Math.abs(splitTotal - 100) > 0.01) {
-            throw apiBadRequest('jar_split_total', { total: splitTotal });
-        }
+        // Validate before anything is created: the same rules `previewSplit` applies, so the
+        // board always matches what the person saw.
+        const templates = await this.requireJarTemplates();
+        const shares = resolveJarSplit(templates, input.split);
+        const percentageByKey = new Map(shares.map(share => [share.key, share.percentage]));
 
-        const slug = await this.uniqueOrgSlug(input.householdName);
+        const householdName = input.householdName?.trim() || defaultHouseholdName(locale);
         let org: { id: string; name: string; slug: string };
-        try {
-            const created = await this.authService.api.createOrganization({
-                body: { name: input.householdName, slug },
-                headers,
-            });
-            if (!created?.id) throw apiBadRequest('household_create_failed');
-            org = { id: created.id, name: created.name, slug: created.slug };
-        } catch (error) {
-            throw mapToOrpcClientError(error);
+        if (unfinished) {
+            org = unfinished;
+        } else {
+            const slug = await this.uniqueOrgSlug(householdName);
+            try {
+                const created = await this.authService.api.createOrganization({
+                    body: { name: householdName, slug },
+                    headers,
+                });
+                if (!created?.id) throw apiBadRequest('household_create_failed');
+                org = { id: created.id, name: created.name, slug: created.slug };
+            } catch (error) {
+                throw mapToOrpcClientError(error);
+            }
         }
 
         await this.authService.api.setActiveOrganization({
@@ -327,35 +491,96 @@ export class HouseholdService {
             headers,
         });
 
-        const splitByKey = new Map(
-            input.split.map((share: { key: string; percentage: number }) => [
-                share.key.toUpperCase(),
-                share.percentage,
-            ])
-        );
-
-        const templates = await this.jarTemplates.listActive();
-        if (templates.length === 0) {
-            throw new BadRequestException(
-                'Jar catalog is empty — seed backoffice.reference_money_jar_template'
-            );
+        try {
+            await this.seedBoard(org, userId, input, {
+                templates,
+                percentageByKey,
+                planKey,
+                locale,
+            });
+        } catch (error) {
+            // Two retries raced on the same unfinished organization and the other one wrote
+            // the jars first (unique household + key). Onboarding is idempotent: hand back
+            // the household that is already there instead of a 500.
+            if (!parseUniqueConstraint(error)) throw error;
+            this.em.clear();
+            return this.alreadyOnboarded(org, input.currency);
         }
 
+        return {
+            id: org.id,
+            name: org.name,
+            slug: org.slug,
+            currency: input.currency,
+            periodStartDay: 1,
+            createdAt: new Date().toISOString(),
+        };
+    }
+
+    /** The household a racing onboard already finished, as the caller would have received it. */
+    private async alreadyOnboarded(
+        org: { id: string; name: string; slug: string },
+        fallbackCurrency: Currency
+    ) {
+        const settings = await this.em.findOne(HouseholdSettings, { household: org.id });
+        return {
+            id: org.id,
+            name: org.name,
+            slug: org.slug,
+            currency: settings?.currency ?? fallbackCurrency,
+            periodStartDay: settings?.money.periodStartDay ?? 1,
+            createdAt: new Date().toISOString(),
+        };
+    }
+
+    /** Everything one onboard writes into the new household, in one flush. */
+    private async seedBoard(
+        org: { id: string; name: string; slug: string },
+        userId: string,
+        input: z.infer<typeof OnboardingInput>,
+        resolved: {
+            templates: Awaited<ReturnType<HouseholdService['requireJarTemplates']>>;
+            percentageByKey: Map<JarKey, number>;
+            planKey: PlanKey;
+            locale: Locale;
+        }
+    ): Promise<void> {
+        const { templates, percentageByKey, planKey, locale } = resolved;
+        // One account for the whole board: no bank, no IBAN — those come later from the
+        // checklist or Settings. Every jar and the income land on it.
+        const mainAccount = this.em.create(BankAccount, {
+            household: org.id,
+            name: mainAccountName(locale),
+            iban: null,
+            bank: null,
+            kind: AccountKind.CHECKING,
+            balance: 0,
+            isPrimary: true,
+        } as never);
+
         for (const meta of templates) {
-            const pct = splitByKey.get(meta.key) ?? Number(meta.percentage);
-            this.em.create(Jar, {
+            const percentage = percentageByKey.get(meta.key) ?? Number(meta.percentage);
+            const jar = this.em.create(Jar, {
                 household: org.id,
                 key: meta.key,
                 name: meta.name,
                 subtitle: meta.subtitle,
                 icon: meta.icon,
-                percentage: pct.toFixed(2),
+                percentage: percentage.toFixed(2),
                 capabilities: { ...meta.capabilities },
                 sortOrder: meta.sortOrder,
+                defaultAccount: mainAccount.id,
+            } as never);
+            // The pot's share history starts here: this share since the pot existed.
+            this.em.create(JarShare, {
+                household: org.id,
+                jar,
+                period: JAR_SHARE_BASELINE_PERIOD,
+                percentage: percentage.toFixed(2),
             } as never);
         }
 
-        this.householdSettings.create({
+        const settings = this.householdSettings.create({
             householdId: org.id,
             planKey,
             currency: input.currency,
@@ -365,9 +590,14 @@ export class HouseholdService {
                 payoffStrategy: input.payoffStrategy ?? PayoffStrategy.AVALANCHE,
             },
         });
+        // Kept for compatibility: the old bank wizard keyed off these two answers.
+        settings.answers = {
+            [HouseholdAnswerKey.JAR_EXPERIENCE]: JarExperience.NEW,
+            [HouseholdAnswerKey.JAR_BANK_SETUP_DONE]: true,
+        };
 
         await this.accountSettings.upsertForUser(userId, {
-            locale: input.locale as never,
+            locale: locale as never,
             spendingStyle: input.spendingStyle,
         });
         await this.accountSettings.markOnboarded(userId);
@@ -382,6 +612,7 @@ export class HouseholdService {
                 isActive: true,
                 startedOn,
                 endsOn: null,
+                account: mainAccount.id,
             } as never);
             this.em.create(IncomeAmountPeriod, {
                 household: org.id,
@@ -392,15 +623,6 @@ export class HouseholdService {
         }
 
         await this.em.flush();
-
-        return {
-            id: org.id,
-            name: org.name,
-            slug: org.slug,
-            currency: input.currency,
-            periodStartDay: 1,
-            createdAt: new Date().toISOString(),
-        };
     }
 }
 

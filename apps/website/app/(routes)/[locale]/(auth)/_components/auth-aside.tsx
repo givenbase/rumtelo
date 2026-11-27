@@ -4,13 +4,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { usePathname } from 'next/navigation';
 
+import { DEFAULT_GROUP_SPLIT, JAR_GROUP_ORDER, JarGroup } from '@rumtelo/contracts';
 import { useTranslations, type BrandQuote } from '@rumtelo/i18n';
-import {
-    AUTH_MANIFESTO_JAR_VISUALS,
-    AUTH_MANIFESTO_PORTAL_VISUALS,
-    AuthManifesto,
-    type AuthManifestoStrip,
-} from '@rumtelo/ui';
+import { AUTH_MANIFESTO_PORTAL_VISUALS, AuthManifesto, type AuthManifestoStrip } from '@rumtelo/ui';
 
 import { isLaunchProductsDeferred, isProductLive } from '@/lib/launch-products';
 
@@ -26,10 +22,15 @@ const LIVE_PORTAL_ITEMS = PORTAL_KEYS.map((key, index) => ({
     key,
     tone: AUTH_MANIFESTO_PORTAL_VISUALS[index]!.tone,
 })).filter(item => isProductLive(item.key));
-const JAR_KEYS = ['necessity', 'freedom', 'education', 'savings', 'play', 'give'] as const;
+/** One segment per group — the tone of its main pot; a new household starts with these three. */
+const GROUP_TONE: Record<JarGroup, string> = {
+    [JarGroup.BASIS]: 'bg-jar-nec',
+    [JarGroup.FUTURE]: 'bg-jar-lts',
+    [JarGroup.FREE]: 'bg-jar-play',
+};
 
 /**
- * Desktop auth manifesto — marketing quotes; jars on sign-up, portals elsewhere.
+ * Desktop auth manifesto — marketing quotes; the three pots on sign-up, portals elsewhere.
  * Respects prefers-reduced-motion (first quote stays; no video).
  */
 export function AuthAside() {
@@ -38,7 +39,6 @@ export function AuthAside() {
     const videoRef = useRef<HTMLVideoElement>(null);
     const [reduceMotion, setReduceMotion] = useState(false);
     const isSignUp = pathname.includes('/sign-up');
-    const footer = isSignUp ? 'jars' : 'portals';
     /** docs/brand/quotes.md — sign-up leads with how-it-works. */
     const initialIndex = isSignUp ? 1 : 0;
 
@@ -55,15 +55,17 @@ export function AuthAside() {
     const tablistAriaLabel = t('features.brand.auth_manifesto.brand_lines_aria');
 
     const strip: AuthManifestoStrip = useMemo(() => {
-        if (footer === 'jars') {
+        if (isSignUp) {
             return {
+                showShare: true,
                 eyebrow: t('features.brand.auth_manifesto.jars_eyebrow'),
                 line: t('features.brand.auth_manifesto.jars_line'),
-                items: JAR_KEYS.map((key, index) => ({
-                    name: t(`features.brand.auth_manifesto.jars.${key}.name`),
-                    short: t(`features.brand.auth_manifesto.jars.${key}.short`),
-                    tone: AUTH_MANIFESTO_JAR_VISUALS[index]!.tone,
-                    share: AUTH_MANIFESTO_JAR_VISUALS[index]!.share,
+                // The strip uppercases `short`, so the group title serves as both labels.
+                items: JAR_GROUP_ORDER.map(group => ({
+                    name: t(`features.money.groups.${group}.title`),
+                    short: t(`features.money.groups.${group}.title`),
+                    tone: GROUP_TONE[group],
+                    share: DEFAULT_GROUP_SPLIT[group],
                 })),
             };
         }
@@ -82,7 +84,7 @@ export function AuthAside() {
                 share: 100 / LIVE_PORTAL_ITEMS.length,
             })),
         };
-    }, [footer, t]);
+    }, [isSignUp, t]);
 
     useEffect(() => {
         const media = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -120,7 +122,6 @@ export function AuthAside() {
             <AuthManifesto
                 quotes={quotes}
                 reduceMotion={reduceMotion}
-                footer={footer}
                 initialIndex={initialIndex}
                 tablistAriaLabel={tablistAriaLabel}
                 strip={strip}

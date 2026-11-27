@@ -13,6 +13,7 @@ import ormConfig from '../mikro-orm.config';
 import { OrpcErrorFilter } from './common/filters/orpc-error.filter';
 import { HouseholdContextModule } from './common/household/household-context.module';
 import { CapabilityAccessModule } from './common/capability';
+import { VisibilityModule } from './common/household/visibility.module';
 import { MarkErrorsDefinedPlugin } from './common/plugins/mark-errors-defined.plugin';
 import { RedisModule, createThrottlerOptions } from './common/redis';
 import { mapDatabaseConstraintErrorInterceptor } from './common/utils/database-constraint-error.util';
@@ -38,6 +39,7 @@ export class AppModule {
                 }),
                 HouseholdContextModule,
                 CapabilityAccessModule,
+                VisibilityModule,
                 PagesModule,
                 ...FeatureModules,
             ],

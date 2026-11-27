@@ -24,7 +24,7 @@ export type PageContentWidth = keyof typeof PAGE_CONTENT_WIDTH;
  * Centers page content within the shell. Use `narrow` for wizard/form flows;
  * omit or use `full` for dashboard-style wide layouts.
  *
- * Also registers the width so WhyCaption (shell) can match the same column.
+ * Also registers the width so shell chrome can match the same column.
  */
 export function PageContent({
     children,

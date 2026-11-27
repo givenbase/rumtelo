@@ -20,6 +20,7 @@ import {
 import { catalogMarkChrome } from '@/app/_lib/party-mark-chrome';
 import { isLiveData } from '@/app/_lib/preview';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
+import { usePresentJarKeys } from '@/app/_lib/use-jar-name';
 import { partyMark } from '@/app/_lib/vendor-brands';
 import { CoachFeatureGate } from '@/components/features/helpers/coach-feature-gate';
 import { CoachMark } from '@/components/features/helpers/helper-mark';
@@ -252,6 +253,10 @@ function GivingOrganizationCard({
     const tRoot = useTranslations();
     const signalTiers = givingSignalTiers(tRoot);
     const { byKey: jarByKey } = useJarCatalog();
+    const presentKeys = usePresentJarKeys();
+    // Giving is an optional pot. While it is off (list loaded, no Give pot) the organization
+    // mark stays neutral instead of borrowing the Give pot's colour and icon, as if it existed.
+    const givePotOn = presentKeys.length === 0 || presentKeys.includes(JarKey.GIVE);
     const where = [organization.scope, organization.country].filter(Boolean).join(' · ');
     const mark = partyMark(
         {
@@ -259,7 +264,7 @@ function GivingOrganizationCard({
             website: organization.website,
         },
         catalogMarkChrome({
-            jarKey: JarKey.GIVE,
+            jarKey: givePotOn ? JarKey.GIVE : null,
             jarByKey,
         })
     );

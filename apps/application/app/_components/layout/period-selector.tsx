@@ -7,12 +7,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@rumtelo
 import { useTranslations } from '@rumtelo/i18n';
 import {
     cn,
+    currentWeekKey,
     currentYearMonth,
     describePeriodTravel,
     isYearMonthAfter,
     isYearMonthBefore,
     periodTravelBounds,
-    shiftYearMonth,
 } from '@rumtelo/utils';
 
 import { formatPeriodTravelLabels } from '@/app/_lib/period-travel-i18n';
@@ -31,6 +31,20 @@ function monthLong(period: Period, locale: string): string {
     return new Intl.DateTimeFormat(locale, { month: 'long' }).format(
         new Date(period.year, period.month - 1, 1)
     );
+}
+
+/** Today's read-out: weekday + day number for the tile, ISO week, quarter, month progress. */
+function todayParts(locale: string) {
+    const now = new Date();
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    return {
+        weekday: new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(now),
+        day: now.getDate(),
+        week: Number(currentWeekKey(now).slice(-2)),
+        quarter: Math.ceil((now.getMonth() + 1) / 3),
+        daysLeft: daysInMonth - now.getDate(),
+        monthPct: Math.round((now.getDate() / daysInMonth) * 100),
+    };
 }
 
 function encode(period: Period): string {
@@ -53,7 +67,8 @@ function labelShort(period: Period, locale: string): string {
 
 /**
  * Budget-period month picker:
- * hero read-out, quick jumps, year nav, 3×4 month grid.
+ * selected month (with a jump back to this month), today's date / week / quarter,
+ * year nav, and a month grid with one row per quarter.
  */
 export function PeriodSelector() {
     const t = useTranslations('pages.shell');
@@ -66,10 +81,10 @@ export function PeriodSelector() {
     const { floor, horizon } = periodTravelBounds(householdCreatedAt);
     const value = encode(period);
     const thisMonth = encode(current);
-    const lastMonth = encode(shiftYearMonth(current, -1));
-    const nextMonth = encode(shiftYearMonth(current, 1));
     const travel = describePeriodTravel(period);
     const labels = formatPeriodTravelLabels(travel, t);
+    const today = todayParts(locale);
+    const selectedQuarter = Math.ceil(period.month / 3);
 
     function handleOpenChange(next: boolean) {
         setOpen(next);
@@ -143,89 +158,65 @@ export function PeriodSelector() {
                 align="end"
                 sideOffset={8}
                 className="w-[min(100vw-2rem,19.5rem)] overflow-hidden rounded-2xl border border-line bg-surface p-0 text-fg shadow-[0_18px_50px_-28px_rgba(15,23,42,0.45)]">
-                <div
-                    className={cn(
-                        'relative overflow-hidden border-b border-line px-4 pt-4 pb-3.5',
-                        travel.direction === 'past'
-                            ? 'bg-linear-to-br from-amber-500/15 via-surface to-surface'
-                            : 'bg-linear-to-br from-accent-soft via-surface to-surface'
-                    )}>
-                    <span
-                        className={cn(
-                            'pointer-events-none absolute inset-x-3 top-3 h-px',
-                            travel.direction === 'past' ? 'bg-amber-500/40' : 'bg-accent/35'
-                        )}
-                        aria-hidden
-                    />
-                    <p className="text-[13px] text-fg-muted italic">
-                        {travel.direction === 'current'
-                            ? t('period_options.this_month')
-                            : travel.direction === 'past'
-                              ? t('period_looking_back')
-                              : t('period_looking_ahead')}
+                {/* Header: the selected month; off the current month, one button back to it. */}
+                <div className="flex items-center justify-between gap-3 px-4 pt-3.5 pb-1">
+                    <p className="min-w-0 truncate text-base font-semibold text-fg first-letter:uppercase">
+                        {monthLong(period, locale)} {period.year}
                     </p>
-                    <div className="mt-1.5 flex items-end gap-2.5">
-                        <p className="font-display text-[34px] leading-none font-semibold tracking-tight text-fg">
-                            {monthShort(period, locale)}
-                        </p>
-                        <div className="mb-0.5 min-w-0">
-                            <p className="text-sm leading-tight font-medium text-fg">
-                                {monthLong(period, locale)}
-                            </p>
-                            <p className="text-xs leading-tight text-fg-muted">
-                                {period.year}
-                                {travel.direction !== 'current' ? ` · ${labels.relativeLabel}` : ''}
-                            </p>
+                    {travel.direction === 'current' ? (
+                        <span className="shrink-0 rounded-full bg-accent-soft px-2.5 py-1 text-xs font-medium text-accent">
+                            {t('period_options.this_month')}
+                        </span>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={() => commitKey(thisMonth)}
+                            className="shrink-0 rounded-full border border-line px-2.5 py-1 text-xs font-medium text-fg-muted transition-colors hover:border-accent hover:bg-accent-soft hover:text-accent">
+                            {travel.direction === 'past'
+                                ? `${t('period_options.this_month')} ›`
+                                : `‹ ${t('period_options.this_month')}`}
+                        </button>
+                    )}
+                </div>
+                {/* Today strip: a date tile, week + quarter chips and how far the month is. */}
+                <div className="mx-3 mt-2 mb-1 flex items-center gap-3 rounded-2xl bg-raised p-2.5">
+                    <div className="flex size-12 shrink-0 flex-col items-center justify-center rounded-xl bg-accent text-on-accent">
+                        <span className="text-[10px] leading-none font-medium tracking-wide uppercase opacity-80">
+                            {today.weekday.replace('.', '')}
+                        </span>
+                        <span className="mt-0.5 text-xl leading-none font-semibold tabular-nums">
+                            {today.day}
+                        </span>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-sm font-semibold text-fg">
+                                {t('period_today')}
+                            </span>
+                            <span className="rounded-full bg-surface px-2 py-0.5 text-[11px] font-medium text-fg-muted ring-1 ring-line">
+                                {t('period_week', { week: today.week })}
+                            </span>
+                            <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-medium text-accent">
+                                {t('period_quarter', { quarter: today.quarter })}
+                            </span>
                         </div>
+                        <div className="mt-2 h-1 overflow-hidden rounded-full bg-line">
+                            <div
+                                className="h-full rounded-full bg-accent"
+                                style={{ width: `${today.monthPct}%` }}
+                            />
+                        </div>
+                        <p className="mt-1 truncate text-[11px] text-fg-muted">
+                            {t('period_days_left', {
+                                count: today.daysLeft,
+                                month: monthLong(current, locale),
+                            })}
+                        </p>
                     </div>
                 </div>
 
-                <div
-                    className="flex flex-wrap items-center gap-1 border-b border-line px-3 py-2"
-                    role="listbox"
-                    aria-label={t('period_quick')}>
-                    {(
-                        [
-                            { labelKey: 'period_options.this_month', key: thisMonth },
-                            { labelKey: 'period_options.last_month', key: lastMonth },
-                            { labelKey: 'period_options.next_month', key: nextMonth },
-                        ] as const
-                    ).map((option, index) => {
-                        const selected = value === option.key;
-                        const optionPeriod = decode(option.key);
-                        const disabled =
-                            isYearMonthBefore(optionPeriod, floor) ||
-                            isYearMonthAfter(optionPeriod, horizon);
-                        return (
-                            <span key={option.key} className="inline-flex items-center gap-1">
-                                {index > 0 ? (
-                                    <span className="text-fg-faint" aria-hidden>
-                                        ·
-                                    </span>
-                                ) : null}
-                                <button
-                                    type="button"
-                                    role="option"
-                                    aria-selected={selected}
-                                    disabled={disabled}
-                                    onClick={() => commitKey(option.key)}
-                                    className={cn(
-                                        'px-1.5 py-1 text-xs tracking-tight transition-colors',
-                                        selected
-                                            ? 'font-semibold text-accent'
-                                            : disabled
-                                              ? 'cursor-not-allowed text-fg-faint opacity-40'
-                                              : 'text-fg-muted hover:text-fg'
-                                    )}>
-                                    {t(option.labelKey)}
-                                </button>
-                            </span>
-                        );
-                    })}
-                </div>
-
-                <div className="px-3 pt-2.5 pb-3">
-                    <div className="mb-3 flex items-center gap-1">
+                <div className="mt-2 border-t border-line px-3 pt-2.5 pb-3">
+                    <div className="mb-2 flex items-center justify-center gap-4">
                         <button
                             type="button"
                             aria-label={t('period_prev_year')}
@@ -235,7 +226,7 @@ export function PeriodSelector() {
                             className="inline-flex size-8 items-center justify-center rounded-lg text-fg-muted transition-colors hover:bg-accent-soft hover:text-accent disabled:opacity-30">
                             ‹
                         </button>
-                        <p className="flex-1 text-center font-mono text-sm font-medium tracking-wide text-fg tabular-nums">
+                        <p className="min-w-12 text-center font-mono text-sm font-medium tracking-wide text-fg tabular-nums">
                             {viewYear}
                         </p>
                         <button
@@ -249,40 +240,77 @@ export function PeriodSelector() {
                         </button>
                     </div>
 
-                    <div
-                        className="grid grid-cols-3 gap-1"
-                        role="listbox"
-                        aria-label={t('period_months')}>
-                        {Array.from({ length: 12 }, (_, monthIndex) => {
-                            const next: Period = { year: viewYear, month: monthIndex + 1 };
-                            const key = encode(next);
-                            const selected = value === key;
-                            const isCurrent = thisMonth === key;
-                            const disabled =
-                                isYearMonthBefore(next, floor) || isYearMonthAfter(next, horizon);
-                            const label = monthShort(next, locale);
-                            return (
-                                <button
-                                    key={key}
-                                    type="button"
-                                    role="option"
-                                    aria-selected={selected}
-                                    disabled={disabled}
-                                    onClick={() => commit(next)}
+                    {/* One row per quarter: a small Q label, then its three months. */}
+                    <div className="space-y-1" role="listbox" aria-label={t('period_months')}>
+                        {[1, 2, 3, 4].map(quarter => (
+                            <div
+                                key={quarter}
+                                role="group"
+                                aria-label={t('period_quarter_label', { quarter })}
+                                className="grid grid-cols-[1.75rem_repeat(3,minmax(0,1fr))] items-center gap-1">
+                                <span
+                                    aria-hidden
                                     className={cn(
-                                        'h-10 rounded-xl font-mono text-[13px] tracking-tight tabular-nums transition-colors',
-                                        selected
-                                            ? 'bg-accent font-semibold text-on-accent shadow-[0_8px_18px_-10px_color-mix(in_oklab,var(--color-accent)_80%,transparent)]'
-                                            : disabled
-                                              ? 'cursor-not-allowed text-fg-faint opacity-40'
-                                              : isCurrent
-                                                ? 'bg-accent-soft/55 font-medium text-accent ring-1 ring-accent/25 ring-inset hover:bg-accent-soft'
-                                                : 'text-fg hover:bg-accent-soft hover:text-accent'
+                                        'font-mono text-[11px]',
+                                        viewYear === period.year && quarter === selectedQuarter
+                                            ? 'font-medium text-accent'
+                                            : 'text-fg-faint'
                                     )}>
-                                    {label}
-                                </button>
-                            );
-                        })}
+                                    {t('period_quarter', { quarter })}
+                                </span>
+                                {[0, 1, 2].map(offset => {
+                                    const next: Period = {
+                                        year: viewYear,
+                                        month: (quarter - 1) * 3 + offset + 1,
+                                    };
+                                    const key = encode(next);
+                                    const selected = value === key;
+                                    const isCurrent = thisMonth === key;
+                                    const disabled =
+                                        isYearMonthBefore(next, floor) ||
+                                        isYearMonthAfter(next, horizon);
+                                    const label = monthShort(next, locale);
+                                    return (
+                                        <button
+                                            key={key}
+                                            type="button"
+                                            role="option"
+                                            aria-selected={selected}
+                                            aria-label={
+                                                isCurrent
+                                                    ? t('period_month_current', {
+                                                          month: monthLong(next, locale),
+                                                      })
+                                                    : undefined
+                                            }
+                                            disabled={disabled}
+                                            onClick={() => commit(next)}
+                                            className={cn(
+                                                'relative h-10 rounded-xl text-[13px] tabular-nums transition-colors',
+                                                selected
+                                                    ? 'bg-accent font-semibold text-on-accent'
+                                                    : disabled
+                                                      ? 'cursor-not-allowed text-fg-faint opacity-40'
+                                                      : isCurrent
+                                                        ? 'font-medium text-accent hover:bg-accent-soft'
+                                                        : 'text-fg hover:bg-accent-soft hover:text-accent'
+                                            )}>
+                                            {label}
+                                            {/* Today's month keeps a dot, also when another month is selected. */}
+                                            {isCurrent ? (
+                                                <span
+                                                    aria-hidden
+                                                    className={cn(
+                                                        'absolute bottom-1.5 left-1/2 size-1 -translate-x-1/2 rounded-full',
+                                                        selected ? 'bg-on-accent' : 'bg-accent'
+                                                    )}
+                                                />
+                                            ) : null}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        ))}
                     </div>
                 </div>
             </DropdownMenuContent>

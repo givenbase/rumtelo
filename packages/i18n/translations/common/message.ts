@@ -25,12 +25,14 @@ const message = {
         send_failed: 'Could not send',
         /** Known Nest/oRPC keys — must match `API_ERROR_MESSAGES` in @rumtelo/contracts. */
         api: {
-            goal_save_only_jar_focus: 'Only SAVE goals have jar focus',
-            goal_save_needs_jar_focus: 'SAVE goal needs a jar before it can be focus',
+            goal_save_only_jar_focus: 'Only SAVE goals have pot focus',
+            goal_save_needs_jar_focus: 'SAVE goal needs a pot before it can be focus',
             goal_only_active_focus: 'Only active goals can be focus',
             goal_save_only_achieved: 'Only SAVE goals can be marked achieved this way',
             goal_not_active: 'Goal is not active',
-            goal_no_jar_spend: 'Goal has no jar to spend from',
+            goal_no_jar_spend: 'Goal has no pot to spend from',
+            goal_give_needs_give_jar:
+                'A giving pledge needs the Giving pot. Turn on Giving in your split, then make the pledge.',
             payment_amount_positive: 'Payment amount must be positive',
             bill_paused_no_settlement: 'Paused or ended bills cannot take new settlements.',
             due_month_required: 'Pick which month you are charged for quarterly or yearly bills.',
@@ -46,7 +48,7 @@ const message = {
             period_closed:
                 'This month is closed — you cannot add or change anything for that period.',
             month_close_incomplete:
-                'Finish open work before closing this month ({inbox} unsorted in inbox, {bills} bills unpaid or unskipped).',
+                'Finish open work before closing this month ({inbox} transactions to sort, {bills} bills unpaid or unskipped).',
             month_close_prior_open:
                 'Close {period} first — months must be finished in order so the log stays honest.',
             month_close_bill_disposition:
@@ -56,6 +58,13 @@ const message = {
             bill_link_outflow: 'Link an outflow to settle an outgoing bill.',
             bill_link_inflow: 'Link an inflow to settle a recurring credit.',
             asset_not_found: 'That holding is not in your net worth.',
+            jar_not_found: 'That pot is no longer here. Pick another pot.',
+            category_not_found: 'That category is no longer here. Pick another category.',
+            transaction_not_found:
+                'That transaction is no longer here. Refresh the page to see the current list.',
+            debt_not_found: 'That debt is no longer here. Refresh the page to see your debts.',
+            fixed_cost_not_found:
+                'That fixed cost is no longer here. Refresh the page to see your fixed costs.',
             bank_account_not_found: 'That bank account is not in this household.',
             iban_already_linked: 'This IBAN is already linked to an account.',
             account_name_taken: 'An account with this name already exists.',
@@ -79,7 +88,18 @@ const message = {
             invitation_not_found: 'This invitation is missing, expired, or already used.',
             invitation_accept_failed:
                 'Could not accept the invitation. Try again or ask for a new one.',
-            jar_split_total: 'Jar split must total 100%, received {total}%',
+            member_not_found: 'That household member is no longer here',
+            cannot_remove_owner: 'The household owner cannot be removed',
+            member_remove_failed: 'Could not remove that member. Try again.',
+            jar_split_total: 'Pot split must total 100%, received {total}%',
+            jar_split_keys: 'The split must list each of your pots exactly once',
+            jar_not_optional:
+                'This is one of your three main pots, so it stays on. Change its share in your split instead.',
+            jar_already_active: 'This pot is already on.',
+            jar_not_empty:
+                'This pot still holds transactions, fixed costs or goals. Move them to another pot first, then turn it off.',
+            jar_share_too_small:
+                'The main pot has too little share left for this. Raise the group’s share in your split first.',
             jar_placement_account_invalid: 'That bank account is not in this household.',
             book_catalog_unavailable: 'The book catalog did not answer.',
             contact_send_failed:
@@ -95,6 +115,21 @@ const message = {
             capability_unavailable: 'This feature is not available yet',
             feature_not_implemented: 'This feature is not available yet',
             viewer_read_only: 'Viewers can look along but cannot change household data',
+            visibility_choice_not_allowed: 'That sharing option is not available here',
+            visibility_edit_forbidden: 'Only the person who made this can change it',
+            course_item_not_found: 'That Course item no longer exists',
+            course_period_full: 'Five is the limit here. Finish, move or let one go first.',
+            course_parent_invalid: 'Pick a goal from the layer above, in the matching period',
+            course_carry_done: 'Done items stay where they are',
+            course_goal_invalid: 'Only year and quarter goals can link a money goal',
+            course_target_invalid: 'Only a month or quarter step can count times',
+            course_scope_invalid: 'Only a year, quarter or month goal can be personal or business',
+            course_rhythm_not_found: 'That routine no longer exists',
+            course_rhythm_parent_invalid: 'A routine hangs under a year, quarter or month step',
+            course_rhythm_target_invalid: 'That many times does not fit this rhythm',
+            course_rhythm_tick_future: 'You can tick today or earlier',
+            course_rhythm_renew_invalid: 'This routine has no past month step to renew',
+            course_feed_not_found: 'Switch the calendar feed on first',
             role_permission_denied: 'Your role cannot do that in this household',
             practice_not_found: 'Practice not found',
             practice_not_member: 'You are not a member of this practice',

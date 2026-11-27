@@ -1,153 +1,48 @@
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 import { RumteloLogo } from '@rumtelo/brand';
-import { LocaleSwitcher, useTranslations } from '@rumtelo/i18n';
-import { Icon, useTheme } from '@rumtelo/ui';
-import { cn, accountThemeFromCss } from '@rumtelo/utils';
-
-import { signOutToSignIn } from '@/app/_lib/auth';
-import { HouseholdRole } from '@rumtelo/contracts';
+import { useTranslations } from '@rumtelo/i18n';
+import { Icon } from '@rumtelo/ui';
+import { cn } from '@rumtelo/utils';
 
 import {
-    TOP_PILL_LABEL_KEYS,
-    navGroupsForRole,
-    resolveNavChildForPath,
-    resolveNavGroupForPath,
+    activeGrowthSubnavKey,
+    activeMoneySubnavKey,
+    activeSoulSubnavKey,
+    activeTabForPath,
 } from '@/app/_lib/nav';
-import { planLabel } from '@/app/_lib/plan';
 import { consumeTourOfferPending } from '@/app/_lib/offer-tour-flag';
-import { forceClearPracticePreview } from '@/app/_lib/practice-preview';
-import { practicePath, productPath } from '@/app/_lib/routes';
-import { settingsHref, settingsHrefForPathname } from '@/app/_lib/settings-tabs';
-import { apiQuery } from '@/app/_lib/api-hooks';
-import { useLiveQuery } from '@rumtelo/hooks';
-import { useAccountTheme } from '@/components/features/shell/account-theme-sync';
-import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
+import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
+import { useShellNav } from '@/app/_lib/use-shell-nav';
+import { BoardMutateRouteGuard } from '@/components/features/shell/board-mutate-route-guard';
+import { CapabilityGate } from '@/components/features/shell/capability-gate';
 import { PendingPlanCheckout } from '@/components/features/shell/pending-plan-checkout';
 import { PendingPracticeInviteRedeem } from '@/components/features/shell/pending-practice-invite-redeem';
-import { CapabilityGate } from '@/components/features/shell/capability-gate';
-import { BoardMutateRouteGuard } from '@/components/features/shell/board-mutate-route-guard';
-import { ViewerPortalRouteGuard } from '@/components/features/shell/viewer-portal-route-guard';
 import { usePracticePreview } from '@/components/features/shell/practice-preview';
-import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
 import { usePlanCapabilities } from '@/components/features/shell/use-plan-capabilities';
+import { ViewerPortalRouteGuard } from '@/components/features/shell/viewer-portal-route-guard';
+import { FeatureHelpersProvider } from '@/components/features/helpers';
 import { PageHelpButton, PageTourProvider, usePageTour } from '@/components/features/tour';
-import { FeatureHelpersProvider, WhyCaption } from '@/components/features/helpers';
 import { PageContentWidthProvider } from '@/components/layout/page-content-width';
 
 import { PeriodSelector } from './period-selector';
 import { PeriodTravelBanner } from './period-travel-banner';
 import { PracticePreviewBanner } from './practice-preview-banner';
 import { QuickAddFab } from './quick-add';
-// ── Menu items ───────────────────────────────────────────────────────────────
-
-interface MenuItem {
-    labelKey: string;
-    subKey: string;
-    href: string | null;
-    danger: boolean;
-}
-
-const MENU_ITEMS: MenuItem[] = [
-    {
-        labelKey: 'pages.shell.menu.settings',
-        subKey: 'pages.shell.menu.settings_sub',
-        href: '__settings__',
-        danger: false,
-    },
-    {
-        labelKey: 'pages.shell.menu.my_plan',
-        subKey: 'pages.shell.menu.my_plan_sub',
-        href: '/settings/general/plan',
-        danger: false,
-    },
-    {
-        labelKey: 'pages.shell.menu.sign_out',
-        subKey: 'pages.shell.menu.sign_out_sub',
-        href: null,
-        danger: true,
-    },
-];
-
-// ── Subnav tint — each group borrows a jar hue (design: TINTS) ───────────────
-
-const SUBNAV_TINT: Record<string, string> = {
-    home: 'border-t-jar-ff',
-    money: 'border-t-jar-give',
-    growth: 'border-t-jar-lts',
-    energy: 'border-t-jar-play',
-    soul: 'border-t-portal-soul',
-};
-
-// ── Practice menu link ────────────────────────────────────────────────────────
-
-/**
- * User-menu entry to the practice desk: "Go to Practice" when the user has one,
- * otherwise "Start a practice" (viewers get "Start something of my own" instead).
- * Fetches the practice list silently — renders nothing while loading.
- */
-function PracticeMenuLink({ onClose, offerStart }: { onClose: () => void; offerStart: boolean }) {
-    const t = useTranslations();
-    const { exitPreview } = usePracticePreview();
-    const practiceListQuery = useLiveQuery(apiQuery.practice.list.queryOptions(), [], true);
-    const hasPractice = (practiceListQuery.data?.length ?? 0) > 0;
-
-    if (!hasPractice) {
-        if (!offerStart || !practiceListQuery.isSuccess) return null;
-        return (
-            <div className="border-b border-line px-2 pt-1 pb-2">
-                <Link
-                    href={practicePath('create')}
-                    onClick={onClose}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-raised">
-                    <span className="grid size-6 shrink-0 place-items-center rounded-md border border-accent/40 bg-accent-soft font-mono text-[10px] font-bold text-accent">
-                        P
-                    </span>
-                    <span className="grid gap-0.5">
-                        <span className="text-sm text-fg">
-                            {t('pages.practice.switcher.start_practice')}
-                        </span>
-                        <span className="text-xs leading-tight text-fg-faint">
-                            {t('pages.practice.switcher.start_practice_sub')}
-                        </span>
-                    </span>
-                </Link>
-            </div>
-        );
-    }
-
-    return (
-        <div className="border-b border-line px-2 pt-1 pb-2">
-            <Link
-                href={practicePath()}
-                onClick={() => {
-                    exitPreview();
-                    onClose();
-                }}
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-raised">
-                <span className="grid size-6 shrink-0 place-items-center rounded-md bg-accent font-mono text-[10px] font-bold text-on-accent">
-                    P
-                </span>
-                <span className="grid gap-0.5">
-                    <span className="text-sm text-fg">
-                        {t('pages.practice.switcher.go_to_practice')}
-                    </span>
-                    <span className="text-xs leading-tight text-fg-faint">
-                        {(practiceListQuery.data?.[0]?.displayName ||
-                            practiceListQuery.data?.[0]?.legalName) ??
-                            t('pages.practice.nav.practice_label')}
-                    </span>
-                </span>
-            </Link>
-        </div>
-    );
-}
+import { AvatarMenu } from './shell-nav/avatar-menu';
+import { BottomTabs } from './shell-nav/bottom-tabs';
+import { ComingUpSheet } from './shell-nav/coming-up-sheet';
+import { PortalPills } from './shell-nav/portal-pills';
+import { ProductSubnav } from './shell-nav/product-subnav';
+import { StageNote } from './shell-nav/stage-note';
+import { YouSheet } from './shell-nav/you-sheet';
+import type { YouRowActions } from './shell-nav/you-rows';
 
 // ── Public export ─────────────────────────────────────────────────────────────
 
@@ -175,28 +70,19 @@ export { useHouseholdShell } from '@/components/features/shell/household-shell-c
 
 function HouseholdShellInner({ children }: { children: ReactNode }) {
     const t = useTranslations();
-    const pathname = usePathname();
-    const router = useRouter();
-    const [menuOpen, setMenuOpen] = useState(false);
-    const [portalOpen, setPortalOpen] = useState(false);
-    const [subOpen, setSubOpen] = useState(false);
-    const [signingOut, setSigningOut] = useState(false);
-    const subnavRef = useRef<HTMLDivElement>(null);
-    const { plan, showToast } = useHouseholdShell();
-    const { setAccountTheme } = useAccountTheme();
-    const { resolvedTheme } = useTheme();
-    const { isCapabilityLocked, accessForPath } = usePlanCapabilities();
-    const { session } = useAuth();
-    const { capabilities } = usePracticePreview();
-    const { canMutate, role, canSeeCoach } = useBoardWriteAccess();
-    const portalGroups = navGroupsForRole(role);
-    const isViewer = role === HouseholdRole.VIEWER && !capabilities.active;
-    const bottomTabs = portalGroups.map(group => ({
-        href: group.href,
-        labelKey: TOP_PILL_LABEL_KEYS[group.key] ?? group.labelKey,
-        glyph: group.icon,
-    }));
-    const { requestTourOffer } = usePageTour();
+    const pathname = usePathname() ?? '/';
+    const [youOpen, setYouOpen] = useState(false);
+    const [comingUpOpen, setComingUpOpen] = useState(false);
+    const { householdId } = useAuth();
+    const { accessForPath } = usePlanCapabilities();
+    const { capabilities, exitPreview } = usePracticePreview();
+    const { canMutate, canSeeCoach } = useBoardWriteAccess();
+    const { nav, isViewer, stage, stageReady, stageFromServer, showAll, additionsSince, progress } =
+        useShellNav();
+    const comingUp = nav.youRows.find(row => row.kind === 'coming_up') ?? null;
+    const { requestTourOffer, setHelpOpen } = usePageTour();
+    const activeTab = activeTabForPath(pathname);
+    const access = accessForPath(pathname);
 
     // After jar-bank setup on the onboarding page, a session flag triggers
     // the tour offer once the user lands back in the shell.
@@ -205,81 +91,15 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
         requestTourOffer();
     }, [requestTourOffer]);
 
-    const isDark = resolvedTheme === 'dark';
-    const planName = planLabel(plan, t);
-
-    const userName = session?.user?.name?.trim() || t('pages.settings.guest');
-    const userEmail = session?.user?.email ?? '';
-    const userInitials = (() => {
-        const parts = userName.split(/\s+/).filter(Boolean);
-        if (parts.length >= 2) {
-            return `${parts[0]![0] ?? ''}${parts[1]![0] ?? ''}`.toUpperCase();
-        }
-        if (parts[0]?.length) return parts[0].slice(0, 2).toUpperCase();
-        return (userEmail.slice(0, 2) || '?').toUpperCase();
-    })();
-
-    function closeOverlays() {
-        setMenuOpen(false);
-        setPortalOpen(false);
-        setSubOpen(false);
-    }
-
-    useEffect(() => {
-        if (!subOpen) return;
-        function onPointerDown(event: PointerEvent) {
-            if (!subnavRef.current?.contains(event.target as Node)) {
-                setSubOpen(false);
-            }
-        }
-        function onKeyDown(event: KeyboardEvent) {
-            if (event.key === 'Escape') setSubOpen(false);
-        }
-        document.addEventListener('pointerdown', onPointerDown);
-        document.addEventListener('keydown', onKeyDown);
-        return () => {
-            document.removeEventListener('pointerdown', onPointerDown);
-            document.removeEventListener('keydown', onKeyDown);
-        };
-    }, [subOpen]);
-
-    async function handleSignOut() {
-        setSigningOut(true);
-        closeOverlays();
-        try {
-            // Never leave client-household preview headers after logout.
-            forceClearPracticePreview();
-            await signOutToSignIn(router);
-        } catch {
-            setSigningOut(false);
-        }
-    }
-
-    function handleToggleTheme() {
-        const next = isDark ? 'light' : 'dark';
-        void setAccountTheme(accountThemeFromCss(next)).catch(error => {
-            console.error('theme save failed', error);
-            showToast(t('pages.settings.toasts.theme_failed'), 'error');
-        });
-    }
-
-    const activeGroup = resolveNavGroupForPath(pathname);
-    const activeChild = resolveNavChildForPath(pathname);
-    const access = accessForPath(pathname);
-    const activePortalLabel = activeGroup
-        ? t(TOP_PILL_LABEL_KEYS[activeGroup.key] ?? activeGroup.labelKey)
-        : t('pages.shell.home');
-
-    const subnavChildren =
-        activeGroup?.children.filter(child => {
-            const isCoach = child.href === productPath('coach');
-            const isWhy = child.href === productPath('why');
-            // Coach is never for VIEWER; Practice preview can also hide Coach nav.
-            if (isCoach && (!canSeeCoach || !capabilities.showCoachNav)) return false;
-            // Why stays for look-along; only Practice preview can hide it.
-            if (isWhy && !capabilities.showCoachNav && capabilities.active) return false;
-            return true;
-        }) ?? [];
+    const youActions: YouRowActions = {
+        onNavigate: () => setYouOpen(false),
+        onHelp: () => setHelpOpen(true),
+        onExitPreview: exitPreview,
+        onComingUp: () => {
+            setYouOpen(false);
+            setComingUpOpen(true);
+        },
+    };
 
     return (
         <div
@@ -302,13 +122,20 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                         'bg-chrome backdrop-blur-md',
                         capabilities.active && 'border-b-2 border-accent/50'
                     )}>
-                    <div className="relative mx-auto flex h-16 max-w-7xl items-center px-4">
-                        {/* Wordmark */}
+                    <div className="mx-auto flex h-16 max-w-7xl items-center gap-2 px-4">
+                        {/* Wordmark: the icon on narrow phones and on tablet, where the pills need the room */}
                         <Link
                             href="/"
                             className="relative z-10 flex shrink-0 items-center gap-2"
                             data-tour="shell-brand">
-                            <RumteloLogo variant="wordmark" className="h-7 w-auto max-w-[9.5rem]" />
+                            <RumteloLogo
+                                variant="icon"
+                                className="h-8 w-auto min-[380px]:max-md:hidden lg:hidden"
+                            />
+                            <RumteloLogo
+                                variant="wordmark"
+                                className="hidden h-7 w-auto max-w-[9.5rem] min-[380px]:max-md:block lg:block"
+                            />
                             {capabilities.active ? (
                                 <span className="hidden items-center gap-1 rounded-full bg-accent px-2 py-0.5 font-mono text-[9px] font-bold tracking-wide text-on-accent uppercase sm:inline-flex">
                                     <Icon name="eye" size="sm" className="text-on-accent" />
@@ -317,421 +144,59 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                             ) : null}
                         </Link>
 
-                        {/* Portal switcher — mobile dropdown */}
-                        <div className="relative z-10 mx-3 min-w-0 flex-1 md:hidden">
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setMenuOpen(false);
-                                    setSubOpen(false);
-                                    setPortalOpen(previous => !previous);
-                                }}
-                                aria-label={t('pages.shell.aria.switch_product')}
-                                aria-expanded={portalOpen}
-                                className="flex w-full max-w-[14rem] items-center justify-between gap-2 rounded-full border border-line-strong bg-sunken px-3.5 py-2 shadow-sm transition-colors hover:border-accent-hover">
-                                <span className="flex min-w-0 items-center gap-2">
-                                    <span aria-hidden className="text-accent">
-                                        {activeGroup?.icon ?? '◇'}
-                                    </span>
-                                    <span className="truncate font-mono text-xs font-semibold tracking-widest text-fg uppercase">
-                                        {activePortalLabel}
-                                    </span>
-                                </span>
-                                <span
-                                    aria-hidden
-                                    className={cn(
-                                        'text-fg-faint transition-transform duration-200',
-                                        portalOpen && 'rotate-180'
-                                    )}>
-                                    ▾
-                                </span>
-                            </button>
+                        {/* Portal pills — desktop. On phones the bottom tabs carry this. */}
+                        <PortalPills tabs={nav.tabs} activeTab={activeTab} />
 
-                            {portalOpen && (
-                                <>
-                                    <button
-                                        type="button"
-                                        aria-label={t('pages.shell.aria.close_product_menu')}
-                                        onClick={() => setPortalOpen(false)}
-                                        className="fixed inset-0 z-30 cursor-default"
-                                    />
-                                    <div className="absolute top-11 left-0 z-40 w-[min(16.5rem,calc(100vw-2rem))] animate-rise overflow-hidden rounded-2xl border border-line-strong bg-surface p-1.5 shadow-xl">
-                                        {portalGroups.map(group => {
-                                            const active = group.key === activeGroup?.key;
-                                            return (
-                                                <Link
-                                                    key={group.key}
-                                                    href={group.href}
-                                                    onClick={() => setPortalOpen(false)}
-                                                    className={cn(
-                                                        'flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors',
-                                                        active
-                                                            ? 'bg-accent text-on-accent'
-                                                            : 'text-fg hover:bg-raised'
-                                                    )}>
-                                                    <span
-                                                        aria-hidden
-                                                        className={cn(
-                                                            'grid size-8 place-items-center rounded-full font-mono text-sm',
-                                                            active
-                                                                ? 'bg-on-accent/15'
-                                                                : 'bg-sunken text-accent'
-                                                        )}>
-                                                        {group.icon}
-                                                    </span>
-                                                    <span className="font-mono text-xs font-semibold tracking-widest uppercase">
-                                                        {t(
-                                                            TOP_PILL_LABEL_KEYS[group.key] ??
-                                                                group.labelKey
-                                                        )}
-                                                    </span>
-                                                </Link>
-                                            );
-                                        })}
-                                    </div>
-                                </>
-                            )}
-                        </div>
-
-                        {/* Portal pill bar — desktop, truly centered */}
-                        <nav
-                            data-testid="main-nav"
-                            className="pointer-events-none absolute inset-x-0 hidden justify-center md:flex"
-                            aria-label={t('pages.shell.aria.main_nav')}>
-                            <div className="pointer-events-auto flex items-center gap-0.5 rounded-full border border-line bg-sunken p-1 shadow-md">
-                                {portalGroups.map(group => {
-                                    const active = group.key === activeGroup?.key;
-                                    return (
-                                        <Link
-                                            key={group.key}
-                                            href={group.href}
-                                            className={cn(
-                                                'flex items-center gap-1.5 rounded-full px-4 py-2 font-mono text-xs font-semibold tracking-widest uppercase transition-colors',
-                                                active
-                                                    ? 'bg-accent text-on-accent'
-                                                    : 'text-fg-secondary hover:text-accent'
-                                            )}>
-                                            <span aria-hidden>{group.icon}</span>
-                                            {t(TOP_PILL_LABEL_KEYS[group.key] ?? group.labelKey)}
-                                        </Link>
-                                    );
-                                })}
+                        <div className="ml-auto flex shrink-0 items-center gap-2">
+                            <div data-tour="shell-period">
+                                <PeriodSelector />
                             </div>
-                        </nav>
-
-                        {/* Avatar menu (language + theme live here) */}
-                        <div className="relative z-10 ml-auto shrink-0">
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setPortalOpen(false);
-                                    setSubOpen(false);
-                                    setMenuOpen(previous => !previous);
-                                }}
-                                aria-label={t('pages.shell.aria.user_menu')}
-                                aria-expanded={menuOpen}
-                                className="grid size-9 place-items-center rounded-full bg-accent font-mono text-xs font-bold text-on-accent transition hover:brightness-110 active:scale-95">
-                                {userInitials}
-                            </button>
-
-                            {menuOpen && (
-                                <>
-                                    <button
-                                        type="button"
-                                        aria-label={t('pages.shell.aria.close_menu')}
-                                        onClick={() => setMenuOpen(false)}
-                                        className="fixed inset-0 z-30 cursor-default"
-                                    />
-                                    <div className="absolute top-11 right-0 z-40 w-[min(18rem,calc(100vw-2rem))] animate-rise overflow-hidden rounded-2xl border border-line-strong bg-surface shadow-xl">
-                                        {/* User row */}
-                                        <div className="flex items-center gap-3 border-b border-line px-4.5 py-4">
-                                            <div className="grid size-9.5 shrink-0 place-items-center rounded-full bg-accent font-mono text-xs font-bold text-on-accent">
-                                                {userInitials}
-                                            </div>
-                                            <div className="min-w-0">
-                                                <p className="text-sm font-medium text-fg">
-                                                    {userName}
-                                                </p>
-                                                <p className="truncate font-mono text-xs text-fg-faint">
-                                                    {userEmail || '—'}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div className="grid gap-0.5 border-b border-line p-2">
-                                            <div className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5">
-                                                <span className="grid gap-0.5">
-                                                    <span className="text-sm text-fg">
-                                                        {t('pages.shell.menu.language')}
-                                                    </span>
-                                                    <span className="text-xs leading-tight text-fg-faint">
-                                                        {t('pages.shell.menu.language_sub')}
-                                                    </span>
-                                                </span>
-                                                <LocaleSwitcher />
-                                            </div>
-                                            <button
-                                                type="button"
-                                                onClick={handleToggleTheme}
-                                                className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-raised">
-                                                <span className="grid gap-0.5">
-                                                    <span className="text-sm text-fg">
-                                                        {t('pages.shell.menu.appearance')}
-                                                    </span>
-                                                    <span className="text-xs leading-tight text-fg-faint">
-                                                        {t('pages.shell.menu.appearance_sub')}
-                                                    </span>
-                                                </span>
-                                                <span
-                                                    className="rounded-full border border-line px-2.5 py-1 font-mono text-xs font-semibold tracking-wide text-fg-muted"
-                                                    suppressHydrationWarning>
-                                                    {isDark
-                                                        ? t('pages.shell.menu.theme_dark')
-                                                        : t('pages.shell.menu.theme_light')}
-                                                </span>
-                                            </button>
-                                        </div>
-
-                                        {/* Practice switcher — open the desk, or start one */}
-                                        <PracticeMenuLink
-                                            onClose={() => setMenuOpen(false)}
-                                            offerStart={!isViewer}
-                                        />
-
-                                        {isViewer ? (
-                                            <div className="grid gap-0.5 border-b border-line p-2">
-                                                <Link
-                                                    href="/onboarding/start"
-                                                    aria-label={t('pages.shell.menu.start_own')}
-                                                    onClick={() => setMenuOpen(false)}
-                                                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-raised">
-                                                    <span className="grid min-w-0 flex-1 gap-0.5">
-                                                        <span className="text-sm text-fg">
-                                                            {t('pages.shell.menu.start_own')}
-                                                        </span>
-                                                        <span className="text-xs leading-tight text-fg-faint">
-                                                            {t('pages.shell.menu.start_own_sub')}
-                                                        </span>
-                                                    </span>
-                                                </Link>
-                                            </div>
-                                        ) : null}
-
-                                        <div className="grid gap-0.5 p-2">
-                                            {MENU_ITEMS.filter(item => {
-                                                if (
-                                                    isViewer &&
-                                                    item.href === '/settings/general/plan'
-                                                ) {
-                                                    return false;
-                                                }
-                                                if (!capabilities.showSettings) {
-                                                    return (
-                                                        item.href !== '__settings__' &&
-                                                        item.href !== '/settings/general/plan'
-                                                    );
-                                                }
-                                                return true;
-                                            }).map(item => {
-                                                const isPlan =
-                                                    item.href === '/settings/general/plan';
-                                                const isSettings = item.href === '__settings__';
-                                                const settingsSubKey = isViewer
-                                                    ? 'pages.shell.menu.settings_sub_viewer'
-                                                    : item.subKey;
-                                                const inner = (
-                                                    <>
-                                                        <span className="grid min-w-0 flex-1 gap-0.5">
-                                                            <span
-                                                                className={cn(
-                                                                    'text-sm',
-                                                                    item.danger
-                                                                        ? 'text-danger'
-                                                                        : 'text-fg'
-                                                                )}>
-                                                                {t(item.labelKey)}
-                                                            </span>
-                                                            <span className="text-xs leading-tight text-fg-faint">
-                                                                {t(
-                                                                    isSettings
-                                                                        ? settingsSubKey
-                                                                        : item.subKey
-                                                                )}
-                                                            </span>
-                                                        </span>
-                                                        {isPlan ? (
-                                                            <span className="shrink-0 rounded-full border border-line px-2.5 py-1 font-mono text-xs font-semibold tracking-wide text-fg-muted">
-                                                                {planName}
-                                                            </span>
-                                                        ) : null}
-                                                    </>
-                                                );
-
-                                                if (item.href) {
-                                                    const href =
-                                                        item.href === '__settings__'
-                                                            ? isViewer
-                                                                ? settingsHref('account')
-                                                                : settingsHrefForPathname(pathname)
-                                                            : item.href;
-                                                    return (
-                                                        <Link
-                                                            key={item.labelKey}
-                                                            href={href}
-                                                            onClick={() => setMenuOpen(false)}
-                                                            className={cn(
-                                                                'rounded-lg px-3 py-2.5 transition-colors hover:bg-raised',
-                                                                isPlan
-                                                                    ? 'flex items-center justify-between gap-3'
-                                                                    : 'grid gap-0.5'
-                                                            )}>
-                                                            {inner}
-                                                        </Link>
-                                                    );
-                                                }
-
-                                                return (
-                                                    <button
-                                                        key={item.labelKey}
-                                                        type="button"
-                                                        disabled={signingOut}
-                                                        onClick={() => void handleSignOut()}
-                                                        className="grid w-full gap-0.5 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-raised">
-                                                        {inner}
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                </>
-                            )}
+                            {/* Help is Coach teaching chrome — role gate, not tip preference. */}
+                            {canSeeCoach && capabilities.showPageHelp ? <PageHelpButton /> : null}
+                            <AvatarMenu
+                                rows={nav.youRows}
+                                pathname={pathname}
+                                actions={youActions}
+                                isViewer={isViewer}
+                                active={activeTab === 'you'}
+                            />
                         </div>
                     </div>
 
-                    {/* Subnav (portal children) */}
-                    {activeGroup && subnavChildren.length > 0 && (
-                        <div className={cn('border-t-2 bg-bg-app', SUBNAV_TINT[activeGroup.key])}>
-                            <div className="mx-auto flex max-w-7xl items-center gap-1.5 px-4 py-2.5">
-                                {/* Desktop pill strip */}
-                                <div className="hidden flex-wrap items-center gap-1.5 sm:flex">
-                                    {subnavChildren.map(child => {
-                                        const active = activeChild?.href === child.href;
-                                        const locked = isCapabilityLocked(child.capabilityKey);
-                                        return (
-                                            <Link
-                                                key={child.href}
-                                                href={child.href}
-                                                className={cn(
-                                                    'rounded-full border px-3.5 py-1.5 font-mono text-xs font-medium tracking-wide uppercase transition-colors',
-                                                    active
-                                                        ? 'border-accent-hover bg-accent-soft text-accent'
-                                                        : 'border-line text-fg-muted hover:border-accent-hover hover:text-accent',
-                                                    locked && !active && 'opacity-55'
-                                                )}>
-                                                {locked && (
-                                                    <span aria-hidden className="mr-1 text-xs">
-                                                        🔒
-                                                    </span>
-                                                )}
-                                                {t(child.labelKey)}
-                                            </Link>
-                                        );
-                                    })}
-                                </div>
-
-                                {/* Mobile dropdown */}
-                                <div ref={subnavRef} className="relative min-w-0 sm:hidden">
-                                    <button
-                                        type="button"
-                                        aria-expanded={subOpen}
-                                        aria-haspopup="listbox"
-                                        onClick={() => {
-                                            setPortalOpen(false);
-                                            setMenuOpen(false);
-                                            setSubOpen(previous => !previous);
-                                        }}
-                                        className="flex max-w-[min(100%,14rem)] items-center gap-2 rounded-full border border-line-strong bg-surface px-3.5 py-2 font-mono text-xs font-semibold tracking-wide text-fg uppercase transition-colors hover:border-accent-hover">
-                                        <span className="truncate">
-                                            {activeChild &&
-                                            subnavChildren.some(
-                                                navChild => navChild.href === activeChild.href
-                                            )
-                                                ? t(activeChild.labelKey)
-                                                : t(subnavChildren[0]!.labelKey)}
-                                        </span>
-                                        <Icon
-                                            name="chevron-down"
-                                            size="sm"
-                                            className={cn(
-                                                'shrink-0 text-fg-muted transition-transform',
-                                                subOpen && 'rotate-180'
-                                            )}
-                                            aria-hidden
-                                        />
-                                    </button>
-                                    {subOpen && (
-                                        <div
-                                            role="listbox"
-                                            className="absolute top-11 left-0 z-40 grid w-[min(16rem,calc(100vw-2rem))] animate-rise gap-0.5 rounded-xl border border-line-strong bg-surface p-1.5 shadow-xl">
-                                            {subnavChildren.map(child => {
-                                                const locked = isCapabilityLocked(
-                                                    child.capabilityKey
-                                                );
-                                                const active = activeChild?.href === child.href;
-                                                return (
-                                                    <Link
-                                                        key={child.href}
-                                                        role="option"
-                                                        aria-selected={active}
-                                                        href={child.href}
-                                                        onClick={() => setSubOpen(false)}
-                                                        className={cn(
-                                                            'rounded-lg px-3 py-2.5 text-sm transition-colors',
-                                                            active
-                                                                ? 'bg-accent-soft font-medium text-accent'
-                                                                : 'text-fg hover:bg-raised',
-                                                            locked && !active && 'opacity-55'
-                                                        )}>
-                                                        {locked && (
-                                                            <span
-                                                                aria-hidden
-                                                                className="mr-1 text-xs">
-                                                                🔒
-                                                            </span>
-                                                        )}
-                                                        {t(child.labelKey)}
-                                                    </Link>
-                                                );
-                                            })}
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Period selector + Help + Settings */}
-                                <div className="ml-auto flex shrink-0 items-center gap-2">
-                                    <div data-tour="shell-period">
-                                        <PeriodSelector />
-                                    </div>
-                                    {/* Help is Coach teaching chrome — role gate, not tip preference. */}
-                                    {canSeeCoach && capabilities.showPageHelp ? (
-                                        <PageHelpButton />
-                                    ) : null}
-                                    {capabilities.showSettings ? (
-                                        <Link
-                                            href={
-                                                isViewer
-                                                    ? settingsHref('account')
-                                                    : settingsHrefForPathname(pathname)
-                                            }
-                                            className="hidden items-center gap-1.5 rounded-full border border-line px-3.5 py-1.5 font-mono text-xs font-medium tracking-wide text-fg-faint uppercase transition-colors hover:border-accent-hover hover:text-accent sm:flex">
-                                            <span aria-hidden>◇</span>
-                                            {t('pages.shell.settings')}
-                                        </Link>
-                                    ) : null}
-                                </div>
+                    {/* Product sections (Money, Growth, Soul): one row of links, same on every width */}
+                    {activeTab === 'money' && nav.moneySubnav.length > 0 ? (
+                        <div className="border-t-2 border-t-jar-give bg-bg-app">
+                            <div className="mx-auto max-w-7xl px-4 py-2">
+                                <ProductSubnav
+                                    items={nav.moneySubnav}
+                                    activeKey={activeMoneySubnavKey(pathname)}
+                                    ariaLabel={t('pages.nav.aria.money_sections')}
+                                />
                             </div>
                         </div>
-                    )}
+                    ) : null}
+                    {activeTab === 'growth' && nav.growthSubnav.length > 0 ? (
+                        <div className="border-t-2 border-t-jar-give bg-bg-app">
+                            <div className="mx-auto max-w-7xl px-4 py-2">
+                                <ProductSubnav
+                                    items={nav.growthSubnav}
+                                    activeKey={activeGrowthSubnavKey(pathname)}
+                                    ariaLabel={t('pages.nav.aria.growth_sections')}
+                                />
+                            </div>
+                        </div>
+                    ) : null}
+                    {activeTab === 'soul' && nav.soulSubnav.length > 0 ? (
+                        <div className="border-t-2 border-t-jar-give bg-bg-app">
+                            <div className="mx-auto max-w-7xl px-4 py-2">
+                                <ProductSubnav
+                                    items={nav.soulSubnav}
+                                    activeKey={activeSoulSubnavKey(pathname)}
+                                    ariaLabel={t('pages.nav.aria.soul_sections')}
+                                />
+                            </div>
+                        </div>
+                    ) : null}
                 </header>
             </div>
 
@@ -758,10 +223,15 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                         </Link>
                     </aside>
                 ) : null}
-                {capabilities.showWhyCaption ? (
-                    <WhyCaption pathname={pathname} locked={access.locked} />
-                ) : null}
                 <main className="min-w-0">
+                    <StageNote
+                        householdId={householdId}
+                        stage={stage}
+                        ready={stageReady && stageFromServer}
+                        suppressed={capabilities.active || showAll}
+                        additionsSince={additionsSince}
+                        dismissSignal={youOpen}
+                    />
                     <CapabilityGate>
                         <ViewerPortalRouteGuard>
                             <BoardMutateRouteGuard>{children}</BoardMutateRouteGuard>
@@ -770,37 +240,27 @@ function HouseholdShellInner({ children }: { children: ReactNode }) {
                 </main>
             </div>
 
-            {/* ── BOTTOM NAV (mobile) ───────────────────────────────────────── */}
-            <nav
-                className={cn(
-                    'fixed inset-x-0 bottom-0 z-50 grid border-t border-line bg-chrome pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden',
-                    bottomTabs.length <= 3
-                        ? 'grid-cols-3'
-                        : bottomTabs.length === 4
-                          ? 'grid-cols-4'
-                          : 'grid-cols-5'
-                )}
-                aria-label={t('pages.shell.aria.mobile_nav')}>
-                {bottomTabs.map(tab => {
-                    const active =
-                        portalGroups.find(group => group.href === tab.href)?.key ===
-                        activeGroup?.key;
-                    return (
-                        <Link
-                            key={tab.href}
-                            href={tab.href}
-                            className={cn(
-                                'flex flex-col items-center gap-0.5 py-2.5 text-xs font-medium',
-                                active ? 'text-accent' : 'text-fg-muted'
-                            )}>
-                            <span aria-hidden className="text-base">
-                                {tab.glyph}
-                            </span>
-                            {t(tab.labelKey)}
-                        </Link>
-                    );
-                })}
-            </nav>
+            {/* ── BOTTOM TABS + YOU (mobile) ───────────────────────────────── */}
+            <BottomTabs
+                tabs={nav.tabs}
+                activeTab={activeTab}
+                youOpen={youOpen}
+                onOpenYou={() => setYouOpen(true)}
+            />
+            <YouSheet
+                open={youOpen}
+                onOpenChange={setYouOpen}
+                rows={nav.youRows}
+                pathname={pathname}
+                actions={youActions}
+                isViewer={isViewer}
+            />
+            <ComingUpSheet
+                open={comingUpOpen}
+                onOpenChange={setComingUpOpen}
+                data={comingUp?.kind === 'coming_up' ? comingUp : null}
+                progress={progress}
+            />
 
             {/* ── OVERLAYS ─────────────────────────────────────────────────── */}
             {capabilities.showQuickAdd && canMutate ? <QuickAddFab /> : null}

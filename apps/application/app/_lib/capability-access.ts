@@ -1,21 +1,9 @@
-import { normalizeAppPathname, resolveNavChildForPath } from './nav';
 import { minPlanForCapability, type PlanKey } from './plan';
+import { routeAccessForPath } from './route-capabilities';
 
-/**
- * Routes that are not nav children but inherit a gated capability.
- * Empty for now — create flows live under their parent nav routes.
- */
-const CAPABILITY_PATH_ALIASES: ReadonlyArray<{ prefix: string; capabilityKey: string }> = [];
-
-/** Resolve the plan-gating capability key for any app pathname. */
+/** Resolve the plan-gating capability key for any app pathname (route table, not the nav). */
 export function capabilityKeyForPathname(pathname: string): string | null {
-    const path = normalizeAppPathname(pathname);
-    const alias = CAPABILITY_PATH_ALIASES.filter(
-        entry => path === entry.prefix || path.startsWith(`${entry.prefix}/`)
-    ).sort((left, right) => right.prefix.length - left.prefix.length)[0];
-    if (alias) return alias.capabilityKey;
-
-    return resolveNavChildForPath(path)?.capabilityKey ?? null;
+    return routeAccessForPath(pathname)?.capabilityKey ?? null;
 }
 
 export interface CapabilityAccess {

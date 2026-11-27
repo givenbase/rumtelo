@@ -1,7 +1,7 @@
 'use client';
 
 import { apiQuery } from '@/app/_lib/api-hooks';
-import { useMemo, useState } from 'react';
+import { useDeferredValue, useMemo, useState } from 'react';
 
 import type { Debt } from '@rumtelo/contracts';
 import { HouseholdRole, JarKey, PayoffStrategy } from '@rumtelo/contracts';
@@ -109,6 +109,8 @@ export function DebtsPageClient() {
     const [extra, setExtra] = useState(30_000);
     const [filter, setFilter] = useState<DebtFilter>('all');
     const [sort, setSort] = useState<DebtSort>('payoff');
+    const [search, setSearch] = useState('');
+    const deferredSearch = useDeferredValue(search.trim().toLowerCase());
     const live = isLiveData(householdId);
     const travel = describePeriodTravel(period);
     const travelLabels = formatPeriodTravelLabels(travel, tShell);
@@ -206,9 +208,11 @@ export function DebtsPageClient() {
 
     const visibleDebts = useMemo(() => {
         const filtered = debts.filter(debt => {
-            if (filter === 'expensive') return debt.interestRate >= EXPENSIVE_RATE;
-            if (filter === 'lower') return debt.interestRate < EXPENSIVE_RATE;
-            return true;
+            if (filter === 'expensive' && debt.interestRate < EXPENSIVE_RATE) return false;
+            if (filter === 'lower' && debt.interestRate >= EXPENSIVE_RATE) return false;
+            if (!deferredSearch) return true;
+            const hay = `${debt.counterparty ?? ''} ${debt.name}`.toLowerCase();
+            return hay.includes(deferredSearch);
         });
 
         if (sort === 'payoff') {
@@ -229,7 +233,7 @@ export function DebtsPageClient() {
             default:
                 return list;
         }
-    }, [debts, filter, sort, payoffOrdered]);
+    }, [debts, filter, sort, payoffOrdered, deferredSearch]);
 
     const baselineById = useMemo(
         () => new Map(debtsLive.map(debt => [debt.id, debt.balance] as const)),
@@ -392,6 +396,12 @@ export function DebtsPageClient() {
                 <div className="grid gap-4">
                     <ListControls
                         title={listTitle}
+                        search={{
+                            value: search,
+                            onChange: setSearch,
+                            placeholder: t('search_placeholder'),
+                            ariaLabel: t('search_aria'),
+                        }}
                         sort={{
                             value: sort,
                             options: debtSorts,
@@ -415,8 +425,20 @@ export function DebtsPageClient() {
                     {visibleDebts.length === 0 ? (
                         <EmptyState
                             icon="arrow-down"
-                            title={debtsLive.length === 0 ? t('empty_title') : t('empty_filter')}
-                            body={debtsLive.length === 0 ? t('empty_body') : t('empty_filter_body')}
+                            title={
+                                debtsLive.length === 0
+                                    ? t('empty_title')
+                                    : deferredSearch
+                                      ? t('empty_search_title')
+                                      : t('empty_filter')
+                            }
+                            body={
+                                debtsLive.length === 0
+                                    ? t('empty_body')
+                                    : deferredSearch
+                                      ? t('empty_search_body')
+                                      : t('empty_filter_body')
+                            }
                         />
                     ) : (
                         <Card className="p-0">

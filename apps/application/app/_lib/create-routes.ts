@@ -6,7 +6,7 @@ export const CREATE_HREF = {
     importStatement: productPath('money/transactions/import'),
     fixed: productPath('money/fixed-costs/create'),
     debt: productPath('money/debt/create'),
-    income: productPath('growth/income/create'),
+    income: productPath('money/income/create'),
     goal: productPath('growth/goals/create'),
     session: productPath('energy/training/create'),
     asset: productPath('money/net-worth/create'),
@@ -84,8 +84,11 @@ export function createFixedHref(opts?: {
     transactionId?: string;
     /** Growth holding this bill is paid for — locks the holding picker (asset out). */
     assetId?: string;
+    /** `in` = Income › Other regular income (recurring money in). Costs omit it. */
+    direction?: 'in';
 }) {
     const params = new URLSearchParams();
+    if (opts?.direction) params.set('direction', opts.direction);
     if (opts?.jarId) params.set('jarId', opts.jarId);
     if (opts?.assetId) params.set('assetId', opts.assetId);
     if (opts?.orgKey) params.set('orgKey', opts.orgKey);
@@ -143,7 +146,7 @@ export function updateHref(
         case 'debt':
             return productPath(`money/debt/update/${id}`);
         case 'income':
-            return productPath(`growth/income/update/${id}`);
+            return productPath(`money/income/update/${id}`);
         case 'goal':
             return productPath(`growth/goals/update/${id}`);
         case 'asset':
@@ -181,11 +184,16 @@ export function assetDetailHref(id: string, opts?: { setup?: 'in' | 'out' }) {
     return opts?.setup ? `${base}?setup=${opts.setup}` : base;
 }
 
-/** Geld → Fixed costs filtered to one holding (bills + income). */
-export function fixedCostsForAssetHref(assetId: string, tab?: 'out' | 'in') {
+/** Geld → Fixed costs filtered to one holding (bills only; income lives under Income). */
+export function fixedCostsForAssetHref(assetId: string) {
     const params = new URLSearchParams({ assetId });
-    if (tab) params.set('tab', tab);
     return `${productPath('money/fixed-costs')}?${params.toString()}`;
+}
+
+/** Geld → Income filtered to one holding (income sources + other regular income). */
+export function incomeForAssetHref(assetId: string) {
+    const params = new URLSearchParams({ assetId });
+    return `${productPath('money/income')}?${params.toString()}`;
 }
 
 /** Geld → Transactions filtered to one holding. */

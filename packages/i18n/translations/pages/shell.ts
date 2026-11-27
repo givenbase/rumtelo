@@ -11,6 +11,12 @@ const shell = {
     period_months: 'Months',
     period_prev_year: 'Previous year',
     period_next_year: 'Next year',
+    period_today: 'Today',
+    period_week: 'Week {week}',
+    period_days_left: '{count, plural, one {# day} other {# days}} left in {month}',
+    period_quarter: 'Q{quarter}',
+    period_quarter_label: 'Quarter {quarter}',
+    period_month_current: '{month}, this month',
     sign_in: 'Sign in',
     sign_up: 'Create account',
     home: 'Home',
@@ -42,8 +48,8 @@ const shell = {
         chooser_lead:
             'You’re looking along on someone else’s board. Pick what you need — you can always do both later.',
         chooser_household_title: 'Household board',
-        chooser_household_body: 'Your own jars and money board for personal or family money.',
-        chooser_household_bullet_1: 'Six jars and a clear month plan',
+        chooser_household_body: 'Your own pots and money board for personal or family money.',
+        chooser_household_bullet_1: 'Basics, Future, Free and a clear month overview',
         chooser_household_bullet_2: 'Invite family or trusted people later',
         chooser_household_bullet_3: 'You become the owner of your board',
         chooser_household_cta: 'Start my household',
@@ -70,7 +76,14 @@ const shell = {
         close_aria: 'Close palette',
         mode_ask: 'Ask',
         mode_add: 'Add',
-        ask_placeholder: 'Ask Coach or search…',
+        ask_placeholder: 'Search The Coach or a page…',
+        search_label_ask: 'Search pages and The Coach',
+        search_label_add: 'Filter what to add',
+        /** Muted line under a kind the ladder keeps out of the default list. */
+        deferred: {
+            week_check: 'Shows here after your first week check.',
+            month_close: 'Shows here after you close your first month.',
+        },
         add_placeholder: 'Filter what to add…',
         next_step: 'Next with Coach',
         open_coach: 'Open Coach',
@@ -88,20 +101,24 @@ const shell = {
     forms: {
         tx_create: {
             title: 'New transaction',
-            description: 'Out for spend, In for gifts, refunds, and jar top-ups.',
+            description: 'Out for spend, In for gifts, refunds, and pot top-ups.',
         },
         tx_import: {
             title: 'Import bank statement',
             description:
-                'Prefer CAMT.053 from your bank. Rows land in the Inbox — sort them and link fixed costs when they match.',
+                'Prefer CAMT.053 from your bank. Rows land in Transactions under To sort — sort them and link fixed costs when they match.',
         },
         tx_update: {
             title: 'Edit transaction',
-            description: 'Update direction, amount, jar, or note.',
+            description: 'Update direction, amount, pot, or note.',
         },
         fixed_create: {
             title: 'New fixed cost',
-            description: 'What leaves a jar every month?',
+            description: 'What leaves a pot every month?',
+        },
+        fixed_income_create: {
+            title: 'Add other regular income',
+            description: 'What arrives on a schedule, besides your income sources?',
         },
         fixed_update: {
             title: 'Edit fixed cost',
@@ -115,7 +132,7 @@ const shell = {
         },
         income_create: {
             title: 'New income',
-            description: 'Add an income source that feeds your jars.',
+            description: 'Add an income source that feeds your pots.',
         },
         income_update: {
             title: 'Edit income',
@@ -142,7 +159,7 @@ const shell = {
             title: 'Move money',
             description:
                 'Pick from and to. Available this month shifts; your split stays the same.',
-            description_from_jar: 'Pick where it goes — this jar is already the source.',
+            description_from_jar: 'Pick where it goes — this pot is already the source.',
         },
     },
     period_travel: {
@@ -183,29 +200,50 @@ const shell = {
         close_menu: 'Close menu',
         mobile_nav: 'Mobile navigation',
     },
+    plan_gains: {
+        title: 'More with {plan}',
+        price: '{plan} · {price}/month',
+        close: 'Close',
+        members: 'Up to {count} people on the board',
+        goals: 'Up to {count} goals',
+        goals_unlimited: 'As many goals as you need',
+        bank_links: '{count, plural, one {# bank link} other {# bank links}}',
+    },
     gates: {
         maintenance_title: 'Briefly offline',
         maintenance_body: 'We are doing a short update. Try again in a few minutes.',
         maintenance_api_down_title: 'Rumtelo is briefly offline',
         maintenance_api_down_body:
-            'We cannot reach the API right now. Your jars and data are safe — try again in a moment.',
+            'We cannot reach the API right now. Your pots and data are safe — try again in a moment.',
         maintenance_update_title: 'Rumtelo is getting ready',
         maintenance_update_body:
             'We are finishing a short update. Only the Rumtelo team can sign in for now.',
         locked_title: 'Upgrade to open this',
         locked_body: 'This part of Rumtelo is on a higher plan.',
-        locked_plan_title: 'Available in the {plan} plan',
         locked_plan_title_practice: 'This client needs {plan}',
         locked_plan_title_viewer: 'Not included on this household’s plan',
         locked_plan_body_practice:
             'Their household plan does not include this. If you manage them, upgrade from Practice billing.',
         locked_plan_body_viewer:
             'You’re looking along — only someone who manages this household can open this with a higher plan.',
-        locked_plan_aria: 'Plan upgrade required',
         locked_plan_aria_practice: 'Client plan upgrade required',
         locked_plan_aria_viewer: 'Not available on this household’s plan',
         upgrade_cta: 'Upgrade to {plan}',
         upgrade_cta_practice: 'Open Practice billing',
+        lock: {
+            badge: 'Locked · in {plan}',
+            badge_sr: 'Locked: in {plan}',
+            title: '{feature} is in {plan} · {price}/month',
+            feature_fallback: 'This page',
+            body_tail: 'Everything you’ve entered stays yours on every plan.',
+            example: 'Example',
+            switch_cta: 'Switch to {plan}',
+            not_now: 'Not now',
+            back: 'Back',
+            ask_owner: 'Ask {owner} to switch to {plan}.',
+            ask_owner_unknown: 'Ask the owner of this household to switch to {plan}.',
+            region_aria: 'Locked: {feature} is in {plan}',
+        },
         back_to_practice: 'Back to Practice clients',
         back_to_dashboard: 'Back to dashboard',
         back_to_website: 'Back to website',

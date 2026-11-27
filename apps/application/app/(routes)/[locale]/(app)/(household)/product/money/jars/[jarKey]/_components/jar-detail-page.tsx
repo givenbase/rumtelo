@@ -8,7 +8,10 @@ import {
     GoalStatus,
     JarKey,
     jarCapabilitiesFor,
+    jarGroupFor,
     FlowDirection,
+    OPTIONAL_JAR_KEYS,
+    type OptionalJarKey,
 } from '@rumtelo/contracts';
 import { useLocale, useTranslations } from '@rumtelo/i18n';
 import { useLiveQuery } from '@rumtelo/hooks';
@@ -31,6 +34,7 @@ import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
 import { jarKeyToSlug } from '@/app/_lib/jar-slug';
 import { isLiveData } from '@/app/_lib/preview';
 import { useBoardWriteAccess } from '@/app/_lib/use-board-write-access';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import { findPartyVendor, partyMark } from '@/app/_lib/vendor-brands';
 import { useCategoryTemplates } from '@/components/features/forms/catalog-helpers';
 import { JarGuideCard } from '@/components/features/helpers';
@@ -39,6 +43,7 @@ import { JarCoverageStrip } from '@/components/features/money/jar-coverage-strip
 import { JarGoalAccordion } from '@/components/features/money/jar-goal-accordion';
 import { MetaChip, formatBookedDate } from '@/components/features/money/jar-badge';
 import { MoneyPartyRow } from '@/components/features/money/money-party-row';
+import { PotOffPrompt } from '@/components/features/money/pot-off-prompt';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { MoneyDeltaLabel } from '@/components/features/home/money-delta-label';
@@ -57,6 +62,8 @@ import {
 export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
     const t = useTranslations('features.money.jars.detail');
     const tJars = useTranslations('features.money.jars');
+    const tGroups = useTranslations('features.money.groups');
+    const jarName = useJarName();
     const { householdId } = useAuth();
     const { period } = useHouseholdShell();
     const { showCreateFlows } = useBoardWriteAccess();
@@ -151,6 +158,34 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
     const claimedTxIds = claimLinkedFixedCostTxIds(transactions, settlements);
     const leftoverPeriodTxs = transactions.filter(tx => !claimedTxIds.has(tx.id));
 
+    // An optional pot the household has not turned on has no row to show: say so and offer to turn
+    // it on, instead of "loading" for ever. Only once the board has loaded, so a pot that exists
+    // never flashes this.
+    const potIsOff =
+        !jar &&
+        live &&
+        !dashboardQuery.isPending &&
+        (OPTIONAL_JAR_KEYS as readonly string[]).includes(jarKey);
+    if (potIsOff) {
+        const potName = tJars(`names.${jarKey}`);
+        const groupTitle = tGroups(`${jarGroupFor(jarKey)}.title`);
+        return (
+            <div className="grid animate-rise gap-6">
+                <Link
+                    href="/product/money"
+                    className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase hover:text-accent">
+                    {t('back_jars')}
+                </Link>
+                <PotOffPrompt
+                    jarKey={jarKey as OptionalJarKey}
+                    title={tJars('inactive.title', { pot: potName })}
+                    body={tJars('inactive.body', { pot: potName, group: groupTitle })}
+                    ctaLabel={tJars('inactive.cta', { pot: potName })}
+                />
+            </div>
+        );
+    }
+
     if (!jar) {
         return (
             <div className="grid animate-rise gap-6">
@@ -234,7 +269,7 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                             {jar.icon ?? catalog?.icon ?? '◇'}
                         </span>
                         <div className="grid min-w-0 gap-1">
-                            <Typography as="h1">{jar.name}</Typography>
+                            <Typography as="h1">{jarName(jar)}</Typography>
                             <p className="font-mono text-xs font-medium tracking-wide text-fg-faint uppercase">
                                 {resolveJarSubtitle(tJars, jarKey, jar.subtitle, catalog?.subtitle)}{' '}
                                 · {t('pct_of_net', { pct: jar.percentage })}
@@ -426,7 +461,12 @@ export function JarDetailPageClient({ jarKey }: { jarKey: JarKey }) {
                 </Card>
             </section>
 
-            <JarGuideCard jarKey={jarKey} jarId={jar.id} allocatedCents={jar.allocated} />
+            <JarGuideCard
+                jarKey={jarKey}
+                jarId={jar.id}
+                allocatedCents={jar.allocated}
+                jarName={jarName(jar)}
+            />
         </div>
     );
 }

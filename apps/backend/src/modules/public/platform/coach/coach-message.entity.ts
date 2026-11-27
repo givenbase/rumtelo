@@ -43,6 +43,14 @@ export class CoachMessage extends HouseholdEntity {
     @Property({ length: 200, nullable: true })
     ctaHref: string | null = null;
 
+    /** Label of an optional second move (e.g. "Open the biggest fixed cost"); null on most tips. */
+    @Property({ length: 60, nullable: true })
+    ctaSecondaryLabel: string | null = null;
+
+    /** In-app path of the second move; set together with `ctaSecondaryLabel`. */
+    @Property({ length: 200, nullable: true })
+    ctaSecondaryHref: string | null = null;
+
     /** When the household dismissed it; null = still shown. */
     @Property({ type: 'timestamptz', nullable: true })
     dismissedAt: Date | null = null;

@@ -1,137 +1,51 @@
 import type { Jar } from '@rumtelo/contracts';
-import { JarKey, SpendingStyle } from '@rumtelo/contracts';
+import { JarGroup, JarKey, sumPercentageByGroup } from '@rumtelo/contracts';
 
-import {
-    DEFAULT_JAR_SPLIT,
-    SPLIT_SOFT_CEILING,
-    SPLIT_SOFT_FLOOR,
-    type SplitPctByKey,
-    type SplitTip,
-} from './types';
+import { GROUP_SOFT_CEILING, GROUP_SOFT_FLOOR, type SplitPctByKey, type SplitTip } from './types';
 
 /**
- * Rule-based split coach (Phase A + B spending-style hooks).
- * Pure — no I/O. Pass declared spendingStyle from account settings.
+ * Rule-based split coach at group level, pure — no I/O. A household has three to eight pots,
+ * so the coach looks at what each group holds in total, never at one pot against a six-pot
+ * default. A pot the household does not have is not in `pct` and counts as 0 %.
+ *
+ * - Basics above `GROUP_SOFT_CEILING.BASIS` → `basics-high`: what must be paid takes most of
+ *   the income; look at the biggest fixed cost, not at squeezing the split.
+ * - Future below `GROUP_SOFT_FLOOR.FUTURE` → `future-low`: little is left to build with.
  */
-export function evaluateSplitCoach(
-    pct: SplitPctByKey,
-    spendingStyle: SpendingStyle = SpendingStyle.UNKNOWN
-): SplitTip[] {
+export function evaluateSplitCoach(pct: SplitPctByKey): SplitTip[] {
+    const entries = Object.entries(pct) as [JarKey, number][];
+    // No pots yet (list still loading): nothing to coach, and "0 % Future" would be a false alarm.
+    if (entries.length === 0) return [];
+
+    const groupShare = sumPercentageByGroup(
+        entries.map(([key, percentage]) => ({ key, percentage }))
+    );
     const tips: SplitTip[] = [];
-    const play = pct[JarKey.PLAY] ?? DEFAULT_JAR_SPLIT[JarKey.PLAY];
-    const give = pct[JarKey.GIVE] ?? DEFAULT_JAR_SPLIT[JarKey.GIVE];
-    const edu = pct[JarKey.EDUCATION] ?? DEFAULT_JAR_SPLIT[JarKey.EDUCATION];
-    const ff = pct[JarKey.FINANCIAL_FREEDOM] ?? DEFAULT_JAR_SPLIT[JarKey.FINANCIAL_FREEDOM];
-    const lts = pct[JarKey.LONG_TERM_SAVINGS] ?? DEFAULT_JAR_SPLIT[JarKey.LONG_TERM_SAVINGS];
-    const nec = pct[JarKey.NECESSITIES] ?? DEFAULT_JAR_SPLIT[JarKey.NECESSITIES];
 
-    const futureFirst = ff + lts;
-    const futureDefault =
-        DEFAULT_JAR_SPLIT[JarKey.FINANCIAL_FREEDOM] + DEFAULT_JAR_SPLIT[JarKey.LONG_TERM_SAVINGS];
-
-    if (play > SPLIT_SOFT_CEILING[JarKey.PLAY]) {
+    const basicsCeiling = GROUP_SOFT_CEILING[JarGroup.BASIS];
+    if (basicsCeiling !== undefined && groupShare[JarGroup.BASIS] > basicsCeiling) {
         tips.push({
-            id:
-                spendingStyle === SpendingStyle.SAVER
-                    ? 'play-above-default-saver'
-                    : 'play-above-default',
-            severity: 'warn',
-            jars: [JarKey.PLAY, JarKey.FINANCIAL_FREEDOM, JarKey.LONG_TERM_SAVINGS],
-        });
-    }
-
-    if (give > SPLIT_SOFT_CEILING[JarKey.GIVE]) {
-        tips.push({
-            id: 'give-above-default',
+            id: 'basics-high',
             severity: 'info',
-            jars: [JarKey.GIVE, JarKey.FINANCIAL_FREEDOM],
+            jars: [JarKey.NECESSITIES, JarKey.DAILY],
         });
     }
 
-    if (edu > SPLIT_SOFT_CEILING[JarKey.EDUCATION]) {
+    const futureFloor = GROUP_SOFT_FLOOR[JarGroup.FUTURE];
+    if (futureFloor !== undefined && groupShare[JarGroup.FUTURE] < futureFloor) {
         tips.push({
-            id: 'edu-above-soft',
-            severity: 'info',
-            jars: [JarKey.EDUCATION, JarKey.FINANCIAL_FREEDOM],
-        });
-    }
-
-    if (ff < SPLIT_SOFT_FLOOR[JarKey.FINANCIAL_FREEDOM]) {
-        tips.push({
-            id: 'ff-below-default',
+            id: 'future-low',
             severity: 'warn',
-            jars: [JarKey.FINANCIAL_FREEDOM],
+            jars: [
+                JarKey.LONG_TERM_SAVINGS,
+                JarKey.GOALS,
+                JarKey.FINANCIAL_FREEDOM,
+                JarKey.EDUCATION,
+            ],
         });
     }
 
-    if (lts < SPLIT_SOFT_FLOOR[JarKey.LONG_TERM_SAVINGS]) {
-        tips.push({
-            id: 'lts-below-default',
-            severity: 'warn',
-            jars: [JarKey.LONG_TERM_SAVINGS],
-        });
-    }
-
-    if (
-        futureFirst < futureDefault &&
-        (play > DEFAULT_JAR_SPLIT[JarKey.PLAY] || give > DEFAULT_JAR_SPLIT[JarKey.GIVE])
-    ) {
-        tips.push({
-            id: 'future-vs-fun',
-            severity: 'warn',
-            jars: [JarKey.PLAY, JarKey.GIVE, JarKey.FINANCIAL_FREEDOM, JarKey.LONG_TERM_SAVINGS],
-        });
-    }
-
-    // Soft ceiling — see money README → “When Necessities can’t fit in 55%”.
-    // Prefer cutting fixed costs / raising income over starving FF.
-    if (nec > SPLIT_SOFT_CEILING[JarKey.NECESSITIES]) {
-        tips.push({
-            id: 'nec-high',
-            severity: 'info',
-            jars: [JarKey.NECESSITIES],
-        });
-    }
-
-    if (nec < SPLIT_SOFT_FLOOR[JarKey.NECESSITIES]) {
-        tips.push({
-            id: 'nec-low',
-            severity: 'warn',
-            jars: [JarKey.NECESSITIES],
-        });
-    }
-
-    // Spending-style nudges — works once spendingStyle ≠ UNKNOWN
-    if (
-        spendingStyle === SpendingStyle.SPENDER &&
-        play >= DEFAULT_JAR_SPLIT[JarKey.PLAY] &&
-        ff <= DEFAULT_JAR_SPLIT[JarKey.FINANCIAL_FREEDOM]
-    ) {
-        tips.push({
-            id: 'spender-ff',
-            severity: 'info',
-            jars: [JarKey.PLAY, JarKey.FINANCIAL_FREEDOM],
-        });
-    }
-
-    if (spendingStyle === SpendingStyle.SAVER && play < 5 && ff + lts >= 25) {
-        tips.push({
-            id: 'saver-play',
-            severity: 'info',
-            jars: [JarKey.PLAY],
-        });
-    }
-
-    return dedupeTips(tips);
-}
-
-function dedupeTips(tips: SplitTip[]): SplitTip[] {
-    const seen = new Set<string>();
-    return tips.filter(tip => {
-        if (seen.has(tip.id)) return false;
-        seen.add(tip.id);
-        return true;
-    });
+    return tips;
 }
 
 /** Map jar list rows → % by key for the evaluator. */
@@ -144,4 +58,10 @@ export function pctByJarKey(
         out[jar.key] = pctById[jar.id] ?? jar.percentage;
     }
     return out;
+}
+
+/** Warnings before information, then the order the rules fire in (stable sort). */
+export function orderSplitTips(tips: readonly SplitTip[]): SplitTip[] {
+    const rank = (tip: SplitTip) => (tip.severity === 'warn' ? 0 : 1);
+    return tips.slice().sort((left, right) => rank(left) - rank(right));
 }

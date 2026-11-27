@@ -11,6 +11,7 @@ import { CoachMessage } from '../../../platform/coach/coach.schema';
 import { JarKey } from '../enums';
 import { JarBalance } from '../jar/jar.schema';
 import { MonthScore } from '../month-score/month-score.schema';
+import { MoneyProgress } from '../progress/progress.schema';
 
 export const DashboardTravel = z.object({
     direction: z.enum(['current', 'past', 'future']),
@@ -45,6 +46,12 @@ export const DashboardBaselineJar = z.object({
     allocated: Money,
 });
 
+/**
+ * First-run facts + board stage for Home — same shape as `money.progress.get`, so Home needs
+ * no second request. Kept as an alias for one release; prefer {@link MoneyProgress}.
+ */
+export const DashboardProgress = MoneyProgress;
+
 /** One aggregated read for the dashboard — avoids a waterfall of round trips. */
 export const Dashboard = z.object({
     period: PeriodKey,
@@ -69,6 +76,8 @@ export const Dashboard = z.object({
     coach: z.array(CoachMessage),
     monthScore: MonthScore,
     why: z.string().nullable(),
+    /** First-run facts and board stage for Home — independent of period travel. */
+    progress: DashboardProgress,
     /** Period-travel chrome — snapshot when viewing the live month. */
     travel: DashboardTravel,
     /** Open goals projected to the selected period (fulfillment / shortfalls). */
@@ -88,6 +97,7 @@ export const Dashboard = z.object({
 
 // Inferred types (same-module merge for consumers)
 export type Dashboard = z.infer<typeof Dashboard>;
+export type DashboardProgress = z.infer<typeof DashboardProgress>;
 export type DashboardTravel = z.infer<typeof DashboardTravel>;
 export type DashboardGoalAtPeriod = z.infer<typeof DashboardGoalAtPeriod>;
 export type DashboardDebtsAtPeriod = z.infer<typeof DashboardDebtsAtPeriod>;

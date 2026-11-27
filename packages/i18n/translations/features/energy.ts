@@ -4,10 +4,6 @@ const energy = {
         eyebrow: 'Energy · your capacity',
         title: 'The floor under every decision.',
         line: 'Grip on your energy — sleep, hours, training, food.',
-        fallback_coach_kind: 'THIS WEEK',
-        fallback_coach_text:
-            'Log sleep and training — energy is the floor under every money decision.',
-        fallback_coach_cta: 'Open your week',
         cards: {
             week: {
                 name: 'Week',
@@ -66,7 +62,7 @@ const energy = {
         page_title: 'My week',
         eyebrow: 'My week',
         title: 'Every hour gets a job too.',
-        lead: 'Log where a day went, in hours. The week is compared with what public-health bodies and field studies on three continents actually found — not with your jar percentages.',
+        lead: 'Log where a day went, in hours. The week is compared with what public-health bodies and field studies on three continents actually found — not with your pot percentages.',
         metric_sleep: 'Sleep',
         metric_train: 'Training',
         metric_food: 'Nutrition',

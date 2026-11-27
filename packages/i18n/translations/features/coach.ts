@@ -2,11 +2,11 @@
 const coach = {
     page_title: 'The Coach',
     eyebrow: 'Across every portal',
-    lead: 'One tip at a time from money, growth, energy, and soul — so you keep grip. Never shame. You choose.',
+    lead: 'One tip at a time from money, planning, energy, and mindset — so you keep grip. Never shame. You choose.',
     empty_title: 'Nothing to coach yet',
-    empty_body: 'Log income, jars, or sleep — the Coach speaks when there is enough to see.',
+    empty_body: 'Log income, pots, or sleep — the Coach speaks when there is enough to see.',
     empty_quiet:
-        'No open tips right now. The Coach speaks when a jar, habit, or week needs a nudge.',
+        'No open tips right now. The Coach speaks when a pot, habit, or week needs a nudge.',
     open_week: 'Open my week →',
     open_week_check: 'Open the week check →',
     session: {
@@ -14,12 +14,14 @@ const coach = {
         quiet_title: "You're caught up for now",
         quiet_body:
             'Nothing urgent is waiting. Close the month when you are ready, or check My week.',
+        quiet_body_core:
+            'Nothing urgent is waiting. Close the month when you are ready, or open the week check.',
         progress: '{done} of ~{total}',
         card_eyebrow: 'Next',
         answer_label: 'Your answer',
         insights_title: 'Insights',
         insights_lead: 'Tips from the portals — dismiss when they no longer help.',
-        prompt_inbox: 'Which jar for {who} ({amount})?',
+        prompt_inbox: 'Which pot for {who} ({amount})?',
         prompt_inbox_fallback: 'this transaction',
         prompt_due_bill: 'Was {name} ({amount}) paid this month, or skip it?',
         prompt_time_day: 'Was {day} a typical {kind}?',
@@ -29,7 +31,7 @@ const coach = {
         prompt_score_food: 'How well did you fuel today?',
         prompt_score_train: 'Did you train today? How was the session?',
         prompt_score_mind: 'Stillness today — how settled do you feel?',
-        prompt_week_look: 'Ten minutes for this week’s money check — look at the jars first.',
+        prompt_week_look: 'Ten minutes for this week’s money check — look at the pots first.',
         prompt_week_redirect: 'You have {amount} left this week. Redirect any of it?',
         prompt_week_redirect_empty: 'No surplus to redirect — continue to your intention.',
         prompt_week_intend: 'One sentence for this week — small enough to keep.',
@@ -61,8 +63,8 @@ const coach = {
         metric_sleep: 'Quality, not hours — the diary already holds sleep length.',
         metric_food: 'How well did you fuel — not a calorie log.',
         metric_train: 'Session quality if you trained; skip if you did not.',
-        metric_mind: 'Stillness / settled mind — same score Soul writes.',
-        toast_sorted: 'Sorted into a jar',
+        metric_mind: 'Stillness / settled mind — same score Mindset writes.',
+        toast_sorted: 'Sorted into a pot',
         toast_paid: 'Marked paid',
         toast_skipped: 'Skipped for this month',
         toast_time_logged: 'Day logged as typical',
@@ -78,66 +80,40 @@ const coach = {
         voice_discard: 'Discard',
         voice_unavailable: 'Voice is not available in this browser',
     },
+    /** The one Coach line per page (`CoachLine`): after the household's own data. */
+    line: {
+        label: 'The Coach',
+        hide: 'Hide this tip',
+        hidden: 'Tip hidden.',
+        undo: 'Undo',
+        locked_suffix: 'Plus',
+    },
     verdict: {
-        eyebrow: '✦ The Coach',
-        kind_nudge: 'Attention',
+        kind_nudge: 'Next move',
         kind_win: 'Win',
-        kind_warning: 'Warning',
+        kind_warning: 'Worth a look',
         kind_insight: 'Insight',
         kind_week_check: 'Week check',
         kind_on_track: 'On track',
-        kind_alert: 'Alert',
-        share: 'Share',
-        open: 'Open',
-        detail: 'Detail',
-        message_n: 'Message {n}',
-        month_score_badge: 'Month score',
-        month_score_slide: 'Month score advice',
-        previous: 'Previous',
-        next: 'Next',
-        collapse: 'Collapse',
-        expand: 'Show coach',
-        collapsed_clear: 'Nothing waiting — expand when you want the score',
-        collapsed_attention: 'Something needs you',
-        collapsed_waiting: '{count} waiting',
+        kind_alert: 'Act this week',
     },
     dismiss: 'Dismiss',
     got_it: 'Got it',
+    split_more: '{count, plural, =1 {1 more tip} other {# more tips}}',
     split_tips: {
-        'play-above-default':
-            'Play above 10% usually comes from Financial Freedom or Long Term Savings. Those two buy your future; Play spends this month.',
-        'play-above-default-saver':
-            'Play above 10% can be healthy if you under-spend joy — just don’t fund it by cutting Financial Freedom.',
-        'give-above-default':
-            'Give above 5% is generous — keep Financial Freedom at least at 10% so giving doesn’t replace paying yourself first.',
-        'edu-above-soft':
-            'Education raises earning power — still protect Financial Freedom at 10% so learning doesn’t crowd out investing.',
-        'ff-below-default':
-            'Financial Freedom under 10% means you’re paying everyone else first. Put yourself back in the split before raising Play or Give.',
-        'lts-below-default':
-            'Long Term Savings under 10% leaves no buffer for planned big things. Raise this before expanding Play.',
-        'future-vs-fun':
-            'You’re funding today (Play / Give) while shrinking tomorrow (Freedom + Long Term). Prefer raising those two before fun.',
-        'nec-high':
-            'Necessity above 60% squeezes every other jar. Cutting fixed costs usually helps more than cutting Freedom.',
-        'nec-low':
-            'Necessity under 45% is tight for most households — check rent, insurance and debt instalments still fit.',
-        'spender-ff':
-            'Your pattern leans spender — try +1–2% into Financial Freedom before adding more Play.',
-        'saver-play':
-            'Your pattern leans saver — a little more Play can make the plan sustainable. Joy that is planned is not waste.',
+        // Group-level tips for Rumtelo Pots (three pots by default); limits in GROUP_SOFT_CEILING / _FLOOR.
+        'basics-high':
+            'Basics is above 60% of your income — what must be paid takes most of it. Look at your biggest fixed cost first; the split is not the thing to squeeze.',
+        'future-low':
+            'Future is under 10% of your income, so little is left to build with. Move 1–2% from Free to Future.',
     },
     helpers: {
         mark_title: 'From The Coach — turn on-screen tips on or off in Settings → Preferences',
         mark_label: 'The Coach',
-        tip_aria: 'The Coach: {title}',
-        locked_cta: '🔒 {cta}',
         open_coach: 'Open The Coach',
-        why_aria: 'The Coach',
     },
     jar_guide: {
-        aria: 'The Coach for this jar',
-        heading: 'What can I use this for?',
+        summary: 'What is {jar} for?',
         allowed: 'This may go to',
         give_who: 'Who should receive it?',
         give_hint:
@@ -147,10 +123,8 @@ const coach = {
         add_transaction: 'Add transaction',
         learn_nudge_title: 'Grow with Learn',
         learn_nudge:
-            'Put titles on your Learn shelf, browse the library for inspiration, and add a goal on this jar when you are ready to claim the spend.',
-        split_inside: 'Split inside this jar',
-        footer: 'The Coach — tips without shame.',
-        turn_off: 'Turn tips off',
+            'Put titles on your Learn shelf, browse the library for inspiration, and add a goal on this pot when you are ready to claim the spend.',
+        split_inside: 'Split inside this pot',
     },
     /** Rule-based tips from money tip producers (`money.*` keys). */
     money_coach: {
@@ -162,12 +136,43 @@ const coach = {
             cta: 'Open fixed costs',
         },
         inbox_unsorted: {
-            text: '{count} transactions wait in the inbox. Sort them into jars so the picture stays honest.',
-            cta: 'Open inbox',
+            text: '{count} transactions are waiting to be sorted. Sort them into pots so the picture stays honest.',
+            cta: 'Sort transactions',
+        },
+        fixed_costs: {
+            over_necessities: {
+                text: '{jar} bills come to {amount} a month more than the pot gets.',
+                cta: 'Add income',
+                cta_secondary: 'Open the biggest fixed cost',
+            },
+            business_leak: {
+                text: '{amount} a month in business costs is paid from your household.',
+                cta: 'See linked bills',
+            },
+            subscription_review: {
+                text_one: '1 subscription costs {amount} a month. Still using it?',
+                text_other: '{count} subscriptions cost {amount} a month. Still using all of them?',
+                cta: 'Review subscriptions',
+            },
         },
         necessities_share: {
-            text: 'Necessities is at {pct}% — the goal is 55%. Fine for now; to close the gap, trim fixed costs or raise income and leave Freedom untouched.',
-            cta: 'Review jars',
+            text: 'Basics is at {pct}%, above the 55% the default split starts from. Fine for now — to bring it down, trim fixed costs or raise income.',
+            cta: 'Review pots',
+        },
+        /** Household-wide fixed-cost tips (`money.fixed_costs.*` keys). */
+        over_necessities: {
+            text: '{jar} bills come to {amount} a month more than the pot gets.',
+            cta: 'Add income',
+            cta_secondary: 'Open the biggest fixed cost',
+        },
+        business_leak: {
+            text: '{amount} a month in business costs is paid from your household.',
+            cta: 'Review these bills',
+        },
+        subscription_review: {
+            text_one: '1 subscription costs {amount} a month. Still using it?',
+            text_other: '{count} subscriptions cost {amount} a month. Still using all of them?',
+            cta: 'Review subscriptions',
         },
     },
     /** Rule-based tips from the energy time-week coach (`energy.time.*` keys). */
@@ -205,19 +210,6 @@ const coach = {
         },
     },
     /** Looking Ahead / Looking Back coach line on money dashboard & portal hub. */
-    period_travel: {
-        looking_back_one:
-            'Looking back at {stamp} ({relativeLabel}): about {money} moved through your jars that month.',
-        looking_back_other:
-            'Looking back at {stamp} ({relativeLabel}): about {money} moved through your jars that month.',
-        looking_ahead_one:
-            'By {stamp}, if you keep this plan, about {money} will have moved through your jars across {horizon} month.',
-        looking_ahead_other:
-            'By {stamp}, if you keep this plan, about {money} will have moved through your jars across {horizon} months.',
-        pace_needed: '{name} still needs pace — roughly {money}/mo net to make the date.',
-        past_note: 'Lifetime goal saved and live debt are not rewound for past months.',
-        jar_highlight: '{name} {from} → {to}',
-    },
 } as const;
 
 export default coach;

@@ -48,6 +48,10 @@ import { IncomeAmountPeriod } from '../../../modules/public/product/money/plan/i
 import { IncomeSource } from '../../../modules/public/product/money/plan/income/income-source.entity';
 import { Party } from '../../../modules/public/product/money/plan/party/party.entity';
 import { Jar } from '../../../modules/public/product/money/plan/jar/jar.entity';
+import {
+    JAR_SHARE_BASELINE_PERIOD,
+    JarShare,
+} from '../../../modules/public/product/money/plan/jar/jar-share.entity';
 import { Category } from '../../../modules/public/product/money/plan/jar/category.entity';
 import { Debt } from '../../../modules/public/product/money/targets/debt/debt.entity';
 import { Goal } from '../../../modules/public/product/money/targets/goal/goal.entity';
@@ -63,8 +67,12 @@ loadEnvFiles();
 /** Where the max persona's Give jar flows — a name from the giving-organization catalog. */
 const DEMO_GIVE_COUNTERPARTY = 'GiveDirectly';
 
-/** Persona jar splits (must sum to 100) — shaped for the story, not the catalog default. */
-const JAR_SPLIT: Record<DemoPersona, Record<string, number>> = {
+/**
+ * Persona jar splits (must sum to 100) — shaped for the story, not the catalog default.
+ * A demo household gets exactly the pots named here: templates without a persona share
+ * (DAILY, GOALS, any later optional pot) are skipped, so the split still sums to 100.
+ */
+const JAR_SPLIT: Record<DemoPersona, Partial<Record<JarKey, number>>> = {
     basic: {
         NECESSITIES: 55,
         FINANCIAL_FREEDOM: 5,
@@ -81,10 +89,13 @@ const JAR_SPLIT: Record<DemoPersona, Record<string, number>> = {
         PLAY: 20,
         GIVE: 10,
     },
+    // An owner who builds: Future 40. Basics stays at 45 because this persona's bills on
+    // Basics (mortgage, tax, insurance, groceries, hosting) come to about 40 % of its income;
+    // a lower share put the demo board in the red on day one.
     max: {
-        NECESSITIES: 35,
-        FINANCIAL_FREEDOM: 25,
-        EDUCATION: 10,
+        NECESSITIES: 45,
+        FINANCIAL_FREEDOM: 20,
+        EDUCATION: 5,
         LONG_TERM_SAVINGS: 15,
         PLAY: 10,
         GIVE: 5,
@@ -291,6 +302,8 @@ export class DemoHouseholdSeeder extends Seeder {
         const features = {
             isBankSyncEnabled: demo.persona !== 'basic',
             isCoachEnabled: true,
+            isCourseQuartersEnabled: false,
+            isCourseDaysEnabled: false,
         };
 
         if (!settings) {
@@ -338,13 +351,15 @@ export class DemoHouseholdSeeder extends Seeder {
         if (jarCount === 0) {
             for (const meta of templates) {
                 const pct = split[meta.key];
+                // Only the persona's pots: an optional template without a share stays off.
+                if (typeof pct !== 'number') continue;
                 em.create(Jar, {
                     household: householdId,
                     key: meta.key,
                     name: meta.name,
                     subtitle: meta.subtitle,
                     icon: meta.icon,
-                    percentage: typeof pct === 'number' ? `${pct}.00` : meta.percentage,
+                    percentage: pct.toFixed(2),
                     capabilities: { ...meta.capabilities },
                     sortOrder: meta.sortOrder,
                 } as never);
@@ -365,6 +380,7 @@ export class DemoHouseholdSeeder extends Seeder {
             { orderBy: { sortOrder: 'ASC' } }
         );
         const jarMap = toJarMap(jars);
+        await this.ensureBaselineShares(em, householdId, jars);
 
         const incomeCount = await em.count(IncomeSource, { household: householdId });
         if (incomeCount === 0) {
@@ -390,7 +406,7 @@ export class DemoHouseholdSeeder extends Seeder {
 
         await em.flush();
 
-        // Jar-sorted demo rows still need categoryId — otherwise Six Jars shows Uncategorized.
+        // Jar-sorted demo rows still need categoryId — otherwise the pots screen shows Uncategorized.
         await this.linkDemoCategories(em, householdId, jars);
         await em.flush();
 
@@ -1680,6 +1696,37 @@ export class DemoHouseholdSeeder extends Seeder {
     }
 
     /**
+     * One baseline share row per demo pot (period {@link JAR_SHARE_BASELINE_PERIOD}) carrying the
+     * pot's current percentage, like the migration that created `money_jar_share` wrote for real
+     * households. A re-run brings an existing baseline row in line with the persona split.
+     */
+    private async ensureBaselineShares(
+        em: EntityManager,
+        householdId: string,
+        jars: Jar[]
+    ): Promise<void> {
+        const baselines = await em.find(JarShare, {
+            household: householdId,
+            period: JAR_SHARE_BASELINE_PERIOD,
+        });
+        const baselineByJar = new Map(baselines.map(share => [share.jar.id, share]));
+        for (const jar of jars) {
+            const baseline = baselineByJar.get(jar.id);
+            if (baseline) {
+                baseline.percentage = jar.percentage;
+                continue;
+            }
+            em.create(JarShare, {
+                household: householdId,
+                jar,
+                period: JAR_SHARE_BASELINE_PERIOD,
+                percentage: jar.percentage,
+            } as never);
+        }
+        await em.flush();
+    }
+
+    /**
      * Copy category templates into the household and attach them to demo fixed
      * costs / transactions (catalog presets + demo name hints).
      * Without this, jar-sorted rows stay categoryId=null → UI "Uncategorized".
@@ -1838,8 +1885,18 @@ export class DemoHouseholdSeeder extends Seeder {
     }
 }
 
+/**
+ * Every persona names all six classic pots in `JAR_SPLIT`, so a missing jar is a seeding bug.
+ * Throw instead of falling back to another pot: demo transactions on the wrong jar would hide it.
+ */
 function toJarMap(jars: Jar[]): JarMap {
-    const byKey = (key: JarKey) => jars.find(j => j.key === key) ?? jars[0]!;
+    const byKey = (key: JarKey): Jar => {
+        const jar = jars.find(candidate => candidate.key === key);
+        if (!jar) {
+            throw new Error(`DemoHouseholdSeeder: demo household has no ${key} jar`);
+        }
+        return jar;
+    };
     return {
         necessities: byKey(JarKey.NECESSITIES),
         ff: byKey(JarKey.FINANCIAL_FREEDOM),

@@ -8,6 +8,7 @@ import {
     type Transaction,
 } from '@rumtelo/contracts';
 
+import { jarForKey } from '@/app/_lib/jar-for-key';
 import { matchMerchantJarKey } from '@/app/_lib/merchant-match';
 
 export type InboxSuggestConfidence = 'high' | 'low';
@@ -121,7 +122,6 @@ export function suggestInboxJar(input: {
 }): InboxSuggestion {
     const { transaction, jars, merchants, rules, payeeMemory } = input;
     const jarById = new Map(jars.map(jar => [jar.id, jar]));
-    const jarByKey = new Map(jars.map(jar => [jar.key, jar]));
 
     function fromJarId(jarId: string | null | undefined): InboxSuggestion | null {
         if (!jarId) return null;
@@ -135,10 +135,11 @@ export function suggestInboxJar(input: {
         confidence: InboxSuggestConfidence
     ): InboxSuggestion {
         if (!jarKey) return { jarId: null, jarKey: null, confidence };
-        const jar = jarByKey.get(jarKey);
+        // A catalog key the household has not turned on resolves to its group's main pot.
+        const jar = jarForKey(jars, jarKey);
         return {
             jarId: jar?.id ?? null,
-            jarKey,
+            jarKey: jar?.key ?? jarKey,
             confidence,
         };
     }

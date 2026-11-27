@@ -12,5 +12,9 @@ export type {
     HouseholdAnswers,
     HouseholdSettings,
     HouseholdSettingsPatch,
+    HouseholdSeatUsage,
+    JarSplitShare,
     OnboardingInput,
+    OnboardingSplitPreview,
+    OnboardingSplitPreviewInput,
 } from './household.schema';

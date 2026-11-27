@@ -23,7 +23,6 @@ export const CoachFeatureId = {
     DEBT_STRATEGY: 'debt_strategy',
     NECESSITIES_PRESSURE: 'necessities_pressure',
     JAR_GUIDE: 'jar_guide',
-    WHY_CAPTION: 'why_caption',
     PERIOD_TRAVEL: 'period_travel',
     GIVING_FINDER: 'giving_finder',
     GOAL_ADVICE: 'goal_advice',
@@ -36,7 +35,7 @@ export const CoachFeatureId = {
     GROWTH_TIP_PRODUCERS: 'growth_tip_producers',
     SOUL_TIP_PRODUCERS: 'soul_tip_producers',
     HOUSEHOLD_COACH_TOGGLE: 'household_coach_toggle',
-    COACH_GUIDE_SURFACE: 'coach_guide_surface',
+    COACH_LINE: 'coach_line',
     FEED_KEY_I18N: 'feed_key_i18n',
 } as const;
 
@@ -84,28 +83,21 @@ export const COACH_FEATURES: readonly CoachFeature[] = [
         id: CoachFeatureId.NECESSITIES_PRESSURE,
         status: CoachFeatureStatus.SHIP,
         title: 'Necessities pressure',
-        where: 'Money → Fixed costs',
+        where: 'Coach line on Money overview + Fixed costs',
         gaps: [],
     },
     {
         id: CoachFeatureId.JAR_GUIDE,
         status: CoachFeatureStatus.SHIP,
         title: 'Jar guide card',
-        where: 'Money → Jar detail',
-        gaps: [],
-    },
-    {
-        id: CoachFeatureId.WHY_CAPTION,
-        status: CoachFeatureStatus.SHIP,
-        title: 'Shell why-line',
-        where: 'App shell under header',
+        where: 'Jar detail disclosure',
         gaps: [],
     },
     {
         id: CoachFeatureId.PERIOD_TRAVEL,
         status: CoachFeatureStatus.SHIP,
         title: 'Period travel coach copy',
-        where: 'Money portal Looking Ahead/Back',
+        where: 'Home month-score note',
         gaps: [],
     },
     {
@@ -159,8 +151,8 @@ export const COACH_FEATURES: readonly CoachFeature[] = [
     {
         id: CoachFeatureId.SPLIT_COACH_C,
         status: CoachFeatureStatus.BACKLOG,
-        title: 'Split coach Phase C — weekly Home card',
-        where: 'Home / Jars',
+        title: 'Split coach Phase C — weekly split tip as a feed producer',
+        where: 'Shows in the Home Coach line',
         gaps: ['Not built — see split-coach README'],
     },
     {
@@ -172,10 +164,10 @@ export const COACH_FEATURES: readonly CoachFeature[] = [
     },
     {
         id: CoachFeatureId.GROWTH_TIP_PRODUCERS,
-        status: CoachFeatureStatus.BACKLOG,
+        status: CoachFeatureStatus.SHIP,
         title: 'Growth inbox tip producers',
-        where: 'CoachService.registerRefresher',
-        gaps: ['No growth domain refresher yet'],
+        where: 'CourseCoachService → CoachService.registerRefresher (Course › Rhythm)',
+        gaps: [],
     },
     {
         id: CoachFeatureId.SOUL_TIP_PRODUCERS,
@@ -192,11 +184,11 @@ export const COACH_FEATURES: readonly CoachFeature[] = [
         gaps: ['Schema default exists; not read by UI or CoachService'],
     },
     {
-        id: CoachFeatureId.COACH_GUIDE_SURFACE,
-        status: CoachFeatureStatus.BACKLOG,
-        title: 'Adopt CoachGuideSurface at call sites',
-        where: 'On-screen helpers',
-        gaps: ['Component exported; few/no consumers'],
+        id: CoachFeatureId.COACH_LINE,
+        status: CoachFeatureStatus.SHIP,
+        title: 'One Coach line per page, after your data',
+        where: 'Home, Money overview, Fixed costs, holding detail',
+        gaps: [],
     },
     {
         id: CoachFeatureId.FEED_KEY_I18N,

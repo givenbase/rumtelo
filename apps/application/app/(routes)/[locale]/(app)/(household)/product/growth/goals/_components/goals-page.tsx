@@ -2,7 +2,7 @@
 
 import { apiQuery } from '@/app/_lib/api-hooks';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useDeferredValue, useMemo, useState } from 'react';
 import { useLocale } from 'next-intl';
 
 import {
@@ -32,12 +32,14 @@ import { isFocusSaveGoal, saveGoalRank } from '@/app/_lib/goal-focus';
 import { isLiveData } from '@/app/_lib/preview';
 import { useHouseholdCurrency } from '@/app/_lib/use-household-currency';
 import { useJarCatalog } from '@/app/_lib/use-jar-catalog';
+import { useJarName } from '@/app/_lib/use-jar-name';
 import { GoalKindMark } from '@/components/features/growth/goal-kind-mark';
 import { JarBadge, JarMark } from '@/components/features/money/jar-badge';
 import { PlanCapacityCreate } from '@/components/features/shell/plan-capacity-create';
 import { useHouseholdShell } from '@/components/features/shell/household-shell-context';
 import { useAuth } from '@/components/features/shell/auth-provider';
 import { usePlanCapacity } from '@/components/features/shell/use-plan-capacity';
+import { ListSearchField } from '@/components/layout/list-controls';
 import { ListToolbar } from '@/components/layout/list-toolbar';
 
 type Tab = 'ON_TRACK' | 'REACHED';
@@ -206,12 +208,15 @@ export function GoalsPageClient() {
     const t = useTranslations('features.growth.goals');
     const tDetail = useTranslations('features.growth.goals.detail');
     const tShell = useTranslations('pages.shell');
+    const jarName = useJarName();
     const locale = useLocale();
     const { householdId } = useAuth();
     const { period } = useHouseholdShell();
     const [tab, setTab] = useState<Tab>('ON_TRACK');
     const [kindFilter, setKindFilter] = useState<KindFilter>('ALL');
     const [jarFilter, setJarFilter] = useState<JarKey | null>(null);
+    const [search, setSearch] = useState('');
+    const deferredSearch = useDeferredValue(search.trim().toLowerCase());
     const [openKindKeys, setOpenKindKeys] = useState<Set<string>>(() => new Set());
     const { formatMoney } = useHouseholdCurrency();
     const live = isLiveData(householdId);
@@ -251,10 +256,11 @@ export function GoalsPageClient() {
     const jarById = useMemo(() => {
         const map = new Map<string, { id: string; key: JarKey; name: string }>();
         for (const jar of jarsQuery.data ?? []) {
-            map.set(jar.id, { id: jar.id, key: jar.key, name: jar.name });
+            // Resolved once here so every badge and label below shows the pot's current name.
+            map.set(jar.id, { id: jar.id, key: jar.key, name: jarName(jar) });
         }
         return map;
-    }, [jarsQuery.data]);
+    }, [jarName, jarsQuery.data]);
 
     const goals = useMemo((): ReadonlyArray<Goal> => goalsQuery.data ?? [], [goalsQuery.data]);
     /** Backend `assertWithinLimit('maxGoals')` counts ACTIVE status only. */
@@ -333,7 +339,9 @@ export function GoalsPageClient() {
             const jar = goal.jarId ? jarById.get(goal.jarId) : null;
             if (!jar || jar.key !== jarFilter) return false;
         }
-        return true;
+        if (!deferredSearch) return true;
+        const hay = `${goal.name} ${goal.why ?? ''}`.toLowerCase();
+        return hay.includes(deferredSearch);
     });
 
     const featured = shown.length > 0 && shown.length <= FEATURED_MAX;
@@ -432,6 +440,15 @@ export function GoalsPageClient() {
                 })}
             </ListToolbar>
 
+            {tabGoals.length > 0 ? (
+                <ListSearchField
+                    value={search}
+                    onChange={setSearch}
+                    placeholder={t('search_placeholder')}
+                    ariaLabel={t('search_aria')}
+                />
+            ) : null}
+
             {kindsPresent.length > 1 || saveJarKeys.length > 1 ? (
                 <div className="grid gap-3">
                     {kindsPresent.length > 1 ? (
@@ -495,9 +512,10 @@ export function GoalsPageClient() {
                                 {saveJarKeys.map(key => {
                                     const on = jarFilter === key;
                                     const catalog = jarByKey.get(key);
+                                    // The household's own pot first (its name is already resolved), then the catalog.
                                     const name =
-                                        catalog?.name ??
                                         [...jarById.values()].find(jar => jar.key === key)?.name ??
+                                        (catalog ? jarName(catalog) : undefined) ??
                                         key;
                                     return (
                                         <button
@@ -529,13 +547,21 @@ export function GoalsPageClient() {
             {shown.length === 0 ? (
                 <EmptyState
                     icon="target"
-                    title={tab === 'REACHED' ? t('reached_empty_title') : t('empty_title')}
+                    title={
+                        deferredSearch
+                            ? t('empty_search_title')
+                            : tab === 'REACHED'
+                              ? t('reached_empty_title')
+                              : t('empty_title')
+                    }
                     body={
-                        tab === 'REACHED'
-                            ? t('reached_empty_body')
-                            : kindFilter !== 'ALL' || jarFilter
-                              ? t('empty_filter_body')
-                              : t('empty_body')
+                        deferredSearch
+                            ? t('empty_search_body')
+                            : tab === 'REACHED'
+                              ? t('reached_empty_body')
+                              : kindFilter !== 'ALL' || jarFilter
+                                ? t('empty_filter_body')
+                                : t('empty_body')
                     }
                 />
             ) : featured ? (
